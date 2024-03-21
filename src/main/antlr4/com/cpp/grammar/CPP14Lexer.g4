@@ -1,8 +1,10 @@
 lexer grammar CPP14Lexer;
 
+/*
 PreProcessorLiteral:
     '<' Cchar+ '>'
     ;
+ */
 
 IntegerLiteral:
 	DecimalLiteral Integersuffix?
@@ -57,11 +59,13 @@ LineBreakCombiner: '\\' '\r'? '\n' -> channel (HIDDEN);
 
 /*Keywords*/
 
+/*
 Pragma_Once: '#pragma once';
 
 Preprocessor_Include: '#include';
 Preprocessor_If: '#if';
 Preprocessor_Endif: '#endif';
+ */
 
 Alignas: 'alignas';
 

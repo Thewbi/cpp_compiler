@@ -1,0 +1,3 @@
+https://google.github.io/styleguide/cppguide.html
+https://github.com/limitedeternity/some-gists/tree/master/CPPStuff
+https://github.com/vic4key/blah-blah/blob/master/cpp/design-pattern-builder.cpp

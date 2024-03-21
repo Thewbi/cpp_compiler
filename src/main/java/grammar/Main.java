@@ -31,7 +31,8 @@ public class Main {
         //final String filename = "src/test/resources/pragma.h";
         //final String filename = "src/test/resources/preprocessor.cpp";
         //final String filename = "src/test/resources/scratchpad.h";
-        final String filename = "src/test/resources/test_f.cpp";
+        final String filename = "src/test/resources/template.h";
+        //final String filename = "src/test/resources/test_f.cpp";
         //final String filename = "src/test/resources/variables.cpp";
 
         final CharStream charStream = CharStreams

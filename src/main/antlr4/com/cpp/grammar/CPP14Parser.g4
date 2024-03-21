@@ -32,16 +32,17 @@ options {
 
 translationUnit: 
     (
-        pragma_directive
-        |
-        preprocessor_directive
-        |
+//        pragma_directive
+//        |
+//        preprocessor_directive
+//        |
         declarationseq
     )*
     EOF
     ;
 /*Expressions*/
 
+/*
 pragma_directive:
     Pragma_Once
     ;
@@ -55,7 +56,8 @@ preprocessor_directive:
     |
     Preprocessor_Endif
     ;
-
+ */
+ 
 primaryExpression:
 	literal+
 	| This
