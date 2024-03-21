@@ -30,8 +30,31 @@ options {
 
 /*Basic concepts*/
 
-translationUnit: declarationseq? EOF;
+translationUnit: 
+    (
+        pragma_directive
+        |
+        preprocessor_directive
+        |
+        declarationseq
+    )*
+    EOF
+    ;
 /*Expressions*/
+
+pragma_directive:
+    Pragma_Once
+    ;
+
+preprocessor_directive:
+    //MultiLineMacro
+    //|
+    Preprocessor_Include ( UserDefinedStringLiteral | PreProcessorLiteral )
+    |
+    Preprocessor_If expression
+    |
+    Preprocessor_Endif
+    ;
 
 primaryExpression:
 	literal+

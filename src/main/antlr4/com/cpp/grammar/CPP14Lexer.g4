@@ -1,5 +1,9 @@
 lexer grammar CPP14Lexer;
 
+PreProcessorLiteral:
+    '<' Cchar+ '>'
+    ;
+
 IntegerLiteral:
 	DecimalLiteral Integersuffix?
 	| OctalLiteral Integersuffix?
@@ -37,11 +41,27 @@ UserDefinedLiteral:
 	| UserDefinedStringLiteral
 	| UserDefinedCharacterLiteral;
 
-MultiLineMacro:
-	'#' (~[\n]*? '\\' '\r'? '\n')+ ~ [\n]+ -> channel (HIDDEN);
+// MultiLineMacro:
+// 	'#' (~[\n]*? '\\' '\r'? '\n')+ ~ [\n]+ -> channel (HIDDEN);
 
-Directive: '#' ~ [\n]* -> channel (HIDDEN);
+// Directive: '#' ~ [\n]* -> channel (HIDDEN);
+
+// MultiLineMacro:
+// 	'#' (~[\n]*? '\\' '\r'? '\n')+ ~ [\n]
+//     ;
+
+// Directive: '#' ~ [\n]
+//     ;
+
+LineBreakCombiner: '\\' '\r'? '\n' -> channel (HIDDEN);
+
 /*Keywords*/
+
+Pragma_Once: '#pragma once';
+
+Preprocessor_Include: '#include';
+Preprocessor_If: '#if';
+Preprocessor_Endif: '#endif';
 
 Alignas: 'alignas';
 

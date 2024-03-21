@@ -25,8 +25,17 @@ public class Main {
     private static void translationUnit() throws IOException {
         System.out.println("translationUnit");
 
+        //final String filename = "src/test/resources/helloworld.cpp";
+        //final String filename = "src/test/resources/interface.h";
+        //final String filename = "src/test/resources/main.cpp";
+        //final String filename = "src/test/resources/pragma.h";
+        //final String filename = "src/test/resources/preprocessor.cpp";
+        //final String filename = "src/test/resources/scratchpad.h";
+        final String filename = "src/test/resources/test_f.cpp";
+        //final String filename = "src/test/resources/variables.cpp";
+
         final CharStream charStream = CharStreams
-                .fromFileName("src/test/resources/helloworld.cpp");
+                .fromFileName(filename);
 
         final CPP14Lexer lexer = new CPP14Lexer(charStream);
 
