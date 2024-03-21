@@ -9,7 +9,10 @@ import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
 import com.cpp.grammar.CPP14Lexer;
 import com.cpp.grammar.CPP14Parser;
+import com.cpp.grammar.PreprocessorLexer;
+import com.cpp.grammar.PreprocessorParser;
 import com.cpp.grammar.CPP14Parser.TranslationUnitContext;
+import com.cpp.grammar.PreprocessorParser.StreamContext;
 
 /**
  * https://en.cppreference.com/w/cpp/language/translation_phases
@@ -18,11 +21,39 @@ public class Main {
 
     public static void main(String[] args) throws IOException {
         System.out.println("Start");
-        translationUnit();
+        preProcessor();
+        //translationUnit();
         System.out.println("End");
     }
 
+    private static void preProcessor() throws IOException {
+
+        //final String filename = "src/test/resources/preprocessor.cpp";
+        final String filename = "src/test/resources/preprocessor2.cpp";
+
+        final CharStream charStream = CharStreams
+                .fromFileName(filename);
+
+        final PreprocessorLexer lexer = new PreprocessorLexer(charStream);
+
+        // create a buffer of tokens pulled from the lexer
+        final CommonTokenStream tokens = new CommonTokenStream(lexer);
+
+        final PreprocessorParser parser = new PreprocessorParser(tokens);
+
+        // parse
+        StreamContext root = parser.stream();
+
+        PreprocessorParserListener listener = new PreprocessorParserListener();
+
+        // // Create a generic parse tree walker that can trigger callbacks
+        final ParseTreeWalker walker = new ParseTreeWalker();
+        // Walk the tree created during the parse, trigger callbacks
+        walker.walk(listener, root);
+    }
+
     private static void translationUnit() throws IOException {
+
         System.out.println("translationUnit");
 
         //final String filename = "src/test/resources/helloworld.cpp";
