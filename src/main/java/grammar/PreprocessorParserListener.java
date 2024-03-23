@@ -14,26 +14,41 @@ public class PreprocessorParserListener extends PreprocessorParserBaseListener {
 
     private boolean insert;
 
-    // @Override
-    // public void exitNormal_row(PreprocessorParser.Normal_rowContext ctx) {
-    //     System.out.println("\"" + ctx.getText() + "\"");
-    // }
+    @Override
+    public void enterPifdef(PreprocessorParser.PifdefContext ctx) {
+        insert = false;
+    }
 
-    // @Override
-    // public void enterPreproc_row(PreprocessorParser.Preproc_rowContext ctx) {
-    //     insert = false;
-    // }
+    @Override
+    public void exitPifdef(PreprocessorParser.PifdefContext ctx) {
+        insert = true;
+    }
 
-    // @Override
-    // public void exitPreproc_row(PreprocessorParser.Preproc_rowContext ctx) {
-    //     insert = true;
-    // }
+    @Override
+    public void enterPelse(PreprocessorParser.PelseContext ctx) {
+        insert = false;
+    }
 
-    // @Override
-    // public void exitInclude_pcmd(PreprocessorParser.Include_pcmdContext ctx) {
-    //     // System.out.println(ctx.StringLiteral());
-    //     // System.out.println(ctx.TriStringLiteral());
-    // }
+    @Override
+    public void exitPelse(PreprocessorParser.PelseContext ctx) {
+        insert = true;
+    }
+
+    @Override
+    public void enterPendif(PreprocessorParser.PendifContext ctx) {
+        insert = false;
+    }
+
+    @Override
+    public void exitPendif(PreprocessorParser.PendifContext ctx) {
+        insert = true;
+    }
+
+    @Override
+    public void exitCode_block(PreprocessorParser.Code_blockContext ctx) {
+        System.out.println(stringBuilder.toString());
+        stringBuilder.delete(0, stringBuilder.length());
+    }
 
     @Override
     public void enterEveryRule(ParserRuleContext ctx) {
@@ -49,10 +64,10 @@ public class PreprocessorParserListener extends PreprocessorParserBaseListener {
 
     @Override
     public void visitTerminal(TerminalNode node) {
-        descend();
-        printIndent();
-        System.out.println(node.getText());
-        ascend();
+        // descend();
+        // printIndent();
+        // System.out.println(node.getText());
+        // ascend();
 
         if (stringBuilder != null) {
             if (insert) {
