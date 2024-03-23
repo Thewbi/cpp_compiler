@@ -12,17 +12,17 @@ NEWLINE : '\r'? '\n';
 //TEXT : ~[#]+ ;
 TEXT : ~[\r\n];
 
-PIFDEFStart : [ ]* '#ifdef' -> pushMode(PreProcIFDEF) ;
-PELSEStart : [ ]* '#else' -> pushMode(PreProcELSE) ;
-PENDIFStart : [ ]* '#endif' -> pushMode(PreProcENDIF) ;
-PINCLUDEStart : [ ]* '#include' -> pushMode(PreProcINCLUDE) ;
+PIFDEFStart     : [ ]* '#ifdef' -> pushMode(PreProcIFDEF) ;
+PELSEStart      : [ ]* '#else' -> pushMode(PreProcELSE) ;
+PENDIFStart     : [ ]* '#endif' -> pushMode(PreProcENDIF) ;
+PINCLUDEStart   : [ ]* '#include' -> pushMode(PreProcINCLUDE) ;
 
 
 
 
 mode PreProcINCLUDE ;
 
-PINCLUDEPTEXT   : [a-zA-Z0-9_-]+ ;
+PINCLUDEPTEXT  : '"' ( [a-zA-Z0-9_-] | '.') + '"';
 PINCLUDEPEOL   : '\r'? '\n'    -> popMode ;
 PINCLUDEPWS    : [ \t]+        -> channel(HIDDEN) ;
 PINCLUDEPCMT   : '//' ~[\r\n]* -> channel(HIDDEN) ;

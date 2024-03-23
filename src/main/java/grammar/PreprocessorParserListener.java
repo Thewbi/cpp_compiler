@@ -28,7 +28,7 @@ public class PreprocessorParserListener extends PreprocessorParserBaseListener {
         TerminalNode terminalNode = ctx.PINCLUDEPTEXT().get(0);
 
         String filename = terminalNode.getText();
-        filename = filename.substring(1);
+        filename = StringUtils.replace(filename, "\"", "");
 
         System.out.println("Including: \"" + filename + "\"");
 
