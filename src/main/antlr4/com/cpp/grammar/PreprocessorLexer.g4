@@ -12,10 +12,10 @@ NEWLINE : '\r'? '\n';
 //TEXT : ~[#]+ ;
 TEXT : ~[\r\n];
 
-PIFDEFStart : '#ifdef' -> pushMode(PreProcIFDEF) ;
-PELSEStart : '#else' -> pushMode(PreProcELSE) ;
-PENDIFStart : '#endif' -> pushMode(PreProcENDIF) ;
-PINCLUDEStart : '#include' -> pushMode(PreProcINCLUDE) ;
+PIFDEFStart : [ ]* '#ifdef' -> pushMode(PreProcIFDEF) ;
+PELSEStart : [ ]* '#else' -> pushMode(PreProcELSE) ;
+PENDIFStart : [ ]* '#endif' -> pushMode(PreProcENDIF) ;
+PINCLUDEStart : [ ]* '#include' -> pushMode(PreProcINCLUDE) ;
 
 
 

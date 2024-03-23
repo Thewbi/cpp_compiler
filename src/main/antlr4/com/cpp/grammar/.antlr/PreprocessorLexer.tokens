@@ -18,7 +18,3 @@ PELSEPCMT=17
 PENDIFPEOL=18
 PENDIFPWS=19
 PENDIFPCMT=20
-'#ifdef'=3
-'#else'=4
-'#endif'=5
-'#include'=6
