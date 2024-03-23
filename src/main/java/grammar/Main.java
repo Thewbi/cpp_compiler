@@ -5,6 +5,9 @@ import java.util.Collection;
 import java.util.List;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
 
 import java.io.File;
 
@@ -45,6 +48,7 @@ public class Main {
         preProcessor(filename, processedIncludeFiles, stringBuilder);
 
         System.out.println(stringBuilder.toString());
+        Files.writeString(Paths.get("preprocessed.cpp"), stringBuilder.toString());
 
         // translationUnit();
 
