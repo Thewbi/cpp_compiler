@@ -14,27 +14,31 @@ public class PreprocessorParserListener extends PreprocessorParserBaseListener {
 
     private boolean insert;
 
-    @Override
-    public void enterPreproc_row(PreprocessorParser.Preproc_rowContext ctx) {
-        insert = false;
-    }
+    // @Override
+    // public void exitNormal_row(PreprocessorParser.Normal_rowContext ctx) {
+    //     System.out.println("\"" + ctx.getText() + "\"");
+    // }
 
-    @Override
-    public void exitPreproc_row(PreprocessorParser.Preproc_rowContext ctx) {
-        insert = true;
-    }
+    // @Override
+    // public void enterPreproc_row(PreprocessorParser.Preproc_rowContext ctx) {
+    //     insert = false;
+    // }
 
-    @Override
-    public void exitInclude_pcmd(PreprocessorParser.Include_pcmdContext ctx) {
-        // System.out.println(ctx.StringLiteral());
-        // System.out.println(ctx.TriStringLiteral());
-    }
+    // @Override
+    // public void exitPreproc_row(PreprocessorParser.Preproc_rowContext ctx) {
+    //     insert = true;
+    // }
+
+    // @Override
+    // public void exitInclude_pcmd(PreprocessorParser.Include_pcmdContext ctx) {
+    //     // System.out.println(ctx.StringLiteral());
+    //     // System.out.println(ctx.TriStringLiteral());
+    // }
 
     @Override
     public void enterEveryRule(ParserRuleContext ctx) {
         printIndent();
-        // System.out.println(ctx.getClass().getSimpleName() + " [" +
-        // ctx.getStart().getText() + "]");
+        System.out.println(ctx.getClass().getSimpleName() + " [" + ctx.getStart().getText() + "]");
         descend();
     }
 
@@ -45,10 +49,10 @@ public class PreprocessorParserListener extends PreprocessorParserBaseListener {
 
     @Override
     public void visitTerminal(TerminalNode node) {
-        // descend();
-        // printIndent();
-        // System.out.println(node.getText());
-        // ascend();
+        descend();
+        printIndent();
+        System.out.println(node.getText());
+        ascend();
 
         if (stringBuilder != null) {
             if (insert) {

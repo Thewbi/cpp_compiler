@@ -1,88 +1,52 @@
 lexer grammar PreprocessorLexer;
 
-NormalWhitespace:
-    [ \t\r\n]+
-    ;
+// https://stackoverflow.com/questions/31255856/simple-antlr-preprocessor
 
-NormalIdentifier:
-    [a-zA-Z_0-9\\.\\(\\),*\\[\]\\{\\};=<>?:]+
-    ;
+//PStart : ('\r'? '\n') '#' -> channel(HIDDEN), pushMode(PreProc) ;
+//PStart : [ \t\r\n]+ '#' -> channel(HIDDEN), pushMode(PreProc) ;
 
-// https://stackoverflow.com/questions/17218096/antlr4-how-to-specify-line-does-not-start-with-specific-character
-//Hashtag: '#' {_input.LA(-2) == '\n'}?
-//    ;
+PIFDEFStart : '#IFDEF' -> pushMode(PreProcIFDEF) ;
+PELSEStart : '#ELSE' -> pushMode(PreProcELSE) ;
+PENDIFStart : '#ENDIF' -> pushMode(PreProcENDIF) ;
 
-// https://media.pragprog.com/titles/tpantlr2/islands.pdf
-Hashtag: '#' -> mode(ISLAND)
-    ;
+NEWLINE : '\r'? '\n';
 
-
-
-
-mode ISLAND;
-Greater: '>'
-    ;
-
-Less: '<'
-    ;
-
-Else_PCmd: 'else';
-Elif_PCmd: 'elif';
-If_PCmd: 'if';
-Endif_PCmd: 'endif';
-Include_PCmd: 'include';
+//TEXT : ~[\u000C]+ ;
+//TEXT : 'print';
+//TEXT : ~[#]+ ;
+TEXT : ~[\r\n];
 
 
 
+mode PreProcIFDEF ;
 
-
-//Element : [a-zA-Z_0-9\\.\\(\\),*\\[\]\\{\\};]+;
-
-NewLine:
-    '\r'? '\n' -> mode(DEFAULT_MODE)
-    ;
-
-Whitespace:
-    [ \t\r\n]+ -> skip
-    ;
-
-LineComment: '//' ~ [\r\n]*;
-
-BlockComment: '/*' .*? '*/';
-
-StringLiteral: 
-    UnterminatedStringLiteral '"'
-    ;
-
-UnterminatedStringLiteral: 
-    '"' (~["\\\r\n] | '\\' (. | EOF))*
-    ;
-
-
-TriStringLiteral:
-    '<'
-    ( Identifier | '.' )*
-    '>'
-    ;
-
-/*
-TriStringLiteral: 
-    UnterminatedTStringLiteral '>'
-    ;
-
-UnterminatedTStringLiteral: 
-    '<' (~[>\\\r\n] | '\\' (. | EOF))*
-    ;
-     */
-
-Number: 
-    [0-9]+
-    ;
-
-Identifier:
-    [a-zA-Z]+
-    ;
+//PIFDEF : 'IFDEF' ;
+//PELSE  : 'ELSE'  ;
+//PENDIF : 'ENDIF' ;
+PIFDEFPTEXT  : [a-zA-Z0-9_-]+ ;
+PIFDEFPEOL   : '\r'? '\n'    -> popMode ;
+PIFDEFPWS    : [ \t]+        -> channel(HIDDEN) ;
+PIFDEFPCMT   : '//' ~[\r\n]* -> channel(HIDDEN) ;
 
 
 
+mode PreProcELSE ;
 
+//PIFDEF : 'IFDEF' ;
+//PELSE  : 'ELSE'  ;
+//PENDIF : 'ENDIF' ;
+//PELSEPTEXT  : [a-zA-Z0-9_-]+ ;
+PELSEPEOL   : '\r'? '\n'    -> popMode ;
+PELSEPWS    : [ \t]+        -> channel(HIDDEN) ;
+PELSEPCMT   : '//' ~[\r\n]* -> channel(HIDDEN) ;
+
+
+mode PreProcENDIF ;
+
+//PIFDEF : 'IFDEF' ;
+//PELSE  : 'ELSE'  ;
+//PENDIF : 'ENDIF' ;
+//PENDIFPTEXT  : [a-zA-Z0-9_-]+ ;
+PENDIFPEOL   : '\r'? '\n'    -> popMode ;
+PENDIFPWS    : [ \t]+        -> channel(HIDDEN) ;
+PENDIFPCMT   : '//' ~[\r\n]* -> channel(HIDDEN) ;

@@ -12,7 +12,7 @@ import com.cpp.grammar.CPP14Parser;
 import com.cpp.grammar.PreprocessorLexer;
 import com.cpp.grammar.PreprocessorParser;
 import com.cpp.grammar.CPP14Parser.TranslationUnitContext;
-import com.cpp.grammar.PreprocessorParser.RowsContext;
+import com.cpp.grammar.PreprocessorParser.Code_fileContext;
 
 /**
  * https://en.cppreference.com/w/cpp/language/translation_phases
@@ -24,13 +24,15 @@ public class Main {
         preProcessor();
         //translationUnit();
         System.out.println("End");
-    }
+    }   
 
     private static void preProcessor() throws IOException {
 
         //final String filename = "src/test/resources/preprocessor.cpp";
         //final String filename = "src/test/resources/preprocessor2.cpp";
-        final String filename = "src/test/resources/preprocessor3.cpp";
+        //final String filename = "src/test/resources/preprocessor3.cpp";
+        final String filename = "src/test/resources/preprocessor4.cpp";
+        //final String filename = "src/test/resources/main.cpp";
 
         final CharStream charStream = CharStreams
                 .fromFileName(filename);
@@ -44,7 +46,8 @@ public class Main {
 
         // parse
         //StreamContext root = parser.stream();
-        RowsContext root = parser.rows();
+        //RowsContext root = parser.rows();
+        Code_fileContext root = parser.code_file();
 
         PreprocessorParserListener listener = new PreprocessorParserListener();
         StringBuilder stringBuilder = new StringBuilder();
@@ -55,8 +58,8 @@ public class Main {
         // Walk the tree created during the parse, trigger callbacks
         walker.walk(listener, root);
 
-        System.out.println("-----------------------------------------");
-        System.out.println(stringBuilder.toString());
+        // System.out.println("-----------------------------------------");
+        // System.out.println(stringBuilder.toString());
     }
 
     private static void translationUnit() throws IOException {
