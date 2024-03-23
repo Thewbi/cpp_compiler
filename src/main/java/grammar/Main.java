@@ -1,6 +1,12 @@
 package grammar;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 import java.io.IOException;
+
+import java.io.File;
 
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
@@ -21,21 +27,34 @@ public class Main {
 
     public static void main(String[] args) throws IOException {
         System.out.println("Start");
-        preProcessor();
-        //translationUnit();
+
+        // final String filename = "src/test/resources/preprocessor.cpp";
+        // final String filename = "src/test/resources/preprocessor2.cpp";
+        // final String filename = "src/test/resources/preprocessor3.cpp";
+        // final String filename = "src/test/resources/preprocessor4.cpp";
+        // final String filename = "src/test/resources/main.cpp";
+        // final String filename = "src/test/resources/class.h";
+        // final String filename = "src/test/resources/for_loop.cpp";
+        //final String filename = "src/test/resources/helloworld.cpp";
+        final String filename = "src/test/resources/helloworld2.cpp";
+
+        List<String> processedIncludeFiles = new ArrayList<>();
+
+        StringBuilder stringBuilder = new StringBuilder();
+        preProcessor(filename, processedIncludeFiles, stringBuilder);
+
+        System.out.println(stringBuilder.toString());
+
+        // translationUnit();
+
         System.out.println("End");
     } 
 
-    private static void preProcessor() throws IOException {
+    public static void preProcessor(String filename, List<String> processedIncludeFiles, StringBuilder stringBuilder)
+            throws IOException {
 
-        //final String filename = "src/test/resources/preprocessor.cpp";
-        //final String filename = "src/test/resources/preprocessor2.cpp";
-        //final String filename = "src/test/resources/preprocessor3.cpp";
-        final String filename = "src/test/resources/preprocessor4.cpp";
-        //final String filename = "src/test/resources/main.cpp";
-        //final String filename = "src/test/resources/class.h";
-        //final String filename = "src/test/resources/for_loop.cpp";
-        //final String filename = "src/test/resources/helloworld.cpp";
+        File file = new File(filename);
+        System.out.println(file.getAbsolutePath());
 
         final CharStream charStream = CharStreams
                 .fromFileName(filename);
@@ -48,12 +67,12 @@ public class Main {
         final PreprocessorParser parser = new PreprocessorParser(tokens);
 
         // parse
-        //StreamContext root = parser.stream();
-        //RowsContext root = parser.rows();
+        // StreamContext root = parser.stream();
+        // RowsContext root = parser.rows();
         Code_fileContext root = parser.code_file();
 
         PreprocessorParserListener listener = new PreprocessorParserListener();
-        StringBuilder stringBuilder = new StringBuilder();
+        listener.setProcessedIncludeFiles(processedIncludeFiles);
         listener.setStringBuilder(stringBuilder);
 
         // // Create a generic parse tree walker that can trigger callbacks
@@ -69,15 +88,15 @@ public class Main {
 
         System.out.println("translationUnit");
 
-        //final String filename = "src/test/resources/helloworld.cpp";
-        //final String filename = "src/test/resources/interface.h";
-        //final String filename = "src/test/resources/main.cpp";
-        //final String filename = "src/test/resources/pragma.h";
-        //final String filename = "src/test/resources/preprocessor.cpp";
-        //final String filename = "src/test/resources/scratchpad.h";
+        // final String filename = "src/test/resources/helloworld.cpp";
+        // final String filename = "src/test/resources/interface.h";
+        // final String filename = "src/test/resources/main.cpp";
+        // final String filename = "src/test/resources/pragma.h";
+        // final String filename = "src/test/resources/preprocessor.cpp";
+        // final String filename = "src/test/resources/scratchpad.h";
         final String filename = "src/test/resources/template.h";
-        //final String filename = "src/test/resources/test_f.cpp";
-        //final String filename = "src/test/resources/variables.cpp";
+        // final String filename = "src/test/resources/test_f.cpp";
+        // final String filename = "src/test/resources/variables.cpp";
 
         final CharStream charStream = CharStreams
                 .fromFileName(filename);

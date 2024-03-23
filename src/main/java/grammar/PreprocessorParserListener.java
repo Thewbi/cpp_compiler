@@ -1,7 +1,13 @@
 package grammar;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.io.IOException;
+
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.TerminalNode;
+import org.apache.commons.lang3.StringUtils;
 
 import com.cpp.grammar.PreprocessorParser;
 import com.cpp.grammar.PreprocessorParserBaseListener;
@@ -14,9 +20,35 @@ public class PreprocessorParserListener extends PreprocessorParserBaseListener {
 
     private boolean insert = true;
 
+    private List<String> processedIncludeFiles;
+
     @Override
     public void enterPinclude(PreprocessorParser.PincludeContext ctx) {
         // System.out.println("");
+        TerminalNode terminalNode = ctx.PINCLUDEPTEXT().get(0);
+
+        String filename = terminalNode.getText();
+        filename = filename.substring(1);
+
+        System.out.println("Including: \"" + filename + "\"");
+
+        if (!processedIncludeFiles.contains(filename)) {
+        //if (!processedIncludeFiles.contains("test2.h")) {
+
+            try {
+
+                processedIncludeFiles.add(filename);
+                Main.preProcessor("src/test/resources/" + filename, processedIncludeFiles, stringBuilder);
+
+                // processedIncludeFiles.add("test2.h");
+                // Main.preProcessor("src/test/resources/test2.h", processedIncludeFiles, stringBuilder);
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+        }
+
         insert = false;
     }
 
@@ -58,7 +90,7 @@ public class PreprocessorParserListener extends PreprocessorParserBaseListener {
     @Override
     public void exitCode_block(PreprocessorParser.Code_blockContext ctx) {
         // System.out.println(stringBuilder.toString());
-        stringBuilder.delete(0, stringBuilder.length());
+        // stringBuilder.delete(0, stringBuilder.length());
     }
 
     @Override
@@ -82,7 +114,12 @@ public class PreprocessorParserListener extends PreprocessorParserBaseListener {
 
         if (stringBuilder != null) {
             if (insert) {
-                stringBuilder.append(node.getText());
+
+                if (StringUtils.equalsIgnoreCase(node.getText(), "<EOF>")) {
+
+                } else {
+                    stringBuilder.append(node.getText());
+                }
             }
         }
     }
@@ -107,6 +144,10 @@ public class PreprocessorParserListener extends PreprocessorParserBaseListener {
 
     public void setStringBuilder(StringBuilder stringBuilder) {
         this.stringBuilder = stringBuilder;
+    }
+
+    public void setProcessedIncludeFiles(List<String> processedIncludeFiles) {
+        this.processedIncludeFiles = processedIncludeFiles;
     }
 
 }

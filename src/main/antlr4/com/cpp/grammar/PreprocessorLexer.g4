@@ -22,7 +22,7 @@ PINCLUDEStart : '#include' -> pushMode(PreProcINCLUDE) ;
 
 mode PreProcINCLUDE ;
 
-PINCLUDEPTEXT   : ["<>a-zA-Z0-9_-]+ ;
+PINCLUDEPTEXT   : [a-zA-Z0-9_-]+ ;
 PINCLUDEPEOL   : '\r'? '\n'    -> popMode ;
 PINCLUDEPWS    : [ \t]+        -> channel(HIDDEN) ;
 PINCLUDEPCMT   : '//' ~[\r\n]* -> channel(HIDDEN) ;
