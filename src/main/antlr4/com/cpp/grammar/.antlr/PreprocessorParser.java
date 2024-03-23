@@ -16,28 +16,30 @@ public class PreprocessorParser extends Parser {
 	protected static final PredictionContextCache _sharedContextCache =
 		new PredictionContextCache();
 	public static final int
-		PIFDEFStart=1, PELSEStart=2, PENDIFStart=3, NEWLINE=4, TEXT=5, PIFDEFPTEXT=6, 
-		PIFDEFPEOL=7, PIFDEFPWS=8, PIFDEFPCMT=9, PELSEPEOL=10, PELSEPWS=11, PELSEPCMT=12, 
-		PENDIFPEOL=13, PENDIFPWS=14, PENDIFPCMT=15;
+		NEWLINE=1, TEXT=2, PIFDEFStart=3, PELSEStart=4, PENDIFStart=5, PINCLUDEStart=6, 
+		PINCLUDEPTEXT=7, PINCLUDEPEOL=8, PINCLUDEPWS=9, PINCLUDEPCMT=10, PIFDEFPTEXT=11, 
+		PIFDEFPEOL=12, PIFDEFPWS=13, PIFDEFPCMT=14, PELSEPEOL=15, PELSEPWS=16, 
+		PELSEPCMT=17, PENDIFPEOL=18, PENDIFPWS=19, PENDIFPCMT=20;
 	public static final int
 		RULE_code_file = 0, RULE_code_block = 1, RULE_preproc = 2, RULE_pifdef = 3, 
-		RULE_pelse = 4, RULE_pendif = 5;
+		RULE_pelse = 4, RULE_pendif = 5, RULE_pinclude = 6;
 	private static String[] makeRuleNames() {
 		return new String[] {
-			"code_file", "code_block", "preproc", "pifdef", "pelse", "pendif"
+			"code_file", "code_block", "preproc", "pifdef", "pelse", "pendif", "pinclude"
 		};
 	}
 	public static final String[] ruleNames = makeRuleNames();
 
 	private static String[] makeLiteralNames() {
 		return new String[] {
-			null, "'#IFDEF'", "'#ELSE'", "'#ENDIF'"
+			null, null, null, "'#IFDEF'", "'#ELSE'", "'#ENDIF'", "'#INCLUDE'"
 		};
 	}
 	private static final String[] _LITERAL_NAMES = makeLiteralNames();
 	private static String[] makeSymbolicNames() {
 		return new String[] {
-			null, "PIFDEFStart", "PELSEStart", "PENDIFStart", "NEWLINE", "TEXT", 
+			null, "NEWLINE", "TEXT", "PIFDEFStart", "PELSEStart", "PENDIFStart", 
+			"PINCLUDEStart", "PINCLUDEPTEXT", "PINCLUDEPEOL", "PINCLUDEPWS", "PINCLUDEPCMT", 
 			"PIFDEFPTEXT", "PIFDEFPEOL", "PIFDEFPWS", "PIFDEFPCMT", "PELSEPEOL", 
 			"PELSEPWS", "PELSEPCMT", "PENDIFPEOL", "PENDIFPWS", "PENDIFPCMT"
 		};
@@ -108,6 +110,10 @@ public class PreprocessorParser extends Parser {
 		public Code_blockContext code_block(int i) {
 			return getRuleContext(Code_blockContext.class,i);
 		}
+		public List<TerminalNode> NEWLINE() { return getTokens(PreprocessorParser.NEWLINE); }
+		public TerminalNode NEWLINE(int i) {
+			return getToken(PreprocessorParser.NEWLINE, i);
+		}
 		public Code_fileContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
@@ -121,37 +127,44 @@ public class PreprocessorParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(14); 
+			setState(17); 
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			do {
 				{
-				setState(14);
+				setState(17);
 				_errHandler.sync(this);
 				switch (_input.LA(1)) {
 				case PIFDEFStart:
 				case PELSEStart:
 				case PENDIFStart:
+				case PINCLUDEStart:
 					{
-					setState(12);
+					setState(14);
 					preproc();
 					}
 					break;
 				case TEXT:
 					{
-					setState(13);
+					setState(15);
 					code_block();
+					}
+					break;
+				case NEWLINE:
+					{
+					setState(16);
+					match(NEWLINE);
 					}
 					break;
 				default:
 					throw new NoViableAltException(this);
 				}
 				}
-				setState(16); 
+				setState(19); 
 				_errHandler.sync(this);
 				_la = _input.LA(1);
-			} while ( (((_la) & ~0x3f) == 0 && ((1L << _la) & 46L) != 0) );
-			setState(18);
+			} while ( (((_la) & ~0x3f) == 0 && ((1L << _la) & 126L) != 0) );
+			setState(21);
 			match(EOF);
 			}
 		}
@@ -169,6 +182,7 @@ public class PreprocessorParser extends Parser {
 	@SuppressWarnings("CheckReturnValue")
 	public static class Code_blockContext extends ParserRuleContext {
 		public TerminalNode NEWLINE() { return getToken(PreprocessorParser.NEWLINE, 0); }
+		public TerminalNode EOF() { return getToken(PreprocessorParser.EOF, 0); }
 		public List<TerminalNode> TEXT() { return getTokens(PreprocessorParser.TEXT); }
 		public TerminalNode TEXT(int i) {
 			return getToken(PreprocessorParser.TEXT, i);
@@ -186,22 +200,30 @@ public class PreprocessorParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(21); 
+			setState(24); 
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			do {
 				{
 				{
-				setState(20);
+				setState(23);
 				match(TEXT);
 				}
 				}
-				setState(23); 
+				setState(26); 
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 			} while ( _la==TEXT );
-			setState(25);
-			match(NEWLINE);
+			setState(28);
+			_la = _input.LA(1);
+			if ( !(_la==EOF || _la==NEWLINE) ) {
+			_errHandler.recoverInline(this);
+			}
+			else {
+				if ( _input.LA(1)==Token.EOF ) matchedEOF = true;
+				_errHandler.reportMatch(this);
+				consume();
+			}
 			}
 		}
 		catch (RecognitionException re) {
@@ -226,6 +248,9 @@ public class PreprocessorParser extends Parser {
 		public PendifContext pendif() {
 			return getRuleContext(PendifContext.class,0);
 		}
+		public PincludeContext pinclude() {
+			return getRuleContext(PincludeContext.class,0);
+		}
 		public PreprocContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
@@ -236,28 +261,35 @@ public class PreprocessorParser extends Parser {
 		PreprocContext _localctx = new PreprocContext(_ctx, getState());
 		enterRule(_localctx, 4, RULE_preproc);
 		try {
-			setState(30);
+			setState(34);
 			_errHandler.sync(this);
 			switch (_input.LA(1)) {
 			case PIFDEFStart:
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(27);
+				setState(30);
 				pifdef();
 				}
 				break;
 			case PELSEStart:
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(28);
+				setState(31);
 				pelse();
 				}
 				break;
 			case PENDIFStart:
 				enterOuterAlt(_localctx, 3);
 				{
-				setState(29);
+				setState(32);
 				pendif();
+				}
+				break;
+			case PINCLUDEStart:
+				enterOuterAlt(_localctx, 4);
+				{
+				setState(33);
+				pinclude();
 				}
 				break;
 			default:
@@ -296,23 +328,23 @@ public class PreprocessorParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(32);
+			setState(36);
 			match(PIFDEFStart);
-			setState(34); 
+			setState(38); 
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			do {
 				{
 				{
-				setState(33);
+				setState(37);
 				match(PIFDEFPTEXT);
 				}
 				}
-				setState(36); 
+				setState(40); 
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 			} while ( _la==PIFDEFPTEXT );
-			setState(38);
+			setState(42);
 			match(PIFDEFPEOL);
 			}
 		}
@@ -343,9 +375,9 @@ public class PreprocessorParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(40);
+			setState(44);
 			match(PELSEStart);
-			setState(41);
+			setState(45);
 			match(PELSEPEOL);
 			}
 		}
@@ -376,9 +408,9 @@ public class PreprocessorParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(43);
+			setState(47);
 			match(PENDIFStart);
-			setState(44);
+			setState(48);
 			match(PENDIFPEOL);
 			}
 		}
@@ -393,37 +425,97 @@ public class PreprocessorParser extends Parser {
 		return _localctx;
 	}
 
+	@SuppressWarnings("CheckReturnValue")
+	public static class PincludeContext extends ParserRuleContext {
+		public TerminalNode PINCLUDEStart() { return getToken(PreprocessorParser.PINCLUDEStart, 0); }
+		public TerminalNode PINCLUDEPEOL() { return getToken(PreprocessorParser.PINCLUDEPEOL, 0); }
+		public List<TerminalNode> PINCLUDEPTEXT() { return getTokens(PreprocessorParser.PINCLUDEPTEXT); }
+		public TerminalNode PINCLUDEPTEXT(int i) {
+			return getToken(PreprocessorParser.PINCLUDEPTEXT, i);
+		}
+		public PincludeContext(ParserRuleContext parent, int invokingState) {
+			super(parent, invokingState);
+		}
+		@Override public int getRuleIndex() { return RULE_pinclude; }
+	}
+
+	public final PincludeContext pinclude() throws RecognitionException {
+		PincludeContext _localctx = new PincludeContext(_ctx, getState());
+		enterRule(_localctx, 12, RULE_pinclude);
+		int _la;
+		try {
+			enterOuterAlt(_localctx, 1);
+			{
+			setState(50);
+			match(PINCLUDEStart);
+			setState(52); 
+			_errHandler.sync(this);
+			_la = _input.LA(1);
+			do {
+				{
+				{
+				setState(51);
+				match(PINCLUDEPTEXT);
+				}
+				}
+				setState(54); 
+				_errHandler.sync(this);
+				_la = _input.LA(1);
+			} while ( _la==PINCLUDEPTEXT );
+			setState(56);
+			match(PINCLUDEPEOL);
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			_errHandler.reportError(this, re);
+			_errHandler.recover(this, re);
+		}
+		finally {
+			exitRule();
+		}
+		return _localctx;
+	}
+
 	public static final String _serializedATN =
-		"\u0004\u0001\u000f/\u0002\u0000\u0007\u0000\u0002\u0001\u0007\u0001\u0002"+
+		"\u0004\u0001\u0014;\u0002\u0000\u0007\u0000\u0002\u0001\u0007\u0001\u0002"+
 		"\u0002\u0007\u0002\u0002\u0003\u0007\u0003\u0002\u0004\u0007\u0004\u0002"+
-		"\u0005\u0007\u0005\u0001\u0000\u0001\u0000\u0004\u0000\u000f\b\u0000\u000b"+
-		"\u0000\f\u0000\u0010\u0001\u0000\u0001\u0000\u0001\u0001\u0004\u0001\u0016"+
-		"\b\u0001\u000b\u0001\f\u0001\u0017\u0001\u0001\u0001\u0001\u0001\u0002"+
-		"\u0001\u0002\u0001\u0002\u0003\u0002\u001f\b\u0002\u0001\u0003\u0001\u0003"+
-		"\u0004\u0003#\b\u0003\u000b\u0003\f\u0003$\u0001\u0003\u0001\u0003\u0001"+
-		"\u0004\u0001\u0004\u0001\u0004\u0001\u0005\u0001\u0005\u0001\u0005\u0001"+
-		"\u0005\u0000\u0000\u0006\u0000\u0002\u0004\u0006\b\n\u0000\u0000.\u0000"+
-		"\u000e\u0001\u0000\u0000\u0000\u0002\u0015\u0001\u0000\u0000\u0000\u0004"+
-		"\u001e\u0001\u0000\u0000\u0000\u0006 \u0001\u0000\u0000\u0000\b(\u0001"+
-		"\u0000\u0000\u0000\n+\u0001\u0000\u0000\u0000\f\u000f\u0003\u0004\u0002"+
-		"\u0000\r\u000f\u0003\u0002\u0001\u0000\u000e\f\u0001\u0000\u0000\u0000"+
-		"\u000e\r\u0001\u0000\u0000\u0000\u000f\u0010\u0001\u0000\u0000\u0000\u0010"+
-		"\u000e\u0001\u0000\u0000\u0000\u0010\u0011\u0001\u0000\u0000\u0000\u0011"+
-		"\u0012\u0001\u0000\u0000\u0000\u0012\u0013\u0005\u0000\u0000\u0001\u0013"+
-		"\u0001\u0001\u0000\u0000\u0000\u0014\u0016\u0005\u0005\u0000\u0000\u0015"+
-		"\u0014\u0001\u0000\u0000\u0000\u0016\u0017\u0001\u0000\u0000\u0000\u0017"+
-		"\u0015\u0001\u0000\u0000\u0000\u0017\u0018\u0001\u0000\u0000\u0000\u0018"+
-		"\u0019\u0001\u0000\u0000\u0000\u0019\u001a\u0005\u0004\u0000\u0000\u001a"+
-		"\u0003\u0001\u0000\u0000\u0000\u001b\u001f\u0003\u0006\u0003\u0000\u001c"+
-		"\u001f\u0003\b\u0004\u0000\u001d\u001f\u0003\n\u0005\u0000\u001e\u001b"+
-		"\u0001\u0000\u0000\u0000\u001e\u001c\u0001\u0000\u0000\u0000\u001e\u001d"+
-		"\u0001\u0000\u0000\u0000\u001f\u0005\u0001\u0000\u0000\u0000 \"\u0005"+
-		"\u0001\u0000\u0000!#\u0005\u0006\u0000\u0000\"!\u0001\u0000\u0000\u0000"+
-		"#$\u0001\u0000\u0000\u0000$\"\u0001\u0000\u0000\u0000$%\u0001\u0000\u0000"+
-		"\u0000%&\u0001\u0000\u0000\u0000&\'\u0005\u0007\u0000\u0000\'\u0007\u0001"+
-		"\u0000\u0000\u0000()\u0005\u0002\u0000\u0000)*\u0005\n\u0000\u0000*\t"+
-		"\u0001\u0000\u0000\u0000+,\u0005\u0003\u0000\u0000,-\u0005\r\u0000\u0000"+
-		"-\u000b\u0001\u0000\u0000\u0000\u0005\u000e\u0010\u0017\u001e$";
+		"\u0005\u0007\u0005\u0002\u0006\u0007\u0006\u0001\u0000\u0001\u0000\u0001"+
+		"\u0000\u0004\u0000\u0012\b\u0000\u000b\u0000\f\u0000\u0013\u0001\u0000"+
+		"\u0001\u0000\u0001\u0001\u0004\u0001\u0019\b\u0001\u000b\u0001\f\u0001"+
+		"\u001a\u0001\u0001\u0001\u0001\u0001\u0002\u0001\u0002\u0001\u0002\u0001"+
+		"\u0002\u0003\u0002#\b\u0002\u0001\u0003\u0001\u0003\u0004\u0003\'\b\u0003"+
+		"\u000b\u0003\f\u0003(\u0001\u0003\u0001\u0003\u0001\u0004\u0001\u0004"+
+		"\u0001\u0004\u0001\u0005\u0001\u0005\u0001\u0005\u0001\u0006\u0001\u0006"+
+		"\u0004\u00065\b\u0006\u000b\u0006\f\u00066\u0001\u0006\u0001\u0006\u0001"+
+		"\u0006\u0000\u0000\u0007\u0000\u0002\u0004\u0006\b\n\f\u0000\u0001\u0001"+
+		"\u0001\u0001\u0001<\u0000\u0011\u0001\u0000\u0000\u0000\u0002\u0018\u0001"+
+		"\u0000\u0000\u0000\u0004\"\u0001\u0000\u0000\u0000\u0006$\u0001\u0000"+
+		"\u0000\u0000\b,\u0001\u0000\u0000\u0000\n/\u0001\u0000\u0000\u0000\f2"+
+		"\u0001\u0000\u0000\u0000\u000e\u0012\u0003\u0004\u0002\u0000\u000f\u0012"+
+		"\u0003\u0002\u0001\u0000\u0010\u0012\u0005\u0001\u0000\u0000\u0011\u000e"+
+		"\u0001\u0000\u0000\u0000\u0011\u000f\u0001\u0000\u0000\u0000\u0011\u0010"+
+		"\u0001\u0000\u0000\u0000\u0012\u0013\u0001\u0000\u0000\u0000\u0013\u0011"+
+		"\u0001\u0000\u0000\u0000\u0013\u0014\u0001\u0000\u0000\u0000\u0014\u0015"+
+		"\u0001\u0000\u0000\u0000\u0015\u0016\u0005\u0000\u0000\u0001\u0016\u0001"+
+		"\u0001\u0000\u0000\u0000\u0017\u0019\u0005\u0002\u0000\u0000\u0018\u0017"+
+		"\u0001\u0000\u0000\u0000\u0019\u001a\u0001\u0000\u0000\u0000\u001a\u0018"+
+		"\u0001\u0000\u0000\u0000\u001a\u001b\u0001\u0000\u0000\u0000\u001b\u001c"+
+		"\u0001\u0000\u0000\u0000\u001c\u001d\u0007\u0000\u0000\u0000\u001d\u0003"+
+		"\u0001\u0000\u0000\u0000\u001e#\u0003\u0006\u0003\u0000\u001f#\u0003\b"+
+		"\u0004\u0000 #\u0003\n\u0005\u0000!#\u0003\f\u0006\u0000\"\u001e\u0001"+
+		"\u0000\u0000\u0000\"\u001f\u0001\u0000\u0000\u0000\" \u0001\u0000\u0000"+
+		"\u0000\"!\u0001\u0000\u0000\u0000#\u0005\u0001\u0000\u0000\u0000$&\u0005"+
+		"\u0003\u0000\u0000%\'\u0005\u000b\u0000\u0000&%\u0001\u0000\u0000\u0000"+
+		"\'(\u0001\u0000\u0000\u0000(&\u0001\u0000\u0000\u0000()\u0001\u0000\u0000"+
+		"\u0000)*\u0001\u0000\u0000\u0000*+\u0005\f\u0000\u0000+\u0007\u0001\u0000"+
+		"\u0000\u0000,-\u0005\u0004\u0000\u0000-.\u0005\u000f\u0000\u0000.\t\u0001"+
+		"\u0000\u0000\u0000/0\u0005\u0005\u0000\u000001\u0005\u0012\u0000\u0000"+
+		"1\u000b\u0001\u0000\u0000\u000024\u0005\u0006\u0000\u000035\u0005\u0007"+
+		"\u0000\u000043\u0001\u0000\u0000\u000056\u0001\u0000\u0000\u000064\u0001"+
+		"\u0000\u0000\u000067\u0001\u0000\u0000\u000078\u0001\u0000\u0000\u0000"+
+		"89\u0005\b\u0000\u00009\r\u0001\u0000\u0000\u0000\u0006\u0011\u0013\u001a"+
+		"\"(6";
 	public static final ATN _ATN =
 		new ATNDeserializer().deserialize(_serializedATN.toCharArray());
 	static {

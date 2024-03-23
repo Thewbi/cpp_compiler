@@ -24,7 +24,7 @@ public class Main {
         preProcessor();
         //translationUnit();
         System.out.println("End");
-    }       
+    } 
 
     private static void preProcessor() throws IOException {
 
@@ -33,6 +33,9 @@ public class Main {
         //final String filename = "src/test/resources/preprocessor3.cpp";
         final String filename = "src/test/resources/preprocessor4.cpp";
         //final String filename = "src/test/resources/main.cpp";
+        //final String filename = "src/test/resources/class.h";
+        //final String filename = "src/test/resources/for_loop.cpp";
+        //final String filename = "src/test/resources/helloworld.cpp";
 
         final CharStream charStream = CharStreams
                 .fromFileName(filename);

@@ -1,7 +1,7 @@
-#IFDEF one
+#ifdef one
     asdf#1
     asdfasdf
-#ELSE
+#else
     adsflksdf
     #######
-#ENDIF
+#endif

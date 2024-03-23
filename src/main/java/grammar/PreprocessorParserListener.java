@@ -12,7 +12,18 @@ public class PreprocessorParserListener extends PreprocessorParserBaseListener {
 
     private StringBuilder stringBuilder;
 
-    private boolean insert;
+    private boolean insert = true;
+
+    @Override
+    public void enterPinclude(PreprocessorParser.PincludeContext ctx) {
+        // System.out.println("");
+        insert = false;
+    }
+
+    @Override
+    public void exitPinclude(PreprocessorParser.PincludeContext ctx) {
+        insert = true;
+    }
 
     @Override
     public void enterPifdef(PreprocessorParser.PifdefContext ctx) {
@@ -46,7 +57,7 @@ public class PreprocessorParserListener extends PreprocessorParserBaseListener {
 
     @Override
     public void exitCode_block(PreprocessorParser.Code_blockContext ctx) {
-        System.out.println(stringBuilder.toString());
+        // System.out.println(stringBuilder.toString());
         stringBuilder.delete(0, stringBuilder.length());
     }
 
