@@ -12,3 +12,5 @@ float h = 1.0f * 2.0f + 3.0f;
 std::string i = "test";
 
 a = 2;
+
+int numbers[3] = {10, 20, 30};

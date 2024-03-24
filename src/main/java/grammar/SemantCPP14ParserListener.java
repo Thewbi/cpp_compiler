@@ -29,11 +29,15 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
 
     private Type initializerType;
 
+    private String declaratorName;
+
     @Override
     public void exitSimpleDeclaration(CPP14Parser.SimpleDeclarationContext ctx) {
 
         final ParserRuleContext parserRuleContext = ctx.initDeclaratorList().initDeclarator().get(0).declarator();
-        String varName = parserRuleContext.getText();
+        // String varName = parserRuleContext.getText();
+
+        String varName = declaratorName;
 
         if (ctx.declSpecifierSeq() == null) {
 
@@ -74,13 +78,41 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
         exprTypeStack.clear();
         initializerType = null;
         isArray = false;
+        declaratorName = null;
+    }
+
+    @Override
+    public void exitDeclaratorid(CPP14Parser.DeclaratoridContext ctx) {
+        declaratorName = ctx.getText();
+    }
+
+    @Override
+    public void enterInitializerClause(CPP14Parser.InitializerClauseContext ctx) {
+        // int numbers[3] = {10, '20', 30};
+        // forget about the array length literal '3'
+        exprTypeStack.clear();
     }
 
     @Override
     public void exitInitializerClause(CPP14Parser.InitializerClauseContext ctx) {
         // store type in the initializerType member so the SimpleDeclaration rule
         // can retrieve the type from the member
-        initializerType = exprTypeStack.pop();
+
+        if (exprTypeStack.size() == 1) {
+            Type tempInitializerType = exprTypeStack.pop();
+            if ((initializerType != null) && (!initializerType.equals(tempInitializerType))) {
+                throw new RuntimeException(
+                        "[Error: Initializer Types not compatible! (Line " + ctx.getStart().getLine() + ")] "
+                                + tempInitializerType + " is added to " + initializerType);
+            }
+            initializerType = tempInitializerType;
+        }
+        
+        // else if (exprTypeStack.size() == 2) {
+        //     System.out.println(exprTypeStack.pop());
+        // } else {
+        //     throw new RuntimeException();
+        // }
     }
 
     @Override
@@ -149,6 +181,8 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
     @Override
     public void exitLiteral(CPP14Parser.LiteralContext ctx) {
 
+        // System.out.println(ctx.getText());
+
         boolean typeProcessed = false;
         TerminalNode literalTerminalNode = ctx.IntegerLiteral();
         if (literalTerminalNode != null) {
@@ -186,8 +220,9 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
             final ParserRuleContext ctx) {
         if (targetType != rhsType) {
             throw new RuntimeException(
-                    "[" + label + "]" + " Var's type: \"" + targetType + "\" Assigned value's type: \"" + rhsType
-                            + "\" Line: " + ctx.getStart().getLine());
+                    "[Error: " + label + " Line: " + ctx.getStart().getLine() + "]" + " Var's type: \"" + targetType
+                            + "\" Assigned value's type: \"" + rhsType
+                            + "\" ");
         }
     }
 

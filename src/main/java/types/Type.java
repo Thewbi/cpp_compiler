@@ -1,14 +1,22 @@
 package types;
 
 public class Type {
-    
+
     private String name;
 
     private Type arraySubType;
 
     @Override
     public String toString() {
-        return "Type [name=" + name + "]";
+        StringBuilder stringBuilder = new StringBuilder();
+
+        if (arraySubType != null) {
+            stringBuilder.append("Type [ArrayOf=").append(arraySubType.getName()).append("]");
+        } else {
+            stringBuilder.append("Type [name=").append(name).append("]");
+        }
+
+        return stringBuilder.toString();
     }
 
     @Override
