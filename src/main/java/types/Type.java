@@ -4,13 +4,7 @@ public class Type {
     
     private String name;
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
+    private Type arraySubType;
 
     @Override
     public String toString() {
@@ -40,6 +34,22 @@ public class Type {
         } else if (!name.equals(other.name))
             return false;
         return true;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Type getArraySubType() {
+        return arraySubType;
+    }
+
+    public void setArraySubType(Type arraySubType) {
+        this.arraySubType = arraySubType;
     }
 
 }

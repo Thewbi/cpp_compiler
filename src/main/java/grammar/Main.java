@@ -18,6 +18,7 @@ import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
 import com.cpp.grammar.CPP14Lexer;
 import com.cpp.grammar.CPP14Parser;
+import com.cpp.grammar.CPP14ParserListener;
 import com.cpp.grammar.PreprocessorLexer;
 import com.cpp.grammar.PreprocessorParser;
 import com.cpp.grammar.CPP14Parser.TranslationUnitContext;
@@ -33,11 +34,11 @@ public class Main {
     public static void main(String[] args) throws IOException {
         System.out.println("Start");
 
-        //preprocessor();
+        // preprocessor();
         translationUnit();
 
         System.out.println("End");
-    }    
+    } 
 
     private static void translationUnit() throws IOException {
 
@@ -49,12 +50,12 @@ public class Main {
         // final String filename = "src/test/resources/pragma.h";
         // final String filename = "src/test/resources/preprocessor.cpp";
         // final String filename = "src/test/resources/scratchpad.h";
-        //final String filename = "src/test/resources/template.h";
+        // final String filename = "src/test/resources/template.h";
         // final String filename = "src/test/resources/test_f.cpp";
         // final String filename = "src/test/resources/variables.cpp";
-        //final String filename = "src/test/resources/declaration_type_error.cpp";
-        //final String filename = "src/test/resources/declaration.cpp";
-        final String filename = "src/test/resources/arrays.cpp";
+        // final String filename = "src/test/resources/declaration_type_error.cpp";
+        final String filename = "src/test/resources/declaration.cpp";
+        //final String filename = "src/test/resources/arrays.cpp";
 
         final CharStream charStream = CharStreams
                 .fromFileName(filename);
@@ -69,36 +70,49 @@ public class Main {
         // parse
         TranslationUnitContext root = parser.translationUnit();
 
-        //ConsoleCPP14ParserListener listener = new ConsoleCPP14ParserListener();
-        //DefaultStructuredTextListener listener = new DefaultStructuredTextListener();
+        CPP14ParserListener listener = null;
+        boolean print = false;
+        //boolean print = true;
+        if (print) {
+            listener = new ConsoleCPP14ParserListener();
+        } else {
+            /**/
+            final Map<String, Type> typeMap = new HashMap<>();
 
-        final Map<String, Type> typeMap = new HashMap<>();
+            Type intType = new Type();
+            intType.setName("int");
+            typeMap.put(intType.getName(), intType);
 
-        Type intType = new Type();
-        intType.setName("int");
-        typeMap.put(intType.getName(), intType);
+            Type charType = new Type();
+            charType.setName("char");
+            typeMap.put(charType.getName(), charType);
 
-        Type charType = new Type();
-        charType.setName("char");
-        typeMap.put(charType.getName(), charType);
+            Type floatType = new Type();
+            floatType.setName("float");
+            typeMap.put(floatType.getName(), floatType);
 
-        Type floatType = new Type();
-        floatType.setName("float");
-        typeMap.put(floatType.getName(), floatType);
+            Type stringType = new Type();
+            stringType.setName("std::string");
+            typeMap.put(stringType.getName(), stringType);
 
-        Type stringType = new Type();
-        stringType.setName("std::string");
-        typeMap.put(stringType.getName(), stringType);
+            SemantCPP14ParserListener semantCPP14ParserListener = new SemantCPP14ParserListener();
+            semantCPP14ParserListener.setTypeMap(typeMap);
 
-        SemantCPP14ParserListener listener = new SemantCPP14ParserListener();
-        listener.setTypeMap(typeMap);
+            listener = semantCPP14ParserListener;
+        }
 
         // Create a generic parse tree walker that can trigger callbacks
         final ParseTreeWalker walker = new ParseTreeWalker();
         // Walk the tree created during the parse, trigger callbacks
         walker.walk(listener, root);
 
-        //System.out.println(typeMap);
+        // System.out.println(typeMap);
+
+        if (listener instanceof SemantCPP14ParserListener) {
+            SemantCPP14ParserListener l = (SemantCPP14ParserListener) listener;
+            System.out.println(l.getVarTypeMap());
+        }
+        
 
         // // dump output
         // Node rootNode = listener.getRootNode();
@@ -111,12 +125,12 @@ public class Main {
         // final String filename = "src/test/resources/preprocessor2.cpp";
         // final String filename = "src/test/resources/preprocessor3.cpp";
         // final String filename = "src/test/resources/preprocessor4.cpp";
-        //final String filename = "src/test/resources/preprocessor5.cpp";
+        // final String filename = "src/test/resources/preprocessor5.cpp";
         // final String filename = "src/test/resources/main.cpp";
         // final String filename = "src/test/resources/class.h";
         // final String filename = "src/test/resources/for_loop.cpp";
-        //final String filename = "src/test/resources/helloworld.cpp";
-        //final String filename = "src/test/resources/helloworld2.cpp";
+        // final String filename = "src/test/resources/helloworld.cpp";
+        // final String filename = "src/test/resources/helloworld2.cpp";
         final String filename = "src/test/resources/declaration_type_error.cpp";
 
         List<String> processedIncludeFiles = new ArrayList<>();
@@ -126,7 +140,7 @@ public class Main {
 
         System.out.println(stringBuilder.toString());
         Files.writeString(Paths.get("preprocessed.cpp"), stringBuilder.toString());
-    } 
+    }
 
     public static void preProcessor(String filename, List<String> processedIncludeFiles, StringBuilder stringBuilder)
             throws IOException {
@@ -161,7 +175,5 @@ public class Main {
         // System.out.println("-----------------------------------------");
         // System.out.println(stringBuilder.toString());
     }
-
-    
 
 }

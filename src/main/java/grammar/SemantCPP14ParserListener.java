@@ -25,13 +25,29 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
     /** variable name to type */
     private Map<String, Type> varTypeMap = new HashMap<>();
 
+    private boolean isArray;
+
+    private Type initializerType;
+
     @Override
     public void exitSimpleDeclaration(CPP14Parser.SimpleDeclarationContext ctx) {
 
         final ParserRuleContext parserRuleContext = ctx.initDeclaratorList().initDeclarator().get(0).declarator();
         String varName = parserRuleContext.getText();
 
-        if (ctx.declSpecifierSeq() != null) {
+        if (ctx.declSpecifierSeq() == null) {
+
+            // assignment without type declaration (a = 1;)
+
+            Type targetType = varTypeMap.get(varName);
+
+            // type of the assigned value (right hand side (rhs))
+            if (initializerType != null) {
+                performTypeCheck(targetType, initializerType, "[Assignment TypeError] VarName: \"" + varName + "\"",
+                        parserRuleContext);
+            }
+
+        } else {
 
             // assignment with type declaration (int a = 1;)
 
@@ -40,27 +56,60 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
             Type targetType = typeMap.get(targetTypeName);
 
             // type of the assigned value
-            // String rhsTypeName = exprTypeStack.pop();
-            // Type rhsType = typeMap.get(rhsTypeName);
-            Type rhsType = exprTypeStack.pop();
+            if (initializerType != null) {
+                performTypeCheck(targetType, initializerType, "[Assignment TypeError]", ctx.declSpecifierSeq());
+            }
 
-            performTypeCheck(targetType, rhsType, "[Assignment TypeError]", ctx.declSpecifierSeq());
+            // create an array type if the variable is an array
+            if (isArray) {
+                Type arrayVarType = new Type();
+                arrayVarType.setArraySubType(targetType);
+                varTypeMap.put(varName, arrayVarType);
+            } else {
+                varTypeMap.put(varName, targetType);
+            }
+        }
 
-            varTypeMap.put(varName, targetType);
+        // reset
+        exprTypeStack.clear();
+        initializerType = null;
+        isArray = false;
+    }
 
-        } else {
+    @Override
+    public void exitInitializerClause(CPP14Parser.InitializerClauseContext ctx) {
+        // store type in the initializerType member so the SimpleDeclaration rule
+        // can retrieve the type from the member
+        initializerType = exprTypeStack.pop();
+    }
 
-            // assignment without type declaration (a = 1;)
+    @Override
+    public void exitNoPointerDeclarator(CPP14Parser.NoPointerDeclaratorContext ctx) {
 
-            Type targetType = varTypeMap.get(varName);
+        // sometimes two NoPointerDeclaratorContext are directly nested!
+        // Only deal with the nexted node, ignore the parent!
+        if (ctx.getParent() instanceof CPP14Parser.NoPointerDeclaratorContext) {
+            return;
+        }
 
-            // type of the assigned value (right hand side (rhs))
-            // String rhsTypeName = exprTypeStack.pop();
-            // Type rhsType = typeMap.get(rhsTypeName);
-            Type rhsType = exprTypeStack.pop();
+        if (ctx.getChildCount() > 1) {
 
-            performTypeCheck(targetType, rhsType, "[Assignment TypeError] VarName: \"" + varName + "\"",
-                    parserRuleContext);
+            // System.out.println(ctx.getChild(1).getText());
+            // System.out.println(ctx.getChild(ctx.getChildCount()-1).getText());
+
+            boolean arrayStartFound = false;
+            boolean arrayEndFound = false;
+
+            if (StringUtils.equalsIgnoreCase(ctx.getChild(1).getText(), "[")) {
+                arrayStartFound = true;
+            }
+            if (StringUtils.equalsIgnoreCase(ctx.getChild(ctx.getChildCount() - 1).getText(), "]")) {
+                arrayEndFound = true;
+            }
+
+            if (arrayStartFound && arrayEndFound) {
+                isArray = true;
+            }
         }
     }
 
@@ -81,8 +130,6 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
             return;
         }
 
-        //Type typeA = null;
-
         for (ParserRuleContext expr : objs) {
 
             if (size == 1) {
@@ -90,9 +137,6 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
             }
             size--;
 
-            // String typeAName = exprTypeStack.pop();
-            // Type typeA = typeMap.get(typeAName);
-            // String typeB = exprTypeStack.pop();
             Type typeA = exprTypeStack.pop();
             Type typeB = exprTypeStack.pop();
 
@@ -104,6 +148,7 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
 
     @Override
     public void exitLiteral(CPP14Parser.LiteralContext ctx) {
+
         boolean typeProcessed = false;
         TerminalNode literalTerminalNode = ctx.IntegerLiteral();
         if (literalTerminalNode != null) {
@@ -139,7 +184,6 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
 
     private void performTypeCheck(final Type targetType, final Type rhsType, final String label,
             final ParserRuleContext ctx) {
-        //if (!StringUtils.equalsIgnoreCase(targetType, rhsType)) {
         if (targetType != rhsType) {
             throw new RuntimeException(
                     "[" + label + "]" + " Var's type: \"" + targetType + "\" Assigned value's type: \"" + rhsType
@@ -153,6 +197,10 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
 
     public void setTypeMap(Map<String, Type> typeMap) {
         this.typeMap = typeMap;
+    }
+
+    public Map<String, Type> getVarTypeMap() {
+        return varTypeMap;
     }
 
 }
