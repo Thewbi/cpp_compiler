@@ -2,6 +2,8 @@ package grammar;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -21,6 +23,8 @@ import com.cpp.grammar.PreprocessorParser;
 import com.cpp.grammar.CPP14Parser.TranslationUnitContext;
 import com.cpp.grammar.PreprocessorParser.Code_fileContext;
 
+import types.Type;
+
 /**
  * https://en.cppreference.com/w/cpp/language/translation_phases
  */
@@ -33,7 +37,7 @@ public class Main {
         translationUnit();
 
         System.out.println("End");
-    }   
+    }    
 
     private static void translationUnit() throws IOException {
 
@@ -49,7 +53,8 @@ public class Main {
         // final String filename = "src/test/resources/test_f.cpp";
         // final String filename = "src/test/resources/variables.cpp";
         //final String filename = "src/test/resources/declaration_type_error.cpp";
-        final String filename = "src/test/resources/declaration.cpp";
+        //final String filename = "src/test/resources/declaration.cpp";
+        final String filename = "src/test/resources/arrays.cpp";
 
         final CharStream charStream = CharStreams
                 .fromFileName(filename);
@@ -66,12 +71,34 @@ public class Main {
 
         //ConsoleCPP14ParserListener listener = new ConsoleCPP14ParserListener();
         //DefaultStructuredTextListener listener = new DefaultStructuredTextListener();
-        SemantCPP14ParserListener listener = new SemantCPP14ParserListener();
 
-        // // Create a generic parse tree walker that can trigger callbacks
+        final Map<String, Type> typeMap = new HashMap<>();
+
+        Type intType = new Type();
+        intType.setName("int");
+        typeMap.put(intType.getName(), intType);
+
+        Type charType = new Type();
+        charType.setName("char");
+        typeMap.put(charType.getName(), charType);
+
+        Type floatType = new Type();
+        floatType.setName("float");
+        typeMap.put(floatType.getName(), floatType);
+
+        Type stringType = new Type();
+        stringType.setName("std::string");
+        typeMap.put(stringType.getName(), stringType);
+
+        SemantCPP14ParserListener listener = new SemantCPP14ParserListener();
+        listener.setTypeMap(typeMap);
+
+        // Create a generic parse tree walker that can trigger callbacks
         final ParseTreeWalker walker = new ParseTreeWalker();
         // Walk the tree created during the parse, trigger callbacks
         walker.walk(listener, root);
+
+        //System.out.println(typeMap);
 
         // // dump output
         // Node rootNode = listener.getRootNode();
@@ -79,6 +106,7 @@ public class Main {
     }
 
     private static void preprocessor() throws IOException {
+
         // final String filename = "src/test/resources/preprocessor.cpp";
         // final String filename = "src/test/resources/preprocessor2.cpp";
         // final String filename = "src/test/resources/preprocessor3.cpp";

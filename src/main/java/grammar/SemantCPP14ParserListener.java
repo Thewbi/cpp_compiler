@@ -13,43 +13,54 @@ import org.apache.commons.lang3.StringUtils;
 import com.cpp.grammar.CPP14Parser;
 import com.cpp.grammar.CPP14ParserBaseListener;
 
+import types.Type;
+
 public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
 
-    private Stack<String> exprTypeStack = new Stack<String>();
+    private Stack<Type> exprTypeStack = new Stack<>();
 
-    private Map<String, String> typeMap = new HashMap<>();
+    /** type name to type */
+    private Map<String, Type> typeMap = new HashMap<>();
+
+    /** variable name to type */
+    private Map<String, Type> varTypeMap = new HashMap<>();
 
     @Override
     public void exitSimpleDeclaration(CPP14Parser.SimpleDeclarationContext ctx) {
 
-        String name = ctx.initDeclaratorList().initDeclarator().get(0).declarator().getText();
+        final ParserRuleContext parserRuleContext = ctx.initDeclaratorList().initDeclarator().get(0).declarator();
+        String varName = parserRuleContext.getText();
 
         if (ctx.declSpecifierSeq() != null) {
 
+            // assignment with type declaration (int a = 1;)
+
             // type of declared variable
-            String type = ctx.declSpecifierSeq().getText();
+            String targetTypeName = ctx.declSpecifierSeq().getText();
+            Type targetType = typeMap.get(targetTypeName);
 
             // type of the assigned value
-            String typeA = exprTypeStack.pop();
+            // String rhsTypeName = exprTypeStack.pop();
+            // Type rhsType = typeMap.get(rhsTypeName);
+            Type rhsType = exprTypeStack.pop();
 
-            if (!StringUtils.equalsIgnoreCase(typeA, type)) {
-                throw new RuntimeException(
-                        "type error! Var's type: \"" + type + "\" Assigned value's type: \"" + typeA + "\"");
-            }
+            performTypeCheck(targetType, rhsType, "[Assignment TypeError]", ctx.declSpecifierSeq());
 
-            typeMap.put(name, type);
+            varTypeMap.put(varName, targetType);
 
         } else {
 
-            String type = typeMap.get(name);
+            // assignment without type declaration (a = 1;)
 
-            // type of the assigned value
-            String typeA = exprTypeStack.pop();
+            Type targetType = varTypeMap.get(varName);
 
-            if (!StringUtils.equalsIgnoreCase(typeA, type)) {
-                throw new RuntimeException(
-                        "type error! Var's type: \"" + type + "\" Assigned value's type: \"" + typeA + "\"");
-            }
+            // type of the assigned value (right hand side (rhs))
+            // String rhsTypeName = exprTypeStack.pop();
+            // Type rhsType = typeMap.get(rhsTypeName);
+            Type rhsType = exprTypeStack.pop();
+
+            performTypeCheck(targetType, rhsType, "[Assignment TypeError] VarName: \"" + varName + "\"",
+                    parserRuleContext);
         }
     }
 
@@ -70,7 +81,7 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
             return;
         }
 
-        String typeA = null;
+        //Type typeA = null;
 
         for (ParserRuleContext expr : objs) {
 
@@ -79,13 +90,13 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
             }
             size--;
 
-            typeA = exprTypeStack.pop();
-            String typeB = exprTypeStack.pop();
+            // String typeAName = exprTypeStack.pop();
+            // Type typeA = typeMap.get(typeAName);
+            // String typeB = exprTypeStack.pop();
+            Type typeA = exprTypeStack.pop();
+            Type typeB = exprTypeStack.pop();
 
-            if (!StringUtils.equalsIgnoreCase(typeA, typeB)) {
-                throw new RuntimeException("addition type error! typeA: \"" + typeA + "\" typeB: \"" + typeB
-                        + "\" Line: " + expr.getStart().getLine());
-            }
+            performTypeCheck(typeA, typeB, "Addition TypeError", expr);
 
             exprTypeStack.push(typeA);
         }
@@ -96,27 +107,52 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
         boolean typeProcessed = false;
         TerminalNode literalTerminalNode = ctx.IntegerLiteral();
         if (literalTerminalNode != null) {
-            exprTypeStack.push("int");
+            checkAndAddType("int");
             typeProcessed = true;
         }
         literalTerminalNode = ctx.StringLiteral();
         if (literalTerminalNode != null) {
-            exprTypeStack.push("string");
+            checkAndAddType("std::string");
             typeProcessed = true;
         }
         literalTerminalNode = ctx.CharacterLiteral();
         if (literalTerminalNode != null) {
-            exprTypeStack.push("char");
+            checkAndAddType("char");
             typeProcessed = true;
         }
         literalTerminalNode = ctx.FloatingLiteral();
         if (literalTerminalNode != null) {
-            exprTypeStack.push("float");
+            checkAndAddType("float");
             typeProcessed = true;
         }
         if (!typeProcessed) {
             throw new RuntimeException("type not covered!");
         }
+    }
+
+    private void checkAndAddType(final String typeName) {
+        if (!typeMap.containsKey(typeName)) {
+            throw new RuntimeException("type \"" + typeName + "\" not covered!");
+        }
+        exprTypeStack.push(typeMap.get(typeName));
+    }
+
+    private void performTypeCheck(final Type targetType, final Type rhsType, final String label,
+            final ParserRuleContext ctx) {
+        //if (!StringUtils.equalsIgnoreCase(targetType, rhsType)) {
+        if (targetType != rhsType) {
+            throw new RuntimeException(
+                    "[" + label + "]" + " Var's type: \"" + targetType + "\" Assigned value's type: \"" + rhsType
+                            + "\" Line: " + ctx.getStart().getLine());
+        }
+    }
+
+    public Map<String, Type> getTypeMap() {
+        return typeMap;
+    }
+
+    public void setTypeMap(Map<String, Type> typeMap) {
+        this.typeMap = typeMap;
     }
 
 }
