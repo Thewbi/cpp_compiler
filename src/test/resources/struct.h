@@ -1,9 +1,9 @@
 struct Person {
-    int age_ { 0 };
-    std::string name_;
+    int age { 0 };
+    std::string name;
 };
 
 struct Box {
-    double weight_ { 0.0 };
-    double volume_ { 0.0 };
+    double weight { 0.0 };
+    double volume { 0.0 };
 };

@@ -2,6 +2,7 @@ package grammar;
 
 import java.util.Stack;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
 
@@ -12,6 +13,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.cpp.grammar.CPP14Parser;
 import com.cpp.grammar.CPP14ParserBaseListener;
+import com.cpp.grammar.CPP14Parser.DeclSpecifierSeqContext;
 
 import types.Type;
 
@@ -29,21 +31,35 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
 
     private Type initializerType;
 
-    private String declaratorName;
+    private List<String> declaratorNames = new ArrayList<>();
 
     @Override
     public void exitSimpleDeclaration(CPP14Parser.SimpleDeclarationContext ctx) {
 
         final ParserRuleContext parserRuleContext = ctx.initDeclaratorList().initDeclarator().get(0).declarator();
-        // String varName = parserRuleContext.getText();
+        for (String varName : declaratorNames) {
+            processVariableDeclaration(ctx, parserRuleContext, varName);
+        }
 
-        String varName = declaratorName;
+        // reset
+        exprTypeStack.clear();
+        initializerType = null;
+        isArray = false;
+        declaratorNames.clear();
+    }
 
+    private void processVariableDeclaration(CPP14Parser.SimpleDeclarationContext ctx,
+            final ParserRuleContext parserRuleContext,
+            String varName) {
         if (ctx.declSpecifierSeq() == null) {
 
             // assignment without type declaration (a = 1;)
 
             Type targetType = varTypeMap.get(varName);
+
+            if (targetType == null) {
+                throw new RuntimeException("Unknown type:  \"" + targetType + "\"");
+            }
 
             // type of the assigned value (right hand side (rhs))
             if (initializerType != null) {
@@ -56,12 +72,17 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
             // assignment with type declaration (int a = 1;)
 
             // type of declared variable
-            String targetTypeName = ctx.declSpecifierSeq().getText();
+            DeclSpecifierSeqContext declSpecifierSeqContext = ctx.declSpecifierSeq();
+            String targetTypeName = declSpecifierSeqContext.getText();
             Type targetType = typeMap.get(targetTypeName);
+
+            if (targetType == null) {
+                throw new RuntimeException("Unknown type:  \"" + targetType + "\"");
+            }
 
             // type of the assigned value
             if (initializerType != null) {
-                performTypeCheck(targetType, initializerType, "[Assignment TypeError]", ctx.declSpecifierSeq());
+                performTypeCheck(targetType, initializerType, "[Assignment TypeError]", declSpecifierSeqContext);
             }
 
             // create an array type if the variable is an array
@@ -73,17 +94,11 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
                 varTypeMap.put(varName, targetType);
             }
         }
-
-        // reset
-        exprTypeStack.clear();
-        initializerType = null;
-        isArray = false;
-        declaratorName = null;
     }
 
     @Override
     public void exitDeclaratorid(CPP14Parser.DeclaratoridContext ctx) {
-        declaratorName = ctx.getText();
+        declaratorNames.add(ctx.getText());
     }
 
     @Override
@@ -107,12 +122,6 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
             }
             initializerType = tempInitializerType;
         }
-        
-        // else if (exprTypeStack.size() == 2) {
-        //     System.out.println(exprTypeStack.pop());
-        // } else {
-        //     throw new RuntimeException();
-        // }
     }
 
     @Override

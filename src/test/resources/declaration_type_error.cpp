@@ -10,3 +10,5 @@
 // float f = 1;
 
 // float f = 'a' * 2.0f + 3.0f;
+
+float x { 'x' };
