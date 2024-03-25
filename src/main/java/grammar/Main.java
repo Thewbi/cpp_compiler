@@ -51,12 +51,12 @@ public class Main {
         //final String filename = "src/test/resources/main.cpp";
         //final String filename = "src/test/resources/pragma.h";
         //final String filename = "src/test/resources/preprocessor.cpp";
-        //final String filename = "src/test/resources/scratchpad.h";
+        final String filename = "src/test/resources/scratchpad.h";
         //final String filename = "src/test/resources/template.h";
         //final String filename = "src/test/resources/test_f.cpp";
         //final String filename = "src/test/resources/variables.cpp";
         //final String filename = "src/test/resources/declaration_type_error.cpp";
-        final String filename = "src/test/resources/declaration.cpp";
+        //final String filename = "src/test/resources/declaration.cpp";
         //final String filename = "src/test/resources/arrays.cpp";
         //final String filename = "src/test/resources/if.cpp";
         //final String filename = "src/test/resources/function.cpp";
@@ -74,13 +74,16 @@ public class Main {
         // parse
         TranslationUnitContext root = parser.translationUnit();
 
-        boolean print = false;
-        //boolean print = true;
+        //boolean print = false;
+        boolean print = true;
 
         CPP14ParserListener listener = null;
         if (print) {
+
             listener = new ConsoleCPP14ParserListener();
+
         } else {
+            
             final Map<String, Type> typeMap = new HashMap<>();
 
             Type intType = new Type();
