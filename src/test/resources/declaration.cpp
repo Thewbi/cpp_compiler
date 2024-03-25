@@ -1,4 +1,7 @@
+int m = 4;
+int n = m;
 
+/**/
 int a1, b1;
 int a2, b2, c2;
 

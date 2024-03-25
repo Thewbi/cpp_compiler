@@ -10,11 +10,16 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.stringtemplate.v4.compiler.FormalArgument;
 
 import com.cpp.grammar.CPP14Parser;
 import com.cpp.grammar.CPP14ParserBaseListener;
 import com.cpp.grammar.CPP14Parser.DeclSpecifierSeqContext;
+import com.cpp.grammar.CPP14Parser.InitDeclaratorContext;
+import com.cpp.grammar.CPP14Parser.InitDeclaratorListContext;
 
+import types.FormalParameter;
+import types.FuncDecl;
 import types.Type;
 
 public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
@@ -33,10 +38,87 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
 
     private List<String> declaratorNames = new ArrayList<>();
 
+    private SemAntMode semAntMode = SemAntMode.DEFAULT;
+
+    private FuncDecl funcDecl;
+
+    private Map<String, FuncDecl> funcDeclMap = new HashMap<>();
+
+    /**
+     * Function Declaration begins
+     */
+    @Override
+    public void enterFunctionDefinition(CPP14Parser.FunctionDefinitionContext ctx) {
+        funcDecl = new FuncDecl();
+    }
+
+    @Override
+    public void exitFunctionDefinition(CPP14Parser.FunctionDefinitionContext ctx) {
+        FuncDecl oldFuncDecl = funcDeclMap.put(funcDecl.getName(), funcDecl);
+        if (oldFuncDecl != null) {
+            throw new RuntimeException("[Function Declaration Error (Line " + ctx.getStart().getLine()
+                    + ")] Function \"" + funcDecl.getName() + "\" already defined!");
+        }
+        funcDecl = null;
+    }
+
+    @Override
+    public void enterParameterDeclaration(CPP14Parser.ParameterDeclarationContext ctx) {
+        semAntMode = SemAntMode.PARAMETER_DECLARATION;
+
+        FormalParameter formalParameter = new FormalParameter();
+        funcDecl.getParams().add(formalParameter);
+    }
+
+    @Override
+    public void exitParameterDeclaration(CPP14Parser.ParameterDeclarationContext ctx) {
+        semAntMode = SemAntMode.DEFAULT;
+    }
+
+    @Override
+    public void exitSimpleTypeSpecifier(CPP14Parser.SimpleTypeSpecifierContext ctx) {
+        final String typeName = ctx.getText();
+        // System.out.println(typeName);
+        if (funcDecl != null) {
+
+            if (semAntMode == SemAntMode.PARAMETER_DECLARATION) {
+
+                if (!typeMap.containsKey(typeName)) {
+                    throw new RuntimeException("type \"" + typeName + "\" not covered!");
+                }
+                Type formalParameterType = typeMap.get(typeName);
+
+                FormalParameter formalParameter = funcDecl.getParams().get(funcDecl.getParams().size() - 1);
+                formalParameter.setType(formalParameterType);
+
+            } else {
+                Type returnType = null;
+                if (StringUtils.equalsIgnoreCase("void", typeName)) {
+                    returnType = null;
+                } else {
+                    if (!typeMap.containsKey(typeName)) {
+                        throw new RuntimeException("type \"" + typeName + "\" not covered!");
+                    }
+                    returnType = typeMap.get(typeName);
+                }
+                funcDecl.setReturnType(returnType);
+            }
+        }
+    }
+
     @Override
     public void exitSimpleDeclaration(CPP14Parser.SimpleDeclarationContext ctx) {
 
-        final ParserRuleContext parserRuleContext = ctx.initDeclaratorList().initDeclarator().get(0).declarator();
+        // check if this declaration is a single semicolon and then skip the empty
+        // statement
+        if (StringUtils.equalsIgnoreCase(ctx.getText(), ";")) {
+            return;
+        }
+
+        InitDeclaratorListContext initDeclaratorListContext = ctx.initDeclaratorList();
+        List<InitDeclaratorContext> InitDeclaratorContexts = initDeclaratorListContext.initDeclarator();
+        InitDeclaratorContext initDeclaratorContext = InitDeclaratorContexts.get(0);
+        final ParserRuleContext parserRuleContext = initDeclaratorContext.declarator();
         for (String varName : declaratorNames) {
             processVariableDeclaration(ctx, parserRuleContext, varName);
         }
@@ -51,6 +133,7 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
     private void processVariableDeclaration(CPP14Parser.SimpleDeclarationContext ctx,
             final ParserRuleContext parserRuleContext,
             String varName) {
+
         if (ctx.declSpecifierSeq() == null) {
 
             // assignment without type declaration (a = 1;)
@@ -106,6 +189,7 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
         // int numbers[3] = {10, '20', 30};
         // forget about the array length literal '3'
         exprTypeStack.clear();
+        semAntMode = SemAntMode.INITIALIZER;
     }
 
     @Override
@@ -122,6 +206,8 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
             }
             initializerType = tempInitializerType;
         }
+
+        semAntMode = SemAntMode.DEFAULT;
     }
 
     @Override
@@ -188,6 +274,36 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
     }
 
     @Override
+    public void exitIdExpression(CPP14Parser.IdExpressionContext ctx) {
+
+        final String varName = ctx.getText();
+
+        // System.out.println(varName);
+
+        if (semAntMode == SemAntMode.INITIALIZER) {
+
+            if (!varTypeMap.containsKey(varName)) {
+                throw new RuntimeException(
+                        "[Error: Initializer variable not defined! (Line " + ctx.getStart().getLine() + ")] "
+                                + " Undefined variable is: \"" + varName + "\"");
+            }
+
+            Type type = varTypeMap.get(ctx.getText());
+            exprTypeStack.push(type);
+        }
+
+        if (semAntMode == SemAntMode.PARAMETER_DECLARATION) {
+            System.out.println("Add parameter");
+
+            FormalParameter formalParameter = funcDecl.getParams().get(funcDecl.getParams().size() - 1);
+            formalParameter.setName(varName);
+
+        } else if (funcDecl != null) {
+            funcDecl.setName(varName);
+        }
+    }
+
+    @Override
     public void exitLiteral(CPP14Parser.LiteralContext ctx) {
 
         // System.out.println(ctx.getText());
@@ -245,6 +361,14 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
 
     public Map<String, Type> getVarTypeMap() {
         return varTypeMap;
+    }
+
+    public Map<String, FuncDecl> getFuncDeclMap() {
+        return funcDeclMap;
+    }
+
+    public void setFuncDeclMap(Map<String, FuncDecl> funcDeclMap) {
+        this.funcDeclMap = funcDeclMap;
     }
 
 }

@@ -11,4 +11,12 @@
 
 // float f = 'a' * 2.0f + 3.0f;
 
-float x { 'x' };
+//float x { 'x' };
+
+/*
+char m = 'm';
+int n = m;
+*/
+
+
+int var1 = undeclared_var;

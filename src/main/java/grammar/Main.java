@@ -24,6 +24,7 @@ import com.cpp.grammar.PreprocessorParser;
 import com.cpp.grammar.CPP14Parser.TranslationUnitContext;
 import com.cpp.grammar.PreprocessorParser.Code_fileContext;
 
+import types.FuncDecl;
 import types.Type;
 
 /**
@@ -38,7 +39,7 @@ public class Main {
         translationUnit();
 
         System.out.println("End");
-    }
+    } 
 
     private static void translationUnit() throws IOException {
 
@@ -57,6 +58,8 @@ public class Main {
         //final String filename = "src/test/resources/declaration_type_error.cpp";
         final String filename = "src/test/resources/declaration.cpp";
         //final String filename = "src/test/resources/arrays.cpp";
+        //final String filename = "src/test/resources/if.cpp";
+        //final String filename = "src/test/resources/function.cpp";
 
         final CharStream charStream = CharStreams
                 .fromFileName(filename);
@@ -103,6 +106,9 @@ public class Main {
             SemantCPP14ParserListener semantCPP14ParserListener = new SemantCPP14ParserListener();
             semantCPP14ParserListener.setTypeMap(typeMap);
 
+            Map<String, FuncDecl> funcDeclMap = new HashMap<>();
+            semantCPP14ParserListener.setFuncDeclMap(funcDeclMap);
+
             listener = semantCPP14ParserListener;
         }
 
@@ -115,9 +121,9 @@ public class Main {
 
         if (listener instanceof SemantCPP14ParserListener) {
             SemantCPP14ParserListener l = (SemantCPP14ParserListener) listener;
-            System.out.println(l.getVarTypeMap());
+            System.out.println("VarTypeMap: " + l.getVarTypeMap());
+            System.out.println("FuncDeclMap: " + l.getFuncDeclMap());
         }
-        
 
         // // dump output
         // Node rootNode = listener.getRootNode();
