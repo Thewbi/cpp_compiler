@@ -39,7 +39,7 @@ public class Main {
         translationUnit();
 
         System.out.println("End");
-    }  
+    }   
 
     private static void translationUnit() throws IOException {
 

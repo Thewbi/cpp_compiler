@@ -18,9 +18,7 @@ int numbers[3] = {10, 20, 30};
 int m = 4;
 int n = m;
 
-/**/
 int a1, b1;
 int a2, b2, c2;
-
 
 float x { 0.0f };

@@ -3,6 +3,7 @@ package grammar;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Stack;
 
@@ -43,6 +44,45 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
 
     private Map<String, FuncDecl> funcDeclMap = new HashMap<>();
 
+    private String calledFunctionName;
+
+    @Override
+    public void enterExpressionList(CPP14Parser.ExpressionListContext ctx) {
+    }
+
+    @Override
+    public void exitExpressionList(CPP14Parser.ExpressionListContext ctx) {
+        System.out.println("" + calledFunctionName);
+
+        FuncDecl funcDecl = funcDeclMap.get(calledFunctionName);
+
+        if ((exprTypeStack.size() - 1) != funcDecl.getParams().size()) {
+            throw new RuntimeException("[ERROR: function call of function: \"" + calledFunctionName
+                    + "\"(). Incorrect amount of actual parameters supplied!");
+        }
+
+        // Iterate in reverse.
+        ListIterator li = funcDecl.getParams().listIterator(funcDecl.getParams().size());
+        while (li.hasPrevious()) {
+
+            System.out.println(li.previous());
+
+            Type actualParameterType = exprTypeStack.pop();
+
+            FormalParameter formalParameter = (FormalParameter) li.previous();
+
+            performTypeCheck(formalParameter.getType(), actualParameterType, "[ERROR: function call of function: \""
+                    + calledFunctionName + "\"(). Actual parameter type does not match!", ctx);
+
+            // last value on the stack is the return type of the function
+            // store it into initializerType so that the declaration can perform type check
+            // between the function value and the assigned variable
+            initializerType = exprTypeStack.pop();
+        }
+
+        System.out.println("");
+    }
+
     @Override
     public void enterStatement(CPP14Parser.StatementContext ctx) {
         setSemAntMode(SemAntMode.STATEMENT);
@@ -54,7 +94,7 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
     }
 
     /**
-     * Function Declaration begins
+     * Function Definition begins
      */
     @Override
     public void enterFunctionDefinition(CPP14Parser.FunctionDefinitionContext ctx) {
@@ -75,14 +115,6 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
             returnType = typeMap.get(typeName);
         }
         funcDecl.setReturnType(returnType);
-
-        // // function name
-        // IdExpressionContext declarator = ctx.getChild(IdExpressionContext.class, 1);
-        // String functionName = declarator.getText();
-
-        // ctx.get
-
-        // funcDecl.setName(functionName);
     }
 
     @Override
@@ -125,8 +157,6 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
     public void exitSimpleTypeSpecifier(CPP14Parser.SimpleTypeSpecifierContext ctx) {
         final String typeName = ctx.getText();
         // System.out.println(typeName);
-        // if (funcDecl != null) {
-
         if (semAntMode == SemAntMode.PARAMETER_DECLARATION) {
 
             if (!typeMap.containsKey(typeName)) {
@@ -136,28 +166,13 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
 
             FormalParameter formalParameter = funcDecl.getParams().get(funcDecl.getParams().size() - 1);
             formalParameter.setType(formalParameterType);
-
         }
-
-        // else {
-
-        // Type returnType = null;
-        // if (StringUtils.equalsIgnoreCase("void", typeName)) {
-        // returnType = null;
-        // } else {
-        // if (!typeMap.containsKey(typeName)) {
-        // throw new RuntimeException("type \"" + typeName + "\" not covered!");
-        // }
-        // returnType = typeMap.get(typeName);
-        // }
-        // funcDecl.setReturnType(returnType);
-
-        // }
-        // }
     }
 
     @Override
     public void exitSimpleDeclaration(CPP14Parser.SimpleDeclarationContext ctx) {
+
+        System.out.println(ctx.getText());
 
         // check if this declaration is a single semicolon and then skip the empty
         // statement
@@ -170,15 +185,15 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
         InitDeclaratorContext initDeclaratorContext = InitDeclaratorContexts.get(0);
         final ParserRuleContext parserRuleContext = initDeclaratorContext.declarator();
 
-        if (semAntMode == SemAntMode.STATEMENT) {
+        // if (semAntMode == SemAntMode.STATEMENT) {
 
-            System.out.println("Statement: " + declaratorNames);
+        // System.out.println("Statement: " + declaratorNames);
 
-        } else {
-            for (String varName : declaratorNames) {
-                processVariableDeclaration(ctx, parserRuleContext, varName);
-            }
+        // } else {
+        for (String varName : declaratorNames) {
+            processVariableDeclaration(ctx, parserRuleContext, varName);
         }
+        // }
 
         // reset
         exprTypeStack.clear();
@@ -252,7 +267,7 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
     }
 
     @Override
-    public void enterInitializerClause(CPP14Parser.InitializerClauseContext ctx) {
+    public void enterBraceOrEqualInitializer(CPP14Parser.BraceOrEqualInitializerContext ctx) {
         // int numbers[3] = {10, '20', 30};
         // forget about the array length literal '3'
         exprTypeStack.clear();
@@ -261,6 +276,9 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
 
     @Override
     public void exitInitializerClause(CPP14Parser.InitializerClauseContext ctx) {
+
+        // System.out.println(ctx.getText());
+
         // store type in the initializerType member so the SimpleDeclaration rule
         // can retrieve the type from the member
 
@@ -343,7 +361,7 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
     @Override
     public void enterPostfixExpression(CPP14Parser.PostfixExpressionContext ctx) {
         String primaryExpression = ctx.getText();
-        //System.out.println(primaryExpression);
+        // System.out.println(primaryExpression);
 
         if (StringUtils.endsWithIgnoreCase(primaryExpression, ")")) {
             setSemAntMode(SemAntMode.FUNCTION_CALL);
@@ -355,7 +373,7 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
 
         final String varName = ctx.getText();
 
-        // System.out.println(varName);
+        System.out.println(varName);
 
         switch (semAntMode) {
 
@@ -372,7 +390,7 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
                 break;
 
             case PARAMETER_DECLARATION: {
-                //System.out.println("Add parameter");
+                // System.out.println("Add parameter");
 
                 FormalParameter formalParameter = funcDecl.getParams().get(funcDecl.getParams().size() - 1);
                 formalParameter.setName(varName);
@@ -385,46 +403,24 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
             }
                 break;
 
-                case FUNCTION_CALL: {
-                    //throw new RuntimeException("FunctionCall not implemented yet!");
-                    if (!funcDeclMap.containsKey(varName)) {
-                        throw new RuntimeException(
-                                "[Error: Function not defined! (Line " + ctx.getStart().getLine() + ")] "
-                                        + " Undefined function is: \"" + varName + "\"");
-                    }
-    
-                    FuncDecl funcDecl = funcDeclMap.get(ctx.getText());
-                    exprTypeStack.push(funcDecl.getReturnType());
+            case FUNCTION_CALL: {
+                // throw new RuntimeException("FunctionCall not implemented yet!");
+                if (!funcDeclMap.containsKey(varName)) {
+                    throw new RuntimeException(
+                            "[Error: Function not defined! (Line " + ctx.getStart().getLine() + ")] "
+                                    + " Undefined function is: \"" + varName + "\"");
                 }
-                    break;
+
+                FuncDecl funcDecl = funcDeclMap.get(ctx.getText());
+                exprTypeStack.push(funcDecl.getReturnType());
+
+                calledFunctionName = varName;
+            }
+                break;
 
             default:
                 break;
         }
-
-        // if (semAntMode == SemAntMode.INITIALIZER) {
-
-        // if (!varTypeMap.containsKey(varName)) {
-        // throw new RuntimeException(
-        // "[Error: Initializer variable not defined! (Line " + ctx.getStart().getLine()
-        // + ")] "
-        // + " Undefined variable is: \"" + varName + "\"");
-        // }
-
-        // Type type = varTypeMap.get(ctx.getText());
-        // exprTypeStack.push(type);
-        // }
-
-        // if (semAntMode == SemAntMode.PARAMETER_DECLARATION) {
-        // System.out.println("Add parameter");
-
-        // FormalParameter formalParameter =
-        // funcDecl.getParams().get(funcDecl.getParams().size() - 1);
-        // formalParameter.setName(varName);
-
-        // } else if (funcDecl != null) {
-        // funcDecl.setName(varName);
-        // }
     }
 
     @Override
