@@ -341,6 +341,16 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
     }
 
     @Override
+    public void enterPostfixExpression(CPP14Parser.PostfixExpressionContext ctx) {
+        String primaryExpression = ctx.getText();
+        //System.out.println(primaryExpression);
+
+        if (StringUtils.endsWithIgnoreCase(primaryExpression, ")")) {
+            setSemAntMode(SemAntMode.FUNCTION_CALL);
+        }
+    }
+
+    @Override
     public void exitIdExpression(CPP14Parser.IdExpressionContext ctx) {
 
         final String varName = ctx.getText();
@@ -362,7 +372,7 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
                 break;
 
             case PARAMETER_DECLARATION: {
-                System.out.println("Add parameter");
+                //System.out.println("Add parameter");
 
                 FormalParameter formalParameter = funcDecl.getParams().get(funcDecl.getParams().size() - 1);
                 formalParameter.setName(varName);
@@ -374,6 +384,19 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
                 declaratorNames.clear();
             }
                 break;
+
+                case FUNCTION_CALL: {
+                    //throw new RuntimeException("FunctionCall not implemented yet!");
+                    if (!funcDeclMap.containsKey(varName)) {
+                        throw new RuntimeException(
+                                "[Error: Function not defined! (Line " + ctx.getStart().getLine() + ")] "
+                                        + " Undefined function is: \"" + varName + "\"");
+                    }
+    
+                    FuncDecl funcDecl = funcDeclMap.get(ctx.getText());
+                    exprTypeStack.push(funcDecl.getReturnType());
+                }
+                    break;
 
             default:
                 break;

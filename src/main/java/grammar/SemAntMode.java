@@ -14,6 +14,8 @@ public enum SemAntMode {
 
     FUNCTION_BODY,
 
+    FUNCTION_CALL,
+
     UNKNOWN
 
 }

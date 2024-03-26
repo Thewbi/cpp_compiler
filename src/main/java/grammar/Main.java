@@ -56,11 +56,12 @@ public class Main {
         //final String filename = "src/test/resources/test_f.cpp";
         //final String filename = "src/test/resources/variables.cpp";
         //final String filename = "src/test/resources/declaration_type_error.cpp";
-        final String filename = "src/test/resources/declaration.cpp";
+        //final String filename = "src/test/resources/declaration.cpp";
         //final String filename = "src/test/resources/arrays.cpp";
         //final String filename = "src/test/resources/if.cpp";
         //final String filename = "src/test/resources/for_loop.cpp";
         //final String filename = "src/test/resources/function.cpp";
+        final String filename = "src/test/resources/function_call.cpp";
 
         final CharStream charStream = CharStreams
                 .fromFileName(filename);
@@ -138,7 +139,10 @@ public class Main {
             System.out.println("");
             System.out.println("Functions");
             System.out.println("-------------------------------------------");
-            System.out.println("FuncDeclMap: " + lstnr.getFuncDeclMap());
+            //System.out.println("FuncDeclMap: " + lstnr.getFuncDeclMap());
+            for (Map.Entry<String, FuncDecl> entry : lstnr.getFuncDeclMap().entrySet()) {
+                System.out.println(entry.getKey() + " | " + entry.getValue());
+            }
         }
 
         // // dump output
