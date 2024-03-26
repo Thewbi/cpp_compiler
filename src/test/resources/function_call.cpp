@@ -9,9 +9,9 @@ char funcChar() {
 int funcIntParam(int a, int b) {
     return a;
 }
-// int funcIntParam(int a, char b) {
-//     return a;
-// }
+int funcIntParamChar(int a, char b) {
+     return a;
+}
 
 int main()
 {
@@ -27,7 +27,7 @@ int main()
     //length = funcIntParam(1+2+3+4+5, 1);
     //length = funcIntParam(1+2+3+4+5, 2, 'c', 1.0f, "abc");
 
-    length = funcIntParam(1, funcIntParam(2, 3));
+    length = funcIntParam(1, funcIntParamChar(2, '3'));
 
     return length;
 }

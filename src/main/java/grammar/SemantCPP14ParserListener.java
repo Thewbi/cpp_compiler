@@ -44,7 +44,9 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
 
     private Map<String, FuncDecl> funcDeclMap = new HashMap<>();
 
-    private String calledFunctionName;
+    // private String calledFunctionName;
+
+    private Stack<String> calledFunctionNameStack = new Stack();
 
     @Override
     public void enterExpressionList(CPP14Parser.ExpressionListContext ctx) {
@@ -52,33 +54,37 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
 
     @Override
     public void exitExpressionList(CPP14Parser.ExpressionListContext ctx) {
+
+        String calledFunctionName = calledFunctionNameStack.pop();
+        
         System.out.println("" + calledFunctionName);
 
         FuncDecl funcDecl = funcDeclMap.get(calledFunctionName);
 
-        if ((exprTypeStack.size() - 1) != funcDecl.getParams().size()) {
-            throw new RuntimeException("[ERROR: function call of function: \"" + calledFunctionName
-                    + "\"(). Incorrect amount of actual parameters supplied!");
-        }
+        // if ((exprTypeStack.size() - 1) != funcDecl.getParams().size()) {
+        //     throw new RuntimeException("[ERROR: function call of function: \"" + calledFunctionName
+        //             + "\"(). Incorrect amount of actual parameters supplied!");
+        // }
 
         // Iterate in reverse.
         ListIterator li = funcDecl.getParams().listIterator(funcDecl.getParams().size());
         while (li.hasPrevious()) {
 
-            System.out.println(li.previous());
+            // System.out.println(li.previous());
 
             Type actualParameterType = exprTypeStack.pop();
 
             FormalParameter formalParameter = (FormalParameter) li.previous();
+            System.out.println(formalParameter);
 
             performTypeCheck(formalParameter.getType(), actualParameterType, "[ERROR: function call of function: \""
                     + calledFunctionName + "\"(). Actual parameter type does not match!", ctx);
-
-            // last value on the stack is the return type of the function
-            // store it into initializerType so that the declaration can perform type check
-            // between the function value and the assigned variable
-            initializerType = exprTypeStack.pop();
         }
+
+        // last value on the stack is the return type of the function
+        // store it into initializerType so that the declaration can perform type check
+        // between the function value and the assigned variable
+        initializerType = exprTypeStack.peek();
 
         System.out.println("");
     }
@@ -414,7 +420,8 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
                 FuncDecl funcDecl = funcDeclMap.get(ctx.getText());
                 exprTypeStack.push(funcDecl.getReturnType());
 
-                calledFunctionName = varName;
+                //calledFunctionName = varName;
+                calledFunctionNameStack.push(varName);
             }
                 break;
 
