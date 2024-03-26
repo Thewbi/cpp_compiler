@@ -8,6 +8,12 @@ public enum SemAntMode {
 
     PARAMETER_DECLARATION,
 
+    STATEMENT,
+
+    FUNCTION_DECLARATION,
+
+    FUNCTION_BODY,
+
     UNKNOWN
 
 }

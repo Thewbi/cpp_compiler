@@ -1,13 +1,3 @@
-int m = 4;
-int n = m;
-
-/**/
-int a1, b1;
-int a2, b2, c2;
-
-
-float x { 0.0f };
-
 int a = 1;
 a = 2;
 
@@ -24,3 +14,13 @@ float h = 1.0f * 2.0f + 3.0f;
 std::string i = "test";
 
 int numbers[3] = {10, 20, 30};
+
+int m = 4;
+int n = m;
+
+/**/
+int a1, b1;
+int a2, b2, c2;
+
+
+float x { 0.0f };

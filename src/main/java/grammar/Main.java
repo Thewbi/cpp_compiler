@@ -39,7 +39,7 @@ public class Main {
         translationUnit();
 
         System.out.println("End");
-    } 
+    }  
 
     private static void translationUnit() throws IOException {
 
@@ -51,14 +51,15 @@ public class Main {
         //final String filename = "src/test/resources/main.cpp";
         //final String filename = "src/test/resources/pragma.h";
         //final String filename = "src/test/resources/preprocessor.cpp";
-        final String filename = "src/test/resources/scratchpad.h";
+        //final String filename = "src/test/resources/scratchpad.h";
         //final String filename = "src/test/resources/template.h";
         //final String filename = "src/test/resources/test_f.cpp";
         //final String filename = "src/test/resources/variables.cpp";
         //final String filename = "src/test/resources/declaration_type_error.cpp";
-        //final String filename = "src/test/resources/declaration.cpp";
+        final String filename = "src/test/resources/declaration.cpp";
         //final String filename = "src/test/resources/arrays.cpp";
         //final String filename = "src/test/resources/if.cpp";
+        //final String filename = "src/test/resources/for_loop.cpp";
         //final String filename = "src/test/resources/function.cpp";
 
         final CharStream charStream = CharStreams
@@ -74,8 +75,8 @@ public class Main {
         // parse
         TranslationUnitContext root = parser.translationUnit();
 
-        //boolean print = false;
-        boolean print = true;
+        boolean print = false;
+        //boolean print = true;
 
         CPP14ParserListener listener = null;
         if (print) {
@@ -83,7 +84,7 @@ public class Main {
             listener = new ConsoleCPP14ParserListener();
 
         } else {
-            
+
             final Map<String, Type> typeMap = new HashMap<>();
 
             Type intType = new Type();
@@ -123,9 +124,21 @@ public class Main {
         // System.out.println(typeMap);
 
         if (listener instanceof SemantCPP14ParserListener) {
-            SemantCPP14ParserListener l = (SemantCPP14ParserListener) listener;
-            System.out.println("VarTypeMap: " + l.getVarTypeMap());
-            System.out.println("FuncDeclMap: " + l.getFuncDeclMap());
+            SemantCPP14ParserListener lstnr = (SemantCPP14ParserListener) listener;
+
+            System.out.println("");
+            System.out.println("Variables (VarName | VarType)");
+            System.out.println("-------------------------------------------");
+            // System.out.println("VarTypeMap: " + lstnr.getVarTypeMap());
+            for (Map.Entry<String, Type> entry : lstnr.getVarTypeMap().entrySet()) {
+                //System.out.println("VarName: \"" + entry.getKey() + "\" VarType: " + entry.getValue());
+                System.out.println(entry.getKey() + " | " + entry.getValue());
+            }
+
+            System.out.println("");
+            System.out.println("Functions");
+            System.out.println("-------------------------------------------");
+            System.out.println("FuncDeclMap: " + lstnr.getFuncDeclMap());
         }
 
         // // dump output
