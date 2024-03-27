@@ -26,12 +26,10 @@ import types.Type;
 /**
  * This code is bad. I am sorry.
  * The issue is that most elements conway no sematic meaning and almost
- * all the nodes are reused in different contexts multuple times.
- * To parse out any semantic meaning, wierd code is necessary.
+ * all the nodes are reused in different contexts multiple times.
+ * To parse out any semantic meaning, weird code is necessary.
  */
 public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
-
-    // private Stack<Type> exprTypeStack = new Stack<>();
 
     /** type name to type */
     private Map<String, Type> typeMap = new HashMap<>();
@@ -51,8 +49,6 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
     private FuncDecl funcDecl;
 
     private Map<String, FuncDecl> funcDeclMap = new HashMap<>();
-
-    // private String calledFunctionName;
 
     private Stack<String> calledFunctionNameStack = new Stack<>();
 
@@ -224,9 +220,6 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
 
             FormalParameter formalParameter = funcDecl.getParams().get(funcDecl.getParams().size() - 1);
             formalParameter.setType(formalParameterType);
-
-            // // in the current local scope, parameters are treated as local variables!
-            // varTypeMap.put(formalParameter.getName(), formalParameterType);
         }
     }
 
@@ -581,19 +574,7 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
 
                 System.out.println("FUNCTION_CALL enter without parameters detected");
 
-                // StackFrame stackFrame = new StackFrame();
-                // executionStack.push(stackFrame);
-
                 setSemAntMode(SemAntMode.FUNCTION_CALL);
-
-                // the return type of the the called function goes onto the exprTypeStack of
-                // the lower stackFrame
-                // stackFrame.exprTypeStack.push(funcDecl.getReturnType());
-
-                // // wierd values on the expression stack!
-                // processFunctionCallExit(ctx, funcName, funcDecl);
-
-                // stackFrame = executionStack.pop();
 
             } else {
 
