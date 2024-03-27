@@ -57,7 +57,7 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
 
         String calledFunctionName = calledFunctionNameStack.pop();
         
-        System.out.println("" + calledFunctionName);
+        //System.out.println("FUNCTION_CALL_WITH_PARAMETERS: " + calledFunctionName);
 
         FuncDecl funcDecl = funcDeclMap.get(calledFunctionName);
 
@@ -75,7 +75,7 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
             Type actualParameterType = exprTypeStack.pop();
 
             FormalParameter formalParameter = (FormalParameter) li.previous();
-            System.out.println(formalParameter);
+            // System.out.println(formalParameter);
 
             performTypeCheck(formalParameter.getType(), actualParameterType, "[ERROR: function call of function: \""
                     + calledFunctionName + "\"(). Actual parameter type does not match!", ctx);
@@ -86,7 +86,7 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
         // between the function value and the assigned variable
         initializerType = exprTypeStack.peek();
 
-        System.out.println("");
+        // System.out.println("");
     }
 
     @Override
@@ -178,7 +178,7 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
     @Override
     public void exitSimpleDeclaration(CPP14Parser.SimpleDeclarationContext ctx) {
 
-        System.out.println(ctx.getText());
+        // System.out.println(ctx.getText());
 
         // check if this declaration is a single semicolon and then skip the empty
         // statement
@@ -379,7 +379,7 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
 
         final String varName = ctx.getText();
 
-        System.out.println(varName);
+        // System.out.println(varName);
 
         switch (semAntMode) {
 
@@ -420,7 +420,8 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
                 FuncDecl funcDecl = funcDeclMap.get(ctx.getText());
                 exprTypeStack.push(funcDecl.getReturnType());
 
-                //calledFunctionName = varName;
+                System.out.println("FUNCTION_CALL: " + varName);
+
                 calledFunctionNameStack.push(varName);
             }
                 break;

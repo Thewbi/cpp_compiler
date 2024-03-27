@@ -142,6 +142,7 @@ public class Main {
             //System.out.println("FuncDeclMap: " + lstnr.getFuncDeclMap());
             for (Map.Entry<String, FuncDecl> entry : lstnr.getFuncDeclMap().entrySet()) {
                 System.out.println(entry.getKey() + " | " + entry.getValue());
+                System.out.println("");
             }
         }
 

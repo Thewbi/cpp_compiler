@@ -39,7 +39,20 @@ public class FuncDecl {
 
     @Override
     public String toString() {
-        return "FuncDecl [name=" + name + ", returnType=" + returnType + ", params=" + params + "]";
+        //return "FuncDecl [name=" + name + ", returnType=" + returnType + ", params=" + params + "]";
+
+        StringBuilder stringBuilder = new StringBuilder();
+
+        stringBuilder.append("FuncDecl [name=" + name + ", returnType=" + returnType + " ");
+
+        int i = 1;
+        for (FormalParameter formalParameter : params) {
+            stringBuilder.append("\n");
+            stringBuilder.append("Parameter ").append(i).append(" ").append(formalParameter);
+            i++;
+        }
+
+        return stringBuilder.toString();
     }
 
 }
