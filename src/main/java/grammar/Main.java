@@ -62,10 +62,10 @@ public class Main {
         //final String filename = "src/test/resources/declaration_type_error.cpp";
         //final String filename = "src/test/resources/declaration.cpp";
         //final String filename = "src/test/resources/arrays.cpp";
-        //final String filename = "src/test/resources/if.cpp";
+        final String filename = "src/test/resources/if.cpp";
         //final String filename = "src/test/resources/for_loop.cpp";
         //final String filename = "src/test/resources/function.cpp";
-        final String filename = "src/test/resources/function_call.cpp";
+        //final String filename = "src/test/resources/function_call.cpp";
 
         final CharStream charStream = CharStreams
                 .fromFileName(filename);

@@ -52,6 +52,26 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
     private Stack<StackFrame> executionStack = new Stack<>();
 
     @Override
+    public void enterRelationalExpression(CPP14Parser.RelationalExpressionContext ctx) {
+    }
+
+    @Override
+    public void exitRelationalExpression(CPP14Parser.RelationalExpressionContext ctx) {
+        System.out.println(ctx.getText());
+
+        if (ctx.getChildCount() == 1) {
+            return;
+        }
+
+        Type rhsType = executionStack.peek().exprTypeStack.pop();
+        Type lhsType = executionStack.peek().exprTypeStack.pop();
+
+        performTypeCheck(lhsType, rhsType, "[ERROR: relational expression: Parameter types do not match!", ctx);
+
+        executionStack.peek().exprTypeStack.push(typeMap.get("bool"));
+    }
+
+    @Override
     public void enterExpressionList(CPP14Parser.ExpressionListContext ctx) {
     }
 
