@@ -1,3 +1,4 @@
+/**/
 void funcVoid() {
     ;
 }
@@ -18,6 +19,7 @@ int funcIntParamIntChar(int a, char b) {
      return a;
 }
 
+
 // int length = 0;
 // length = funcInt();
 
@@ -26,8 +28,8 @@ int main()
 {
     int length = 0;
 
-    // // ok
-    // funcVoid();
+    // ok
+    funcVoid();
     // funcInt();
     // funcChar();
     // funcIntParamIntInt(1, 2);
@@ -42,8 +44,7 @@ int main()
 
     // errors
     //call_to_function_which_is_not_declared();
-    //funcInt(1);
-    //funcInt(funcVoid());
+    //funcInt(1);    
     //funcIntParamIntInt(1, funcVoid());
     //funcIntParamIntInt(1);
     //length = funcIntParamIntInt(1);
@@ -51,7 +52,11 @@ int main()
     //length = funcIntParamIntInt(1, 2, 3);
     //length = funcIntParamIntChar(1, 1);
     //length = funcNotDefined(1+2+3+4+5, 2, 'c', 1.0f, "abc");
-    length = funcChar();
+    //length = funcChar();
+
+
+    // this is not detected as an error although it should be
+    funcInt(funcVoid());
 
     //return length;
     return 0;

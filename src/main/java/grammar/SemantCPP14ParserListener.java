@@ -31,6 +31,7 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
     private Map<String, Type> typeMap = new HashMap<>();
 
     /** variable name to type */
+    // TODO: the varTypeMap has to go into the execution stack!!!!!!!
     private Map<String, Type> varTypeMap = new HashMap<>();
 
     private boolean isArray;
@@ -257,15 +258,9 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
         InitDeclaratorContext initDeclaratorContext = InitDeclaratorContexts.get(0);
         final ParserRuleContext parserRuleContext = initDeclaratorContext.declarator();
 
-        // if (semAntMode == SemAntMode.STATEMENT) {
-
-        // System.out.println("Statement: " + declaratorNames);
-
-        // } else {
         for (String varName : declaratorNames) {
             processVariableDeclaration(ctx, parserRuleContext, varName);
         }
-        // }
 
         // reset
         executionStack.peek().exprTypeStack.clear();
@@ -339,6 +334,7 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
 
             case STATEMENT:
                 // funcDecl.setName(id);
+                declaratorNames.add(id);
                 break;
 
             default:

@@ -15,7 +15,6 @@ import java.io.File;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.RuntimeMetaData;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
 import com.cpp.grammar.CPP14Lexer;
@@ -65,7 +64,8 @@ public class Main {
         //final String filename = "src/test/resources/if.cpp";
         //final String filename = "src/test/resources/for_loop.cpp";
         //final String filename = "src/test/resources/function_definition.cpp";
-        final String filename = "src/test/resources/function_call.cpp";
+        //final String filename = "src/test/resources/function_call.cpp";
+        final String filename = "src/test/resources/while.cpp";
 
         final CharStream charStream = CharStreams
                 .fromFileName(filename);

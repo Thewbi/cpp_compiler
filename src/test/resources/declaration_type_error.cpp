@@ -1,6 +1,16 @@
 //int a = "test";
 // a = 'a';
 
+//int a = 1;
+//a = 'x';
+
+char funcChar() {
+    return 'c';
+}
+
+int a = 0;
+a = funcChar();
+
 // int b = 1 + ( 2 + "3" );
 // int a = 1 + "2" + 3 + 4;
 // int b = 1 + ( '2' + 3 );
@@ -19,4 +29,4 @@ int n = m;
 */
 
 
-int var1 = undeclared_var;
+//int var1 = undeclared_var;
