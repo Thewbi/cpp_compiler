@@ -1,4 +1,4 @@
-int func3() {
+int funcInt() {
     return 3;
 }
 
@@ -6,30 +6,44 @@ char funcChar() {
     return 'c';
 }
 
-int funcIntParam(int a, int b) {
+int funcIntParamIntInt(int a, int b) {
     return a;
 }
 
-int funcIntParamChar(int a, char b) {
+int funcIntParamIntChar(int a, char b) {
      return a;
 }
 
+// int length = 0;
+// length = funcInt();
+
+/**/
 int main()
 {
     int length = 0;
 
-    length = func3();
+    // ok
+    funcInt();
+    funcChar();
+    funcIntParamIntInt(1, 2);
+    funcIntParamIntChar(1, 'a');
+    length = funcInt();
+    length = funcIntParamIntInt(1, 2);
+    length = funcIntParamIntInt(1+2+3+4+5, 1);
+    length = funcIntParamIntChar(1+2+3+4+5, '2');
+    length = funcIntParamIntInt(1, funcIntParamIntChar(2, '3'));
+    funcIntParamIntInt(1, funcIntParamIntChar(funcIntParamIntInt(1, funcIntParamIntChar(2, '3')), '3'));
+    length = funcIntParamIntInt(1, funcIntParamIntChar(funcIntParamIntInt(1, funcIntParamIntChar(2, '3')), '3'));
+
+    // errors
+    //funcIntParamIntInt(1);
+    //length = funcIntParamIntInt(1);
+    //funcIntParamIntInt(1, 2, 3);
+    //length = funcIntParamIntInt(1, 2, 3);
+    //length = funcIntParamIntChar(1, 1);
+    //length = funcNotDefined(1+2+3+4+5, 2, 'c', 1.0f, "abc");
     //length = funcChar();
 
-    //length = funcIntParam(1);
-    //length = funcIntParam(1, 2);
-    //length = funcIntParam(1, 2, 3);
-    //length = funcIntParam(1+2+3+4+5, '2');
-    //length = funcIntParam(1+2+3+4+5, 1);
-    //length = funcIntParam(1+2+3+4+5, 2, 'c', 1.0f, "abc");
-
-    //length = funcIntParam(1, funcIntParamChar(2, '3'));
-    length = funcIntParam(1, funcIntParamChar(funcIntParam(1, funcIntParamChar(2, '3')), '3'));
-
-    return length;
+    //return length;
+    return 0;
 }

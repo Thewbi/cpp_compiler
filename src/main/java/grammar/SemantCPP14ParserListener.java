@@ -20,11 +20,12 @@ import com.cpp.grammar.CPP14ParserBaseListener;
 
 import types.FormalParameter;
 import types.FuncDecl;
+import types.StackFrame;
 import types.Type;
 
 public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
 
-    private Stack<Type> exprTypeStack = new Stack<>();
+    // private Stack<Type> exprTypeStack = new Stack<>();
 
     /** type name to type */
     private Map<String, Type> typeMap = new HashMap<>();
@@ -48,6 +49,8 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
 
     private Stack<String> calledFunctionNameStack = new Stack();
 
+    private Stack<StackFrame> executionStack = new Stack<>();
+
     @Override
     public void enterExpressionList(CPP14Parser.ExpressionListContext ctx) {
     }
@@ -55,16 +58,22 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
     @Override
     public void exitExpressionList(CPP14Parser.ExpressionListContext ctx) {
 
+        if (calledFunctionNameStack.isEmpty()) {
+            return;
+        }
+
         String calledFunctionName = calledFunctionNameStack.pop();
-        
-        //System.out.println("FUNCTION_CALL_WITH_PARAMETERS: " + calledFunctionName);
+
+        // System.out.println("FUNCTION_CALL_WITH_PARAMETERS: " + calledFunctionName);
 
         FuncDecl funcDecl = funcDeclMap.get(calledFunctionName);
 
-        // if ((exprTypeStack.size() - 1) != funcDecl.getParams().size()) {
-        //     throw new RuntimeException("[ERROR: function call of function: \"" + calledFunctionName
-        //             + "\"(). Incorrect amount of actual parameters supplied!");
-        // }
+        int returnValueIsOnStackToo = 1;
+        if (funcDecl.getParams().size() != (executionStack.peek().exprTypeStack.size() - returnValueIsOnStackToo)) {
+            throw new RuntimeException(
+                        "[ERROR: Bonked! Actual parameter count does not match formal parameter count! (Line \""
+                                + ctx.getStart().getLine() + "\")]");
+        }
 
         // Iterate in reverse.
         ListIterator li = funcDecl.getParams().listIterator(funcDecl.getParams().size());
@@ -72,7 +81,7 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
 
             // System.out.println(li.previous());
 
-            Type actualParameterType = exprTypeStack.pop();
+            Type actualParameterType = executionStack.peek().exprTypeStack.pop();
 
             FormalParameter formalParameter = (FormalParameter) li.previous();
             // System.out.println(formalParameter);
@@ -84,7 +93,17 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
         // last value on the stack is the return type of the function
         // store it into initializerType so that the declaration can perform type check
         // between the function value and the assigned variable
-        initializerType = exprTypeStack.peek();
+        initializerType = executionStack.peek().exprTypeStack.peek();
+
+        System.out.println("FUNCTION_CALL exit detected");
+
+        // the return value of the the called function goes onto the exprTypeStack of
+        // the lower stackFrome
+        Type returnValue = executionStack.peek().exprTypeStack.pop();
+        executionStack.pop();
+        executionStack.peek().exprTypeStack.push(returnValue);
+
+        setSemAntMode(SemAntMode.DEFAULT);
 
         // System.out.println("");
     }
@@ -178,7 +197,15 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
     @Override
     public void exitSimpleDeclaration(CPP14Parser.SimpleDeclarationContext ctx) {
 
-        // System.out.println(ctx.getText());
+        System.out.println(ctx.getText());
+
+        if (declaratorNames.isEmpty()) {
+            return;
+        }
+
+        if (semAntMode == SemAntMode.STATEMENT) {
+            return;
+        }
 
         // check if this declaration is a single semicolon and then skip the empty
         // statement
@@ -202,14 +229,14 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
         // }
 
         // reset
-        exprTypeStack.clear();
+        executionStack.peek().exprTypeStack.clear();
         initializerType = null;
         isArray = false;
         declaratorNames.clear();
     }
 
     private void processVariableDeclaration(CPP14Parser.SimpleDeclarationContext ctx,
-            final ParserRuleContext parserRuleContext,
+            ParserRuleContext parserRuleContext,
             String varName) {
 
         if (ctx.declSpecifierSeq() == null) {
@@ -260,10 +287,19 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
     public void exitDeclaratorid(CPP14Parser.DeclaratoridContext ctx) {
 
         String id = ctx.getText();
+        System.out.println(id);
 
         switch (semAntMode) {
             case FUNCTION_DECLARATION:
                 funcDecl.setName(id);
+                break;
+
+            case FUNCTION_CALL:
+                // funcDecl.setName(id);
+                break;
+
+            case STATEMENT:
+                // funcDecl.setName(id);
                 break;
 
             default:
@@ -276,7 +312,7 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
     public void enterBraceOrEqualInitializer(CPP14Parser.BraceOrEqualInitializerContext ctx) {
         // int numbers[3] = {10, '20', 30};
         // forget about the array length literal '3'
-        exprTypeStack.clear();
+        executionStack.peek().exprTypeStack.clear();
         setSemAntMode(SemAntMode.INITIALIZER);
     }
 
@@ -288,8 +324,8 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
         // store type in the initializerType member so the SimpleDeclaration rule
         // can retrieve the type from the member
 
-        if (exprTypeStack.size() == 1) {
-            Type tempInitializerType = exprTypeStack.pop();
+        if (executionStack.peek().exprTypeStack.size() == 1) {
+            Type tempInitializerType = executionStack.peek().exprTypeStack.pop();
             if ((initializerType != null) && (!initializerType.equals(tempInitializerType))) {
                 throw new RuntimeException(
                         "[Error: Initializer Types not compatible! (Line " + ctx.getStart().getLine() + ")] "
@@ -355,24 +391,54 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
             }
             size--;
 
-            Type typeA = exprTypeStack.pop();
-            Type typeB = exprTypeStack.pop();
+            Type typeA = executionStack.peek().exprTypeStack.pop();
+            Type typeB = executionStack.peek().exprTypeStack.pop();
 
             performTypeCheck(typeA, typeB, "Addition TypeError", expr);
 
-            exprTypeStack.push(typeA);
+            executionStack.peek().exprTypeStack.push(typeA);
         }
     }
 
-    @Override
-    public void enterPostfixExpression(CPP14Parser.PostfixExpressionContext ctx) {
-        String primaryExpression = ctx.getText();
-        // System.out.println(primaryExpression);
+    // @Override
+    // public void enterPostfixExpression(CPP14Parser.PostfixExpressionContext ctx) {
 
-        if (StringUtils.endsWithIgnoreCase(primaryExpression, ")")) {
-            setSemAntMode(SemAntMode.FUNCTION_CALL);
-        }
-    }
+    //     if (ctx.getChild(0) instanceof CPP14Parser.PostfixExpressionContext) {
+
+    //         System.out.println("FUNCTION_CALL enter detected");
+
+    //         StackFrame stackFrame = new StackFrame();
+    //         executionStack.push(stackFrame);
+
+    //         setSemAntMode(SemAntMode.FUNCTION_CALL);
+    //     }
+
+    //     // String primaryExpression = ctx.getText();
+    //     // // System.out.println(primaryExpression);
+
+    //     // if (StringUtils.endsWithIgnoreCase(primaryExpression, ")")) {
+    //     // setSemAntMode(SemAntMode.FUNCTION_CALL);
+    //     // }
+    // }
+
+    // @Override
+    // public void exitPostfixExpression(CPP14Parser.PostfixExpressionContext ctx) {
+
+    //     if (ctx.getChild(0) instanceof CPP14Parser.PostfixExpressionContext) {
+
+    //         System.out.println("FUNCTION_CALL exit detected");
+
+    //         // the return value of the the called function goes onto the exprTypeStack of
+    //         // the lower stackFrome
+    //         Type returnValue = executionStack.peek().exprTypeStack.pop();
+    //         executionStack.pop();
+    //         executionStack.peek().exprTypeStack.push(returnValue);
+
+    //         setSemAntMode(SemAntMode.DEFAULT);
+
+    //     }
+
+    // }
 
     @Override
     public void exitIdExpression(CPP14Parser.IdExpressionContext ctx) {
@@ -391,7 +457,7 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
                 }
 
                 Type type = varTypeMap.get(ctx.getText());
-                exprTypeStack.push(type);
+                executionStack.peek().exprTypeStack.push(type);
             }
                 break;
 
@@ -418,7 +484,13 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
                 }
 
                 FuncDecl funcDecl = funcDeclMap.get(ctx.getText());
-                exprTypeStack.push(funcDecl.getReturnType());
+
+                executionStack.peek().exprTypeStack.push(funcDecl.getReturnType());
+
+                // executionStack.peek();
+
+                // Type bonkMarkerType = typeMap.get("bonk1122");
+                // exprTypeStack.push(bonkMarkerType);
 
                 System.out.println("FUNCTION_CALL: " + varName);
 
@@ -466,7 +538,7 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
         if (!typeMap.containsKey(typeName)) {
             throw new RuntimeException("type \"" + typeName + "\" not covered!");
         }
-        exprTypeStack.push(typeMap.get(typeName));
+        executionStack.peek().exprTypeStack.push(typeMap.get(typeName));
     }
 
     private void performTypeCheck(final Type targetType, final Type rhsType, final String label,
@@ -477,6 +549,33 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
                             + "\" Assigned value's type: \"" + rhsType
                             + "\" ");
         }
+    }
+
+    /**
+     * With the AST that the grammar produces, it is hard to tell where a function call occurs!
+     * 
+     * The strategy here is to check every identifier versus known declared function names.
+     * If the identifier is a function name, then assume a function call.
+     */
+    @Override
+    public void enterUnqualifiedId(CPP14Parser.UnqualifiedIdContext ctx) {
+        String funcName = ctx.getText();
+
+        // System.out.println(funcName);
+
+        if (funcDeclMap.containsKey(funcName)) {
+            
+            System.out.println("FUNCTION_CALL enter detected");
+
+            StackFrame stackFrame = new StackFrame();
+            executionStack.push(stackFrame);
+
+            setSemAntMode(SemAntMode.FUNCTION_CALL);
+        }
+    }
+
+    @Override
+    public void exitUnqualifiedId(CPP14Parser.UnqualifiedIdContext ctx) {
     }
 
     public Map<String, Type> getTypeMap() {
@@ -503,6 +602,14 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
         // System.out.println("SemAntMode old: " + this.semAntMode + " new: " +
         // semAntMode);
         this.semAntMode = semAntMode;
+    }
+
+    public Stack<StackFrame> getExecutionStack() {
+        return executionStack;
+    }
+
+    public void setExecutionStack(Stack<StackFrame> executionStack) {
+        this.executionStack = executionStack;
     }
 
 }

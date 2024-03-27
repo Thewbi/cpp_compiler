@@ -1,4 +1,12 @@
-int main(int argc, char *argv[])
+int funcInt() {
+    return 3;
+}
+
+// int length = 0;
+// length = funcInt();
+
+int main()
 {
-    return 0;
+    int length = 0;
+    length = funcInt();
 }

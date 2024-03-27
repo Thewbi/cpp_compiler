@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.Stack;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -14,6 +15,7 @@ import java.io.File;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.RuntimeMetaData;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
 import com.cpp.grammar.CPP14Lexer;
@@ -25,7 +27,9 @@ import com.cpp.grammar.CPP14Parser.TranslationUnitContext;
 import com.cpp.grammar.PreprocessorParser.Code_fileContext;
 
 import types.FuncDecl;
+import types.StackFrame;
 import types.Type;
+
 
 /**
  * https://en.cppreference.com/w/cpp/language/translation_phases
@@ -88,6 +92,14 @@ public class Main {
 
             final Map<String, Type> typeMap = new HashMap<>();
 
+            // Type bonk1122Type = new Type();
+            // bonk1122Type.setName("bonk1122");
+            // typeMap.put(bonk1122Type.getName(), bonk1122Type);
+
+            Type boolType = new Type();
+            boolType.setName("bool");
+            typeMap.put(boolType.getName(), boolType);
+
             Type intType = new Type();
             intType.setName("int");
             typeMap.put(intType.getName(), intType);
@@ -114,6 +126,13 @@ public class Main {
             Map<String, FuncDecl> funcDeclMap = new HashMap<>();
             semantCPP14ParserListener.setFuncDeclMap(funcDeclMap);
 
+            StackFrame baseStackFrame = new StackFrame();
+            Stack<StackFrame> executionStack = new Stack<>();
+            executionStack.push(baseStackFrame);
+            semantCPP14ParserListener.setExecutionStack(executionStack);
+
+            // semantCPP14ParserListener.getSemAntModeStack().push(SemAntMode.DEFAULT);
+
             listener = semantCPP14ParserListener;
         }
 
@@ -126,6 +145,13 @@ public class Main {
 
         if (listener instanceof SemantCPP14ParserListener) {
             SemantCPP14ParserListener lstnr = (SemantCPP14ParserListener) listener;
+
+            // if (lstnr.getSemAntModeStack().size() != 1) {
+            //     throw new RuntimeException("SemAntModeStack invalid!");
+            // }
+            // if (lstnr.getSemAntModeStack().peek() != SemAntMode.DEFAULT) {
+            //     throw new RuntimeException("SemAntModeStack invalid!");
+            // }
 
             System.out.println("");
             System.out.println("Variables (VarName | VarType)");

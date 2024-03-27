@@ -2,8 +2,11 @@ int a = 1;
 a = 2;
 
 int b = 1 + 2;
+
 int c = 1 + ( 2 + 3 );
+
 int d = 1 + ( 2 + 3 );
+
 int e = 1 + 2 + 3 + 4;
 
 char f = 'a';
