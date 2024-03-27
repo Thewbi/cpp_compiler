@@ -23,6 +23,12 @@ import types.FuncDecl;
 import types.StackFrame;
 import types.Type;
 
+/**
+ * This code is bad. I am sorry.
+ * The issue is that most elements conway no sematic meaning and almost
+ * all the nodes are reused in different contexts multuple times.
+ * To parse out any semantic meaning, wierd code is necessary.
+ */
 public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
 
     // private Stack<Type> exprTypeStack = new Stack<>();
@@ -48,7 +54,7 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
 
     // private String calledFunctionName;
 
-    private Stack<String> calledFunctionNameStack = new Stack();
+    private Stack<String> calledFunctionNameStack = new Stack<>();
 
     private Stack<StackFrame> executionStack = new Stack<>();
 
@@ -107,7 +113,7 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
         }
 
         // Iterate in reverse.
-        ListIterator li = funcDecl.getParams().listIterator(funcDecl.getParams().size());
+        ListIterator<FormalParameter> li = funcDecl.getParams().listIterator(funcDecl.getParams().size());
         while (li.hasPrevious()) {
 
             // System.out.println(li.previous());
@@ -383,9 +389,6 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
 
         if (ctx.getChildCount() > 1) {
 
-            // System.out.println(ctx.getChild(1).getText());
-            // System.out.println(ctx.getChild(ctx.getChildCount()-1).getText());
-
             boolean arrayStartFound = false;
             boolean arrayEndFound = false;
 
@@ -585,7 +588,7 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
 
                 // the return type of the the called function goes onto the exprTypeStack of
                 // the lower stackFrame
-                //stackFrame.exprTypeStack.push(funcDecl.getReturnType());
+                // stackFrame.exprTypeStack.push(funcDecl.getReturnType());
 
                 // // wierd values on the expression stack!
                 // processFunctionCallExit(ctx, funcName, funcDecl);
@@ -605,7 +608,8 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
         } else {
 
             if ((semAntMode != SemAntMode.FUNCTION_DECLARATION) && (semAntMode != SemAntMode.VARIABLE_DECLARATION)) {
-                throw new RuntimeException("Unknown function / variable: \"" + identifier + "\". Line " + ctx.getStart().getLine());
+                throw new RuntimeException(
+                        "Unknown function / variable: \"" + identifier + "\". Line " + ctx.getStart().getLine());
             }
         }
     }
