@@ -12,7 +12,7 @@ public class ConsoleCPP14ParserListener extends CPP14ParserBaseListener {
     @Override
     public void enterEveryRule(ParserRuleContext ctx) {
         printIndent();
-        System.out.println(ctx.getClass().getSimpleName() + " [" + ctx.getStart().getText() + "]");
+        System.out.println(ctx.getClass().getSimpleName() + " [" + ctx.getStart().getText() + "] " + ctx.hashCode());
         descend();
     }
 

@@ -63,8 +63,10 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
             return;
         }
 
-        Type rhsType = executionStack.peek().exprTypeStack.pop();
-        Type lhsType = executionStack.peek().exprTypeStack.pop();
+        Stack<Type> localExprTypeStack = executionStack.peek().exprTypeStack;
+
+        Type rhsType = localExprTypeStack.pop();
+        Type lhsType = localExprTypeStack.pop();
 
         performTypeCheck(lhsType, rhsType, "[ERROR: relational expression: Parameter types do not match!", ctx);
 
@@ -88,11 +90,19 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
 
         FuncDecl funcDecl = funcDeclMap.get(calledFunctionName);
 
+        processFunctionCallExit(ctx, calledFunctionName, funcDecl);
+
+        setSemAntMode(SemAntMode.DEFAULT);
+
+        // System.out.println("");
+    }
+
+    private void processFunctionCallExit(ParserRuleContext ctx, String calledFunctionName, FuncDecl funcDecl) {
         int returnValueIsOnStackToo = 1;
         if (funcDecl.getParams().size() != (executionStack.peek().exprTypeStack.size() - returnValueIsOnStackToo)) {
             throw new RuntimeException(
-                        "[ERROR: Bonked! Actual parameter count does not match formal parameter count! (Line \""
-                                + ctx.getStart().getLine() + "\")]");
+                    "[ERROR: Bonked! Actual parameter count does not match formal parameter count! (Line \""
+                            + ctx.getStart().getLine() + "\")]");
         }
 
         // Iterate in reverse.
@@ -117,15 +127,11 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
 
         System.out.println("FUNCTION_CALL exit detected");
 
-        // the return value of the the called function goes onto the exprTypeStack of
-        // the lower stackFrome
+        // the return type of the the called function goes onto the exprTypeStack of
+        // the lower stackFrame
         Type returnValue = executionStack.peek().exprTypeStack.pop();
         executionStack.pop();
         executionStack.peek().exprTypeStack.push(returnValue);
-
-        setSemAntMode(SemAntMode.DEFAULT);
-
-        // System.out.println("");
     }
 
     @Override
@@ -211,6 +217,19 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
 
             FormalParameter formalParameter = funcDecl.getParams().get(funcDecl.getParams().size() - 1);
             formalParameter.setType(formalParameterType);
+
+            // // in the current local scope, parameters are treated as local variables!
+            // varTypeMap.put(formalParameter.getName(), formalParameterType);
+        }
+    }
+
+    @Override
+    public void enterSimpleDeclaration(CPP14Parser.SimpleDeclarationContext ctx) {
+
+        System.out.println(ctx.getText());
+
+        if (ctx.getChild(0) instanceof DeclSpecifierSeqContext) {
+            semAntMode = SemAntMode.VARIABLE_DECLARATION;
         }
     }
 
@@ -420,60 +439,23 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
         }
     }
 
-    // @Override
-    // public void enterPostfixExpression(CPP14Parser.PostfixExpressionContext ctx) {
-
-    //     if (ctx.getChild(0) instanceof CPP14Parser.PostfixExpressionContext) {
-
-    //         System.out.println("FUNCTION_CALL enter detected");
-
-    //         StackFrame stackFrame = new StackFrame();
-    //         executionStack.push(stackFrame);
-
-    //         setSemAntMode(SemAntMode.FUNCTION_CALL);
-    //     }
-
-    //     // String primaryExpression = ctx.getText();
-    //     // // System.out.println(primaryExpression);
-
-    //     // if (StringUtils.endsWithIgnoreCase(primaryExpression, ")")) {
-    //     // setSemAntMode(SemAntMode.FUNCTION_CALL);
-    //     // }
-    // }
-
-    // @Override
-    // public void exitPostfixExpression(CPP14Parser.PostfixExpressionContext ctx) {
-
-    //     if (ctx.getChild(0) instanceof CPP14Parser.PostfixExpressionContext) {
-
-    //         System.out.println("FUNCTION_CALL exit detected");
-
-    //         // the return value of the the called function goes onto the exprTypeStack of
-    //         // the lower stackFrome
-    //         Type returnValue = executionStack.peek().exprTypeStack.pop();
-    //         executionStack.pop();
-    //         executionStack.peek().exprTypeStack.push(returnValue);
-
-    //         setSemAntMode(SemAntMode.DEFAULT);
-
-    //     }
-
-    // }
-
     @Override
     public void exitIdExpression(CPP14Parser.IdExpressionContext ctx) {
 
         final String varName = ctx.getText();
 
-        // System.out.println(varName);
+        System.out.println(varName);
 
         switch (semAntMode) {
 
             case INITIALIZER: {
                 if (!varTypeMap.containsKey(varName)) {
-                    throw new RuntimeException(
-                            "[Error: Initializer variable not defined! (Line " + ctx.getStart().getLine() + ")] "
-                                    + " Undefined variable is: \"" + varName + "\"");
+
+                    if (!funcDeclMap.containsKey(varName)) {
+                        throw new RuntimeException(
+                                "[Error: Initializer variable not defined! (Line " + ctx.getStart().getLine() + ")] "
+                                        + " Undefined variable is: \"" + varName + "\" node = " + ctx.hashCode());
+                    }
                 }
 
                 Type type = varTypeMap.get(ctx.getText());
@@ -486,6 +468,9 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
 
                 FormalParameter formalParameter = funcDecl.getParams().get(funcDecl.getParams().size() - 1);
                 formalParameter.setName(varName);
+
+                // in the current local scope, parameters are treated as local variables!
+                varTypeMap.put(formalParameter.getName(), formalParameter.getType());
             }
                 break;
 
@@ -496,7 +481,6 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
                 break;
 
             case FUNCTION_CALL: {
-                // throw new RuntimeException("FunctionCall not implemented yet!");
                 if (!funcDeclMap.containsKey(varName)) {
                     throw new RuntimeException(
                             "[Error: Function not defined! (Line " + ctx.getStart().getLine() + ")] "
@@ -504,16 +488,8 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
                 }
 
                 FuncDecl funcDecl = funcDeclMap.get(ctx.getText());
-
                 executionStack.peek().exprTypeStack.push(funcDecl.getReturnType());
-
-                // executionStack.peek();
-
-                // Type bonkMarkerType = typeMap.get("bonk1122");
-                // exprTypeStack.push(bonkMarkerType);
-
                 System.out.println("FUNCTION_CALL: " + varName);
-
                 calledFunctionNameStack.push(varName);
             }
                 break;
@@ -526,7 +502,7 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
     @Override
     public void exitLiteral(CPP14Parser.LiteralContext ctx) {
 
-        // System.out.println(ctx.getText());
+        System.out.println(ctx.getText());
 
         boolean typeProcessed = false;
         TerminalNode literalTerminalNode = ctx.IntegerLiteral();
@@ -572,25 +548,69 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
     }
 
     /**
-     * With the AST that the grammar produces, it is hard to tell where a function call occurs!
+     * With the AST that the grammar produces, it is hard to tell where a function
+     * call occurs!
      * 
-     * The strategy here is to check every identifier versus known declared function names.
+     * The strategy here is to check every identifier versus known declared function
+     * names.
      * If the identifier is a function name, then assume a function call.
      */
     @Override
     public void enterUnqualifiedId(CPP14Parser.UnqualifiedIdContext ctx) {
-        String funcName = ctx.getText();
 
-        // System.out.println(funcName);
+        String identifier = ctx.getText();
 
-        if (funcDeclMap.containsKey(funcName)) {
-            
-            System.out.println("FUNCTION_CALL enter detected");
+        System.out.println(identifier);
 
-            StackFrame stackFrame = new StackFrame();
-            executionStack.push(stackFrame);
+        if (StringUtils.equalsIgnoreCase(identifier, "main")) {
+            return;
+        }
 
-            setSemAntMode(SemAntMode.FUNCTION_CALL);
+        if (semAntMode == SemAntMode.PARAMETER_DECLARATION) {
+            return;
+        }
+
+        if (varTypeMap.containsKey(identifier)) {
+            return;
+        }
+
+        if (funcDeclMap.containsKey(identifier)) {
+
+            FuncDecl funcDecl = funcDeclMap.get(identifier);
+
+            if (funcDecl.getParams().size() == 0) {
+
+                System.out.println("FUNCTION_CALL enter without parameters detected");
+
+                // StackFrame stackFrame = new StackFrame();
+                // executionStack.push(stackFrame);
+
+                setSemAntMode(SemAntMode.FUNCTION_CALL);
+
+                // the return type of the the called function goes onto the exprTypeStack of
+                // the lower stackFrame
+                //stackFrame.exprTypeStack.push(funcDecl.getReturnType());
+
+                // // wierd values on the expression stack!
+                // processFunctionCallExit(ctx, funcName, funcDecl);
+
+                // stackFrame = executionStack.pop();
+
+            } else {
+
+                System.out.println("FUNCTION_CALL enter detected");
+
+                StackFrame stackFrame = new StackFrame();
+                executionStack.push(stackFrame);
+
+                setSemAntMode(SemAntMode.FUNCTION_CALL);
+
+            }
+        } else {
+
+            if ((semAntMode != SemAntMode.FUNCTION_DECLARATION) && (semAntMode != SemAntMode.VARIABLE_DECLARATION)) {
+                throw new RuntimeException("Unknown function / variable: \"" + identifier + "\". Line " + ctx.getStart().getLine());
+            }
         }
     }
 

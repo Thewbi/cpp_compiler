@@ -11,10 +11,16 @@ int main()
     //funcInt();
 
 /**/
-    //if (1 > 0) {
+    // ok
+    if (1 > 0) {
+    //if (1 > funcInt()) {
+    //if ('c' > funcChar()) {
+    //if (funcChar() > 'c') {
+
+    // error
     //if (1 > 'c') {
-    if (1 > funcInt()) {
     //if (1 > funcChar()) {
+    //if (funcChar() > 1) {
         return 1;
     }
 

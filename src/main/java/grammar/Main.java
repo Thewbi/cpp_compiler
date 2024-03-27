@@ -62,10 +62,10 @@ public class Main {
         //final String filename = "src/test/resources/declaration_type_error.cpp";
         //final String filename = "src/test/resources/declaration.cpp";
         //final String filename = "src/test/resources/arrays.cpp";
-        final String filename = "src/test/resources/if.cpp";
+        //final String filename = "src/test/resources/if.cpp";
         //final String filename = "src/test/resources/for_loop.cpp";
-        //final String filename = "src/test/resources/function.cpp";
-        //final String filename = "src/test/resources/function_call.cpp";
+        //final String filename = "src/test/resources/function_definition.cpp";
+        final String filename = "src/test/resources/function_call.cpp";
 
         final CharStream charStream = CharStreams
                 .fromFileName(filename);
@@ -80,15 +80,11 @@ public class Main {
         // parse
         TranslationUnitContext root = parser.translationUnit();
 
-        boolean print = false;
-        //boolean print = true;
+        
 
-        CPP14ParserListener listener = null;
-        if (print) {
-
-            listener = new ConsoleCPP14ParserListener();
-
-        } else {
+        
+        
+        //else {
 
             final Map<String, Type> typeMap = new HashMap<>();
 
@@ -132,12 +128,21 @@ public class Main {
             semantCPP14ParserListener.setExecutionStack(executionStack);
 
             // semantCPP14ParserListener.getSemAntModeStack().push(SemAntMode.DEFAULT);
-
-            listener = semantCPP14ParserListener;
-        }
+             CPP14ParserListener listener = semantCPP14ParserListener;
+        //}
 
         // Create a generic parse tree walker that can trigger callbacks
         final ParseTreeWalker walker = new ParseTreeWalker();
+
+        boolean print = false;
+        //boolean print = true;
+        if (print) {
+
+            ConsoleCPP14ParserListener printListener = new ConsoleCPP14ParserListener();
+            walker.walk(printListener, root);
+            
+        } 
+
         // Walk the tree created during the parse, trigger callbacks
         walker.walk(listener, root);
 

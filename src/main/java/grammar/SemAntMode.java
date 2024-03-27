@@ -18,6 +18,6 @@ public enum SemAntMode {
 
     EXPRESSION,
 
-    UNKNOWN
+    UNKNOWN, VARIABLE_DECLARATION
 
 }
