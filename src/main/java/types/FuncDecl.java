@@ -39,15 +39,30 @@ public class FuncDecl {
 
     @Override
     public String toString() {
+        StringBuilder stringBuilder = new StringBuilder();
+        toString(stringBuilder, 0);
+        return stringBuilder.toString();
+    }
+
+    public String toString(StringBuilder stringBuilder, int indent) {
         //return "FuncDecl [name=" + name + ", returnType=" + returnType + ", params=" + params + "]";
 
-        StringBuilder stringBuilder = new StringBuilder();
+        // StringBuilder stringBuilder = new StringBuilder();
+
+        for (int i = 0; i < indent; i++) {
+            stringBuilder.append("  ");
+        }
 
         stringBuilder.append("FuncDecl [name=" + name + ", returnType=" + returnType + " ");
 
         int i = 1;
         for (FormalParameter formalParameter : params) {
             stringBuilder.append("\n");
+
+            for (int j = 0; j < indent+1; j++) {
+                stringBuilder.append("  ");
+            }
+
             stringBuilder.append("Parameter ").append(i).append(" ").append(formalParameter);
             i++;
         }

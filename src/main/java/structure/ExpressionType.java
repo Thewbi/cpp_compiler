@@ -12,6 +12,18 @@ public enum ExpressionType {
 
     INT_LITERAL,
 
-    UNKNOWN//, PLUS, MULTIPLY
+    STRING_LITERAL, 
     
+    CHAR_LITERAL, 
+    
+    FLOAT_LITERAL,
+
+    FUNCTION_CALL, 
+    
+    RETURN_VALUE_PREVIOUS_CALL,
+
+    IDENTIFIER,
+
+    UNKNOWN
+
 }

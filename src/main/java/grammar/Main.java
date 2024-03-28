@@ -67,7 +67,8 @@ public class Main {
         //final String filename = "src/test/resources/function_definition.cpp";
         //final String filename = "src/test/resources/function_call.cpp";
         //final String filename = "src/test/resources/while.cpp";
-        final String filename = "src/test/resources/app1.cpp";
+        //final String filename = "src/test/resources/app1.cpp";
+        final String filename = "src/test/resources/ECO32_1.cpp";
 
         final CharStream charStream = CharStreams
                 .fromFileName(filename);
@@ -140,8 +141,8 @@ public class Main {
         // Create a generic parse tree walker that can trigger callbacks
         final ParseTreeWalker walker = new ParseTreeWalker();
 
-        //boolean print = false;
-        boolean print = true;
+        boolean print = false;
+        //boolean print = true;
         if (print) {
 
             ConsoleCPP14ParserListener printListener = new ConsoleCPP14ParserListener();

@@ -33,6 +33,8 @@ public interface StructureCallback {
 
     void floatLiteral(Float value);
 
+    void identifierLiteral(String value);
+
     void plus();
 
     void minus();
