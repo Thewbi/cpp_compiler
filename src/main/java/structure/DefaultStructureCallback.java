@@ -26,8 +26,15 @@ public class DefaultStructureCallback implements StructureCallback {
 
     @Override
     public void functionCall(String name, FuncDecl funcDecl) {
-        System.out.println("[STR-CB] functionCall()");
+        System.out.println("[STR-CB] functionCall() Name: \"" + name + "\"");
         startScope();
+    }
+
+    @Override
+    public void functionDeclaration(FuncDecl funcDecl) {
+        System.out.println("[STR-CB] functionDeclaration() " + funcDecl);
+
+        expressions.clear();
     }
 
     @Override
@@ -40,6 +47,13 @@ public class DefaultStructureCallback implements StructureCallback {
     @Override
     public void variableAssignment(String name) {
         System.out.println("[STR-CB] variableAssignment() Name: \"" + name + "\" \nExpressions: " + expressions);
+
+        expressions.clear();
+    }
+
+    @Override
+    public void returnStatement() {
+        System.out.println("[STR-CB] returnStatement() \nExpressions: " + expressions);
 
         expressions.clear();
     }
@@ -79,7 +93,6 @@ public class DefaultStructureCallback implements StructureCallback {
         expression.setIntValue(value);
 
         if (CollectionUtils.isEmpty(expressions)) {
-            // throw new RuntimeException("no parent found!");
             expressions.add(expression);
         } else {
             currentExpression.getChildren().add(expression);
@@ -132,7 +145,5 @@ public class DefaultStructureCallback implements StructureCallback {
     public void setExpressions(List<Expression> expressions) {
         this.expressions = expressions;
     }
-
-    
 
 }

@@ -160,32 +160,38 @@ public class Main {
 
         // System.out.println(typeMap);
 
-        if (listener instanceof SemantCPP14ParserListener) {
-            SemantCPP14ParserListener lstnr = (SemantCPP14ParserListener) listener;
+        //boolean debugOutputListenerData = true;
+        boolean debugOutputListenerData = false;
+        if (debugOutputListenerData) {
 
-            // if (lstnr.getSemAntModeStack().size() != 1) {
-            //     throw new RuntimeException("SemAntModeStack invalid!");
-            // }
-            // if (lstnr.getSemAntModeStack().peek() != SemAntMode.DEFAULT) {
-            //     throw new RuntimeException("SemAntModeStack invalid!");
-            // }
+            if (listener instanceof SemantCPP14ParserListener) {
 
-            System.out.println("");
-            System.out.println("Variables (VarName | VarType)");
-            System.out.println("-------------------------------------------");
-            // System.out.println("VarTypeMap: " + lstnr.getVarTypeMap());
-            for (Map.Entry<String, Type> entry : lstnr.getVarTypeMap().entrySet()) {
-                //System.out.println("VarName: \"" + entry.getKey() + "\" VarType: " + entry.getValue());
-                System.out.println(entry.getKey() + " | " + entry.getValue());
-            }
+                SemantCPP14ParserListener lstnr = (SemantCPP14ParserListener) listener;
 
-            System.out.println("");
-            System.out.println("Functions");
-            System.out.println("-------------------------------------------");
-            //System.out.println("FuncDeclMap: " + lstnr.getFuncDeclMap());
-            for (Map.Entry<String, FuncDecl> entry : lstnr.getFuncDeclMap().entrySet()) {
-                System.out.println(entry.getKey() + " | " + entry.getValue());
+                // if (lstnr.getSemAntModeStack().size() != 1) {
+                //     throw new RuntimeException("SemAntModeStack invalid!");
+                // }
+                // if (lstnr.getSemAntModeStack().peek() != SemAntMode.DEFAULT) {
+                //     throw new RuntimeException("SemAntModeStack invalid!");
+                // }
+
                 System.out.println("");
+                System.out.println("Variables (VarName | VarType)");
+                System.out.println("-------------------------------------------");
+                // System.out.println("VarTypeMap: " + lstnr.getVarTypeMap());
+                for (Map.Entry<String, Type> entry : lstnr.getVarTypeMap().entrySet()) {
+                    //System.out.println("VarName: \"" + entry.getKey() + "\" VarType: " + entry.getValue());
+                    System.out.println(entry.getKey() + " | " + entry.getValue());
+                }
+
+                System.out.println("");
+                System.out.println("Functions");
+                System.out.println("-------------------------------------------");
+                //System.out.println("FuncDeclMap: " + lstnr.getFuncDeclMap());
+                for (Map.Entry<String, FuncDecl> entry : lstnr.getFuncDeclMap().entrySet()) {
+                    System.out.println(entry.getKey() + " | " + entry.getValue());
+                    System.out.println("");
+                }
             }
         }
 

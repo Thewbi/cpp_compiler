@@ -8,22 +8,18 @@ import java.util.Map;
 import java.util.Stack;
 
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import com.cpp.grammar.CPP14Parser;
 import com.cpp.grammar.CPP14Parser.DeclSpecifierSeqContext;
+import com.cpp.grammar.CPP14Parser.ExpressionContext;
 import com.cpp.grammar.CPP14Parser.InitDeclaratorContext;
 import com.cpp.grammar.CPP14Parser.InitDeclaratorListContext;
-
-import structure.Expression;
-import structure.ExpressionType;
-import structure.StructureCallback;
-
 import com.cpp.grammar.CPP14ParserBaseListener;
 
+import structure.StructureCallback;
 import types.FormalParameter;
 import types.FuncDecl;
 import types.StackFrame;
@@ -62,7 +58,23 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
 
     private StructureCallback structureCallback;
 
-    // private String lastTerminal;
+    @Override
+    public void enterJumpStatement(CPP14Parser.JumpStatementContext ctx) {
+        
+    }
+
+    @Override
+    public void exitJumpStatement(CPP14Parser.JumpStatementContext ctx) {
+        System.out.println(ctx.getText());
+
+        TerminalNode returnTerminalNode = ctx.Return();
+        if (returnTerminalNode != null) {
+            ExpressionContext expressionContext = ctx.expression();
+            System.out.println(expressionContext.getText());
+
+            structureCallback.returnStatement();
+        }
+    }
 
     @Override
     public void enterRelationalExpression(CPP14Parser.RelationalExpressionContext ctx) {
@@ -190,6 +202,8 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
     @Override
     public void exitFunctionDefinition(CPP14Parser.FunctionDefinitionContext ctx) {
 
+        // structureCallback.functionDeclaration(funcDecl);
+
         setSemAntMode(SemAntMode.DEFAULT);
 
         FuncDecl oldFuncDecl = funcDeclMap.put(funcDecl.getName(), funcDecl);
@@ -203,6 +217,8 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
     @Override
     public void enterFunctionBody(CPP14Parser.FunctionBodyContext ctx) {
         setSemAntMode(SemAntMode.FUNCTION_BODY);
+
+        structureCallback.functionDeclaration(funcDecl);
     }
 
     @Override
@@ -438,7 +454,6 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
 
     @Override
     public void enterMultiplicativeExpression(CPP14Parser.MultiplicativeExpressionContext ctx) {
-
         if (ctx.getChildCount() != 1) {
             structureCallback.addExpression();
         }
@@ -447,7 +462,6 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
     @Override
     public void exitMultiplicativeExpression(CPP14Parser.MultiplicativeExpressionContext ctx) {
         getExpr(ctx.pointerMemberExpression());
-
         if (ctx.getChildCount() != 1) {
             structureCallback.ascendExpression();
         }
@@ -530,6 +544,8 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
             case FUNCTION_DECLARATION: {
                 funcDecl.setName(varName);
                 declaratorNames.clear();
+
+                // structureCallback.functionDeclaration(funcDecl);
             }
                 break;
 
@@ -668,9 +684,9 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
 
         // System.out.println(identifier);
 
-        if (StringUtils.equalsIgnoreCase(identifier, "main")) {
-            return;
-        }
+        // if (StringUtils.equalsIgnoreCase(identifier, "main")) {
+        // return;
+        // }
 
         if (semAntMode == SemAntMode.PARAMETER_DECLARATION) {
             return;

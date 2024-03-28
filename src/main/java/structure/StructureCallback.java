@@ -11,11 +11,15 @@ public interface StructureCallback {
 
     void endScope();
 
+    void functionDeclaration(FuncDecl funcDecl);
+
     void functionCall(String name, FuncDecl funcDecl);
 
     void variableDeclaration(String name, Type type);
 
     void variableAssignment(String name);
+
+    void returnStatement();
 
     void addExpression();
     
