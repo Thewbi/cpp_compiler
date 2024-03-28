@@ -25,6 +25,7 @@ import com.cpp.grammar.PreprocessorParser;
 import com.cpp.grammar.CPP14Parser.TranslationUnitContext;
 import com.cpp.grammar.PreprocessorParser.Code_fileContext;
 
+import structure.DefaultStructureCallback;
 import types.FuncDecl;
 import types.StackFrame;
 import types.Type;
@@ -65,7 +66,8 @@ public class Main {
         //final String filename = "src/test/resources/for_loop.cpp";
         //final String filename = "src/test/resources/function_definition.cpp";
         //final String filename = "src/test/resources/function_call.cpp";
-        final String filename = "src/test/resources/while.cpp";
+        //final String filename = "src/test/resources/while.cpp";
+        final String filename = "src/test/resources/app1.cpp";
 
         final CharStream charStream = CharStreams
                 .fromFileName(filename);
@@ -127,6 +129,10 @@ public class Main {
             executionStack.push(baseStackFrame);
             semantCPP14ParserListener.setExecutionStack(executionStack);
 
+
+            DefaultStructureCallback structureCallback = new DefaultStructureCallback();
+            semantCPP14ParserListener.setStructureCallback(structureCallback);
+
             // semantCPP14ParserListener.getSemAntModeStack().push(SemAntMode.DEFAULT);
              CPP14ParserListener listener = semantCPP14ParserListener;
         //}
@@ -134,17 +140,23 @@ public class Main {
         // Create a generic parse tree walker that can trigger callbacks
         final ParseTreeWalker walker = new ParseTreeWalker();
 
-        boolean print = false;
-        //boolean print = true;
+        //boolean print = false;
+        boolean print = true;
         if (print) {
 
             ConsoleCPP14ParserListener printListener = new ConsoleCPP14ParserListener();
             walker.walk(printListener, root);
             
-        } 
+        }
+
+        // start the base scope
+        structureCallback.startScope();
 
         // Walk the tree created during the parse, trigger callbacks
         walker.walk(listener, root);
+
+        // end the base scope
+        structureCallback.endScope();
 
         // System.out.println(typeMap);
 

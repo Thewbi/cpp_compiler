@@ -38,3 +38,19 @@ large .cpp file is compiled into a single object file.
 ## Linking
 
 Linking of the object files is not part of this compiler.
+
+## TODO 
+
+```
+add true/false constants
+else if
+while
+do while
+elvis operator
+for
+structs
+pointers
+enum
+union
+switch
+```

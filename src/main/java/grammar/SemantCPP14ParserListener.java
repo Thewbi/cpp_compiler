@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Stack;
 
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -16,6 +17,11 @@ import com.cpp.grammar.CPP14Parser;
 import com.cpp.grammar.CPP14Parser.DeclSpecifierSeqContext;
 import com.cpp.grammar.CPP14Parser.InitDeclaratorContext;
 import com.cpp.grammar.CPP14Parser.InitDeclaratorListContext;
+
+import structure.Expression;
+import structure.ExpressionType;
+import structure.StructureCallback;
+
 import com.cpp.grammar.CPP14ParserBaseListener;
 
 import types.FormalParameter;
@@ -54,13 +60,18 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
 
     private Stack<StackFrame> executionStack = new Stack<>();
 
+    private StructureCallback structureCallback;
+
+    // private String lastTerminal;
+
     @Override
     public void enterRelationalExpression(CPP14Parser.RelationalExpressionContext ctx) {
     }
 
     @Override
     public void exitRelationalExpression(CPP14Parser.RelationalExpressionContext ctx) {
-        System.out.println(ctx.getText());
+
+        // System.out.println(ctx.getText());
 
         if (ctx.getChildCount() == 1) {
             return;
@@ -101,6 +112,8 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
     }
 
     private void processFunctionCallExit(ParserRuleContext ctx, String calledFunctionName, FuncDecl funcDecl) {
+
+        // verify that the parameter count between formal and actual parameters matches
         int returnValueIsOnStackToo = 1;
         if (funcDecl.getParams().size() != (executionStack.peek().exprTypeStack.size() - returnValueIsOnStackToo)) {
             throw new RuntimeException(
@@ -108,7 +121,7 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
                             + ctx.getStart().getLine() + "\")]");
         }
 
-        // Iterate in reverse.
+        // iterate in reverse, check each type
         ListIterator<FormalParameter> li = funcDecl.getParams().listIterator(funcDecl.getParams().size());
         while (li.hasPrevious()) {
 
@@ -128,13 +141,16 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
         // between the function value and the assigned variable
         initializerType = executionStack.peek().exprTypeStack.peek();
 
-        System.out.println("FUNCTION_CALL exit detected");
+        // System.out.println("FUNCTION_CALL exit detected");
 
         // the return type of the the called function goes onto the exprTypeStack of
         // the lower stackFrame
         Type returnValue = executionStack.peek().exprTypeStack.pop();
         executionStack.pop();
         executionStack.peek().exprTypeStack.push(returnValue);
+
+        // structure callback
+        structureCallback.endScope();
     }
 
     @Override
@@ -226,7 +242,7 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
     @Override
     public void enterSimpleDeclaration(CPP14Parser.SimpleDeclarationContext ctx) {
 
-        System.out.println(ctx.getText());
+        // System.out.println(ctx.getText());
 
         if (ctx.getChild(0) instanceof DeclSpecifierSeqContext) {
             semAntMode = SemAntMode.VARIABLE_DECLARATION;
@@ -236,7 +252,7 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
     @Override
     public void exitSimpleDeclaration(CPP14Parser.SimpleDeclarationContext ctx) {
 
-        System.out.println(ctx.getText());
+        // System.out.println(ctx.getText());
 
         if (declaratorNames.isEmpty()) {
             return;
@@ -272,6 +288,8 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
             ParserRuleContext parserRuleContext,
             String varName) {
 
+        // System.out.println(ctx.getText());
+
         if (ctx.declSpecifierSeq() == null) {
 
             // assignment without type declaration (a = 1;)
@@ -286,6 +304,9 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
                 performTypeCheck(targetType, initializerType, "[Assignment TypeError] VarName: \"" + varName + "\"",
                         parserRuleContext);
             }
+
+            // STRUCTURE CALLBACK
+            structureCallback.variableAssignment(varName);
 
         } else {
 
@@ -305,14 +326,29 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
                 performTypeCheck(targetType, initializerType, "[Assignment TypeError]", declSpecifierSeqContext);
             }
 
+            Type type = null;
+
             // create an array type if the variable is an array
             if (isArray) {
                 Type arrayVarType = new Type();
                 arrayVarType.setArraySubType(targetType);
                 varTypeMap.put(varName, arrayVarType);
+
+                type = arrayVarType;
+
             } else {
                 varTypeMap.put(varName, targetType);
+
+                type = targetType;
             }
+
+            // STRUCTURE CALLBACK - declaration
+            structureCallback.variableDeclaration(varName, type);
+
+            // System.out.println(structureCallback.getExpressions());
+
+            // STRUCTURE CALLBACK - assignment of an expression
+            structureCallback.variableAssignment(varName);
         }
     }
 
@@ -320,9 +356,11 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
     public void exitDeclaratorid(CPP14Parser.DeclaratoridContext ctx) {
 
         String id = ctx.getText();
-        System.out.println(id);
+
+        // System.out.println(id);
 
         switch (semAntMode) {
+
             case FUNCTION_DECLARATION:
                 funcDecl.setName(id);
                 break;
@@ -399,13 +437,36 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
     }
 
     @Override
+    public void enterMultiplicativeExpression(CPP14Parser.MultiplicativeExpressionContext ctx) {
+
+        if (ctx.getChildCount() != 1) {
+            structureCallback.addExpression();
+        }
+    }
+
+    @Override
     public void exitMultiplicativeExpression(CPP14Parser.MultiplicativeExpressionContext ctx) {
         getExpr(ctx.pointerMemberExpression());
+
+        if (ctx.getChildCount() != 1) {
+            structureCallback.ascendExpression();
+        }
+    }
+
+    @Override
+    public void enterAdditiveExpression(CPP14Parser.AdditiveExpressionContext ctx) {
+        if (ctx.getChildCount() != 1) {
+            structureCallback.addExpression();
+        }
     }
 
     @Override
     public void exitAdditiveExpression(CPP14Parser.AdditiveExpressionContext ctx) {
         getExpr(ctx.multiplicativeExpression());
+
+        if (ctx.getChildCount() != 1) {
+            structureCallback.ascendExpression();
+        }
     }
 
     private void getExpr(List<? extends ParserRuleContext> objs) {
@@ -425,7 +486,7 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
             Type typeA = executionStack.peek().exprTypeStack.pop();
             Type typeB = executionStack.peek().exprTypeStack.pop();
 
-            performTypeCheck(typeA, typeB, "Addition TypeError", expr);
+            performTypeCheck(typeA, typeB, "TypeError", expr);
 
             executionStack.peek().exprTypeStack.push(typeA);
         }
@@ -436,7 +497,7 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
 
         final String varName = ctx.getText();
 
-        System.out.println(varName);
+        // System.out.println(varName);
 
         switch (semAntMode) {
 
@@ -481,7 +542,7 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
 
                 FuncDecl funcDecl = funcDeclMap.get(ctx.getText());
                 executionStack.peek().exprTypeStack.push(funcDecl.getReturnType());
-                System.out.println("FUNCTION_CALL: " + varName);
+                // System.out.println("FUNCTION_CALL: " + varName);
                 calledFunctionNameStack.push(varName);
             }
                 break;
@@ -492,31 +553,84 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
     }
 
     @Override
-    public void exitLiteral(CPP14Parser.LiteralContext ctx) {
-
-        System.out.println(ctx.getText());
+    public void enterLiteral(CPP14Parser.LiteralContext ctx) {
 
         boolean typeProcessed = false;
+
+        // int
+        TerminalNode literalTerminalNode = ctx.IntegerLiteral();
+        if (literalTerminalNode != null) {
+            typeProcessed = true;
+            Integer value = Integer.parseInt(ctx.getText());
+            structureCallback.intLiteral(value);
+        }
+
+        // std::string
+        literalTerminalNode = ctx.StringLiteral();
+        if (literalTerminalNode != null) {
+            typeProcessed = true;
+            String value = ctx.getText();
+            structureCallback.stringLiteral(value);
+        }
+
+        // char
+        literalTerminalNode = ctx.CharacterLiteral();
+        if (literalTerminalNode != null) {
+            typeProcessed = true;
+            String value = ctx.getText();
+            structureCallback.charLiteral(value);
+        }
+
+        // float
+        literalTerminalNode = ctx.FloatingLiteral();
+        if (literalTerminalNode != null) {
+            typeProcessed = true;
+            Float value = Float.parseFloat(ctx.getText());
+            structureCallback.floatLiteral(value);
+        }
+
+        // unknown type
+        if (!typeProcessed) {
+            throw new RuntimeException("type not covered!");
+        }
+    }
+
+    @Override
+    public void exitLiteral(CPP14Parser.LiteralContext ctx) {
+
+        // System.out.println(ctx.getText());
+
+        boolean typeProcessed = false;
+
+        // int
         TerminalNode literalTerminalNode = ctx.IntegerLiteral();
         if (literalTerminalNode != null) {
             checkAndAddType("int");
             typeProcessed = true;
         }
+
+        // std::string
         literalTerminalNode = ctx.StringLiteral();
         if (literalTerminalNode != null) {
             checkAndAddType("std::string");
             typeProcessed = true;
         }
+
+        // char
         literalTerminalNode = ctx.CharacterLiteral();
         if (literalTerminalNode != null) {
             checkAndAddType("char");
             typeProcessed = true;
         }
+
+        // float
         literalTerminalNode = ctx.FloatingLiteral();
         if (literalTerminalNode != null) {
             checkAndAddType("float");
             typeProcessed = true;
         }
+
+        // unknown type
         if (!typeProcessed) {
             throw new RuntimeException("type not covered!");
         }
@@ -552,7 +666,7 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
 
         String identifier = ctx.getText();
 
-        System.out.println(identifier);
+        // System.out.println(identifier);
 
         if (StringUtils.equalsIgnoreCase(identifier, "main")) {
             return;
@@ -572,31 +686,53 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
 
             if (funcDecl.getParams().size() == 0) {
 
-                System.out.println("FUNCTION_CALL enter without parameters detected");
+                // System.out.println("FUNCTION_CALL enter without parameters detected");
 
                 setSemAntMode(SemAntMode.FUNCTION_CALL);
 
+                // STRUCTURE CALLBACK
+                structureCallback.functionCall(identifier, funcDecl);
+
             } else {
 
-                System.out.println("FUNCTION_CALL enter detected");
+                // System.out.println("FUNCTION_CALL enter detected");
 
                 StackFrame stackFrame = new StackFrame();
                 executionStack.push(stackFrame);
 
                 setSemAntMode(SemAntMode.FUNCTION_CALL);
 
+                // STRUCTURE CALLBACK
+                structureCallback.functionCall(identifier, funcDecl);
+
             }
+
         } else {
 
             if ((semAntMode != SemAntMode.FUNCTION_DECLARATION) && (semAntMode != SemAntMode.VARIABLE_DECLARATION)) {
                 throw new RuntimeException(
                         "Unknown function / variable: \"" + identifier + "\". Line " + ctx.getStart().getLine());
             }
+
         }
     }
 
     @Override
     public void exitUnqualifiedId(CPP14Parser.UnqualifiedIdContext ctx) {
+    }
+
+    @Override
+    public void visitTerminal(TerminalNode node) {
+
+        if (StringUtils.equalsIgnoreCase(node.getText(), "+")) {
+            structureCallback.plus();
+        } else if (StringUtils.equalsIgnoreCase(node.getText(), "-")) {
+            structureCallback.minus();
+        } else if (StringUtils.equalsIgnoreCase(node.getText(), "*")) {
+            structureCallback.mult();
+        } else if (StringUtils.equalsIgnoreCase(node.getText(), "/")) {
+            structureCallback.divisor();
+        }
     }
 
     public Map<String, Type> getTypeMap() {
@@ -631,6 +767,14 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
 
     public void setExecutionStack(Stack<StackFrame> executionStack) {
         this.executionStack = executionStack;
+    }
+
+    public StructureCallback getStructureCallback() {
+        return structureCallback;
+    }
+
+    public void setStructureCallback(StructureCallback structureCallback) {
+        this.structureCallback = structureCallback;
     }
 
 }
