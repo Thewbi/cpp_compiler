@@ -16,9 +16,6 @@ public class DefaultStructureCallback implements StructureCallback {
 
     private Expression currentExpression;
 
-    // private boolean returnNestedFunctionCalls = true;
-    // private boolean returnNestedFunctionCalls = false;
-
     @Override
     public void startScope() {
         System.out.println("[STR-CB] startScope()");
@@ -29,37 +26,10 @@ public class DefaultStructureCallback implements StructureCallback {
     public void endScope() {
         System.out.println("[STR-CB] endScope()");
         System.out.println("");
-
-        // if (!returnNestedFunctionCalls) {
-        //     clearExpressions();
-        // }
     }
 
     @Override
     public void functionCall(String name, FuncDecl funcDecl) {
-
-        /* 
-        Expression expression = new Expression();
-        expression.setExpressionType(ExpressionType.FUNCTION_CALL);
-        expression.setFuncDeclValue(funcDecl);
-
-        List<FormalParameter> params = funcDecl.getParams();
-        // iterate in reverse
-        ListIterator<FormalParameter> literator = funcDecl.getParams().listIterator(funcDecl.getParams().size());
-        while (literator.hasPrevious()) {
-
-            FormalParameter formalParameter = (FormalParameter) literator.previous();
-
-            Expression actualParameter = expressions.get(expressions.size() - 1);
-            expressions.remove(expressions.size() - 1);
-
-            expression.getChildren().add(0, actualParameter);
-            actualParameter.setParent(actualParameter);
-        }
-
-        expressions.add(expression);
-
-        */
 
         List<Expression> expressionList = new ArrayList<>();
 
@@ -80,21 +50,6 @@ public class DefaultStructureCallback implements StructureCallback {
         Expression expression = new Expression();
         expression.setExpressionType(ExpressionType.RETURN_VALUE_PREVIOUS_CALL);
         expressions.add(expression);
-
-        // if (returnNestedFunctionCalls) {
-
-        //     expressions.add(expression);
-
-        // } else {
-
-        //     expression = new Expression();
-        //     expression.setExpressionType(ExpressionType.RETURN_VALUE_PREVIOUS_CALL);
-
-        //     expressions.add(expression);
-
-        // }
-
-        //System.out.println("[STR-CB] functionCall() Name: \"" + name + "\" Expressions: " + expressions);
 
         System.out.println("[STR-CB] functionCall() Name: \"" + name + "\" Params: " + expressionList);
 
