@@ -1,0 +1,1 @@
+..\..\..\..\bin\ECO32Assembler.exe -o build\ECO32_helloworld_selfcontained.out ECO32_helloworld_selfcontained.s 

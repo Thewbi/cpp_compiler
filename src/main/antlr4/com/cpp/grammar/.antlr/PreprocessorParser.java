@@ -32,7 +32,6 @@ public class PreprocessorParser extends Parser {
 
 	private static String[] makeLiteralNames() {
 		return new String[] {
-			null, null, null, "'#IFDEF'", "'#ELSE'", "'#ENDIF'", "'#INCLUDE'"
 		};
 	}
 	private static final String[] _LITERAL_NAMES = makeLiteralNames();
