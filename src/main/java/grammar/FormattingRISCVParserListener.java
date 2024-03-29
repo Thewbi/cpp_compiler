@@ -3,6 +3,7 @@ package grammar;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNodeImpl;
+import org.apache.commons.lang3.StringUtils;
 
 import com.cpp.grammar.RISCVParser;
 import com.cpp.grammar.RISCVParser.Label_definitionContext;
@@ -58,6 +59,19 @@ public class FormattingRISCVParserListener extends RISCVParserBaseListener {
     }
 
     @Override
+    public void exitRow(RISCVParser.RowContext ctx) {
+    }
+
+    @Override
+    public void enterComment(RISCVParser.CommentContext ctx) {
+        System.out.print(ctx.getText());
+    }
+
+    @Override
+    public void exitComment(RISCVParser.CommentContext ctx) {
+    }
+
+    @Override
     public void enterPreprocessor_directive(RISCVParser.Preprocessor_directiveContext ctx) {
     }
 
@@ -82,7 +96,7 @@ public class FormattingRISCVParserListener extends RISCVParserBaseListener {
 
         MnemonicContext mnemonicContext = ctx.mnemonic();
 
-        addToBuffer(COLUMN_1, mnemonicContext.getText());
+        addToBuffer(COLUMN_1, StringUtils.lowerCase(mnemonicContext.getText()));
         addToBuffer(COLUMN_2, "");
 
         int idx = 0;

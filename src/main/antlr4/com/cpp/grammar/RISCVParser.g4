@@ -12,7 +12,9 @@ newline:
     NEWLINE
     ;
 
-row : 
+row :
+    comment
+    |
     preprocessor_directive
     |
     asm_intrinsic_instruction
@@ -20,6 +22,10 @@ row :
 //    macro_usage
     |
     instruction_row
+    ;
+
+comment:
+    LINE_COMMENT | DOUBLE_SLASH_LINE_COMMENT | BLOCK_COMMENT
     ;
 
 instruction_row :
@@ -58,6 +64,8 @@ expression :
     expression MINUS expression
     |
     expression PLUS expression
+    |
+    PLUS expression
     |
     MINUS expression
     |

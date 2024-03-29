@@ -101,15 +101,22 @@ TYPE : 'type' ;
 NEWLINE : '\r'? '\n' ;
 
 //WS : [ \t\n\r\f]+ -> skip ;
-WS : [ \t\f]+ -> skip ;
+WS : 
+    [ \t\f]+ -> skip 
+    ;
 
 LINE_COMMENT 
     : 
-    ';' ~[\r\n]* -> skip 
+    ';' ~[\r\n]* // -> skip 
     ;
 
-BLOCK_COMMENT : '/*' (BLOCK_COMMENT|.)*? '*/' -> channel(HIDDEN) ;
-DOUBLE_SLASH_LINE_COMMENT : '//' .*? '\n' -> channel(HIDDEN) ;
+BLOCK_COMMENT : 
+    '/*' (BLOCK_COMMENT|.)*? '*/' //-> channel(HIDDEN) 
+    ;
+
+DOUBLE_SLASH_LINE_COMMENT : 
+    '//' .*? '\n' //-> channel(HIDDEN) 
+    ;
 
 STRING : '"' ('""'|~'"')* '"' ;
 
