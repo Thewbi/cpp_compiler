@@ -100,7 +100,8 @@ TYPE : 'type' ;
 
 NEWLINE : '\r'? '\n' ;
 
-WS : [ \t\n\r\f]+ -> skip  ;
+//WS : [ \t\n\r\f]+ -> skip ;
+WS : [ \t\f]+ -> skip ;
 
 LINE_COMMENT 
     : 

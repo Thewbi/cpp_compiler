@@ -6,7 +6,11 @@ options {
 	tokenVocab = RISCVLexer;
 }
 
-asm_file : NEWLINE* row ( NEWLINE* row )* NEWLINE* EOF ;
+asm_file : ( newline* row )+ newline* EOF ;
+
+newline:
+    NEWLINE
+    ;
 
 row : 
     preprocessor_directive
@@ -15,7 +19,11 @@ row :
 //    |
 //    macro_usage
     |
-    label_definition? instruction    
+    instruction_row
+    ;
+
+instruction_row :
+    label_definition? newline? instruction
     ;
 
 instruction : mnemonic ( param ( COMMA param )? ( COMMA param )? )? ;

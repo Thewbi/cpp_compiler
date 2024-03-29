@@ -92,4 +92,3 @@ main:
 
 
 	.ident	"GCC: (GNU) 7.2.0"
- /**/
