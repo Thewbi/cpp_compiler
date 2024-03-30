@@ -12,7 +12,6 @@ import java.nio.file.Paths;
 
 import java.io.File;
 
-import org.antlr.v4.runtime.ANTLRErrorListener;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -52,13 +51,14 @@ public class Main {
     private static void riscvassembler() throws IOException {
 
         //final String filename = "src/test/resources/RISCV/addi.s";
-        final String filename = "src/test/resources/RISCV/fibonacci.s";
+        // final String filename = "src/test/resources/RISCV/fibonacci.s";
         //final String filename = "src/test/resources/RISCV/hello.s";
         //final String filename = "src/test/resources/RISCV/hello2.s";
         //final String filename = "src/test/resources/RISCV/sw.s";
         //final String filename = "src/test/resources/RISCV/test.s";
         //final String filename = "src/test/resources/RISCV/intrinsic.s";
         //final String filename = "src/test/resources/RISCV/data_list.s";
+        final String filename = "src/test/resources/RISCV/scratchpad.s";
 
         //final String filename = "C:\\aaa_se\\riscv\\snake_game_risc-v\\Main.asm";
         //final String filename = "C:\\aaa_se\\riscv\\snake_game_risc-v\\include\\background.asm";
@@ -96,11 +96,19 @@ public class Main {
 
         }
 
-        //RISCVParserListener riscVParserListener = new RISCVParserListener();
-        // ConsoleRISCVParserListener riscVParserListener = new ConsoleRISCVParserListener();
-        FormattingRISCVParserListener riscVParserListener = new FormattingRISCVParserListener();
+        //RISCVParserListener listener = new RISCVParserListener();
+        ConsoleRISCVParserListener listener = new ConsoleRISCVParserListener();
+        //FormattingRISCVParserListener listener = new FormattingRISCVParserListener();
+        // RISCVRowListener listener = new RISCVRowListener();
 
-        walker.walk(riscVParserListener, root);
+        walker.walk(listener, root);
+
+        listener.enterNewline(null);
+
+        // for (RISCVRow row : listener.getRows()) {
+        //     System.out.println(row);
+        //     System.out.println("");
+        // }
     }
 
     private static void translationUnit() throws IOException {

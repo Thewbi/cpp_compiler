@@ -6,7 +6,6 @@ import org.antlr.v4.runtime.tree.TerminalNodeImpl;
 import org.apache.commons.lang3.StringUtils;
 
 import com.cpp.grammar.RISCVParser;
-import com.cpp.grammar.RISCVParser.Label_definitionContext;
 import com.cpp.grammar.RISCVParser.MnemonicContext;
 import com.cpp.grammar.RISCVParser.ParamContext;
 import com.cpp.grammar.RISCVParserBaseListener;
@@ -20,8 +19,6 @@ public class FormattingRISCVParserListener extends RISCVParserBaseListener {
     private static final int COLUMN_3 = 45;
 
     private StringBuilder stringBuilder = new StringBuilder();
-
-    private boolean label;
 
     private void clearBuffer() {
         stringBuilder.setLength(0);
@@ -70,26 +67,18 @@ public class FormattingRISCVParserListener extends RISCVParserBaseListener {
     }
 
     @Override public void enterLabel_definition(RISCVParser.Label_definitionContext ctx) { 
-
         final String text = ctx.getText();
         addToBuffer(text);
-
-        if (StringUtils.equalsIgnoreCase("iniciaCobra:", text)) {
-            label = true;
-        }
     }
 	@Override public void exitLabel_definition(RISCVParser.Label_definitionContext ctx) { }
 
     @Override public void enterExpression_list(RISCVParser.Expression_listContext ctx) {
         addToBuffer(COLUMN_1, ctx.getText());
-        // outputBuffer();
      }
 	@Override public void exitExpression_list(RISCVParser.Expression_listContext ctx) { }
 
     @Override
     public void enterRow(RISCVParser.RowContext ctx) {
-        // outputBuffer();
-        // clearBuffer();
     }
 
     @Override
@@ -98,9 +87,7 @@ public class FormattingRISCVParserListener extends RISCVParserBaseListener {
 
     @Override
     public void enterComment(RISCVParser.CommentContext ctx) {
-
         final String text = ctx.getText();
-        //System.out.print(ctx.getText());
         addToBuffer(COLUMN_3, text);
     }
 
@@ -118,7 +105,6 @@ public class FormattingRISCVParserListener extends RISCVParserBaseListener {
 
     @Override
     public void enterInstruction_row(RISCVParser.Instruction_rowContext ctx) {
-        
     }
 
     @Override
@@ -144,7 +130,6 @@ public class FormattingRISCVParserListener extends RISCVParserBaseListener {
 
             idx++;
         }
-        // outputBuffer();
     }
 
     @Override
@@ -155,11 +140,6 @@ public class FormattingRISCVParserListener extends RISCVParserBaseListener {
     public void enterAsm_intrinsic_instruction(RISCVParser.Asm_intrinsic_instructionContext ctx) {
 
         int idx = 0;
-        // ParseTree parseTree0 = ctx.getChild(idx);
-        // if (parseTree0 instanceof Label_definitionContext) {
-        //     addToBuffer(COLUMN_0, parseTree0.getText());
-        //     idx++;
-        // }
 
         // ignore the DOT
         idx++;
@@ -175,41 +155,34 @@ public class FormattingRISCVParserListener extends RISCVParserBaseListener {
             case RISCVParser.ALIGN:
                 addToBuffer(COLUMN_1, ".align ");
                 addToBuffer(ctx.getChild(idx).getText());
-                // outputBuffer();
                 break;
 
             case RISCVParser.FILE:
                 addToBuffer(COLUMN_1, ".file ");
                 addToBuffer(ctx.getChild(idx).getText());
-                // outputBuffer();
                 break;
 
             case RISCVParser.GLOBL:
                 addToBuffer(COLUMN_1, ".globl ");
                 addToBuffer(ctx.getChild(idx).getText());
-                // outputBuffer();
                 break;
 
             case RISCVParser.IDENT:
                 addToBuffer(COLUMN_1, ".ident ");
                 addToBuffer(ctx.getChild(idx).getText());
-                // outputBuffer();
                 break;
 
             case RISCVParser.OPTION:
                 addToBuffer(COLUMN_1, ".option ");
                 addToBuffer(ctx.getChild(idx).getText());
-                // outputBuffer();
                 break;
 
             case RISCVParser.TEXT:
                 addToBuffer(COLUMN_1, ".text");
-                // outputBuffer();
                 break;
 
             case RISCVParser.DATA:
                 addToBuffer(COLUMN_1, ".data");
-                // outputBuffer();
                 break;
 
             case RISCVParser.TYPE:
@@ -220,7 +193,6 @@ public class FormattingRISCVParserListener extends RISCVParserBaseListener {
                 idx++;
                 addToBuffer(ctx.getChild(idx).getText());
                 idx++;
-                // outputBuffer();
                 break;
 
             case RISCVParser.SIZE:
@@ -231,31 +203,26 @@ public class FormattingRISCVParserListener extends RISCVParserBaseListener {
                 idx++;
                 addToBuffer(ctx.getChild(idx).getText());
                 idx++;
-                // outputBuffer();
                 break;
 
             case RISCVParser.WORD:
                 addToBuffer(COLUMN_1, ".word ");
                 addToBuffer(ctx.getChild(idx).getText());
-                // outputBuffer();
                 break;
 
             case RISCVParser.SPACE:
                 addToBuffer(COLUMN_1, ".space ");
                 addToBuffer(ctx.getChild(idx).getText());
-                // outputBuffer();
                 break;
 
             case RISCVParser.INCLUDE:
                 addToBuffer(COLUMN_1, ".include ");
                 addToBuffer(ctx.getChild(idx).getText());
-                // outputBuffer();
                 break;
 
             case RISCVParser.STRING_KEYWORD:
                 addToBuffer(COLUMN_1, ".string ");
                 addToBuffer(ctx.getChild(idx).getText());
-                // outputBuffer();
                 break;
 /*
             case RISCVParser.ADD:

@@ -10,16 +10,16 @@
 	.type	fib, @function
 fib:
 	addi	sp,sp,-32
-    sw	ra,28(sp)
-	sw	s0,24(sp)
-	sw	s1,20(sp)
+    sw	    ra,28(sp)
+	sw	    s0,24(sp)
+	sw	    s1,20(sp)
 	addi	s0,sp,32
-	sw	a0,-20(s0)
-	lw	a4,-20(s0)
-	li	a5,1
-	bgt	a4,a5,.L2
-	lw	a5,-20(s0)
-	j	.L3
+	sw	    a0,-20(s0)
+	lw	    a4,-20(s0)
+	li	    a5,1
+	bgt	    a4,a5,.L2
+	lw	    a5,-20(s0)
+	j	    .L3
 .L2:
 	lw	a5,-20(s0)
 	addi	a5,a5,-1
