@@ -30,13 +30,20 @@ fragment Z:[zZ];
 ADD : A D D ;
 ADDI : A D D I ;
 
+BEQ : B E Q ;
 BGT : B G T ;
 
 CALL : C A L L ;
+CSRW : C S R W ;
+CSRSI : C S R S I ;
+
+ECALL : E C A L L ;
 
 J_ : J ;
+JAL : J A L ;
 JR : J R ;
 
+LA : L A ;
 LI : L I ;
 LW : L W ;
 
@@ -53,6 +60,7 @@ COLON : ':' ;
 COMMA : ',' ;
 CSEG : 'cseg' ;
 
+DATA : 'data' ;
 DEF : 'def' ;
 DEVICE : 'device' ;
 DOT : '.' ;
@@ -94,9 +102,13 @@ RIGHT_SHIFT : '>>' ;
 
 SIZE : 'size' ;
 SLASH : '/' ;
+SPACE : 'space' ;
+STRING_KEYWORD : 'string' ;
 
 TEXT : 'text' ;
 TYPE : 'type' ;
+
+WORD : 'word' ;
 
 NEWLINE : '\r'? '\n' ;
 
@@ -107,11 +119,11 @@ WS :
 
 LINE_COMMENT 
     : 
-    ';' ~[\r\n]* // -> skip 
+    ( ';' | '#' ) ~[\r\n]* // -> skip 
     ;
 
 BLOCK_COMMENT : 
-    '/*' (BLOCK_COMMENT|.)*? '*/' //-> channel(HIDDEN) 
+    '/*' ( BLOCK_COMMENT | . )*? '*/' //-> channel(HIDDEN) 
     ;
 
 DOUBLE_SLASH_LINE_COMMENT : 

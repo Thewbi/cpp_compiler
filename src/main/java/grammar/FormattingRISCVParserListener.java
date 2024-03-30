@@ -14,10 +14,14 @@ import com.cpp.grammar.RISCVParserBaseListener;
 public class FormattingRISCVParserListener extends RISCVParserBaseListener {
 
     private static final String SPACE_BUDGET = "                                             ";
-    private static final int COLUMN_1 = 4;
-    private static final int COLUMN_2 = 10;
+    private static final int COLUMN_0 = 0;
+    private static final int COLUMN_1 = 10;
+    private static final int COLUMN_2 = 20;
+    private static final int COLUMN_3 = 45;
 
     private StringBuilder stringBuilder = new StringBuilder();
+
+    private boolean label;
 
     private void clearBuffer() {
         stringBuilder.setLength(0);
@@ -31,11 +35,13 @@ public class FormattingRISCVParserListener extends RISCVParserBaseListener {
 
         int currentColumn = stringBuilder.length();
 
-        if (currentColumn > column) {
-            throw new RuntimeException("Column not possible!");
+        if (currentColumn >= column) {
+            // throw new RuntimeException("Column not possible!");
+            stringBuilder.append(" ");
+        } else {
+            stringBuilder.append(SPACE_BUDGET, currentColumn, column);
+            //stringBuilder.append(SPACE_BUDGET, 0, (column - currentColumn) );
         }
-
-        stringBuilder.append(SPACE_BUDGET, currentColumn, column);
 
         stringBuilder.append(data);
     }
@@ -44,18 +50,46 @@ public class FormattingRISCVParserListener extends RISCVParserBaseListener {
         System.out.print(stringBuilder.toString());
     }
 
+    @Override public void enterAsm_file(RISCVParser.Asm_fileContext ctx) { }
+	
+	@Override public void exitAsm_file(RISCVParser.Asm_fileContext ctx) { 
+        outputBuffer();
+        clearBuffer();
+    }
+
     @Override
     public void enterNewline(RISCVParser.NewlineContext ctx) {
-        System.out.println("");
+        addToBuffer("\n");
+
+        outputBuffer();
+        clearBuffer();
     }
 
     @Override
     public void exitNewline(RISCVParser.NewlineContext ctx) {
     }
 
+    @Override public void enterLabel_definition(RISCVParser.Label_definitionContext ctx) { 
+
+        final String text = ctx.getText();
+        addToBuffer(text);
+
+        if (StringUtils.equalsIgnoreCase("iniciaCobra:", text)) {
+            label = true;
+        }
+    }
+	@Override public void exitLabel_definition(RISCVParser.Label_definitionContext ctx) { }
+
+    @Override public void enterExpression_list(RISCVParser.Expression_listContext ctx) {
+        addToBuffer(COLUMN_1, ctx.getText());
+        // outputBuffer();
+     }
+	@Override public void exitExpression_list(RISCVParser.Expression_listContext ctx) { }
+
     @Override
     public void enterRow(RISCVParser.RowContext ctx) {
-        clearBuffer();
+        // outputBuffer();
+        // clearBuffer();
     }
 
     @Override
@@ -64,7 +98,10 @@ public class FormattingRISCVParserListener extends RISCVParserBaseListener {
 
     @Override
     public void enterComment(RISCVParser.CommentContext ctx) {
-        System.out.print(ctx.getText());
+
+        final String text = ctx.getText();
+        //System.out.print(ctx.getText());
+        addToBuffer(COLUMN_3, text);
     }
 
     @Override
@@ -81,10 +118,7 @@ public class FormattingRISCVParserListener extends RISCVParserBaseListener {
 
     @Override
     public void enterInstruction_row(RISCVParser.Instruction_rowContext ctx) {
-        Label_definitionContext label_definitionContext = ctx.label_definition();
-        if (label_definitionContext != null) {
-            System.out.print(label_definitionContext.getText());
-        }
+        
     }
 
     @Override
@@ -110,7 +144,7 @@ public class FormattingRISCVParserListener extends RISCVParserBaseListener {
 
             idx++;
         }
-        outputBuffer();
+        // outputBuffer();
     }
 
     @Override
@@ -120,7 +154,19 @@ public class FormattingRISCVParserListener extends RISCVParserBaseListener {
     @Override
     public void enterAsm_intrinsic_instruction(RISCVParser.Asm_intrinsic_instructionContext ctx) {
 
-        ParseTree parseTree = ctx.getChild(1);
+        int idx = 0;
+        // ParseTree parseTree0 = ctx.getChild(idx);
+        // if (parseTree0 instanceof Label_definitionContext) {
+        //     addToBuffer(COLUMN_0, parseTree0.getText());
+        //     idx++;
+        // }
+
+        // ignore the DOT
+        idx++;
+
+        ParseTree parseTree = ctx.getChild(idx);
+        idx++;
+
         TerminalNodeImpl terminalNodeImpl = (TerminalNodeImpl) parseTree;
         Token symbol = terminalNodeImpl.getSymbol();
 
@@ -128,55 +174,280 @@ public class FormattingRISCVParserListener extends RISCVParserBaseListener {
 
             case RISCVParser.ALIGN:
                 addToBuffer(COLUMN_1, ".align ");
-                addToBuffer(ctx.getChild(2).getText());
-                outputBuffer();
+                addToBuffer(ctx.getChild(idx).getText());
+                // outputBuffer();
                 break;
 
             case RISCVParser.FILE:
                 addToBuffer(COLUMN_1, ".file ");
-                addToBuffer(ctx.getChild(2).getText());
-                outputBuffer();
+                addToBuffer(ctx.getChild(idx).getText());
+                // outputBuffer();
                 break;
 
             case RISCVParser.GLOBL:
                 addToBuffer(COLUMN_1, ".globl ");
-                addToBuffer(ctx.getChild(2).getText());
-                outputBuffer();
+                addToBuffer(ctx.getChild(idx).getText());
+                // outputBuffer();
                 break;
 
             case RISCVParser.IDENT:
                 addToBuffer(COLUMN_1, ".ident ");
-                addToBuffer(ctx.getChild(2).getText());
-                outputBuffer();
+                addToBuffer(ctx.getChild(idx).getText());
+                // outputBuffer();
                 break;
 
             case RISCVParser.OPTION:
                 addToBuffer(COLUMN_1, ".option ");
-                addToBuffer(ctx.getChild(2).getText());
-                outputBuffer();
+                addToBuffer(ctx.getChild(idx).getText());
+                // outputBuffer();
                 break;
 
             case RISCVParser.TEXT:
                 addToBuffer(COLUMN_1, ".text");
-                outputBuffer();
+                // outputBuffer();
+                break;
+
+            case RISCVParser.DATA:
+                addToBuffer(COLUMN_1, ".data");
+                // outputBuffer();
                 break;
 
             case RISCVParser.TYPE:
                 addToBuffer(COLUMN_1, ".type ");
-                addToBuffer(ctx.getChild(2).getText());
+                addToBuffer(ctx.getChild(idx).getText());
+                idx++;
                 addToBuffer(", ");
-                addToBuffer(ctx.getChild(4).getText());
-                outputBuffer();
+                idx++;
+                addToBuffer(ctx.getChild(idx).getText());
+                idx++;
+                // outputBuffer();
                 break;
 
             case RISCVParser.SIZE:
                 addToBuffer(COLUMN_1, ".size ");
-                addToBuffer(ctx.getChild(2).getText());
+                addToBuffer(ctx.getChild(idx).getText());
+                idx++;
                 addToBuffer(", ");
-                addToBuffer(ctx.getChild(4).getText());
-                outputBuffer();
+                idx++;
+                addToBuffer(ctx.getChild(idx).getText());
+                idx++;
+                // outputBuffer();
                 break;
 
+            case RISCVParser.WORD:
+                addToBuffer(COLUMN_1, ".word ");
+                addToBuffer(ctx.getChild(idx).getText());
+                // outputBuffer();
+                break;
+
+            case RISCVParser.SPACE:
+                addToBuffer(COLUMN_1, ".space ");
+                addToBuffer(ctx.getChild(idx).getText());
+                // outputBuffer();
+                break;
+
+            case RISCVParser.INCLUDE:
+                addToBuffer(COLUMN_1, ".include ");
+                addToBuffer(ctx.getChild(idx).getText());
+                // outputBuffer();
+                break;
+
+            case RISCVParser.STRING_KEYWORD:
+                addToBuffer(COLUMN_1, ".string ");
+                addToBuffer(ctx.getChild(idx).getText());
+                // outputBuffer();
+                break;
+/*
+            case RISCVParser.ADD:
+                System.out.println("");
+                break;
+            case RISCVParser.ADDI:
+                System.out.println("");
+                break;
+            case RISCVParser.BGT:
+                System.out.println("");
+                break;
+            case RISCVParser.CALL:
+                System.out.println("");
+                break;
+            case RISCVParser.J_:
+                System.out.println("");
+                break;
+            case RISCVParser.JR:
+                System.out.println("");
+                break;
+            case RISCVParser.LI:
+                System.out.println("");
+                break;
+            case RISCVParser.LW:
+                System.out.println("");
+                break;
+            case RISCVParser.MV:
+                System.out.println("");
+                break;
+            case RISCVParser.SW:
+                System.out.println("");
+                break;
+            // case RISCVParser.ALIGN:
+            //     System.out.println("");
+            //     break;
+            case RISCVParser.ASTERISK:
+                System.out.println("");
+                break;
+            case RISCVParser.AT:
+                System.out.println("");
+                break;
+            case RISCVParser.CLOSEING_BRACKET:
+                System.out.println("");
+                break;
+            case RISCVParser.COLON:
+                System.out.println("");
+                break;
+            case RISCVParser.COMMA:
+                System.out.println("");
+                break;
+            case RISCVParser.CSEG:
+                System.out.println("");
+                break;
+            // case RISCVParser.DATA:
+            //     System.out.println("");
+            //     break;
+            case RISCVParser.DEF:
+                System.out.println("");
+                break;
+            case RISCVParser.DEVICE:
+                System.out.println("");
+                break;
+            case RISCVParser.DOT:
+                System.out.println("");
+                break;
+            case RISCVParser.ELSE:
+                System.out.println("");
+                break;
+            case RISCVParser.END_MACRO:
+                System.out.println("");
+                break;
+            case RISCVParser.ENDIF:
+                System.out.println("");
+                break;
+            case RISCVParser.EQUALS:
+                System.out.println("");
+                break;
+            case RISCVParser.EQU:
+                System.out.println("");
+                break;
+            case RISCVParser.ERROR:
+                System.out.println("");
+                break;
+            // case RISCVParser.FILE:
+            //     System.out.println("");
+            //     break;
+            case RISCVParser.FUNCTION:
+                System.out.println("");
+                break;
+            // case RISCVParser.GLOBL:
+            //     System.out.println("");
+            //     break;
+            case RISCVParser.GT:
+                System.out.println("");
+                break;
+            case RISCVParser.HASH_TAG:
+                System.out.println("");
+                break;
+            // case RISCVParser.IDENT:
+            //     System.out.println("");
+            //     break;
+            case RISCVParser.IF:
+                System.out.println("");
+                break;
+            // case RISCVParser.INCLUDE:
+            //     System.out.println("");
+            //     break;
+            case RISCVParser.LEFT_SHIFT:
+                System.out.println("");
+                break;
+            case RISCVParser.LT:
+                System.out.println("");
+                break;
+            case RISCVParser.MACRO:
+                System.out.println("");
+                break;
+            case RISCVParser.MINUS:
+                System.out.println("");
+                break;
+            case RISCVParser.NOPIC:
+                System.out.println("");
+                break;
+            case RISCVParser.OPENING_BRACKET:
+                System.out.println("");
+                break;
+            // case RISCVParser.OPTION:
+            //     System.out.println("");
+            //     break;
+            case RISCVParser.ORG:
+                System.out.println("");
+                break;
+            case RISCVParser.PLUS:
+                System.out.println("");
+                break;
+            case RISCVParser.RIGHT_SHIFT:
+                System.out.println("");
+                break;
+            // case RISCVParser.SIZE:
+            //     System.out.println("");
+            //     break;
+            case RISCVParser.SLASH:
+                System.out.println("");
+                break;
+            // case RISCVParser.SPACE:
+            //     System.out.println("");
+            //     break;
+            // case RISCVParser.STRING_KEYWORD:
+            //     System.out.println("");
+            //     break;
+            // case RISCVParser.TEXT:
+            //     System.out.println("");
+            //     break;
+            // case RISCVParser.TYPE:
+            //     System.out.println("");
+            //     break;
+            // case RISCVParser.WORD:
+            //     System.out.println("");
+            //    break;
+            case RISCVParser.NEWLINE:
+                System.out.println("");
+                break;
+            case RISCVParser.WS:
+                System.out.println("");
+                break;
+            case RISCVParser.LINE_COMMENT:
+                System.out.println("");
+                break;
+            case RISCVParser.BLOCK_COMMENT:
+                System.out.println("");
+                break;
+            // case RISCVParser.DOUBLE_SLASH_:
+            //     System.out.println("");
+            //     break;
+            // case RISCVParser.LINE_COMMENT:
+            //     System.out.println("");
+            //     break;
+            case RISCVParser.STRING:
+                System.out.println("");
+                break;
+            case RISCVParser.NUMBER:
+                System.out.println("");
+                break;
+            case RISCVParser.HEX_NUMBER:
+                System.out.println("");
+                break;
+            case RISCVParser.BINARY_NUMBER:
+                System.out.println("");
+                break;
+            case RISCVParser.IDENTIFIER:
+                System.out.println("");
+                break;
+ */
             default:
                 break;
         }

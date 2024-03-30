@@ -21,7 +21,7 @@
         <dependency>
             <groupId>org.antlr</groupId>
             <artifactId>antlr4</artifactId>
-            <version>4.9.1</version>
+            <version>4.13.1</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->
@@ -50,7 +50,7 @@
                 <plugin>
                     <groupId>org.antlr</groupId>
                     <artifactId>antlr4-maven-plugin</artifactId>
-                    <version>4.9.1</version>
+                    <version>4.13.1</version>
                 </plugin>
 
                 <!-- clean lifecycle, see
@@ -102,13 +102,22 @@
             <plugin>
                 <groupId>org.antlr</groupId>
                 <artifactId>antlr4-maven-plugin</artifactId>
-                <version>4.9.1</version>
+                <version>4.13.1</version>
+
+                <configuration>
+                    <encoding>${project.build.sourceEncoding}</encoding>
+                </configuration>
+
                 <executions>
                     <execution>
-                        <id>antlr</id>
-                        <goals>
-                            <goal>antlr4</goal>
-                        </goals>
+                        
+                            <id>antlr</id>
+                            <goals>
+                                <goal>antlr4</goal>
+                            </goals>
+
+                            
+                            
                     </execution>
                 </executions>
             </plugin>
@@ -132,6 +141,37 @@
                     </execution>
                 </executions>
             </plugin>
+
+            <!--
+            <plugin>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <version>1.0</version> 
+                <executions>
+                  <execution>
+                    <id>require-utf-8</id>
+                    <goals>
+                      <goal>enforce</goal>
+                    </goals>
+                    <configuration>
+                      <rules>
+                        <requireEncoding>
+                          <encoding>UTF-8</encoding>
+                          <includes>src/main/resources/**,src/test/resources/**</includes>
+                        </requireEncoding>
+                      </rules>
+                      <fastFail>false</fastFail>
+                    </configuration>
+                  </execution>
+                </executions>
+                <dependencies>
+                  <dependency>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>extra-enforcer-rules</artifactId>
+                    <version>1.0-beta-6</version>
+                  </dependency>
+                </dependencies>
+              </plugin>-->
+
         </plugins>
     </build>
 

@@ -12,16 +12,29 @@ newline:
     NEWLINE
     ;
 
+label_definition : 
+    label_name COLON 
+    ;
+
 row :
-    comment
+    preprocessor_directive ( comment )?
+    
     |
-    preprocessor_directive
-    |
-    asm_intrinsic_instruction
+    ( label_definition )? asm_intrinsic_instruction ( comment )?
 //    |
 //    macro_usage
     |
-    instruction_row
+    ( label_definition )? instruction_row ( comment )?
+    |
+    ( label_definition )? expression_list ( comment )? // example: NOTAS_PERDEU: 6,800,67,800,70,600,81,500,76,1000
+    |
+    label_definition ( comment )?
+    |
+    comment
+    ;
+
+expression_list :
+    expression ( COMMA expression)*
     ;
 
 comment:
@@ -29,16 +42,28 @@ comment:
     ;
 
 instruction_row :
-    label_definition? newline? instruction
+    newline? instruction
     ;
 
 instruction : mnemonic ( param ( COMMA param )? ( COMMA param )? )? ;
 
-param : ( ( MINUS )? IDENTIFIER ( PLUS )? ) | offset_expression | expression | asm_intrinsic_usage | macro_placeholder | label_name;
+param : 
+    ( ( MINUS )? IDENTIFIER ( PLUS )? ) 
+    | 
+    offset_expression 
+    | 
+    expression 
+    | 
+    asm_intrinsic_usage 
+    | 
+    macro_placeholder 
+    | 
+    label_name
+    ;
 
 //macro_usage : IDENTIFIER ( expression )* ;
 
-label_definition : label_name COLON ;
+
 
 label_name:
     (DOT)? IDENTIFIER
@@ -138,6 +163,14 @@ asm_intrinsic_instruction :
         TYPE ( IDENTIFIER COMMA entity_type )
         |
         OPTION ( NOPIC )
+        |
+        DATA
+        |
+        WORD expression
+        |
+        SPACE expression
+        |
+        STRING_KEYWORD STRING
     )
     ;
 
@@ -164,8 +197,10 @@ mnemonic :
  /*   
     |
     mnemonic_d
+*/
     |
     mnemonic_e
+/*
     |
     mnemonic_f
     |
@@ -204,21 +239,21 @@ mnemonic_a :
     ;
 
 mnemonic_b :
-    BGT
+    BEQ | BGT
     ;
 
 mnemonic_c :
-    CALL
+    CALL | CSRW | CSRSI
     ;
 /*
 mnemonic_d :
     DEC | DES
     ;
-
+*/
 mnemonic_e :
-    EICALL | EIJMP | ELPM | EOR
+    ECALL
     ;
-
+/*
 mnemonic_f :
     FMUL | FMULS | FMULSU
     ;
@@ -228,11 +263,11 @@ mnemonic_i :
     ;
 */
 mnemonic_j :
-    J_ | JR
+    J_ | JAL | JR
     ;
 
 mnemonic_l :
-    LI | LW
+    LA | LI | LW
     ; 
 
 mnemonic_m :

@@ -52,11 +52,15 @@ public class Main {
     private static void riscvassembler() throws IOException {
 
         //final String filename = "src/test/resources/RISCV/addi.s";
-        final String filename = "src/test/resources/RISCV/fibonacci.s";
+        //final String filename = "src/test/resources/RISCV/fibonacci.s";
         //final String filename = "src/test/resources/RISCV/hello.s";
         //final String filename = "src/test/resources/RISCV/hello2.s";
         //final String filename = "src/test/resources/RISCV/sw.s";
         //final String filename = "src/test/resources/RISCV/test.s";
+        //final String filename = "src/test/resources/RISCV/intrinsic.s";
+        //final String filename = "src/test/resources/RISCV/data_list.s";
+
+        final String filename = "C:\\aaa_se\\riscv\\snake_game_risc-v\\Main.asm";
 
         final CharStream charStream = CharStreams
                 .fromFileName(filename);
@@ -80,6 +84,15 @@ public class Main {
 
         // Create a generic parse tree walker that can trigger callbacks
         final ParseTreeWalker walker = new ParseTreeWalker();
+
+        boolean print = false;
+        //boolean print = true;
+        if (print) {
+
+            ConsoleCPP14ParserListener printListener = new ConsoleCPP14ParserListener();
+            walker.walk(printListener, root);
+
+        }
 
         //RISCVParserListener riscVParserListener = new RISCVParserListener();
         // ConsoleRISCVParserListener riscVParserListener = new ConsoleRISCVParserListener();
