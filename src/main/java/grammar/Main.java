@@ -51,14 +51,14 @@ public class Main {
     private static void riscvassembler() throws IOException {
 
         //final String filename = "src/test/resources/RISCV/addi.s";
-        // final String filename = "src/test/resources/RISCV/fibonacci.s";
+        final String filename = "src/test/resources/RISCV/fibonacci.s";
         //final String filename = "src/test/resources/RISCV/hello.s";
         //final String filename = "src/test/resources/RISCV/hello2.s";
         //final String filename = "src/test/resources/RISCV/sw.s";
         //final String filename = "src/test/resources/RISCV/test.s";
         //final String filename = "src/test/resources/RISCV/intrinsic.s";
         //final String filename = "src/test/resources/RISCV/data_list.s";
-        final String filename = "src/test/resources/RISCV/scratchpad.s";
+        //final String filename = "src/test/resources/RISCV/scratchpad.s";
 
         //final String filename = "C:\\aaa_se\\riscv\\snake_game_risc-v\\Main.asm";
         //final String filename = "C:\\aaa_se\\riscv\\snake_game_risc-v\\include\\background.asm";
@@ -97,9 +97,9 @@ public class Main {
         }
 
         //RISCVParserListener listener = new RISCVParserListener();
-        ConsoleRISCVParserListener listener = new ConsoleRISCVParserListener();
-        //FormattingRISCVParserListener listener = new FormattingRISCVParserListener();
-        // RISCVRowListener listener = new RISCVRowListener();
+        //ConsoleRISCVParserListener listener = new ConsoleRISCVParserListener();
+        FormattingRISCVParserListener listener = new FormattingRISCVParserListener();
+        //RISCVRowListener listener = new RISCVRowListener();
 
         walker.walk(listener, root);
 

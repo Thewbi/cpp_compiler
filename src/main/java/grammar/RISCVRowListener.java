@@ -12,6 +12,7 @@ import com.cpp.grammar.RISCVParser;
 import com.cpp.grammar.RISCVParser.MnemonicContext;
 import com.cpp.grammar.RISCVParser.Offset_expressionContext;
 import com.cpp.grammar.RISCVParser.ExpressionContext;
+import com.cpp.grammar.RISCVParser.Label_nameContext;
 import com.cpp.grammar.RISCVParserBaseListener;
 
 public class RISCVRowListener extends RISCVParserBaseListener {
@@ -53,8 +54,8 @@ public class RISCVRowListener extends RISCVParserBaseListener {
 
         int idx = 0;
 
-        // ignore the DOT
-        idx++;
+        // // ignore the DOT
+        // idx++;
 
         ParseTree parseTree = ctx.getChild(idx);
         idx++;
@@ -71,7 +72,7 @@ public class RISCVRowListener extends RISCVParserBaseListener {
     @Override
     public void enterParam(RISCVParser.ParamContext ctx) {
 
-        System.out.println(ctx.getClass() + " childcount: " + ctx.getChildCount() + " " + ctx.getText());
+        // System.out.println(ctx.getClass() + " childcount: " + ctx.getChildCount() + " " + ctx.getText());
 
         ParseTree parseTree = ctx.getChild(0);
 
@@ -86,7 +87,16 @@ public class RISCVRowListener extends RISCVParserBaseListener {
 
             row.getParameters().add(riscVRowParam);
 
-        } else {
+        } 
+        else if (parseTree instanceof Label_nameContext) {
+
+            RISCVRowParam riscVRowParam = new RISCVRowParam();
+            riscVRowParam.setLabel(parseTree.getText());
+
+            row.getParameters().add(riscVRowParam);
+
+        } 
+        else {
 
             //System.out.println(parseTree.getText() + " " + parseTree.getClass() + " childcount: " + parseTree.getChildCount());
 

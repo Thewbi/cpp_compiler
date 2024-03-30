@@ -48,28 +48,30 @@ instruction_row :
 instruction : mnemonic ( param ( COMMA param )? ( COMMA param )? )? ;
 
 param : 
-    ( ( MINUS )? IDENTIFIER ( PLUS )? ) 
+    // ( ( MINUS )? IDENTIFIER ( PLUS )? ) 
+    // | 
+    register
+    |
+    offset_expression
     | 
-    offset_expression 
-    | 
-    expression 
+    label_name
     | 
     asm_intrinsic_usage 
     | 
     macro_placeholder 
     | 
-    label_name
+    expression 
     ;
 
 //macro_usage : IDENTIFIER ( expression )* ;
 
-
-
-label_name:
-    (DOT)? IDENTIFIER
+label_name :
+    IDENTIFIER
     ;
 
-macro_placeholder : AT NUMBER ;
+macro_placeholder : 
+    AT NUMBER 
+    ;
 
 expression : 
     OPENING_BRACKET expression CLOSEING_BRACKET
@@ -106,7 +108,15 @@ expression :
     |
     macro_placeholder
     |
+    register
+    |
     DOT
+    ;
+
+register :
+    REG_a4
+    |
+    REG_a5
     ;
 
 offset_expression
@@ -123,55 +133,53 @@ offset_expression_register :
     ;
 
 asm_intrinsic_instruction :
-    DOT (
-        INCLUDE STRING
-        |
-        DEVICE IDENTIFIER
-        |
-        DEF expression
-        |
-        EQU expression
-        | 
-        CSEG 
-        |
-        ORG ( HEX_NUMBER | IDENTIFIER )
-        | 
-        MACRO IDENTIFIER
-        | 
-        END_MACRO
-        | 
-        IF expression
-        | 
-        ELSE
-        | 
-        ENDIF
-        | 
-        ERROR STRING
-        |
-        FILE STRING
-        |
-        TEXT
-        |
-        IDENT STRING
-        |
-        SIZE expression COMMA expression
-        |
-        ALIGN NUMBER
-        |
-        GLOBL IDENTIFIER
-        |
-        TYPE ( IDENTIFIER COMMA entity_type )
-        |
-        OPTION ( NOPIC )
-        |
-        DATA
-        |
-        WORD expression
-        |
-        SPACE expression
-        |
-        STRING_KEYWORD STRING
-    )
+    INCLUDE STRING
+    |
+    DEVICE IDENTIFIER
+    |
+    DEF expression
+    |
+    EQU expression
+    | 
+    CSEG 
+    |
+    ORG ( HEX_NUMBER | IDENTIFIER )
+    | 
+    MACRO IDENTIFIER
+    | 
+    END_MACRO
+    | 
+    IF expression
+    | 
+    ELSE
+    | 
+    ENDIF
+    | 
+    ERROR STRING
+    |
+    FILE STRING
+    |
+    TEXT
+    |
+    IDENT STRING
+    |
+    SIZE expression COMMA expression
+    |
+    ALIGN NUMBER
+    |
+    GLOBL IDENTIFIER
+    |
+    TYPE ( IDENTIFIER COMMA entity_type )
+    |
+    OPTION ( NOPIC )
+    |
+    DATA
+    |
+    WORD expression
+    |
+    SPACE expression
+    |
+    STRING_KEYWORD STRING
     ;
 
 entity_type :

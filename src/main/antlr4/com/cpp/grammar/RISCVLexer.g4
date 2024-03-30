@@ -117,50 +117,53 @@ SLLW : S L L W ;
 XOR : X O R ;
 XORI : X O R I ;
 
-ALIGN : 'align' ;
+REG_a4 : 'a4' ;
+REG_a5 : 'a5' ;
+
+ALIGN : '.align' ;
 ASTERISK : '*' ;
 AT : '@' ;
 
 CLOSEING_BRACKET : ')' ;
 COLON : ':' ;
 COMMA : ',' ;
-CSEG : 'cseg' ;
+CSEG : '.cseg' ;
 
-DATA : 'data' ;
-DEF : 'def' ;
-DEVICE : 'device' ;
+DATA : '.data' ;
+DEF : '.def' ;
+DEVICE : '.device' ;
 DOT : '.' ;
 
-ELSE : 'else' ;
-END_MACRO : 'endmacro' ;
-ENDIF : 'endif' ;
+ELSE : '.else' ;
+END_MACRO : '.endmacro' ;
+ENDIF : '.endif' ;
 EQUALS : '=' ;
-EQU : E Q U ;
-ERROR : 'error' ;
+EQU : '.equ';
+ERROR : '.error' ;
 
-FILE : 'file' ;
+FILE : '.file' ;
 FUNCTION : 'function' ;
 
-GLOBL : 'globl' ;
+GLOBL : '.globl' ;
 GT : '>' ;
 
 HASH_TAG : '#' ;
 
-IDENT : 'ident' ;
-IF : 'if' ;
-INCLUDE : 'include' ;
+IDENT : '.ident' ;
+IF : '.if' ;
+INCLUDE : '.include' ;
 
 LEFT_SHIFT : '<<' ;
 LT : '<' ;
 
-MACRO : 'macro' ;
+MACRO : '.macro' ;
 MINUS : '-' ;
 
 NOPIC : 'nopic' ;
 
 OPENING_BRACKET : '(' ;
-OPTION : 'option' ;
-ORG : 'org' ;
+OPTION : '.option' ;
+ORG : '.org' ;
 
 PLUS : '+' ;
 
@@ -170,15 +173,15 @@ REMW : R E M W ;
 REMU : R E M U ;
 REMUW : R E M U W ;
 
-SIZE : 'size' ;
+SIZE : '.size' ;
 SLASH : '/' ;
-SPACE : 'space' ;
-STRING_KEYWORD : 'string' ;
+SPACE : '.space' ;
+STRING_KEYWORD : '.string' ;
 
-TEXT : 'text' ;
-TYPE : 'type' ;
+TEXT : '.text' ;
+TYPE : '.type' ;
 
-WORD : 'word' ;
+WORD : '.word' ;
 
 MULW : M U L W ;
 
@@ -208,4 +211,4 @@ NUMBER : [0-9]+ ;
 HEX_NUMBER : ('0' 'x' | '$') [a-fA-F0-9]+ ;
 BINARY_NUMBER : '0' 'b' [0,1]+ ;
 
-IDENTIFIER : [a-zA-Z_]([a-zA-Z0-9_])* ;
+IDENTIFIER : (DOT | [a-zA-Z_])([a-zA-Z0-9_])* ;

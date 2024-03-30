@@ -141,8 +141,8 @@ public class FormattingRISCVParserListener extends RISCVParserBaseListener {
 
         int idx = 0;
 
-        // ignore the DOT
-        idx++;
+        // // ignore the DOT
+        // idx++;
 
         ParseTree parseTree = ctx.getChild(idx);
         idx++;

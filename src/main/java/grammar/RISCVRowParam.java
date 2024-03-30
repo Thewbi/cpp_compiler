@@ -6,6 +6,8 @@ public class RISCVRowParam {
 
     private String register;
 
+    private String label;
+
     private String expression;
 
     public String getExpression() {
@@ -32,11 +34,18 @@ public class RISCVRowParam {
         this.register = register;
     }
 
-    @Override
-    public String toString() {
-        return "RISCVRowParam [offset=" + offset + ", register=" + register + ", expression=" + expression + "]";
+    public String getLabel() {
+        return label;
     }
 
-    
+    public void setLabel(String label) {
+        this.label = label;
+    }
+
+    @Override
+    public String toString() {
+        return "RISCVRowParam [offset=" + offset + ", register=" + register + ", label=" + label + ", expression="
+                + expression + "]";
+    } 
     
 }
