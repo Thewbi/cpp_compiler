@@ -28,28 +28,94 @@ fragment Y:[yY];
 fragment Z:[zZ];
 
 ADD : A D D ;
+ADDW : A D D W ;
 ADDI : A D D I ;
+ADDIW : A D D I W ;
+AND : A N D ;
+ANDI : A N D I ;
+AUIPC : A U I P C ;
 
 BEQ : B E Q ;
-BGT : B G T ;
+BNE : B N E ;
+BLT : B L T ;
+BGE : B G E ;
+BGT : B G T ; // pseudo instruction
+BLTU : B L T U ;
+BGEU : B G E U ;
 
 CALL : C A L L ;
 CSRW : C S R W ;
+CSRRW : C S R R W ;
+CSRRS : C S R R S ;
+CSRRC : C S R R C ;
+CSRRWI : C S R R W I ;
+CSRRSI : C S R R S I ;
+CSRRCI : C S R R C I ;
 CSRSI : C S R S I ;
 
+DIV : D I V ;
+DIVU : D I V U ;
+DIVW : D I V W ;
+DIVUW : D I V U W ;
+
 ECALL : E C A L L ;
+EBREAK : E B R E A K ;
+
+FENCE : F E N C E ;
+FENCE_I : F E N C E '.' I ;
 
 J_ : J ;
 JAL : J A L ;
+JALR : J A L R ;
 JR : J R ;
 
 LA : L A ;
+LB : L B ;
+LD : L D ;
 LI : L I ;
+LH : L H ;
 LW : L W ;
+LUI : L U I ;
+LBU : L B U ;
+LHU : L H U ;
+LWU : L W U ;
 
 MV : M V ;
+MUL : M U L ;
+MULH : M U L H ;
+MULHSU : M U L H S U ;
+MULHU : M U L H U ;
 
+OR : O R ;
+ORI : O R I ;
+
+RET : R E T ;
+
+SB : S B ;
+SD : S D ;
+SH : S H ;
 SW : S W ;
+SLLI : S L L I ;
+SLLIW : S L L I W ;
+SRL : S R L ;
+SRLW : S R L W ;
+SRLI : S R L I ;
+SRLIW : S R L I W ;
+SRA : S R A ;
+SRAW : S R A W ;
+SRAI : S R A I ;
+SRAIW : S R A I W ;
+SUB : S U B ;
+SUBW : S U B W ;
+SLT : S L T ;
+SLTU : S L T U ;
+SLTI : S L T I ;
+SLTIU : S L T I U ;
+SLL : S L L ;
+SLLW : S L L W ;
+
+XOR : X O R ;
+XORI : X O R I ;
 
 ALIGN : 'align' ;
 ASTERISK : '*' ;
@@ -99,6 +165,10 @@ ORG : 'org' ;
 PLUS : '+' ;
 
 RIGHT_SHIFT : '>>' ;
+REM : R E M ;
+REMW : R E M W ;
+REMU : R E M U ;
+REMUW : R E M U W ;
 
 SIZE : 'size' ;
 SLASH : '/' ;
@@ -109,6 +179,8 @@ TEXT : 'text' ;
 TYPE : 'type' ;
 
 WORD : 'word' ;
+
+MULW : M U L W ;
 
 NEWLINE : '\r'? '\n' ;
 

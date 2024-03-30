@@ -52,7 +52,7 @@ public class Main {
     private static void riscvassembler() throws IOException {
 
         //final String filename = "src/test/resources/RISCV/addi.s";
-        //final String filename = "src/test/resources/RISCV/fibonacci.s";
+        final String filename = "src/test/resources/RISCV/fibonacci.s";
         //final String filename = "src/test/resources/RISCV/hello.s";
         //final String filename = "src/test/resources/RISCV/hello2.s";
         //final String filename = "src/test/resources/RISCV/sw.s";
@@ -60,7 +60,9 @@ public class Main {
         //final String filename = "src/test/resources/RISCV/intrinsic.s";
         //final String filename = "src/test/resources/RISCV/data_list.s";
 
-        final String filename = "C:\\aaa_se\\riscv\\snake_game_risc-v\\Main.asm";
+        //final String filename = "C:\\aaa_se\\riscv\\snake_game_risc-v\\Main.asm";
+        //final String filename = "C:\\aaa_se\\riscv\\snake_game_risc-v\\include\\background.asm";
+        //final String filename = "C:\\aaa_se\\riscv\\snake_game_risc-v\\include\\Directions.asm";
 
         final CharStream charStream = CharStreams
                 .fromFileName(filename);

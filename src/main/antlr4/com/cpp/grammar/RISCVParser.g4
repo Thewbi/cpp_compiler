@@ -219,9 +219,9 @@ mnemonic :
     mnemonic_o
     |
     mnemonic_p
+*/
     |
     mnemonic_r
-*/
     |
     mnemonic_s
 /*
@@ -235,63 +235,84 @@ mnemonic :
     ;
 
 mnemonic_a :
-    ADD | ADDI
+    ADD | ADDW | ADDI | ADDIW | AND | ANDI | AUIPC
     ;
 
 mnemonic_b :
-    BEQ | BGT
+    BEQ | BNE | BLT | BGE | BGT | BLT | BLTU | BGEU
     ;
 
 mnemonic_c :
-    CALL | CSRW | CSRSI
-    ;
-/*
-mnemonic_d :
-    DEC | DES
-    ;
-*/
-mnemonic_e :
-    ECALL
-    ;
-/*
-mnemonic_f :
-    FMUL | FMULS | FMULSU
+    CALL | CSRW | CSRRW | CSRRS | CSRRC | CSRRWI | CSRRSI | CSRRCI | CSRSI
     ;
 
+mnemonic_d :
+    DIV | DIVU | DIVW | DIVUW
+    ;
+
+mnemonic_e :
+    ECALL | EBREAK
+    ;
+
+mnemonic_f :
+    FENCE | FENCE_I
+    ;
+/*
 mnemonic_i :
     ICALL | IJMP | IN | INC
     ;
 */
 mnemonic_j :
-    J_ | JAL | JR
+    J_ | JAL | JALR | JR
     ;
 
 mnemonic_l :
-    LA | LI | LW
+    LA | LB | LD | LI | LH | LW | LUI | LBU | LHU | LWU
     ; 
 
 mnemonic_m :
-    MV
+    MV | MUL | MULH | MULHSU | MULHU
     ;
 /*
 mnemonic_n :
     NEG | NOP
     ;
-
+*/
 mnemonic_o :
-    OR | ORI | OUT
+    OR | ORI
     ;
-
+/*
 mnemonic_p :
     POP | PUSH
     ;
-
-mnemonic_r :
-    RCALL | RET | RETI | RJMP | ROL|  ROR
-    ;
 */
+mnemonic_r :
+    RET
+    ;
+
 mnemonic_s :
-    SW
+    SB |
+    SD |
+    SH |
+    SW |
+    SLLI |
+    SLLIW |
+    SRL |
+    SRLW |
+    SRLI |
+    SRLIW |
+    SRA |
+    SRAW |
+    SRAI |
+    SRAIW |
+    SUB |
+    SUBW |
+    SLT |
+    SLTU |
+    SLTI |
+    SLTIU |
+    SLL |
+    SLLW
     ;
 /*
 mnemonic_t :
@@ -301,8 +322,8 @@ mnemonic_t :
 mnemonic_w :
     WDR
     ;
-
+*/
 mnemonic_x :
-    XCH
+    XOR | XORI
     ;
- */
+ 
