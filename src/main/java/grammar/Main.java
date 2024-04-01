@@ -25,6 +25,9 @@ import com.cpp.grammar.PreprocessorParser;
 import com.cpp.grammar.CPP14Parser.TranslationUnitContext;
 import com.cpp.grammar.PreprocessorParser.Code_fileContext;
 import com.cpp.grammar.RISCVParser.Asm_fileContext;
+
+import riscv.RISCVProcessor;
+
 import com.cpp.grammar.RISCVLexer;
 import com.cpp.grammar.RISCVParser;
 
@@ -98,17 +101,32 @@ public class Main {
 
         //RISCVParserListener listener = new RISCVParserListener();
         //ConsoleRISCVParserListener listener = new ConsoleRISCVParserListener();
-        FormattingRISCVParserListener listener = new FormattingRISCVParserListener();
-        //RISCVRowListener listener = new RISCVRowListener();
+        //FormattingRISCVParserListener listener = new FormattingRISCVParserListener();
+        RISCVRowListener listener = new RISCVRowListener();
 
         walker.walk(listener, root);
 
         listener.enterNewline(null);
 
-        // for (RISCVRow row : listener.getRows()) {
-        //     System.out.println(row);
-        //     System.out.println("");
-        // }
+        if (listener instanceof RISCVRowListener) {
+
+            RISCVProcessor riscVProcessor = new RISCVProcessor();
+            riscVProcessor.getRows().addAll(listener.getRows());
+
+            riscVProcessor.processLabels();
+
+            while (!riscVProcessor.isDone()) {
+                riscVProcessor.processRow();
+            }
+
+            // for (RISCVRow row : listener.getRows()) {
+
+            //     System.out.println(row);
+            //     System.out.println("");
+
+            //     riscVProcessor.processRow(row);
+            // }
+        }
     }
 
     private static void translationUnit() throws IOException {

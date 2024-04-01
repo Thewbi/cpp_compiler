@@ -6,7 +6,9 @@ options {
 	tokenVocab = RISCVLexer;
 }
 
-asm_file : ( newline* row )+ newline* EOF ;
+asm_file : 
+    ( newline* row )+ newline* EOF 
+    ;
 
 newline:
     NEWLINE
@@ -17,24 +19,21 @@ label_definition :
     ;
 
 row :
-    preprocessor_directive ( comment )?
-    
+    preprocessor_directive ( comment )?    
     |
     ( label_definition )? asm_intrinsic_instruction ( comment )?
-//    |
-//    macro_usage
     |
     ( label_definition )? instruction_row ( comment )?
     |
-    ( label_definition )? expression_list ( comment )? // example: NOTAS_PERDEU: 6,800,67,800,70,600,81,500,76,1000
+    ( label_definition )? const_list ( comment )? // example: NOTAS_PERDEU: 6,800,67,800,70,600,81,500,76,1000
     |
     label_definition ( comment )?
     |
     comment
     ;
 
-expression_list :
-    expression ( COMMA expression)*
+const_list :
+    NUMBER ( COMMA NUMBER )*
     ;
 
 comment:
@@ -45,11 +44,11 @@ instruction_row :
     newline? instruction
     ;
 
-instruction : mnemonic ( param ( COMMA param )? ( COMMA param )? )? ;
+instruction : 
+    mnemonic ( param ( COMMA param )? ( COMMA param )? )? 
+    ;
 
 param : 
-    // ( ( MINUS )? IDENTIFIER ( PLUS )? ) 
-    // | 
     register
     |
     offset_expression
@@ -62,8 +61,6 @@ param :
     | 
     expression 
     ;
-
-//macro_usage : IDENTIFIER ( expression )* ;
 
 label_name :
     IDENTIFIER
@@ -114,9 +111,133 @@ expression :
     ;
 
 register :
-    REG_a4
-    |
-    REG_a5
+    REG_x0 |
+    REG_zero |
+
+    // return address
+    REG_x1 |
+    REG_ra |
+
+    // stack pointer
+    REG_x2 |
+    REG_sp |
+
+    // global pointer
+    REG_x3 |
+    REG_gp |
+
+    // thread pointer
+    REG_x4 |
+    REG_tp |
+
+    // temporary register 0
+    REG_x5 |
+    REG_t0 |
+
+    // temporary register 1
+    REG_x6 |
+    REG_t1 |
+
+    // temporary register 2
+    REG_x7 |
+    REG_t2 |
+
+    // saved register 0 / frame pointer
+    REG_x8 |
+    REG_s0 |
+    REG_fp |
+
+    // saved register 1
+    REG_x9 |
+    REG_s1 |
+
+    // function argument 0 / return value 0
+    REG_x10 |
+    REG_a0 |
+
+    // function argument 1 / return value 1
+    REG_x11 |
+    REG_a1 |
+
+    // function argument 2
+    REG_x12 |
+    REG_a2 |
+
+    // function argument 3
+    REG_x13 |
+    REG_a3 |
+
+    // function argument 4
+    REG_x14 |
+    REG_a4 |
+
+    // function argument 5
+    REG_x15 |
+    REG_a5 |
+
+    // function argument 6
+    REG_x16 |
+    REG_a6 |
+
+    // function argument 7
+    REG_x17 |
+    REG_a7 |
+
+    // saved register 2
+    REG_x18 |
+    REG_s2 |
+
+    // saved register 3
+    REG_x19 |
+    REG_s3 |
+
+    // saved register 4
+    REG_x20 |
+    REG_s4 |
+
+    // saved register 5
+    REG_x21 |
+    REG_s5 |
+
+    // saved register 6
+    REG_x22 |
+    REG_s6 |
+
+    // saved register 7
+    REG_x23 |
+    REG_s7 |
+
+    // saved register 8
+    REG_x24 |
+    REG_s8 |
+
+    // saved register 9
+    REG_x25 |
+    REG_s9 |
+
+    // saved register 10
+    REG_x26 |
+    REG_s10 |
+
+    // saved register 11
+    REG_x27 |
+    REG_s11 |
+
+    // temporary register 3
+    REG_x28 |
+    REG_t3 |
+
+    // temporary register 4
+    REG_x29 |
+    REG_t4 |
+
+    // temporary register 5
+    REG_x30 |
+    REG_t5 |
+
+    // temporary register 6
+    REG_x31 |
+    REG_t6
     ;
 
 offset_expression
@@ -129,7 +250,7 @@ offset_expression_amount :
     ;
 
 offset_expression_register :
-    IDENTIFIER
+    register
     ;
 
 asm_intrinsic_instruction :

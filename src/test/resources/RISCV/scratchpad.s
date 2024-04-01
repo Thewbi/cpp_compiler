@@ -1,1 +1,1 @@
-bgt	    a4,a5,.L2
+addi	sp,sp,1+2*3

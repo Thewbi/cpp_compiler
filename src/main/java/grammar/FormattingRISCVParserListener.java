@@ -72,10 +72,10 @@ public class FormattingRISCVParserListener extends RISCVParserBaseListener {
     }
 	@Override public void exitLabel_definition(RISCVParser.Label_definitionContext ctx) { }
 
-    @Override public void enterExpression_list(RISCVParser.Expression_listContext ctx) {
+    @Override public void enterConst_list(RISCVParser.Const_listContext ctx) {
         addToBuffer(COLUMN_1, ctx.getText());
      }
-	@Override public void exitExpression_list(RISCVParser.Expression_listContext ctx) { }
+	@Override public void exitConst_list(RISCVParser.Const_listContext ctx) { }
 
     @Override
     public void enterRow(RISCVParser.RowContext ctx) {

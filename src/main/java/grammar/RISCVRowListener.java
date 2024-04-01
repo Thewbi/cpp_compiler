@@ -11,6 +11,7 @@ import org.antlr.v4.runtime.tree.TerminalNodeImpl;
 import com.cpp.grammar.RISCVParser;
 import com.cpp.grammar.RISCVParser.MnemonicContext;
 import com.cpp.grammar.RISCVParser.Offset_expressionContext;
+import com.cpp.grammar.RISCVParser.RegisterContext;
 import com.cpp.grammar.RISCVParser.ExpressionContext;
 import com.cpp.grammar.RISCVParser.Label_nameContext;
 import com.cpp.grammar.RISCVParserBaseListener;
@@ -54,9 +55,6 @@ public class RISCVRowListener extends RISCVParserBaseListener {
 
         int idx = 0;
 
-        // // ignore the DOT
-        // idx++;
-
         ParseTree parseTree = ctx.getChild(idx);
         idx++;
 
@@ -67,6 +65,89 @@ public class RISCVRowListener extends RISCVParserBaseListener {
         String literalName = vocab.getLiteralName(tokenType);
         // System.out.println(literalName);
         row.setIntrinsic(literalName);
+
+        switch (tokenType) {
+
+            // case RISCVParser.ALIGN:
+            //     addToBuffer(COLUMN_1, ".align ");
+            //     addToBuffer(ctx.getChild(idx).getText());
+            //     break;
+
+            case RISCVParser.FILE: {
+                // RISCVRowParam riscVRowParam = new RISCVRowParam();
+                // riscVRowParam.setLabel(ctx.getChild(idx).getText());
+                // row.getParameters().add(riscVRowParam);
+
+                row.getIntrinsicParameters().add(ctx.getChild(idx).getText());
+                }
+                break;
+
+            // case RISCVParser.GLOBL:
+            //     addToBuffer(COLUMN_1, ".globl ");
+            //     addToBuffer(ctx.getChild(idx).getText());
+            //     break;
+
+            // case RISCVParser.IDENT:
+            //     addToBuffer(COLUMN_1, ".ident ");
+            //     addToBuffer(ctx.getChild(idx).getText());
+            //     break;
+
+            // case RISCVParser.OPTION:
+            //     addToBuffer(COLUMN_1, ".option ");
+            //     addToBuffer(ctx.getChild(idx).getText());
+            //     break;
+
+            // case RISCVParser.TEXT:
+            //     addToBuffer(COLUMN_1, ".text");
+            //     break;
+
+            // case RISCVParser.DATA:
+            //     addToBuffer(COLUMN_1, ".data");
+            //     break;
+
+            // case RISCVParser.TYPE:
+            //     addToBuffer(COLUMN_1, ".type ");
+            //     addToBuffer(ctx.getChild(idx).getText());
+            //     idx++;
+            //     addToBuffer(", ");
+            //     idx++;
+            //     addToBuffer(ctx.getChild(idx).getText());
+            //     idx++;
+            //     break;
+
+            // case RISCVParser.SIZE:
+            //     addToBuffer(COLUMN_1, ".size ");
+            //     addToBuffer(ctx.getChild(idx).getText());
+            //     idx++;
+            //     addToBuffer(", ");
+            //     idx++;
+            //     addToBuffer(ctx.getChild(idx).getText());
+            //     idx++;
+            //     break;
+
+            // case RISCVParser.WORD:
+            //     addToBuffer(COLUMN_1, ".word ");
+            //     addToBuffer(ctx.getChild(idx).getText());
+            //     break;
+
+            // case RISCVParser.SPACE:
+            //     addToBuffer(COLUMN_1, ".space ");
+            //     addToBuffer(ctx.getChild(idx).getText());
+            //     break;
+
+            // case RISCVParser.INCLUDE:
+            //     addToBuffer(COLUMN_1, ".include ");
+            //     addToBuffer(ctx.getChild(idx).getText());
+            //     break;
+
+            // case RISCVParser.STRING_KEYWORD:
+            //     addToBuffer(COLUMN_1, ".string ");
+            //     addToBuffer(ctx.getChild(idx).getText());
+            //     break;
+
+            default:
+                break;
+        }
     }
 
     @Override
@@ -95,15 +176,25 @@ public class RISCVRowListener extends RISCVParserBaseListener {
 
             row.getParameters().add(riscVRowParam);
 
-        } 
-        else {
-
-            //System.out.println(parseTree.getText() + " " + parseTree.getClass() + " childcount: " + parseTree.getChildCount());
+        }
+        else if (parseTree instanceof RegisterContext) {
 
             RISCVRowParam riscVRowParam = new RISCVRowParam();
             riscVRowParam.setRegister(parseTree.getText());
 
             row.getParameters().add(riscVRowParam);
+
+        } 
+        else {
+
+            System.out.println(parseTree.getText() + " " + parseTree.getClass() + " childcount: " + parseTree.getChildCount());
+
+            // RISCVRowParam riscVRowParam = new RISCVRowParam();
+            // riscVRowParam.setRegister(parseTree.getText());
+
+            // row.getParameters().add(riscVRowParam);
+
+            throw new RuntimeException("Unknown type!");
 
         }
     }
@@ -122,7 +213,7 @@ public class RISCVRowListener extends RISCVParserBaseListener {
     public void enterNewline(RISCVParser.NewlineContext ctx) {
         rows.add(row);
         row = new RISCVRow();
-    }
+    }        
 
     public List<RISCVRow> getRows() {
         return rows;

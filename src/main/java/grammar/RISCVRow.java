@@ -12,7 +12,13 @@ public class RISCVRow {
     private String instruction;
 
     private List<RISCVRowParam> parameters = new ArrayList<>();
+
+    private List<String> intrinsicParameters = new ArrayList<>();
     
+    public List<String> getIntrinsicParameters() {
+        return intrinsicParameters;
+    }
+
     public List<RISCVRowParam> getParameters() {
         return parameters;
     }
@@ -50,6 +56,9 @@ public class RISCVRow {
         stringBuilder.append("RISCVRow [label=" + label + ", intrinsic=" + intrinsic + ", instruction=" + instruction);
 
         for (RISCVRowParam parameter : parameters) {
+            stringBuilder.append("\n    ").append(parameter);
+        }
+        for (String parameter : intrinsicParameters) {
             stringBuilder.append("\n    ").append(parameter);
         }
 
