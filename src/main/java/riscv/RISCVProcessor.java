@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 
+import common.IntegerParserUtil;
 import grammar.RISCVRow;
 import grammar.RISCVRowParam;
 
@@ -55,6 +56,22 @@ public class RISCVProcessor {
         }
     }
 
+    public void startAtLabel(String label) {
+
+        idx = 0;
+
+        if (labels.isEmpty()) {
+            System.out.println("No labels found!");
+            return;
+        }
+        if (!labels.containsKey(label)) {
+            System.out.println("No label \"" + label + "\" found!");
+            return;
+        }
+
+        idx = labels.get(label);
+    }
+
     public void processRow() {
 
         RISCVRow row = rows.get(idx);
@@ -82,6 +99,10 @@ public class RISCVProcessor {
 
                 case ADDI:
                     processADDI(riscVRow);
+                    break;
+
+                case AUIPC:
+                    processAUIPC(riscVRow);
                     break;
 
                 case BGT:
@@ -114,6 +135,10 @@ public class RISCVProcessor {
 
                 case J:
                     processJ(riscVRow);
+                    break;
+
+                case JALR:
+                    processJALR(riscVRow);
                     break;
 
                 default:
@@ -196,10 +221,10 @@ public class RISCVProcessor {
         // perform the jump. The address to jump to is stored in the register given as
         // first parameter
 
-        //throw new UnsupportedOperationException("Unimplemented method 'processJR'");
+        // throw new UnsupportedOperationException("Unimplemented method 'processJR'");
 
         RISCVRowParam param1 = riscVRow.getParameters().get(0);
-        
+
         idx = registerFile[RISCVRegister.mapRegister(param1.getRegister())];
     }
 
@@ -222,6 +247,168 @@ public class RISCVProcessor {
         }
 
         throw new RuntimeException("Not implemented! No implementation other than jumping to label present yet!");
+    }
+
+    /**
+     * Jump and link register.
+     * 
+     * Return address (PC+4) goes into rd
+     * Then performs jump to rs1 + imm
+     * 
+     * <pre>
+     * jalr rd rs1 imm
+     * rd = PC+4; PC = rs1 + imm
+     * </pre>
+     * 
+     * https://stackoverflow.com/questions/58280089/risc-v-difference-between-jal-and-jalr
+     * 
+     * As we can see in specification (page 15), the main difference between jal and
+     * jalr is the address value encoding. jal use immediate (20bits) encoding for
+     * destination address and can jump +-1MiB range. And saves the actual address +
+     * 4 in register rd. (x1 in your example). jalr usees indirect address (x1 in
+     * your
+     * example) plus a constant of 12bits (0 in your example). It saves the actual
+     * address + 4 in register rd too. In your example you set x0 as return address
+     * register because you don't care. When you return from subroutine for
+     * example, the return address is not usefull then we set x0.
+     * 
+     * https://xiayingp.gitbook.io/build_a_os/hardware-device-assembly/risc-v-assembly
+     * 
+     * https://riscv.org/blog/2022/03/risc-v-rv32i-jalr-instruction-maven-silicon/
+     * 
+     * https://stackoverflow.com/questions/64695981/what-does-jalr-with-only-1-argument-and-offset-do
+     * 
+     * <pre>
+     * jalr rs
+     * </pre>
+     * 
+     * expands to
+     * 
+     * <pre>
+     * jalr x1, rs, 0
+     * </pre>
+     * 
+     * <pre>
+     * jalr rs, imm
+     * </pre>
+     * 
+     * expands to
+     * 
+     * <pre>
+     * jalr x1, rs, imm
+     * </pre>
+     * 
+     * he RISC-V Instruction Set Manual Volume I: User-Level ISA has a table of
+     * pseudo-instructions, in which it says that jalr rs expands to jalr x1, rs, 0
+     * (with x1 just being a different name for ra). So by extension, jalr rs, imm
+     * ought to expand into jalr x1, rs, imm
+     * 
+     * @param riscVRow
+     */
+    private void processJALR(RISCVRow riscVRow) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'processJALR'");
+    }
+
+    /**
+     * (RV32I Base Instruction Set) Add Upper Immediate to Program Counter
+     * 
+     * AUIPC (add upper immediate to pc) is used to build pc-relative addresses and
+     * uses the U-type format. AUIPC forms a 32-bit offset from the 20-bit
+     * U-immediate, filling in the lowest 12 bits with zeros, adds this offset to
+     * the pc, then places the result in register rd.
+     * 
+     * This means, the immediate value decoded from the 32 bit opcode is 20 bits
+     * long. These 20 bits are treated as the uppermost 20 bits and the lowermost 12
+     * bits are set to 0 which in total forms a 32 bit offset value. This offset
+     * value is then added to the current PC value, the result is stored into the
+     * destination register rd. PC remains untouched.
+     * 
+     * <pre>
+     * auipc rd, imm
+     * </pre>
+     * 
+     * <pre>
+     * auipc rd, symbol[31:12]
+     * </pre>
+     * 
+     * According to https://github.com/riscv/riscv-isa-manual/issues/144 when
+     * implementing a RISCV assembler, the assembler has to perform some special
+     * +1 trick which I have not fully understood yet!
+     * 
+     * <pre>
+     * Thanks. I have read this document too.
+     *
+     * Eventually, I found out the trick that the RISC-V assembler does to deal with sign-extension of symbol[11:0]. When symbol[11] equals 1, it adds 1 to symbol[31:12]. This resets the high bits that were set to 1 as a result of sign-extension:
+     *
+     * auipc rd, symbol[31:12] + 1
+     * addi rd, rd, symbol[11:0]
+     * 
+     * Probably, this is worth mentioning in the documentation.
+     * </pre>
+     * 
+     * https://stackoverflow.com/questions/52574537/risc-v-pc-absolute-vs-pc-relative
+     * 
+     * Examples:
+     * 
+     * <pre>
+     * auipc a0, 0x0
+     * auipc ra, 0x0
+     * </pre>
+     * 
+     * @param riscVRow
+     */
+    private void processAUIPC(RISCVRow riscVRow) {
+
+        // destination register
+        RISCVRowParam param1 = riscVRow.getParameters().get(0);
+        int registerIndexParam1 = RISCVRegister.mapRegister(param1.getRegister());
+
+        // immediate value (assumption: this is a 32 bit value! The decoder has to
+        // assemble this value from the 20 bits in the instruction!)
+        RISCVRowParam param2 = riscVRow.getParameters().get(1);
+        int immediateValue = IntegerParserUtil.parseInt(param2.getExpression());
+
+        registerFile[registerIndexParam1] = idx + immediateValue;
+
+        idx++;
+    }
+
+    /**
+     * https://inst.eecs.berkeley.edu/~cs61c/resources/RISCV_Calling_Convention.pdf
+     * 
+     * (Pseudo Instruction)
+     * 
+     * call offset
+     * 
+     * Call far-away subroutine
+     * 
+     * <pre>
+     * jalr x1, x1, offset[11:0]
+     * auipc x6, offset[31:12]
+     * </pre>
+     * 
+     * @param riscVRow
+     */
+    private void processCALL(RISCVRow riscVRow) {
+
+        System.out.println(riscVRow);
+
+        // offset
+        //
+        // when a label is used, the immediate offset value is computed from that label.
+        // The rule for computing the offset value from a label is to take the current
+        // address stored inside the pc and build the relative offset between the pc and
+        // the label's address: (label - pc)
+
+        RISCVRowParam param1 = riscVRow.getParameters().get(0);
+        String paramt1Label = param1.getLabel();
+        int labelOffset = labels.get(paramt1Label);
+        int offsetImmediate = idx - labelOffset;
+
+        System.out.println("Label: \"" + paramt1Label + "\" offsetImmediate: " + offsetImmediate);
+
+        throw new UnsupportedOperationException("Unimplemented method 'processCALL'");
     }
 
     /**
@@ -252,20 +439,6 @@ public class RISCVProcessor {
         registerFile[registerIndexParam1] = registerFile[registerIndexParam2];
 
         idx++;
-    }
-
-    /**
-     * https://inst.eecs.berkeley.edu/~cs61c/resources/RISCV_Calling_Convention.pdf
-     * 
-     * pseudo instruction
-     * 
-     * @param riscVRow
-     */
-    private void processCALL(RISCVRow riscVRow) {
-
-        System.out.println(riscVRow);
-
-        throw new UnsupportedOperationException("Unimplemented method 'processCALL'");
     }
 
     /**
@@ -300,7 +473,17 @@ public class RISCVProcessor {
      * 
      * https://stackoverflow.com/questions/76331514/riscv-li-instruction
      * 
+     * Hint: t2 is the ABI name for register x7
+     * 
      * <pre>
+     * li      t2, 0x1800
+     * </pre>
+     * 
+     * is resolved to
+     * 
+     * <pre>
+     * lui x7 2
+     * addi x7 x7 -2048
      * </pre>
      * 
      * @param riscVRow
@@ -319,6 +502,31 @@ public class RISCVProcessor {
         registerFile[registerIndexParam1] = param2Value;
 
         idx++;
+    }
+
+    /**
+     * load address pseudo instruction
+     * 
+     * https://github.com/riscv/riscv-isa-manual/issues/144
+     * 
+     * <pre>
+     * auipc rd, symbol[31:12]
+     * addi rd, rd, symbol[11:0]
+     * </pre>
+     * 
+     * @param riscVRow
+     */
+    private void processLA(RISCVRow riscVRow) {
+
+    }
+
+    /**
+     * LUI (load upper immediate)
+     * 
+     * @param riscVRow
+     */
+    private void processLUI(RISCVRow riscVRow) {
+
     }
 
     /**

@@ -4,27 +4,25 @@ import org.apache.commons.lang3.StringUtils;
 
 public enum RISCVRegister {
 
-    x0(0),
+    x0(0), zero(0),
 
-    zero(0),
+    x1(1), ra(1),
 
-    x1(1),	ra(1),
+    x2(2), sp(2),
 
-    x2(2),	sp(2),
+    x3(3), gp(3),
 
-    x3(3),	gp(3),
+    x4(4), tp(4),
 
-    x4(4),	tp(4),
+    x5(5), t0(5),
 
-    x5(5),	t0(5),
+    x6(6), t1(6),
 
-    x6(6),	t1(6),
+    x7(7), t2(7),
 
-    x7(7),	t2(7),
+    x8(8), s0(8), fp(8),
 
-    x8(8),	s0(8),  fp(8),
-
-    x9(9),	s1(9),
+    x9(9), s1(9),
 
     x10(10), a0(10),
 
@@ -74,20 +72,218 @@ public enum RISCVRegister {
 
     private int numVal;
 
-	RISCVRegister(final int numVal) {
-		this.numVal = numVal;
-	}
+    RISCVRegister(final int numVal) {
+        this.numVal = numVal;
+    }
 
-	public int getNumVal() {
-		return numVal;
-	}
+    public int getNumVal() {
+        return numVal;
+    }
 
-	public static RISCVRegister fromValue(final int numVal) {
+    public static RISCVRegister fromValue(final int numVal) {
 
-		switch (numVal) {
+        switch (numVal) {
 
-			case 0:
-				return RISCVRegister.x0;
+            case 0:
+                return RISCVRegister.x0;
+
+            case 1:
+                return RISCVRegister.x1;
+
+            case 2:
+                return RISCVRegister.x2;
+
+            case 3:
+                return RISCVRegister.x3;
+
+            case 4:
+                return RISCVRegister.x4;
+
+            case 5:
+                return RISCVRegister.x5;
+
+            case 6:
+                return RISCVRegister.x6;
+
+            case 7:
+                return RISCVRegister.x7;
+
+            case 8:
+                return RISCVRegister.x8;
+
+            case 9:
+                return RISCVRegister.x9;
+
+            case 10:
+                return RISCVRegister.x10;
+
+            case 11:
+                return RISCVRegister.x11;
+
+            case 12:
+                return RISCVRegister.x12;
+
+            case 13:
+                return RISCVRegister.x13;
+
+            case 14:
+                return RISCVRegister.x14;
+
+            case 15:
+                return RISCVRegister.x15;
+
+            case 16:
+                return RISCVRegister.x16;
+
+            case 17:
+                return RISCVRegister.x17;
+
+            case 18:
+                return RISCVRegister.x18;
+
+            case 19:
+                return RISCVRegister.x19;
+
+            case 20:
+                return RISCVRegister.x20;
+
+            case 21:
+                return RISCVRegister.x21;
+
+            case 22:
+                return RISCVRegister.x22;
+
+            case 23:
+                return RISCVRegister.x23;
+
+            case 24:
+                return RISCVRegister.x24;
+
+            case 25:
+                return RISCVRegister.x25;
+
+            case 26:
+                return RISCVRegister.x26;
+
+            case 27:
+                return RISCVRegister.x27;
+
+            case 28:
+                return RISCVRegister.x28;
+
+            case 29:
+                return RISCVRegister.x29;
+
+            case 30:
+                return RISCVRegister.x30;
+
+            case 31:
+                return RISCVRegister.x31;
+
+            default:
+                throw new RuntimeException("unknown register!");
+        }
+    }
+
+    public static RISCVRegister fromValueToABI(final int numVal) {
+
+        switch (numVal) {
+
+            case 0:
+                return RISCVRegister.zero;
+
+            case 1:
+                return RISCVRegister.ra;
+
+            case 2:
+                return RISCVRegister.sp;
+
+            case 3:
+                return RISCVRegister.gp;
+
+            case 4:
+                return RISCVRegister.tp;
+
+            case 5:
+                return RISCVRegister.t0;
+
+            case 6:
+                return RISCVRegister.t1;
+
+            case 7:
+                return RISCVRegister.t2;
+
+            case 8:
+                return RISCVRegister.fp;
+
+            case 9:
+                return RISCVRegister.s1;
+
+            case 10:
+                return RISCVRegister.a0;
+
+            case 11:
+                return RISCVRegister.a1;
+
+            case 12:
+                return RISCVRegister.a2;
+
+            case 13:
+                return RISCVRegister.a3;
+
+            case 14:
+                return RISCVRegister.a4;
+
+            case 15:
+                return RISCVRegister.a5;
+
+            case 16:
+                return RISCVRegister.a6;
+
+            case 17:
+                return RISCVRegister.a7;
+
+            case 18:
+                return RISCVRegister.a2;
+
+            case 19:
+                return RISCVRegister.s3;
+
+            case 20:
+                return RISCVRegister.s4;
+
+            case 21:
+                return RISCVRegister.s5;
+
+            case 22:
+                return RISCVRegister.s6;
+
+            case 23:
+                return RISCVRegister.s7;
+
+            case 24:
+                return RISCVRegister.s8;
+
+            case 25:
+                return RISCVRegister.s9;
+
+            case 26:
+                return RISCVRegister.s10;
+
+            case 27:
+                return RISCVRegister.s11;
+
+            case 28:
+                return RISCVRegister.t3;
+
+            case 29:
+                return RISCVRegister.t4;
+
+            case 30:
+                return RISCVRegister.t5;
+
+            case 31:
+                return RISCVRegister.t6;
 
             default:
                 throw new RuntimeException("unknown register!");
@@ -110,7 +306,8 @@ public enum RISCVRegister {
             return 2;
         }
 
-        if (StringUtils.equalsIgnoreCase(registerName, "x8") || StringUtils.equalsIgnoreCase(registerName, "s0") || StringUtils.equalsIgnoreCase(registerName, "fp")) {
+        if (StringUtils.equalsIgnoreCase(registerName, "x8") || StringUtils.equalsIgnoreCase(registerName, "s0")
+                || StringUtils.equalsIgnoreCase(registerName, "fp")) {
             return 8;
         }
 
@@ -132,5 +329,5 @@ public enum RISCVRegister {
 
         throw new RuntimeException("Unknown register name: \"" + registerName + "\"");
     }
-    
+
 }

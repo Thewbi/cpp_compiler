@@ -38,6 +38,37 @@
             <version>4.4</version>
         </dependency>
 
+        <!-- JUnit -->
+        <!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>5.8.2</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>5.8.2</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-engine -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>5.8.2</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- junit -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.11</version>
+            <scope>test</scope>
+        </dependency>
+        
+
     </dependencies>
 
     <build>
@@ -103,21 +134,15 @@
                 <groupId>org.antlr</groupId>
                 <artifactId>antlr4-maven-plugin</artifactId>
                 <version>4.13.1</version>
-
                 <configuration>
                     <encoding>${project.build.sourceEncoding}</encoding>
                 </configuration>
-
                 <executions>
-                    <execution>
-                        
+                    <execution>                        
                             <id>antlr</id>
                             <goals>
                                 <goal>antlr4</goal>
                             </goals>
-
-                            
-                            
                     </execution>
                 </executions>
             </plugin>
@@ -141,36 +166,6 @@
                     </execution>
                 </executions>
             </plugin>
-
-            <!--
-            <plugin>
-                <artifactId>maven-enforcer-plugin</artifactId>
-                <version>1.0</version> 
-                <executions>
-                  <execution>
-                    <id>require-utf-8</id>
-                    <goals>
-                      <goal>enforce</goal>
-                    </goals>
-                    <configuration>
-                      <rules>
-                        <requireEncoding>
-                          <encoding>UTF-8</encoding>
-                          <includes>src/main/resources/**,src/test/resources/**</includes>
-                        </requireEncoding>
-                      </rules>
-                      <fastFail>false</fastFail>
-                    </configuration>
-                  </execution>
-                </executions>
-                <dependencies>
-                  <dependency>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>extra-enforcer-rules</artifactId>
-                    <version>1.0-beta-6</version>
-                  </dependency>
-                </dependencies>
-              </plugin>-->
 
         </plugins>
     </build>
