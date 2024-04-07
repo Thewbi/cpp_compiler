@@ -131,17 +131,17 @@ public class RISCVInstructionDecoder {
             // opcode is seven bits (lowermost two bits are always 11 for 32 bit encoded
             // instructions)
             int opcode = ((data & 0x7F) >> 0);
-            String opcodeBinary = StringUtils.leftPad(Integer.toBinaryString(opcode), 7, '0');
+            //tring opcodeBinary = StringUtils.leftPad(Integer.toBinaryString(opcode), 7, '0');
             // System.out.println("opcode: " + opcode + " " + opcodeBinary);
 
             // funct3 is 3 bits (hence the 3 in the name)
             int funct3 = ((data & 0x7000) >> 12);
-            String funct3Binary = StringUtils.leftPad(Integer.toBinaryString(funct3), 3, '0');
+            //String funct3Binary = StringUtils.leftPad(Integer.toBinaryString(funct3), 3, '0');
             // System.out.println("funct3: " + funct3 + " " + funct3Binary);
 
             // funct7 is 7 bits (hence the 7 in the name)
             int funct7 = ((data & 0xFE000000) >> 25);
-            String funct7Binary = StringUtils.leftPad(Integer.toBinaryString(funct7), 7, '0');
+            //String funct7Binary = StringUtils.leftPad(Integer.toBinaryString(funct7), 7, '0');
             // System.out.println("funct7: " + funct7 + " " + funct7Binary);
 
             RISCVInstruction riscVInstruction = findOpcode(opcode, funct3, funct7);
@@ -155,24 +155,26 @@ public class RISCVInstructionDecoder {
 
                 case I: {
                     int imm110 = ((data & 0xFFF00000) >> 20);
-                    int imm110Unsigned = imm110 & 0b00000000000000000000111111111111;
-                    String imm110Binary = StringUtils.leftPad(Integer.toBinaryString(imm110), 12, '0');
+                    //int imm110Unsigned = imm110 & 0b00000000000000000000111111111111;
+                    //String imm110Binary = StringUtils.leftPad(Integer.toBinaryString(imm110), 12, '0');
                     // System.out.println("imm110: " + imm110 + " " + imm110Unsigned + " " +
                     // imm110Binary);
 
                     int rs1 = ((data & 0xF8000) >> 15);
-                    String rs1Binary = StringUtils.leftPad(Integer.toBinaryString(rs1), 5, '0');
+                    //String rs1Binary = StringUtils.leftPad(Integer.toBinaryString(rs1), 5, '0');
                     // System.out.println("rs1: " + rs1 + " " + rs1Binary);
 
                     RISCVRegister rs1RISCVRegister = RISCVRegister.fromValue(rs1);
 
                     int rd = ((data & 0xF80) >> 7);
-                    String rdBinary = StringUtils.leftPad(Integer.toBinaryString(rd), 5, '0');
+                    //String rdBinary = StringUtils.leftPad(Integer.toBinaryString(rd), 5, '0');
                     // System.out.println("rd: " + rd + " " + rdBinary);
 
                     RISCVRegister rdRISCVRegister = RISCVRegister.fromValue(rd);
 
+                    // custom output format for some instructions
                     switch (riscVInstruction) {
+                        case JALR:
                         case LW:
                             System.out.println(dataAsHexString + " " + riscVInstruction + " " + rdRISCVRegister + ", "
                                     + imm110 + "(" + rs1RISCVRegister + ")");
@@ -188,28 +190,28 @@ public class RISCVInstructionDecoder {
                     break;
 
                 case S: {
-                    int imm115 = ((data & 0xFE000000) >> 25);
+                    //int imm115 = ((data & 0xFE000000) >> 25);
                     int imm115temp = ((data & 0xFE000000) >> 20);
-                    int imm115Unsigned = imm115 & 0b00000000000000000000000001111111;
-                    String imm115Binary = StringUtils.leftPad(Integer.toBinaryString(imm115temp), 7, '0');
+                    //int imm115Unsigned = imm115 & 0b00000000000000000000000001111111;
+                    //String imm115Binary = StringUtils.leftPad(Integer.toBinaryString(imm115temp), 7, '0');
 
                     int imm40 = ((data & 0xF80) >> 7);
-                    int imm40Unsigned = imm40 & 0b00000000000000000000000001111111;
-                    String imm40Binary = StringUtils.leftPad(Integer.toBinaryString(imm40), 5, '0');
+                    //int imm40Unsigned = imm40 & 0b00000000000000000000000001111111;
+                    //String imm40Binary = StringUtils.leftPad(Integer.toBinaryString(imm40), 5, '0');
 
                     // System.out.println(imm115Binary);
                     // System.out.println(imm115Binary + "." + imm40Binary);
 
                     int imm = imm115temp | imm40;
-                    String immBinary = StringUtils.leftPad(Integer.toBinaryString(imm), 32, '0');
+                    //String immBinary = StringUtils.leftPad(Integer.toBinaryString(imm), 32, '0');
                     // System.out.println(immBinary);
 
                     int rs1 = ((data & 0xF8000) >> 15);
-                    String rs1Binary = StringUtils.leftPad(Integer.toBinaryString(rs1), 5, '0');
+                    //String rs1Binary = StringUtils.leftPad(Integer.toBinaryString(rs1), 5, '0');
                     RISCVRegister rs1RISCVRegister = RISCVRegister.fromValue(rs1);
 
                     int rs2 = ((data & 0x1F00000) >> 20);
-                    String rs2Binary = StringUtils.leftPad(Integer.toBinaryString(rs2), 5, '0');
+                    //String rs2Binary = StringUtils.leftPad(Integer.toBinaryString(rs2), 5, '0');
                     RISCVRegister rs2RISCVRegister = RISCVRegister.fromValue(rs2);
 
                     switch (riscVInstruction) {
@@ -227,13 +229,40 @@ public class RISCVInstructionDecoder {
                 }
                     break;
 
-                // case B
+                case B: {
+
+                    int imm11 = ((data & 0x80) << 4);
+                    int imm4_1 = ((data & 0xF00) >> 7);
+                    int imm10_5 = ((data & 0x7E000000) >> 20);
+                    int imm12 = ((data & 0x80000000) >> 19);
+
+                    int immCombined = 0;
+                    if (imm12 == 0) {
+                        immCombined = imm12 | imm11 | imm10_5 | imm4_1;
+                    } else {
+                        immCombined = 0xFFF00000 | imm12 | imm11 | imm10_5 | imm4_1;
+                    }
+
+
+                    int rs1 = ((data & 0xF8000) >> 15);
+                    //String rs1Binary = StringUtils.leftPad(Integer.toBinaryString(rs1), 5, '0');
+                    RISCVRegister rs1RISCVRegister = RISCVRegister.fromValue(rs1);
+
+                    int rs2 = ((data & 0x1F00000) >> 20);
+                    //String rs2Binary = StringUtils.leftPad(Integer.toBinaryString(rs2), 5, '0');
+                    RISCVRegister rs2RISCVRegister = RISCVRegister.fromValue(rs2);
+
+                    System.out.println(
+                            dataAsHexString + " " + riscVInstruction + " " + rs1RISCVRegister + ", " + rs2RISCVRegister + ", " + immCombined);
+
+                }
+                    break;
 
                 // case U
 
                 case J:
 
-                    String encodedInstructionBinary = StringUtils.leftPad(Integer.toBinaryString(data), 32, '0');
+                    //String encodedInstructionBinary = StringUtils.leftPad(Integer.toBinaryString(data), 32, '0');
                     // System.out.println(encodedInstructionBinary);
 
                     int rd = ((data & 0xF80) >> 7);
@@ -242,7 +271,7 @@ public class RISCVInstructionDecoder {
                     RISCVRegister rdRISCVRegister = RISCVRegister.fromValue(rd);
 
                     int imm = ((data & 0xFFFFF000) >> 12);
-                    String immBinary = StringUtils.leftPad(Integer.toBinaryString(imm), 20, '0');
+                    //String immBinary = StringUtils.leftPad(Integer.toBinaryString(imm), 20, '0');
                     // System.out.println(immBinary);
 
                     // imm[20|10:1|11|19:12]
@@ -260,7 +289,7 @@ public class RISCVInstructionDecoder {
                     // 10 bit
                     // imm[19:9] goes to imm[10:1], hence shifted 1 to the left
                     int imm10_1 = ((imm & 0x7FE00) >> 8);
-                    String imm10_1Binary = StringUtils.leftPad(Integer.toBinaryString(imm10_1), 20, '0');
+                    //String imm10_1Binary = StringUtils.leftPad(Integer.toBinaryString(imm10_1), 20, '0');
                     // System.out.println(imm10_1Binary);
 
                     // 1 bit
@@ -274,7 +303,7 @@ public class RISCVInstructionDecoder {
                         immCombined = 0xFFF00000 | imm20 | imm19_12 | imm11 | imm10_1;
                     }
 
-                    String immCombinedBinary = StringUtils.leftPad(Integer.toBinaryString(immCombined), 20, '0');
+                    //String immCombinedBinary = StringUtils.leftPad(Integer.toBinaryString(immCombined), 20, '0');
                     //System.out.println(immCombinedBinary);
 
                     System.out.println(

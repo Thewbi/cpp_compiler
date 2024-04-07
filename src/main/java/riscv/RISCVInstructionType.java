@@ -2,17 +2,17 @@ package riscv;
 
 public enum RISCVInstructionType {
 
-    R,
+    R, // register/register
 
-    I,
+    I, // immediate
 
-    S,
+    S, // store
 
-    B,
+    B, // branch
 
-    U,
+    U, // upper immediate
 
-    J;
+    J; // jump
 
     public static RISCVInstructionType fromValue(final RISCVInstruction instruction) {
 
