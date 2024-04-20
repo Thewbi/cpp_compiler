@@ -40,8 +40,7 @@ public abstract class BaseRISCVProcessor {
         x1StringProperty.setValue(String.valueOf(value));
     }
 
-    // protected byte[] memory = new byte[1024];
-    protected int[] memory = new int[1024];
+    protected IMemory memory;
 
     protected int idx = 0;
 
@@ -54,6 +53,14 @@ public abstract class BaseRISCVProcessor {
             return s0StringProperty;
         }
         throw new UnsupportedOperationException("Unimplemented method 'getTextProperty'");
+    }
+
+    public IMemory getMemory() {
+        return memory;
+    }
+
+    public void setMemory(IMemory memory) {
+        this.memory = memory;
     }
     
 }

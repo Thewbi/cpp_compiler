@@ -218,7 +218,9 @@ public class DecodingRISCVProcessor extends BaseRISCVProcessor {
         // register x0 (= zero) cannot be written!
         if (rd.getNumVal() != 0) {
             // registerFile[rd.getNumVal()] = memory[sourceAddress];
-            setRegisterValue(rd.getNumVal(), memory[sourceAddress]);
+            //setRegisterValue(rd.getNumVal(), memory[sourceAddress]);
+
+            setRegisterValue(rd.getNumVal(), memory.get(sourceAddress));
         }
 
         pc += 4;
@@ -251,7 +253,9 @@ public class DecodingRISCVProcessor extends BaseRISCVProcessor {
 
         int targetAddress = registerFile[rs1.getNumVal()] + offset;
         // System.out.println(targetAddress);
-        memory[targetAddress] = registerFile[rs2.getNumVal()];
+
+        //memory[targetAddress] = registerFile[rs2.getNumVal()];
+        memory.set(targetAddress, registerFile[rs2.getNumVal()]);
 
         pc += 4;
     }

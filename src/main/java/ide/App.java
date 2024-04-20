@@ -14,7 +14,10 @@ import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.controlsfx.control.spreadsheet.GridChange;
+
 import javax.swing.event.DocumentEvent.EventType;
+import javafx.event.EventHandler;
 
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -40,6 +43,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import riscv.DecodingRISCVProcessor;
+import riscv.DefaultMemory;
 import riscv.ExplicitRISCVProcessor;
 import riscv.RISCVInstructionEncoder;
 import riscv.RISCVProcessor;
@@ -456,38 +460,32 @@ public class App extends Application {
         HBox hboxRegisterArea = new HBox();
         hboxRegisterArea.getChildren().addAll(s0Label, s0TextField);
 
-        
+        DefaultMemory memory = new DefaultMemory();
 
+        GridBase grid = new GridBase(memory.getRowCount(), memory.getColumnCount());
+        grid.setRows(memory.getRows());
 
-        int rowCount = 15;
-        int columnCount = 10;
+        //grid.addEventHandler(EventHandler<GridChange.GRID_CHANGE_EVENT>, memory);
+        grid.addEventHandler(GridChange.GRID_CHANGE_EVENT, memory);
 
-        GridBase grid = new GridBase(rowCount, columnCount);
-        
-        ObservableList<ObservableList<SpreadsheetCell>> rows = FXCollections.observableArrayList();
-        for (int row = 0; row < grid.getRowCount(); ++row) {
+        // grid.addEventHandler(javafx.event.EventType.ROOT, R -> {
 
-            final ObservableList<SpreadsheetCell> list = FXCollections.observableArrayList();
-            for (int column = 0; column < grid.getColumnCount(); ++column) {
-                list.add(SpreadsheetCellType.STRING.createCell(row, column, 1, 1,"value"));
-            }
-            rows.add(list);
-        }
-        grid.setRows(rows);
+        //     // DEBUG
+        //     System.out.println(R);
 
-        grid.addEventHandler(javafx.event.EventType.ROOT, R -> {
-            System.out.println(R);
-            if (R instanceof GridChange) {
+        //     if (R instanceof GridChange) {
 
-                GridChange gridChangeEvent = (GridChange)R;
-                System.out.println(gridChangeEvent);
+        //         GridChange gridChangeEvent = (GridChange)R;
+        //         System.out.println(gridChangeEvent);
 
-                System.out.println("Row: " + gridChangeEvent.getRow());
-                System.out.println("Column: " + gridChangeEvent.getColumn());
-                System.out.println("Old: " + gridChangeEvent.getOldValue());
-                System.out.println("New: " + gridChangeEvent.getNewValue());
-            }
-        });
+        //         System.out.println("Row: " + gridChangeEvent.getRow());
+        //         System.out.println("Column: " + gridChangeEvent.getColumn());
+        //         System.out.println("Old: " + gridChangeEvent.getOldValue());
+        //         System.out.println("New: " + gridChangeEvent.getNewValue());
+        //     }
+        // });
+
+        riscVProcessor.setMemory(memory);
 
         SpreadsheetView spreadsheetView = new SpreadsheetView(grid);
         

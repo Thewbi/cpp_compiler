@@ -82,7 +82,7 @@ public class Main {
         riscVRow.getParameters().add(riscvRowParam);
         
         RISCVInstructionEncoder riscVInstructionEncoder = new RISCVInstructionEncoder();
-        riscVInstructionEncoder.encode(riscVRow);
+        riscVInstructionEncoder.encode(riscVRow, null);
     }
 
     private static void riscvdecoder() {
