@@ -6,6 +6,20 @@
     "configurations": [
         {
             "type": "java",
+            "name": "GUIStarter",
+            "request": "launch",
+            "mainClass": "ide.GUIStarter",
+            "projectName": "compiler"
+        },
+        {
+            "type": "java",
+            "name": "App",
+            "request": "launch",
+            "mainClass": "ide.App",
+            "projectName": "compiler"
+        },
+        {
+            "type": "java",
             "name": "Current File",
             "request": "launch",
             "mainClass": "${file}"

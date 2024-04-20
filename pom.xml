@@ -10,12 +10,82 @@
     <version>1.0.0</version>
 
     <properties>
+        <java.version>20</java.version>
         <maven.compiler.source>20</maven.compiler.source>
         <maven.compiler.target>20</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
     <dependencies>
+
+        <!-- JavaFx -->
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-base</artifactId>
+            <version>13</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-controls</artifactId>
+            <version>13</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-graphics </artifactId>
+            <version>13</version>
+            <classifier>win</classifier>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-fxml</artifactId>
+            <version>13</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-web</artifactId>
+            <version>13</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-media</artifactId>
+            <version>13</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-swing</artifactId>
+            <version>13</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/eu.mihosoft.monacofx/monacofx 
+        <dependency>
+            <groupId>eu.mihosoft.monacofx</groupId>
+            <artifactId>monacofx</artifactId>
+            <version>0.0.8</version>
+        </dependency>-->
+
+        <!-- https://mvnrepository.com/artifact/org.fxmisc.richtext/richtextfx -->
+<dependency>
+    <groupId>org.fxmisc.richtext</groupId>
+    <artifactId>richtextfx</artifactId>
+    <version>0.11.2</version>
+</dependency>
+
+<!-- https://mvnrepository.com/artifact/org.fxmisc.flowless/flowless -->
+<dependency>
+    <groupId>org.fxmisc.flowless</groupId>
+    <artifactId>flowless</artifactId>
+    <version>0.7.2</version>
+</dependency>
+
+<!-- https://mvnrepository.com/artifact/org.controlsfx/controlsfx -->
+<dependency>
+    <groupId>org.controlsfx</groupId>
+    <artifactId>controlsfx</artifactId>
+    <version>11.2.1</version>
+</dependency>
+
+
+
 
         <!-- https://mvnrepository.com/artifact/org.antlr/antlr4 -->
         <dependency>
@@ -67,7 +137,6 @@
             <version>4.11</version>
             <scope>test</scope>
         </dependency>
-        
 
     </dependencies>
 
@@ -130,6 +199,16 @@
         </pluginManagement>
 
         <plugins>
+
+            <plugin>
+                <groupId>org.openjfx</groupId>
+                <artifactId>javafx-maven-plugin</artifactId>
+                <version>0.0.3</version>
+                <configuration>
+                    <mainClass>de.wire.App</mainClass>
+                </configuration>
+            </plugin>
+
             <plugin>
                 <groupId>org.antlr</groupId>
                 <artifactId>antlr4-maven-plugin</artifactId>
@@ -138,11 +217,11 @@
                     <encoding>${project.build.sourceEncoding}</encoding>
                 </configuration>
                 <executions>
-                    <execution>                        
-                            <id>antlr</id>
-                            <goals>
-                                <goal>antlr4</goal>
-                            </goals>
+                    <execution>
+                        <id>antlr</id>
+                        <goals>
+                            <goal>antlr4</goal>
+                        </goals>
                     </execution>
                 </executions>
             </plugin>

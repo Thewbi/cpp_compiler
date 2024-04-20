@@ -15,18 +15,18 @@ import grammar.RISCVRowParam;
  * https://shakti.org.in/docs/risc-v-asm-manual.pdf
  * https://www.cs.sfu.ca/~ashriram/Courses/CS295/assets/notebooks/RISCV/RISCV_CARD.pdf
  */
-public class RISCVProcessor {
+public class RISCVProcessor extends BaseRISCVProcessor {
 
     private List<RISCVRow> rows = new ArrayList<>();
 
     private Map<String, Integer> labels = new HashMap<>();
 
-    private int[] registerFile = new int[32];
+    // private int[] registerFile = new int[32];
 
-    // private byte[] memory = new byte[1024];
-    private int[] memory = new int[1024];
+    // // private byte[] memory = new byte[1024];
+    // private int[] memory = new int[1024];
 
-    private int idx = 0;
+    // private int idx = 0;
 
     private boolean done;
 
@@ -89,62 +89,62 @@ public class RISCVProcessor {
 
     public void processRow(RISCVRow riscVRow) {
 
-        if (StringUtils.isNotBlank(riscVRow.getInstruction())) {
+        if (StringUtils.isBlank(riscVRow.getInstruction())) {
+            return;
+        }
 
-            String instruction = StringUtils.upperCase(riscVRow.getInstruction());
-            RISCVInstruction riscVInstruction = RISCVInstruction.valueOf(instruction);
+        String instruction = StringUtils.upperCase(riscVRow.getInstruction());
+        RISCVInstruction riscVInstruction = RISCVInstruction.valueOf(instruction);
 
-            // https://msyksphinz-self.github.io/riscv-isadoc/html/index.html
-            switch (riscVInstruction) {
+        // https://msyksphinz-self.github.io/riscv-isadoc/html/index.html
+        switch (riscVInstruction) {
 
-                case ADDI:
-                    processADDI(riscVRow);
-                    break;
+            case ADDI:
+                processADDI(riscVRow);
+                break;
 
-                case AUIPC:
-                    processAUIPC(riscVRow);
-                    break;
+            case AUIPC:
+                processAUIPC(riscVRow);
+                break;
 
-                case BGT:
-                    processBGT(riscVRow);
-                    break;
+            case BGT:
+                processBGT(riscVRow);
+                break;
 
-                case SW:
-                    processSW(riscVRow);
-                    break;
+            case SW:
+                processSW(riscVRow);
+                break;
 
-                case LI:
-                    processLI(riscVRow);
-                    break;
+            case LI:
+                processLI(riscVRow);
+                break;
 
-                case LW:
-                    processLW(riscVRow);
-                    break;
+            case LW:
+                processLW(riscVRow);
+                break;
 
-                case CALL:
-                    processCALL(riscVRow);
-                    break;
+            case CALL:
+                processCALL(riscVRow);
+                break;
 
-                case MV:
-                    processMV(riscVRow);
-                    break;
+            case MV:
+                processMV(riscVRow);
+                break;
 
-                case JR:
-                    processJR(riscVRow);
-                    break;
+            case JR:
+                processJR(riscVRow);
+                break;
 
-                case J:
-                    processJ(riscVRow);
-                    break;
+            case J:
+                processJ(riscVRow);
+                break;
 
-                case JALR:
-                    processJALR(riscVRow);
-                    break;
+            case JALR:
+                processJALR(riscVRow);
+                break;
 
-                default:
-                    throw new RuntimeException("Unknown instruction: " + riscVInstruction);
-
-            }
+            default:
+                throw new RuntimeException("Unknown instruction: " + riscVInstruction);
 
         }
 
@@ -532,7 +532,6 @@ public class RISCVProcessor {
     /**
      * <pre>
      * sw src, off(dst) => M[dst + off] = src[31:0]
-     * 
      * <pre>
      * 
      * https://electronics.stackexchange.com/questions/554981/help-in-understanding-store-word-sw-instruction-in-risc-v

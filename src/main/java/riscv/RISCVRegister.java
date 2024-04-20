@@ -190,10 +190,10 @@ public enum RISCVRegister {
         switch (numVal) {
 
             case 0:
-                return RISCVRegister.zero;
+                return RISCVRegister.zero; // x0
 
             case 1:
-                return RISCVRegister.ra;
+                return RISCVRegister.ra; // x1
 
             case 2:
                 return RISCVRegister.sp;
@@ -297,6 +297,10 @@ public enum RISCVRegister {
      * @return
      */
     public static int mapRegister(String registerName) {
+
+        if (StringUtils.equalsIgnoreCase(registerName, "x0") || StringUtils.equalsIgnoreCase(registerName, "zero")) {
+            return 0;
+        }
 
         if (StringUtils.equalsIgnoreCase(registerName, "x1") || StringUtils.equalsIgnoreCase(registerName, "ra")) {
             return 1;

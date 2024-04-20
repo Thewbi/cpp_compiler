@@ -16,6 +16,7 @@ import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
+import org.apache.commons.lang3.StringUtils;
 
 import com.cpp.grammar.CPP14Lexer;
 import com.cpp.grammar.CPP14Parser;
@@ -26,6 +27,9 @@ import com.cpp.grammar.CPP14Parser.TranslationUnitContext;
 import com.cpp.grammar.PreprocessorParser.Code_fileContext;
 import com.cpp.grammar.RISCVParser.Asm_fileContext;
 
+import riscv.ExplicitRISCVProcessor;
+import riscv.RISCVInstructionDecoder;
+import riscv.RISCVInstructionEncoder;
 import riscv.RISCVProcessor;
 
 import com.cpp.grammar.RISCVLexer;
@@ -41,20 +45,65 @@ import types.Type;
  */
 public class Main { 
 
-    public static void main(String[] args) throws IOException {
-        System.out.println("Start");
+    // public static void main(String[] args) throws IOException {
+    //     System.out.println("Start");
 
-        // preprocessor();
-        // translationUnit();
-        riscvassembler();
+    //     // preprocessor();
+    //     // translationUnit();
+    //     //riscvassembler();
+    //     //riscvdecoder();
+    //     //riscvencoder();
 
-        System.out.println("\nEnd");
+    //     ide();
+
+    //     System.out.println("\nEnd");
+    // }
+
+    private static void ide() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'ide'");
+    }
+
+    private static void riscvencoder() {
+
+        RISCVRow riscVRow = new RISCVRow();
+        riscVRow.setInstruction(StringUtils.upperCase("addi"));
+
+        RISCVRowParam riscvRowParam = new RISCVRowParam();
+        riscvRowParam.setRegister("x8");
+        riscVRow.getParameters().add(riscvRowParam);
+
+        riscvRowParam = new RISCVRowParam();
+        riscvRowParam.setRegister("x2");
+        riscVRow.getParameters().add(riscvRowParam);
+
+        riscvRowParam = new RISCVRowParam();
+        riscvRowParam.setExpression("32");
+        riscVRow.getParameters().add(riscvRowParam);
+        
+        RISCVInstructionEncoder riscVInstructionEncoder = new RISCVInstructionEncoder();
+        riscVInstructionEncoder.encode(riscVRow);
+    }
+
+    private static void riscvdecoder() {
+
+        RISCVInstructionDecoder riscVInstructionDecoder = new RISCVInstructionDecoder();
+        riscVInstructionDecoder.decode();
+
+        ExplicitRISCVProcessor riscVProcessor = new ExplicitRISCVProcessor();
+        riscVProcessor.getRows().addAll(riscVInstructionDecoder.getRows());
+
+        System.out.println("Start Execution: ---------------------------------------");
+
+        while (!riscVProcessor.isDone()) {
+            riscVProcessor.processRow();
+        }
     }
 
     private static void riscvassembler() throws IOException {
 
-        //final String filename = "src/test/resources/RISCV/addi.s";
-        final String filename = "src/test/resources/RISCV/auipc.s";
+        final String filename = "src/test/resources/RISCV/addi.s";
+        //final String filename = "src/test/resources/RISCV/auipc.s";
         //final String filename = "src/test/resources/RISCV/fibonacci.s";
         //final String filename = "src/test/resources/RISCV/hello.s";
         //final String filename = "src/test/resources/RISCV/hello2.s";
@@ -113,11 +162,8 @@ public class Main {
 
             RISCVProcessor riscVProcessor = new RISCVProcessor();
             riscVProcessor.getRows().addAll(listener.getRows());
-
             riscVProcessor.processLabels();
-
             riscVProcessor.startAtLabel("main");
-
             while (!riscVProcessor.isDone()) {
                 riscVProcessor.processRow();
             }
@@ -229,7 +275,6 @@ public class Main {
 
             ConsoleCPP14ParserListener printListener = new ConsoleCPP14ParserListener();
             walker.walk(printListener, root);
-
         }
 
         // start the base scope

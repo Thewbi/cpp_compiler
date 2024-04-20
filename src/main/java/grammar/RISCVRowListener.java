@@ -24,6 +24,8 @@ public class RISCVRowListener extends RISCVParserBaseListener {
 
     private Vocabulary vocab = RISCVParser.VOCABULARY;
 
+    private int line;
+
     @Override
     public void enterLabel_definition(RISCVParser.Label_definitionContext ctx) {
         final String text = ctx.label_name().getText();
@@ -211,8 +213,12 @@ public class RISCVRowListener extends RISCVParserBaseListener {
 
     @Override
     public void enterNewline(RISCVParser.NewlineContext ctx) {
+        line++;
+        row.setLine(line);
         rows.add(row);
-        row = new RISCVRow();
+
+        // next row        
+        row = new RISCVRow();        
     }        
 
     public List<RISCVRow> getRows() {

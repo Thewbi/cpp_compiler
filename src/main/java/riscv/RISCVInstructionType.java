@@ -72,6 +72,7 @@ public enum RISCVInstructionType {
             case SW:
                 return S;
 
+            // case LI:
             case ADDI:
                 return I;
 
@@ -100,10 +101,10 @@ public enum RISCVInstructionType {
                 return I;
 
             case ADD:
-                return I;
+                return R;
 
             case SUB:
-                return I;
+                return R;
 
             case SLL:
                 return I;
@@ -159,8 +160,20 @@ public enum RISCVInstructionType {
             case CSRRCI:
                 return I;
 
+
+
+            case MUL:
+            case MULH:
+            case MULHSU:
+            case MULHU:
+            case DIV:
+            case DIVU:
+            case REM:
+            case REMU:
+                return R;
+
             default:
-                throw new RuntimeException("unknown register!");
+                throw new RuntimeException("unknown instruction type for instruction: " + instruction + "!");
         }
     }
 
