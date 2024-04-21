@@ -6,6 +6,7 @@ import org.controlsfx.control.spreadsheet.GridChange;
 import org.controlsfx.control.spreadsheet.SpreadsheetCell;
 import org.controlsfx.control.spreadsheet.SpreadsheetCellType;
 
+import common.IMemory;
 import common.IntegerParserUtil;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -26,6 +27,9 @@ public class DefaultMemory implements IMemory, EventHandler<GridChange> {
 
     private ObservableList<ObservableList<SpreadsheetCell>> rows = FXCollections.observableArrayList();
 
+    /**
+     * ctor
+     */
     public DefaultMemory() {
 
         int columnCount = 8;
@@ -46,7 +50,7 @@ public class DefaultMemory implements IMemory, EventHandler<GridChange> {
 
     @Override
     public int get(int sourceAddress) {
-        
+
         if (sourceAddress > MEMORY_SIZE_IN_BYTES) {
             throw new RuntimeException("Memory address " + sourceAddress + " is out of bounds!");
         }
@@ -66,7 +70,7 @@ public class DefaultMemory implements IMemory, EventHandler<GridChange> {
         int columnIdx = targetAddress % 8;
 
         ObservableList<SpreadsheetCell> row = rows.get(rowIdx);
-        row.get(columnIdx).setItem(IntegerParserUtil.hex(value));
+        row.get(columnIdx).setItem(IntegerParserUtil.hexByte(value));
     }
 
     public int getRowCount() {
@@ -90,6 +94,9 @@ public class DefaultMemory implements IMemory, EventHandler<GridChange> {
         System.out.println("Column: " + gridChangeEvent.getColumn());
         System.out.println("Old: " + gridChangeEvent.getOldValue());
         System.out.println("New: " + gridChangeEvent.getNewValue());
+
+        int targetAddress = gridChangeEvent.getRow() * columnCount + gridChangeEvent.getColumn();
+        memory[targetAddress] = IntegerParserUtil.parseInt((String) gridChangeEvent.getNewValue());
     }
 
 }

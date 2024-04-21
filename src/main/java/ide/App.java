@@ -44,6 +44,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import riscv.DecodingRISCVProcessor;
 import riscv.DefaultMemory;
+import riscv.DefaultRegisterFile;
 import riscv.ExplicitRISCVProcessor;
 import riscv.RISCVInstructionEncoder;
 import riscv.RISCVProcessor;
@@ -454,15 +455,51 @@ public class App extends Application {
         vboxCodeArea.setPrefWidth(800);
         vboxCodeArea.setPrefHeight(800);
 
-        Label s0Label = new Label("s0");
-        TextField s0TextField = new TextField();
-        Bindings.bindBidirectional(s0TextField.textProperty(), riscVProcessor.getTextProperty("x1"));
+        // Label s0Label = new Label("s0");
+        // TextField s0TextField = new TextField();
+        // Bindings.bindBidirectional(s0TextField.textProperty(), riscVProcessor.getTextProperty("x1"));
+        // HBox hboxRegisterArea = new HBox();
+        // hboxRegisterArea.getChildren().addAll(s0Label, s0TextField);
+
+
+        DefaultRegisterFile registerFile = new DefaultRegisterFile();
+
+        GridBase grid = new GridBase(registerFile.getRowCount(), registerFile.getColumnCount());
+        grid.setRows(registerFile.getRows());
+
+        //grid.addEventHandler(EventHandler<GridChange.GRID_CHANGE_EVENT>, memory);
+        grid.addEventHandler(GridChange.GRID_CHANGE_EVENT, registerFile);
+
+        // grid.addEventHandler(javafx.event.EventType.ROOT, R -> {
+
+        //     // DEBUG
+        //     System.out.println(R);
+
+        //     if (R instanceof GridChange) {
+
+        //         GridChange gridChangeEvent = (GridChange)R;
+        //         System.out.println(gridChangeEvent);
+
+        //         System.out.println("Row: " + gridChangeEvent.getRow());
+        //         System.out.println("Column: " + gridChangeEvent.getColumn());
+        //         System.out.println("Old: " + gridChangeEvent.getOldValue());
+        //         System.out.println("New: " + gridChangeEvent.getNewValue());
+        //     }
+        // });
+
+        riscVProcessor.setRegisterFile(registerFile);
+
+        SpreadsheetView spreadsheetView = new SpreadsheetView(grid);
+        
         HBox hboxRegisterArea = new HBox();
-        hboxRegisterArea.getChildren().addAll(s0Label, s0TextField);
+        hboxRegisterArea.getChildren().add(spreadsheetView);
+
+
+
 
         DefaultMemory memory = new DefaultMemory();
 
-        GridBase grid = new GridBase(memory.getRowCount(), memory.getColumnCount());
+        grid = new GridBase(memory.getRowCount(), memory.getColumnCount());
         grid.setRows(memory.getRows());
 
         //grid.addEventHandler(EventHandler<GridChange.GRID_CHANGE_EVENT>, memory);
@@ -487,7 +524,7 @@ public class App extends Application {
 
         riscVProcessor.setMemory(memory);
 
-        SpreadsheetView spreadsheetView = new SpreadsheetView(grid);
+        spreadsheetView = new SpreadsheetView(grid);
         
         HBox hboxMemoryArea = new HBox();
         hboxMemoryArea.getChildren().add(spreadsheetView);

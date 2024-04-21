@@ -1,4 +1,4 @@
-package riscv;
+package common;
 
 public interface IMemory {
 

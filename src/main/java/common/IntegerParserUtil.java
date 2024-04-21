@@ -37,6 +37,10 @@ public class IntegerParserUtil {
         return String.format("0x%8s", Integer.toHexString(n)).replace(' ', '0');
     }
 
+    public static String hexByte(int n) {
+        return String.format("0x%2s", Integer.toHexString(n)).replace(' ', '0');
+    }
+
     public static String hex(float f) {
         // change the float to raw integer bits(according to the OP's requirement)
         return hex(Float.floatToRawIntBits(f));
