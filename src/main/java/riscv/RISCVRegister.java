@@ -72,6 +72,11 @@ public enum RISCVRegister {
 
     private int numVal;
 
+    /**
+     * ctor
+     * 
+     * @param numVal
+     */
     RISCVRegister(final int numVal) {
         this.numVal = numVal;
     }

@@ -21,10 +21,10 @@ public class RISCVProcessor extends BaseRISCVProcessor {
 
     private Map<String, Integer> labels = new HashMap<>();
 
-    // private int[] registerFile = new int[32];
+    private int[] registerFile = new int[32];
 
     // // private byte[] memory = new byte[1024];
-    // private int[] memory = new int[1024];
+    private int[] memory = new int[1024];
 
     // private int idx = 0;
 

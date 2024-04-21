@@ -7,6 +7,7 @@ import org.controlsfx.control.spreadsheet.SpreadsheetCellType;
 
 import java.util.Collection;
 
+import common.IRegisterFile;
 import common.IntegerParserUtil;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;

@@ -1,7 +1,5 @@
 package riscv;
 
-import org.antlr.v4.runtime.RuntimeMetaData;
-
 public enum RISCVInstruction {
 
     //

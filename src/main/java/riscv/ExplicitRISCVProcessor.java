@@ -12,6 +12,11 @@ public class ExplicitRISCVProcessor extends BaseRISCVProcessor {
 
     private List<ExplicitRISCVRow> rows = new ArrayList<>();
 
+    private int[] registerFile = new int[32];
+
+    // // private byte[] memory = new byte[1024];
+    private int[] memory = new int[1024];
+
     /**
      * ctor
      */
