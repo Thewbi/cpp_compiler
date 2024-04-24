@@ -160,6 +160,11 @@ public class RISCVInstructionEncoder {
 
         }
 
+        // encode all rows
+        //
+        // if a row has children, the children are encoded instead of the row itself
+        // this happens, when a pseudo instruction is replaced by one or more 
+        // real instructions
         if (CollectionUtils.isEmpty(riscRow.getChildren())) {
             encodeRiscVRow(riscRow);
         } else {

@@ -23,7 +23,7 @@ public class RISCVInstructionEncoderTest {
         riscVRow.getParameters().add(riscVRowParam);
 
         RISCVInstructionEncoder riscVInstructionEncoder = new RISCVInstructionEncoder();
-        riscVInstructionEncoder.encode(riscVRow);
+        riscVInstructionEncoder.encode(riscVRow, null);
 
     }
 

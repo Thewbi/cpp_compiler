@@ -147,7 +147,7 @@ SLTIU : S L T I U ;
 SLL : S L L ;
 // SLLW : S L L W ;
 SLLV : S L L V ;
-SLRV : S L R V ;
+SRLV : S R L V ;
 SYSCALL : S Y S C A L L ;
 SUB_S : S U B '.' S ;
 SUB_D : S U B '.' D ;
@@ -156,100 +156,131 @@ XOR : X O R ;
 XORI : X O R I ;
 
 // zero, the constant value zero - index 0
-REG_x0 : '$0' ;
+REG_0 : '$0' ;
 
 // assembler temporary - index 1
 REG_at : 'at' ;
+REG_1 : '$1' ;
 
 // function return value - index 2
 REG_v0 : '$v0' ;
+REG_2 : '$2' ;
 
 // function return value - index 3
 REG_v1 : '$v1' ;
+REG_3 : '$3' ;
 
 // function arguments - index 4
 REG_a0 : '$a0' ;
+REG_4 : '$4' ;
 
 // function arguments - index 5
 REG_a1 : '$a1' ;
+REG_5 : '$5' ;
 
 // function arguments - index 6
 REG_a2 : '$a2' ;
+REG_6 : '$6' ;
 
 // function arguments - index 7
 REG_a3 : '$a3' ;
+REG_7 : '$7' ;
 
 // temporary variables - index 8
 REG_t0 : '$t0' ;
+REG_8 : '$8' ;
 
 // temporary variables - index 9
 REG_t1 : '$t1' ;
+REG_9 : '$9' ;
 
 // temporary variables - index 10
 REG_t2 : '$t2' ;
+REG_10 : '$10' ;
 
 // temporary variables - index 11
 REG_t3 : '$t3' ;
+REG_11 : '$11' ;
 
 // temporary variables - index 12
 REG_t4 : '$t4' ;
+REG_12 : '$12' ;
 
 // temporary variables - index 13
 REG_t5 : '$t5' ;
+REG_13 : '$13' ;
 
 // temporary variables - index 14
 REG_t6 : '$t6' ;
+REG_14 : '$14' ;
 
 // temporary variables - index 15
 REG_t7 : '$t7' ;
+REG_15 : '$15' ;
 
 // saved variables - index 16
 REG_s0 : '$s0' ;
+REG_16 : '$16' ;
 
 // saved variables - index 17
 REG_s1 : '$s1' ;
+REG_17 : '$17' ;
 
 // saved variables - index 18
 REG_s2 : '$s2' ;
+REG_18 : '$18' ;
 
 // saved variables - index 19
 REG_s3 : '$s3' ;
+REG_19 : '$19' ;
 
 // saved variables - index 20
 REG_s4 : '$s4' ;
+REG_20 : '$20' ;
 
 // saved variables - index 21
 REG_s5 : '$s5' ;
+REG_21 : '$21' ;
 
 // saved variables - index 22
 REG_s6 : '$s6' ;
+REG_22 : '$22' ;
 
 // saved variables - index 23
 REG_s7 : '$s7' ;
+REG_23 : '$23' ;
 
 // temporary variables - index 24
 REG_t8 : '$t8' ;
+REG_24 : '$24' ;
 
 // temporary variables - index 25
 REG_t9 : '$t9' ;
+REG_25 : '$25' ;
 
 // operating system (OS) temporary variables - index 26
 REG_k0 : '$k0' ;
+REG_26 : '$26' ;
 
 // operating system (OS) temporary variables - index 27
 REG_k1 : '$k1' ;
+REG_27 : '$27' ;
 
 // global pointer - index 28
 REG_gp : '$gp' ;
+REG_28 : '$28' ;
 
 // global pointer - index 29
 REG_sp : '$sp' ;
+REG_29 : '$29' ;
 
 // global pointer - index 30
 REG_fp : '$fp' ;
+REG_30 : '$30' ;
 
 // global pointer - index 31
 REG_ra : '$ra' ;
+REG_31 : '$31' ;
 
 
 

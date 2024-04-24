@@ -112,100 +112,131 @@ expression :
 
 register :
     // zero, the constant value zero - index 0
-    REG_x0 |
+    REG_0 |
 
     // assembler temporary - index 1
     REG_at |
+    REG_1 |
 
     // function return value - index 2
     REG_v0 |
+    REG_2 |
 
     // function return value - index 3
     REG_v1 |
+    REG_3 |
 
     // function arguments - index 4
     REG_a0 |
+    REG_4 |
 
     // function arguments - index 5
     REG_a1 |
+    REG_5 |
 
     // function arguments - index 6
     REG_a2 |
+    REG_6 |
 
     // function arguments - index 7
     REG_a3 |
+    REG_7 |
 
     // temporary variables - index 8
     REG_t0 |
+    REG_8 |
 
     // temporary variables - index 9
     REG_t1 |
+    REG_9 |
 
     // temporary variables - index 10
     REG_t2 |
+    REG_10 |
 
     // temporary variables - index 11
     REG_t3 |
+    REG_11 |
 
     // temporary variables - index 12
     REG_t4 |
+    REG_12 |
 
     // temporary variables - index 13
     REG_t5 |
+    REG_13 |
 
     // temporary variables - index 14
     REG_t6 |
+    REG_14 |
 
     // temporary variables - index 15
     REG_t7 |
+    REG_15 |
 
     // saved variables - index 16
     REG_s0 |
+    REG_16 |
 
     // saved variables - index 17
     REG_s1 |
+    REG_17 |
 
     // saved variables - index 18
     REG_s2 |
+    REG_18 |
 
     // saved variables - index 19
     REG_s3 |
+    REG_19 |
 
     // saved variables - index 20
     REG_s4 |
+    REG_20 |
 
     // saved variables - index 21
     REG_s5 |
+    REG_21 |
 
     // saved variables - index 22
     REG_s6 |
+    REG_22 |
 
     // saved variables - index 23
     REG_s7 |
+    REG_23 |
 
     // temporary variables - index 24
     REG_t8 |
+    REG_24 |
 
     // temporary variables - index 25
     REG_t9 |
+    REG_25 |
 
     // operating system (OS) temporary variables - index 26
     REG_k0 |
+    REG_26 |
 
     // operating system (OS) temporary variables - index 27
     REG_k1 |
+    REG_27 |
 
     // global pointer - index 28
     REG_gp |
+    REG_28 |
 
     // global pointer - index 29
     REG_sp |
+    REG_29 |
 
     // global pointer - index 30
     REG_fp |
+    REG_30 |
 
     // global pointer - index 31
-    REG_ra
+    REG_ra |
+    REG_31
     ;
 
 offset_expression
@@ -214,7 +245,8 @@ offset_expression
     ;
 
 offset_expression_amount :
-    MINUS? NUMBER
+//    MINUS? NUMBER
+    expression
     ;
 
 offset_expression_register :
@@ -405,7 +437,7 @@ mnemonic_s :
     SLTIU |
     SLL |
     SLLV |
-    SLRV |
+    SRLV |
     SYSCALL |
     SUB_S |
     SUB_D

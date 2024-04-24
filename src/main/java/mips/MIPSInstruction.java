@@ -90,12 +90,14 @@ public enum MIPSInstruction {
     /** store halfword */
     SH,
 
+    /** store word */
+    SW,
+
     /** load word to fp coprocessor */
     LWC1,
 
     /** store word to fp coprocessor */
     SWC1,
-
 
     //
     // R-Type instructions (They all have the same opcode 000000 and are distinguished by funct)
@@ -114,7 +116,7 @@ public enum MIPSInstruction {
     SLLV,
 
     /** Shift right logical variable */
-    SLRV,
+    SRLV,
 
     /** Shift right arithmetic variable */
     SRAV,
@@ -223,6 +225,19 @@ public enum MIPSInstruction {
 
         switch (mipsInstruction) {
 
+            case OR:
+            case ADD:
+            case SUB:
+            case AND:
+            case SLT:
+                return 0b000000;
+
+            case BEQ:
+                return 0b000100;
+
+            case ADDI:
+                return 0b001000;
+
             case BLTZ:
             case BGEZ:
                 return 0b000001;
@@ -230,8 +245,112 @@ public enum MIPSInstruction {
             case J:
                 return 0b000010;
 
+            case JAL:
+                return 0b000011;
+                
+            case SW:
+                return 0b101011;
+
+            case LW:
+                return 0b100011;
+
             default:
                 throw new RuntimeException("Unknown instruction! " + mipsInstruction);
+
+        }
+
+    }
+
+    public static int getFunc(MIPSInstruction mipsInstruction) {
+
+        switch (mipsInstruction) {
+
+            case SLL:
+                return 0b000000;
+
+            case SRL:
+                return 0b000001;
+            
+            case SRA:
+                return 0b000011;
+
+            case SLLV:
+                return 0b000100;
+
+            case SRLV:
+                return 0b000110;
+
+            case SRAV:
+                return 0b000111;
+
+            case JR:
+                return 0b001000;
+
+            case JALR:
+                return 0b001001;
+
+            case SYSCALL:
+                return 0b001100;
+
+            case BREAK:
+                return 0b001101;
+
+            case MFHI:
+                return 0b010000;
+
+            case MTHI:
+                return 0b010001;
+
+            case MFLO:
+                return 0b010010;
+
+            case MTLO:
+                return 0b010011;
+
+            case MULT:
+                return 0b011000;
+
+            case MULTU:
+                return 0b011001;
+
+            case DIV:
+                return 0b011010;
+
+            case DIVU:
+                return 0b011011;
+
+            case ADD:
+                return 0b100000;
+
+            case ADDU:
+                return 0b100001;
+
+            case SUB:
+                return 0b100010;
+
+            case SUBU:
+                return 0b100011;
+
+            case AND:
+                return 0b100100;
+
+            case OR:
+                return 0b100101;
+
+            case XOR:
+                return 0b100110;
+
+            case NOR:
+                return 0b100111;
+
+            case SLT:
+                return 0b101010;
+
+            case SLTU:
+                return 0b101011;
+
+            default:
+                throw new RuntimeException("Unknown function! " + mipsInstruction);
 
         }
 
