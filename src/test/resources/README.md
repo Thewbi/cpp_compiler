@@ -95,3 +95,28 @@ int a;
 scanf("%d", &a); // Store keyboard input in a variable with address (address of a or &a)
 printf("%d", a);
 ```
+
+## if, if-else, if-elseif-else, nested if
+
+see https://www.codewithharry.com/blogpost/c-cheatsheet/
+see https://www.reddit.com/r/TheInsaneApp/comments/pk5163/c_and_c_cheat_sheets/#lightbox
+
+## switch case
+
+see https://www.codewithharry.com/blogpost/c-cheatsheet/
+
+## while-loop, for-loop, do-while-loop
+
+see https://www.codewithharry.com/blogpost/c-cheatsheet/
+
+## struct declarations
+
+see https://www.codewithharry.com/blogpost/c-cheatsheet/
+
+## typedef
+
+see https://www.codewithharry.com/blogpost/c-cheatsheet/
+
+## FILE datatype
+
+see https://www.codewithharry.com/blogpost/c-cheatsheet/
