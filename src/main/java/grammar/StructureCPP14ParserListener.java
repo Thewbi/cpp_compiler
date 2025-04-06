@@ -6,6 +6,7 @@ import com.cpp.grammar.CPP14Parser;
 import com.cpp.grammar.CPP14ParserBaseListener;
 
 import ast.ASTNode;
+import ast.DeclarationListASTNode;
 import ast.DeclaratorASTNode;
 import ast.ExpressionASTNode;
 import ast.ExpressionType;
@@ -40,22 +41,29 @@ public class StructureCPP14ParserListener extends CPP14ParserBaseListener {
 
     @Override
     public void enterSimpleDeclaration(CPP14Parser.SimpleDeclarationContext ctx) {
+        DeclarationListASTNode declarationListASTNode = new DeclarationListASTNode();
+        declarationListASTNode.type = ctx.getChild(0).getText();
+        declarationListASTNode.ctx = ctx;
+        connectToParent(currentNode, declarationListASTNode);
+
+        // descend
+        currentNode = declarationListASTNode;
+    }
+
+    @Override
+    public void exitSimpleDeclaration(CPP14Parser.SimpleDeclarationContext ctx) {
+        // ascend
+        currentNode = currentNode.parent;
+    }
+
+    @Override
+    public void enterInitDeclarator(CPP14Parser.InitDeclaratorContext ctx) {
         DeclaratorASTNode declaratorASTNode = new DeclaratorASTNode();
-        declaratorASTNode.type = ctx.getChild(0).getText();
         declaratorASTNode.ctx = ctx;
         connectToParent(currentNode, declaratorASTNode);
 
         // descend
         currentNode = declaratorASTNode;
-    }
-
-    @Override
-    public void exitSimpleDeclaration(CPP14Parser.SimpleDeclarationContext ctx) {
-    }
-
-    @Override
-    public void enterInitDeclarator(CPP14Parser.InitDeclaratorContext ctx) {
-
     }
 
     @Override
@@ -151,8 +159,6 @@ public class StructureCPP14ParserListener extends CPP14ParserBaseListener {
         jumpStatementASTNode.value = ctx.getText();
         jumpStatementASTNode.children.add(expressionStack.pop());
         jumpStatementASTNode.type = JumpStatementType.valueOf(ctx.getChild(0).getText().toUpperCase());
-
-        //connectToParent(jumpStatementASTNode, currentNode);
 
         currentNode.children.add(jumpStatementASTNode);
     }

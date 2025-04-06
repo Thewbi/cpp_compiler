@@ -2,11 +2,11 @@ int main() {
 
     int i = 10;
 
-    int i = 11 + 21;
+    float i = 11 + 21;
 
-    // int i = 1 + j;
+    long i = 1 + j;
 
-    // int n, reversed = 0, remainder, original;
+    int n, reversed = 0, remainder = 1, original;
 
     // int value = get_value();
 

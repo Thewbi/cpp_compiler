@@ -1,10 +1,8 @@
 package ast;
 
-public class DeclaratorASTNode extends ASTNode {
+public class DeclarationListASTNode extends ASTNode {
 
-    public boolean isPointer;
-
-
+    public String type;
 
     public void printRecursive(final StringBuilder stringBuilder, final int indent) {
 
@@ -12,7 +10,7 @@ public class DeclaratorASTNode extends ASTNode {
         for (int i = 0; i < indent; i++) {
             stringBuilder.append("  ");
         }
-        stringBuilder.append("[INIT_DECL] name='").append(value).append("' is-pointer=").append(isPointer);
+        stringBuilder.append("[DECL_LIST] type='").append(type).append("'");
         stringBuilder.append("\n");
 
         // all children
