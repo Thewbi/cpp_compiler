@@ -2,8 +2,6 @@ package grammar;
 
 import java.util.Stack;
 
-import org.antlr.v4.runtime.tree.ParseTree;
-
 import com.cpp.grammar.CPP14Parser;
 import com.cpp.grammar.CPP14ParserBaseListener;
 
@@ -12,6 +10,8 @@ import ast.DeclaratorASTNode;
 import ast.ExpressionASTNode;
 import ast.ExpressionType;
 import ast.FunctionDeclarationASTNode;
+import ast.JumpStatementASTNode;
+import ast.JumpStatementType;
 
 public class StructureCPP14ParserListener extends CPP14ParserBaseListener {
 
@@ -134,6 +134,32 @@ public class StructureCPP14ParserListener extends CPP14ParserBaseListener {
 
         expressionStack.push(expressionASTNode);
     }
+
+    //
+    // Statements
+    //
+
+    @Override
+    public void enterJumpStatement(CPP14Parser.JumpStatementContext ctx) {
+    }
+
+    @Override
+    public void exitJumpStatement(CPP14Parser.JumpStatementContext ctx) {
+
+        JumpStatementASTNode jumpStatementASTNode = new JumpStatementASTNode();
+        jumpStatementASTNode.ctx = ctx;
+        jumpStatementASTNode.value = ctx.getText();
+        jumpStatementASTNode.children.add(expressionStack.pop());
+        jumpStatementASTNode.type = JumpStatementType.valueOf(ctx.getChild(0).getText().toUpperCase());
+
+        //connectToParent(jumpStatementASTNode, currentNode);
+
+        currentNode.children.add(jumpStatementASTNode);
+    }
+
+    //
+    // utility
+    //
 
     private void connectToParent(ASTNode parent, ASTNode child) {
         // connect parent and child
