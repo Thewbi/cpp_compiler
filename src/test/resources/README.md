@@ -1,5 +1,9 @@
 # Parsing C from Low Level to High Level
 
+In the first step, convert the parse tree into an AST by constructing the AST traversing the parse tree. The AST will contain less nodes than the parse tree, effectively it will only contain a condensed version of the parse tree where each node carries meaningful information.
+
+During AST construction step, do not care about semantic correctness. Do not check the amount of parameters to function calls. Do not check for type correctness, do not check anything, just construct the AST. Semantic analysis is part of a later step.
+
 ## main() function
 
 Idealy, you would start with a main() function so you can place test data into the main() function later.
@@ -51,6 +55,23 @@ int *ptr = 0;
 int *ptr = &i;
 ```
 
+## Array Variable Declarations
+
+```
+char str[] = "Hello\0World";
+
+int myNumbers[4];
+myNumbers[0] = 25;
+myNumbers[1] = 50;
+myNumbers[2] = 75;
+myNumbers[3] = 100;
+
+int myNumbers[] = {25, 50, 75, 100};
+myNumbers[0] = 33;
+
+printf("%d", myNumbers[0]);
+```
+
 ## Variable assignments
 
 ```
@@ -63,4 +84,14 @@ a = 0;
 ```
 int a = 1;
 float b = (float) a;
+```
+
+## Function Calls
+
+```
+printf("Hello World!");
+
+int a;
+scanf("%d", &a); // Store keyboard input in a variable with address (address of a or &a)
+printf("%d", a);
 ```
