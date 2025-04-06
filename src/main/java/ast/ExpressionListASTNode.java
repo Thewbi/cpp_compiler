@@ -1,12 +1,6 @@
 package ast;
 
-public class ExpressionASTNode extends ASTNode {
-
-    public ExpressionType expressionType = ExpressionType.Unknown;
-
-    public ExpressionASTNode lhs;
-
-    public ExpressionASTNode rhs;
+public class ExpressionListASTNode extends ExpressionASTNode {
 
     public void printRecursive(final StringBuilder stringBuilder, final int indent) {
 
@@ -14,7 +8,7 @@ public class ExpressionASTNode extends ASTNode {
         for (int i = 0; i < indent; i++) {
             stringBuilder.append("  ");
         }
-        stringBuilder.append("[EXPR] type='").append(expressionType).append("' ").append(value);
+        stringBuilder.append("[EXPR_LIST]");
         stringBuilder.append("\n");
 
         // all children

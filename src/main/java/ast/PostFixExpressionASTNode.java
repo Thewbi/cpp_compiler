@@ -1,12 +1,10 @@
 package ast;
 
-public class ExpressionASTNode extends ASTNode {
+public class PostFixExpressionASTNode extends ExpressionASTNode {
 
-    public ExpressionType expressionType = ExpressionType.Unknown;
+    public ExpressionASTNode name;
 
-    public ExpressionASTNode lhs;
-
-    public ExpressionASTNode rhs;
+    public ExpressionASTNode list;
 
     public void printRecursive(final StringBuilder stringBuilder, final int indent) {
 
@@ -14,8 +12,10 @@ public class ExpressionASTNode extends ASTNode {
         for (int i = 0; i < indent; i++) {
             stringBuilder.append("  ");
         }
-        stringBuilder.append("[EXPR] type='").append(expressionType).append("' ").append(value);
+        stringBuilder.append("[EXPR_POSTFIX] name='").append(name.value).append("' "); //.append(value);
         stringBuilder.append("\n");
+
+        list.printRecursive(stringBuilder, indent + 1);
 
         // all children
         for (ASTNode child : children) {

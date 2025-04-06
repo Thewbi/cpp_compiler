@@ -9,10 +9,13 @@ import ast.ASTNode;
 import ast.DeclarationListASTNode;
 import ast.DeclaratorASTNode;
 import ast.ExpressionASTNode;
+import ast.ExpressionListASTNode;
+import ast.ExpressionListBlockerASTNode;
 import ast.ExpressionType;
 import ast.FunctionDeclarationASTNode;
 import ast.JumpStatementASTNode;
 import ast.JumpStatementType;
+import ast.PostFixExpressionASTNode;
 
 public class StructureCPP14ParserListener extends CPP14ParserBaseListener {
 
@@ -141,6 +144,48 @@ public class StructureCPP14ParserListener extends CPP14ParserBaseListener {
         connectToParent(expressionASTNode, rhs);
 
         expressionStack.push(expressionASTNode);
+    }
+
+    @Override
+    public void enterPostfixExpression(CPP14Parser.PostfixExpressionContext ctx) {
+
+    }
+
+    /**
+     * Currently expecting int value = get_value(1, 2);
+     */
+    @Override
+    public void exitPostfixExpression(CPP14Parser.PostfixExpressionContext ctx) {
+
+        if ((ctx.children.size() == 1) || (ctx.children.size() == 3)) {
+            return;
+        }
+
+        // retrieve function name
+        ExpressionASTNode functionNameExpressionASTNode = expressionStack.pop();
+        ExpressionASTNode expressionListASTNode = expressionStack.pop();
+
+        PostFixExpressionASTNode postFixExpressionASTNode = new PostFixExpressionASTNode();
+        postFixExpressionASTNode.name = expressionListASTNode;
+        postFixExpressionASTNode.list = functionNameExpressionASTNode;
+
+        expressionStack.push(postFixExpressionASTNode);
+    }
+
+    @Override public void enterExpressionList(CPP14Parser.ExpressionListContext ctx) {
+        // add a blocker
+        expressionStack.push(new ExpressionListBlockerASTNode());
+     }
+
+	@Override public void exitExpressionList(CPP14Parser.ExpressionListContext ctx) {
+        ExpressionListASTNode expressionListASTNode = new ExpressionListASTNode();
+        while (!(expressionStack.peek() instanceof ExpressionListBlockerASTNode)) {
+            ExpressionASTNode expressionASTNode = expressionStack.pop();
+            expressionListASTNode.children.add(0, expressionASTNode);
+        }
+        // remove the blocker
+        expressionStack.pop();
+        expressionStack.push(expressionListASTNode);
     }
 
     //

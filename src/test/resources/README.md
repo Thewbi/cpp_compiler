@@ -11,6 +11,17 @@ int main() {
 }
 ```
 
+## Return statements
+
+```
+return 1;
+return 1 + 2;
+return 1 + 2 + 3;
+return (1 + 2) * (3 + 4);
+return function_call();
+return function_call() + 222;
+```
+
 ## Variable Declarations
 
 Start with initialization using literal expressions:
@@ -45,4 +56,11 @@ int *ptr = &i;
 ```
 a = 0;
 *ptr = &a;
+```
+
+## Variable Casting
+
+```
+int a = 1;
+float b = (float) a;
 ```
