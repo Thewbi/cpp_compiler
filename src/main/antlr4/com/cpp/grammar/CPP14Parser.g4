@@ -19,6 +19,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  * ****************************************************************************
  */
+
+// start symbol: translationUnit
+
 parser grammar CPP14Parser;
 
 options {
@@ -30,7 +33,7 @@ options {
 
 /*Basic concepts*/
 
-translationUnit: 
+translationUnit:
     (
 //        pragma_directive
 //        |
@@ -57,7 +60,7 @@ preprocessor_directive:
     Preprocessor_Endif
     ;
  */
- 
+
 primaryExpression:
 	literal+
 	| This
@@ -359,7 +362,7 @@ declSpecifier:
 	| Friend
 	| Typedef
 	| Constexpr;
-	
+
 declSpecifierSeq: declSpecifier+? attributeSpecifierSeq?;
 
 storageClassSpecifier:
@@ -392,7 +395,7 @@ trailingTypeSpecifierSeq:
 simpleTypeLengthModifier:
 	Short
 	| Long;
-	
+
 simpleTypeSignednessModifier:
 	Unsigned
 	| Signed;
@@ -852,4 +855,4 @@ literal:
 	| BooleanLiteral
 	| PointerLiteral
 	| UserDefinedLiteral;
-	
+

@@ -3,7 +3,7 @@ package grammar;
 public enum SemAntMode {
 
     DEFAULT,
-    
+
     INITIALIZER,
 
     PARAMETER_DECLARATION,
@@ -18,6 +18,8 @@ public enum SemAntMode {
 
     EXPRESSION,
 
-    UNKNOWN, VARIABLE_DECLARATION
+    VARIABLE_DECLARATION,
+
+    UNKNOWN
 
 }

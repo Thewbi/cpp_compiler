@@ -99,13 +99,13 @@ import javafx.stage.Stage;
  * <li>https://riscvasm.lucasteske.dev/#</li>
  * <li>https://luplab.gitlab.io/rvcodecjs/#q=fffff06f&abi=false&isa=AUTO</li>
  * </ul>
- * 
+ *
  * 1. Read text from code area into string
- * 
+ *
  * <pre>
  * ((CodeArea) getOwnerNode()).getText()
  * </pre>
- * 
+ *
  * 2. Use the antlr parser to return list of rows
  * The rows have to store the source line number into the .s file.
  *
@@ -114,11 +114,11 @@ import javafx.stage.Stage;
  * A pseudo instruction might be converted into several real instructions, that
  * is why
  * a list of pointers is required.
- * 
+ *
  * 4. Single Step button.
  * Find the row that the PC points to, highlight the row in the source code
  * Reference the byte array and make the cpu execute the current instruction
- * 
+ *
  * 5. Increment PC, make the new row the current row
  */
 public class App extends Application {
@@ -135,7 +135,7 @@ public class App extends Application {
     private int paragraphIdx;
     private int start;
     private int end;
-        
+
     private static final String[] KEYWORDS = new String[] {
             "abstract", "assert", "boolean", "break", "byte",
             "case", "catch", "char", "class", "const",
@@ -226,9 +226,9 @@ public class App extends Application {
     //     "     call fib"
     // });
 
-    public static void main(String[] args) {
-        launch(args);
-    }
+    // public static void main(String[] args) {
+    //     launch(args);
+    // }
 
     @Override
     public void start(Stage primaryStage) {
@@ -245,7 +245,7 @@ public class App extends Application {
          * // large files as it does a full scan of ALL the text every time there is a
          * change !
          * Subscription cleanupWhenNoLongerNeedIt = codeArea
-         * 
+         *
          * // plain changes = ignore style changes that are emitted when syntax
          * highlighting is reapplied
          * // multi plain changes = save computation by not rerunning the code multiple
@@ -253,15 +253,15 @@ public class App extends Application {
          * // when making multiple changes (e.g. renaming a method at multiple parts in
          * file)
          * .multiPlainChanges()
-         * 
+         *
          * // do not emit an event until 500 ms have passed since the last emission of
          * previous stream
          * .successionEnds(Duration.ofMillis(500))
-         * 
+         *
          * // run the following code block when previous stream emits an event
          * .subscribe(ignore -> codeArea.setStyleSpans(0,
          * computeHighlighting(codeArea.getText())));
-         * 
+         *
          * // when no longer need syntax highlighting and wish to clean up memory leaks
          * // run: `cleanupWhenNoLongerNeedIt.unsubscribe();`
          */
@@ -374,7 +374,7 @@ public class App extends Application {
 
                         bufferIdx += 4;
                     }
-                    
+
                 }
 
                 int temp = 1;
@@ -396,12 +396,12 @@ public class App extends Application {
                 int pc = riscVProcessor.getPc();
                 highlightRow(pc);
             }
-            
+
         });
 
         Button singleStepButton = new Button("Step");
         singleStepButton.setOnAction(new EventHandler<ActionEvent>() {
-            
+
             @Override
             public void handle(ActionEvent event) {
 
@@ -415,7 +415,7 @@ public class App extends Application {
 
                 //     System.out.println("Start Execution: ---------------------------------------");
                 // }
-                
+
                 // riscVProcessor.processRow();
 
                 ExplicitRISCVRow explicitRISCVRow = riscVProcessor.fetchAndDecode();
@@ -426,7 +426,7 @@ public class App extends Application {
 
                     System.out.println(riscVProcessor);
 
-                    int pc = riscVProcessor.getPc();                
+                    int pc = riscVProcessor.getPc();
                     highlightRow(pc);
                 }
             }
@@ -490,7 +490,7 @@ public class App extends Application {
         riscVProcessor.setRegisterFile(registerFile);
 
         SpreadsheetView spreadsheetView = new SpreadsheetView(grid);
-        
+
         HBox hboxRegisterArea = new HBox();
         hboxRegisterArea.getChildren().add(spreadsheetView);
 
@@ -525,7 +525,7 @@ public class App extends Application {
         riscVProcessor.setMemory(memory);
 
         spreadsheetView = new SpreadsheetView(grid);
-        
+
         HBox hboxMemoryArea = new HBox();
         hboxMemoryArea.getChildren().add(spreadsheetView);
 
@@ -548,11 +548,11 @@ public class App extends Application {
         vboxMain.getChildren().add(toolBar);
         vboxMain.getChildren().add(hbox);
 
-        
 
-        
 
-        
+
+
+
 
         Scene scene = new Scene(vboxMain, 1024, 768);
 
@@ -568,7 +568,7 @@ public class App extends Application {
     }
 
     protected void highlightRow(int bufferIdx) {
-        
+
         RISCVRow sourceFileRow = null;
 
         // find the source file row that matches the buffer idx
@@ -721,7 +721,7 @@ public class App extends Application {
 
     private class DefaultContextMenu extends ContextMenu {
 
-        
+
 
         private MenuItem next;
         // private MenuItem fold, unfold, print;
@@ -759,7 +759,7 @@ public class App extends Application {
             // getItems().addAll(fold, unfold, print);
         }
 
-        
+
 
         /**
          * Folds multiple lines of selected text, only showing the first line and hiding

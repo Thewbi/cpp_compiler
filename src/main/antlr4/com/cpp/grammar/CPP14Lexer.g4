@@ -1,3 +1,5 @@
+// start symbol: translationUnit
+
 lexer grammar CPP14Lexer;
 
 /*
@@ -19,7 +21,7 @@ FloatingLiteral:
 	Fractionalconstant Exponentpart? Floatingsuffix?
 	| Digitsequence Exponentpart Floatingsuffix?;
 
-/* 
+/*
 StringLiteral:
 	Encodingprefix?
     (Rawstring
