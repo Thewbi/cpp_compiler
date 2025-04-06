@@ -1,16 +1,22 @@
 int main() {
 
-    int i = 10;
+//     double i = a;
 
-    float i = 11 + 21;
+//     int i = 10;
 
-    long i = 1 + j;
+//     float i = 11 + 21;
 
-    int n, reversed = 0, remainder = 1, original;
+//     long i = 1 + j;
 
-    // int value = get_value();
+//     int n, reversed = 0, remainder = 1, original;
 
-    int *ptr = 0;
+//     int *ptr = 0;
+// //    int *ptr = &i;
+
+//     int value = get_value();
+    int value = get_value(1);
+    // int value = get_value(1, 2);
+    // int value = get_value(1, get_value());
 
     return 100;
 
