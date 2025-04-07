@@ -9,6 +9,7 @@ import com.cpp.grammar.CPP14Parser;
 import com.cpp.grammar.CPP14ParserBaseListener;
 
 import ast.ASTNode;
+import ast.CastExpressionASTNode;
 import ast.DeclarationListASTNode;
 import ast.DeclaratorASTNode;
 import ast.ExpressionASTNode;
@@ -105,9 +106,11 @@ public class StructureCPP14ParserListener extends CPP14ParserBaseListener {
             return;
         }
 
-        if ((ctx.children.size() == 3) && (ctx.getChild(1).getText().equalsIgnoreCase("[")) && (ctx.getChild(2).getText().equalsIgnoreCase("]"))) {
+        if ((ctx.children.size() == 3) && (ctx.getChild(1).getText().equalsIgnoreCase("["))
+                && (ctx.getChild(2).getText().equalsIgnoreCase("]"))) {
             ((DeclaratorASTNode) currentNode).isArray = true;
-        } else if ((ctx.children.size() > 3) && (ctx.getChild(1).getText().equalsIgnoreCase("[")) && (ctx.getChild(3).getText().equalsIgnoreCase("]"))) {
+        } else if ((ctx.children.size() > 3) && (ctx.getChild(1).getText().equalsIgnoreCase("["))
+                && (ctx.getChild(3).getText().equalsIgnoreCase("]"))) {
             currentNode.value = ctx.getChild(0).getText();
             ((DeclaratorASTNode) currentNode).isArray = true;
             ((DeclaratorASTNode) currentNode).indexExpression = expressionStackPop();
@@ -293,6 +296,52 @@ public class StructureCPP14ParserListener extends CPP14ParserBaseListener {
         // remove the blocker
         expressionStackPop();
         expressionStackPush(expressionListASTNode);
+    }
+
+    //
+    // type cast
+    //
+
+    @Override
+    public void enterCastExpression(CPP14Parser.CastExpressionContext ctx) {
+    }
+
+    @Override
+    public void exitCastExpression(CPP14Parser.CastExpressionContext ctx) {
+        // System.out.println("[" + ctx.hashCode() + "] " + ctx.getText());
+
+        if (ctx.children.size() == 1) {
+            return;
+        }
+
+        if (ctx.children.size() >= 3) {
+
+            // retrieve function name
+            ExpressionASTNode expressionASTNode = expressionStackPop();
+            ExpressionASTNode castTypeExpressionASTNode = expressionStackPop();
+            CastExpressionASTNode castExpressionASTNode = new CastExpressionASTNode();
+            castExpressionASTNode.rhs = expressionASTNode;
+            castExpressionASTNode.castTypeExpression = castTypeExpressionASTNode;
+
+            expressionStackPush(castExpressionASTNode);
+
+            return;
+        }
+
+        throw new RuntimeException("Error");
+    }
+
+    @Override
+    public void enterTheTypeId(CPP14Parser.TheTypeIdContext ctx) {
+    }
+
+    @Override
+    public void exitTheTypeId(CPP14Parser.TheTypeIdContext ctx) {
+        // System.out.println("[" + ctx.hashCode() + "] " + ctx.getText());
+
+        ExpressionASTNode expressionASTNode = new ExpressionASTNode();
+        expressionASTNode.value = ctx.getText();
+        expressionStackPush(expressionASTNode);
     }
 
     //

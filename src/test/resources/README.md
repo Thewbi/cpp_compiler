@@ -80,6 +80,13 @@ int *ptr = &(temp_array[129] + 4);
 int *ptr = &(temp_array + 4);
 ```
 
+Test static variables
+
+```
+static BOOL transmissionIsRunning;
+static UBYTE sendBuffer[MAX_BYTES];
+```
+
 ## Array Variable Declarations
 
 ```
@@ -124,6 +131,12 @@ int main(int argc, char *argv[])
 }
 ```
 
+Static function declarations
+
+```
+static void function_test(UBYTE);
+```
+
 ## Function Calls
 
 ```
@@ -134,27 +147,43 @@ scanf("%d", &a); // Store keyboard input in a variable with address (address of 
 printf("%d", a);
 ```
 
+## Statements using Unary operators
+
+```
+bytesTransmitted++;
+++bytesTransmitted;
+
+bytesLeft--;
+--bytesLeft;
+```
+
 ## if, if-else, if-elseif-else, nested if
 
 see https://www.codewithharry.com/blogpost/c-cheatsheet/
 see https://www.reddit.com/r/TheInsaneApp/comments/pk5163/c_and_c_cheat_sheets/#lightbox
+see https://github.com/rui314/8cc/tree/master/test
 
 ## switch case
 
 see https://www.codewithharry.com/blogpost/c-cheatsheet/
+see https://github.com/rui314/8cc/tree/master/test
 
 ## while-loop, for-loop, do-while-loop
 
 see https://www.codewithharry.com/blogpost/c-cheatsheet/
+see https://github.com/rui314/8cc/tree/master/test
 
 ## struct declarations
 
 see https://www.codewithharry.com/blogpost/c-cheatsheet/
+see https://github.com/rui314/8cc/tree/master/test
 
 ## typedef
 
 see https://www.codewithharry.com/blogpost/c-cheatsheet/
+see https://github.com/rui314/8cc/tree/master/test
 
 ## FILE datatype
 
 see https://www.codewithharry.com/blogpost/c-cheatsheet/
+see https://github.com/rui314/8cc/tree/master/test

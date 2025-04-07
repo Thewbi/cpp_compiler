@@ -1,7 +1,9 @@
 package ast;
 
-public class UnaryOperatorExpressionASTNode extends ExpressionASTNode {
-    
+public class CastExpressionASTNode extends ExpressionASTNode {
+
+    public ExpressionASTNode castTypeExpression;
+
     public void printRecursive(final StringBuilder stringBuilder, final int indent) {
         printRecursive(stringBuilder, indent, true);
     }
@@ -12,16 +14,19 @@ public class UnaryOperatorExpressionASTNode extends ExpressionASTNode {
         for (int i = 0; i < indent; i++) {
             stringBuilder.append("  ");
         }
-        stringBuilder.append("[EXPR] type='").append(expressionType).append("' ");
+        stringBuilder.append("[CAST] ");
         
-        if (value != null) {
-            stringBuilder.append(value);
-        }
-        stringBuilder.append("\n");
-
-        if (rhs != null) {
-            rhs.printRecursive(stringBuilder, indent + 1);
-        }
+        stringBuilder.append("cast-target-type='");
+        castTypeExpression.printRecursive(stringBuilder, 0, false);
+        stringBuilder.append("' ");
+        
+        stringBuilder.append("type='");
+        rhs.printRecursive(stringBuilder, 0, false);
+        stringBuilder.append("'");
+        
+        // if (value != null) {
+        //     stringBuilder.append(value);
+        // }
         // stringBuilder.append("\n");
 
         // all children
@@ -29,5 +34,5 @@ public class UnaryOperatorExpressionASTNode extends ExpressionASTNode {
             child.printRecursive(stringBuilder, indent + 1);
         }
     }
-
+    
 }

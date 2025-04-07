@@ -68,9 +68,11 @@ public class Main {
         // final String filename =
         // "src/test/resources/WritingACCompilerNoraSandler/simplest.c";
 
-        //final String filename = "src/test/resources/initialize_with_expressions.cpp";
-        final String filename = "src/test/resources/initialize_pointers.cpp";
+        // final String filename = "src/test/resources/initialize_with_expressions.cpp";
+        //final String filename = "src/test/resources/initialize_pointers.cpp";
         //final String filename = "src/test/resources/initialize_arrays.cpp";
+        final String filename = "src/test/resources/inititalize_variable_cast.cpp";
+
         // final String filename = "src/test/resources/palindrome_number.cpp";
         // final String filename = "src/test/resources/sample1.cpp";
         // final String filename = "src/test/resources/helloworld.cpp";
@@ -174,7 +176,7 @@ public class Main {
         // Create a generic parse tree walker that can trigger callbacks
         final ParseTreeWalker walker = new ParseTreeWalker();
 
-        //boolean printParseTree = true;
+        // boolean printParseTree = true;
         boolean printParseTree = false;
         if (printParseTree) {
             ConsoleCPP14ParserListener printListener = new ConsoleCPP14ParserListener();
