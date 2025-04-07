@@ -6,6 +6,8 @@ public enum ExpressionType {
 
     Mul,
 
+    AddressOperator,
+
     Primary, // expressions that are not subdivided further
 
     Unknown;

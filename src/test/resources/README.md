@@ -65,6 +65,7 @@ int value = get_value(1, 2);
 int value = get_value_c(1, 2, 3 + 4 + 5);
 int value = get_value(1, get_value());
 int value = get_value_d(1, get_value(1, 2));
+int value = get_value_d(1, get_value(1, (2 + 3) * 7));
 ```
 
 Next declare and initialize pointers
@@ -72,7 +73,11 @@ Next declare and initialize pointers
 ```
 int i = 1;
 int *ptr = 0;
+int *ptr = temp_array;
 int *ptr = &i;
+int *ptr = &(i);
+int *ptr = &(temp_array[129] + 4);
+int *ptr = &(temp_array + 4);
 ```
 
 ## Array Variable Declarations
@@ -104,6 +109,17 @@ a = 0;
 ```
 int a = 1;
 float b = (float) a;
+```
+
+## Function declarations
+
+Parse parameter declarations in prototypes
+
+```
+int main(int argc, char *argv[])
+{
+    return 0;
+}
 ```
 
 ## Function Calls

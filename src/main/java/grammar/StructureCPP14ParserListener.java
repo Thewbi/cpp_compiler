@@ -3,6 +3,7 @@ package grammar;
 import java.util.Stack;
 
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.tree.ParseTree;
 
 import com.cpp.grammar.CPP14Parser;
 import com.cpp.grammar.CPP14ParserBaseListener;
@@ -18,6 +19,7 @@ import ast.FunctionDeclarationASTNode;
 import ast.JumpStatementASTNode;
 import ast.JumpStatementType;
 import ast.PostFixExpressionASTNode;
+import ast.UnaryOperatorExpressionASTNode;
 
 public class StructureCPP14ParserListener extends CPP14ParserBaseListener {
 
@@ -110,20 +112,18 @@ public class StructureCPP14ParserListener extends CPP14ParserBaseListener {
 
     @Override
     public void enterPrimaryExpression(CPP14Parser.PrimaryExpressionContext ctx) {
-        
+
     }
 
     @Override
     public void exitPrimaryExpression(CPP14Parser.PrimaryExpressionContext ctx) {
-
         System.out.println("[" + ctx.hashCode() + "] " + ctx.getText());
-
         if (ctx.children.size() == 3) {
-            if (ctx.children.get(0).getText().equalsIgnoreCase("(") && ctx.children.get(2).getText().equalsIgnoreCase(")")) {
+            if (ctx.children.get(0).getText().equalsIgnoreCase("(")
+                    && ctx.children.get(2).getText().equalsIgnoreCase(")")) {
                 return;
             }
         }
-
         ExpressionASTNode expressionASTNode = new ExpressionASTNode();
         expressionASTNode.ctx = ctx;
         expressionASTNode.value = ctx.getText();
@@ -131,17 +131,19 @@ public class StructureCPP14ParserListener extends CPP14ParserBaseListener {
         expressionStackPush(expressionASTNode);
     }
 
+    //
+    // Operators in Expressions
+    //
+
     @Override
     public void enterAdditiveExpression(CPP14Parser.AdditiveExpressionContext ctx) {
     }
 
     @Override
     public void exitAdditiveExpression(CPP14Parser.AdditiveExpressionContext ctx) {
-
         if (ctx.children.size() == 1) {
             return;
         }
-
         processExpressionOperator(ctx, ExpressionType.Add);
     }
 
@@ -150,8 +152,41 @@ public class StructureCPP14ParserListener extends CPP14ParserBaseListener {
         if (ctx.children.size() == 1) {
             return;
         }
-
         processExpressionOperator(ctx, ExpressionType.Mul);
+    }
+
+    @Override
+    public void enterUnaryOperator(CPP14Parser.UnaryOperatorContext ctx) {
+    }
+
+    @Override
+    public void exitUnaryOperator(CPP14Parser.UnaryOperatorContext ctx) {
+        System.out.println("[" + ctx.hashCode() + "] " + ctx.getText());
+        ExpressionType expressionType = null;
+        if (ctx.getText().equalsIgnoreCase("&")) {
+            expressionType = ExpressionType.AddressOperator;
+        }
+        UnaryOperatorExpressionASTNode unaryOperatorExpressionASTNode = new UnaryOperatorExpressionASTNode();
+        unaryOperatorExpressionASTNode.ctx = ctx;
+        unaryOperatorExpressionASTNode.expressionType = expressionType;
+        expressionStackPush(unaryOperatorExpressionASTNode);
+
+    }
+
+    @Override
+    public void enterUnaryExpression(CPP14Parser.UnaryExpressionContext ctx) {
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * <p>
+     * The default implementation does nothing.
+     * </p>
+     */
+    @Override
+    public void exitUnaryExpression(CPP14Parser.UnaryExpressionContext ctx) {
+        processUnaryOperatorCase(ctx.getChild(0));
     }
 
     @Override
@@ -164,8 +199,10 @@ public class StructureCPP14ParserListener extends CPP14ParserBaseListener {
      */
     @Override
     public void exitPostfixExpression(CPP14Parser.PostfixExpressionContext ctx) {
+        System.out.println("[" + ctx.hashCode() + "] " + ctx.getText());
 
         if (ctx.children.size() == 1) {
+            // processUnaryOperatorCase();
             return;
         }
 
@@ -177,7 +214,9 @@ public class StructureCPP14ParserListener extends CPP14ParserBaseListener {
             PostFixExpressionASTNode postFixExpressionASTNode = new PostFixExpressionASTNode();
             postFixExpressionASTNode.name = functionNameExpressionASTNode;
 
+            // if (!processUnaryOperatorCase()) {
             expressionStackPush(postFixExpressionASTNode);
+            // }
 
             return;
         }
@@ -190,15 +229,60 @@ public class StructureCPP14ParserListener extends CPP14ParserBaseListener {
         postFixExpressionASTNode.name = functionNameExpressionASTNode;
         postFixExpressionASTNode.list = expressionListASTNode;
 
+        // if (!processUnaryOperatorCase()) {
         expressionStackPush(postFixExpressionASTNode);
+        // }
     }
 
-    @Override public void enterExpressionList(CPP14Parser.ExpressionListContext ctx) {
+    /**
+     * The cpp grammar is inconvenient in the way in that it aligns unary operators
+     * and their operands. Instead of nesting them, they are children of the same
+     * parent. The AST wants to nest the operand into the unary operator. In order
+     * to achieve this, it is checkd if a unary operator expression is already
+     * sitting on top of the stack when a expression is added to the stack. In that
+     * case the operand is folded into the operator.
+     * 
+     * As the UnaryOperator node appears a lot in the parse tree at several
+     * locations that are indistinguishable from the correct parset tree node by
+     * only looking at the expression stack, the correct spot in traversing the
+     * parse tree is identified by passing in the parse tree node (ctx) that
+     * contains the parent unary operator to fold the operand into.
+     * 
+     * @param ctx context of the unary operator to fold operand into
+     * @return
+     */
+    private boolean processUnaryOperatorCase(ParseTree ctx) {
+        if (expressionStack.size() == 0) {
+            return false;
+        }
+        // remove topNode so it can be inserted into the unary operator if there is an
+        // unary operator underneath on the expression stack
+        ExpressionASTNode topNode = expressionStackPop();
+        if (expressionStack.size() > 0) {
+            ExpressionASTNode secondNode = expressionStackPop();
+            if ((secondNode instanceof UnaryOperatorExpressionASTNode) && (secondNode.ctx == ctx)) {
+                UnaryOperatorExpressionASTNode unaryOperatorExpressionASTNode = (UnaryOperatorExpressionASTNode) secondNode;
+                unaryOperatorExpressionASTNode.rhs = topNode;
+                expressionStackPush(unaryOperatorExpressionASTNode);
+                return true;
+            } else {
+                // no unary operator found. Put the node back
+                expressionStackPush(secondNode);
+            }
+        }
+        // no unary operator found. Put the node back
+        expressionStackPush(topNode);
+        return false;
+    }
+
+    @Override
+    public void enterExpressionList(CPP14Parser.ExpressionListContext ctx) {
         // add a blocker
         expressionStackPush(new ExpressionListBlockerASTNode());
-     }
+    }
 
-	@Override public void exitExpressionList(CPP14Parser.ExpressionListContext ctx) {
+    @Override
+    public void exitExpressionList(CPP14Parser.ExpressionListContext ctx) {
         ExpressionListASTNode expressionListASTNode = new ExpressionListASTNode();
         while (!(expressionStack.peek() instanceof ExpressionListBlockerASTNode)) {
             ExpressionASTNode expressionASTNode = expressionStackPop();
@@ -248,6 +332,7 @@ public class StructureCPP14ParserListener extends CPP14ParserBaseListener {
     }
 
     private void processExpressionOperator(ParserRuleContext ctx, ExpressionType expressionType) {
+        System.out.println("[" + ctx.hashCode() + "] " + ctx.getText());
         for (int i = 1; i < ctx.children.size(); i += 2) {
 
             ExpressionASTNode rhs = expressionStackPop();
