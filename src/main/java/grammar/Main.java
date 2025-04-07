@@ -51,11 +51,11 @@ public class Main {
 
         // preprocessor();
         translationUnit();
-        //riscvassembler();
-        //riscvdecoder();
-        //riscvencoder();
+        // riscvassembler();
+        // riscvdecoder();
+        // riscvencoder();
 
-        //ide();
+        // ide();
 
         System.out.println("\nEnd");
     }
@@ -64,12 +64,13 @@ public class Main {
 
         System.out.println("translationUnit");
 
-        //final String filename = "src/test/resources/WritingACCompilerNoraSandler/simplest.c";
+        // final String filename =
+        // "src/test/resources/WritingACCompilerNoraSandler/simplest.c";
 
         final String filename = "src/test/resources/initialize_with_expressions.cpp";
-        //final String filename = "src/test/resources/palindrome_number.cpp";
-        //final String filename = "src/test/resources/sample1.cpp";
-        //final String filename = "src/test/resources/helloworld.cpp";
+        // final String filename = "src/test/resources/palindrome_number.cpp";
+        // final String filename = "src/test/resources/sample1.cpp";
+        // final String filename = "src/test/resources/helloworld.cpp";
         // final String filename = "src/test/resources/interface.h";
         // final String filename = "src/test/resources/main.cpp";
         // final String filename = "src/test/resources/pragma.h";
@@ -87,7 +88,7 @@ public class Main {
         // final String filename = "src/test/resources/function_call.cpp";
         // final String filename = "src/test/resources/while.cpp";
         // final String filename = "src/test/resources/app1.cpp";
-        //final String filename = "src/test/resources/ECO32/ECO32_1.cpp";
+        // final String filename = "src/test/resources/ECO32/ECO32_1.cpp";
 
         final CharStream charStream = CharStreams
                 .fromFileName(filename);
@@ -141,21 +142,22 @@ public class Main {
         DefaultStructureCallback structureCallback = new DefaultStructureCallback();
 
         /*
-        SemantCPP14ParserListener semantCPP14ParserListener = new SemantCPP14ParserListener();
-        semantCPP14ParserListener.setTypeMap(typeMap);
-
-        Map<String, FuncDecl> funcDeclMap = new HashMap<>();
-        semantCPP14ParserListener.setFuncDeclMap(funcDeclMap);
-
-        StackFrame baseStackFrame = new StackFrame();
-        Stack<StackFrame> executionStack = new Stack<>();
-        executionStack.push(baseStackFrame);
-        semantCPP14ParserListener.setExecutionStack(executionStack);
-        semantCPP14ParserListener.setStructureCallback(structureCallback);
-
-        // semantCPP14ParserListener.getSemAntModeStack().push(SemAntMode.DEFAULT);
-        CPP14ParserListener listener = semantCPP14ParserListener;
-        // }
+         * SemantCPP14ParserListener semantCPP14ParserListener = new
+         * SemantCPP14ParserListener();
+         * semantCPP14ParserListener.setTypeMap(typeMap);
+         * 
+         * Map<String, FuncDecl> funcDeclMap = new HashMap<>();
+         * semantCPP14ParserListener.setFuncDeclMap(funcDeclMap);
+         * 
+         * StackFrame baseStackFrame = new StackFrame();
+         * Stack<StackFrame> executionStack = new Stack<>();
+         * executionStack.push(baseStackFrame);
+         * semantCPP14ParserListener.setExecutionStack(executionStack);
+         * semantCPP14ParserListener.setStructureCallback(structureCallback);
+         * 
+         * // semantCPP14ParserListener.getSemAntModeStack().push(SemAntMode.DEFAULT);
+         * CPP14ParserListener listener = semantCPP14ParserListener;
+         * // }
          */
 
         ASTNode rootNode = new ASTNode();
@@ -169,8 +171,8 @@ public class Main {
         // Create a generic parse tree walker that can trigger callbacks
         final ParseTreeWalker walker = new ParseTreeWalker();
 
-        boolean print = false;
-        // boolean print = true;
+        boolean print = true;
+        // boolean print = false;
         if (print) {
             ConsoleCPP14ParserListener printListener = new ConsoleCPP14ParserListener();
             walker.walk(printListener, root);
@@ -184,6 +186,14 @@ public class Main {
 
         // end the base scope
         structureCallback.endScope();
+
+        // check if expression stack is empty
+        if (listener instanceof StructureCPP14ParserListener) {
+            int exprStackSize = ((StructureCPP14ParserListener) listener).expressionStack.size();
+            if (exprStackSize != 0) {
+                throw new RuntimeException("Expression Stack is not empty after AST parse!");
+            }
+        }
 
         // System.out.println(typeMap);
 
@@ -299,19 +309,21 @@ public class Main {
     private static void riscvassembler() throws IOException {
 
         final String filename = "src/test/resources/RISCV/addi.s";
-        //final String filename = "src/test/resources/RISCV/auipc.s";
-        //final String filename = "src/test/resources/RISCV/fibonacci.s";
-        //final String filename = "src/test/resources/RISCV/hello.s";
-        //final String filename = "src/test/resources/RISCV/hello2.s";
-        //final String filename = "src/test/resources/RISCV/sw.s";
-        //final String filename = "src/test/resources/RISCV/test.s";
-        //final String filename = "src/test/resources/RISCV/intrinsic.s";
-        //final String filename = "src/test/resources/RISCV/data_list.s";
-        //final String filename = "src/test/resources/RISCV/scratchpad.s";
+        // final String filename = "src/test/resources/RISCV/auipc.s";
+        // final String filename = "src/test/resources/RISCV/fibonacci.s";
+        // final String filename = "src/test/resources/RISCV/hello.s";
+        // final String filename = "src/test/resources/RISCV/hello2.s";
+        // final String filename = "src/test/resources/RISCV/sw.s";
+        // final String filename = "src/test/resources/RISCV/test.s";
+        // final String filename = "src/test/resources/RISCV/intrinsic.s";
+        // final String filename = "src/test/resources/RISCV/data_list.s";
+        // final String filename = "src/test/resources/RISCV/scratchpad.s";
 
-        //final String filename = "C:\\aaa_se\\riscv\\snake_game_risc-v\\Main.asm";
-        //final String filename = "C:\\aaa_se\\riscv\\snake_game_risc-v\\include\\background.asm";
-        //final String filename = "C:\\aaa_se\\riscv\\snake_game_risc-v\\include\\Directions.asm";
+        // final String filename = "C:\\aaa_se\\riscv\\snake_game_risc-v\\Main.asm";
+        // final String filename =
+        // "C:\\aaa_se\\riscv\\snake_game_risc-v\\include\\background.asm";
+        // final String filename =
+        // "C:\\aaa_se\\riscv\\snake_game_risc-v\\include\\Directions.asm";
 
         final CharStream charStream = CharStreams
                 .fromFileName(filename);
@@ -337,7 +349,7 @@ public class Main {
         final ParseTreeWalker walker = new ParseTreeWalker();
 
         boolean print = false;
-        //boolean print = true;
+        // boolean print = true;
         if (print) {
 
             ConsoleCPP14ParserListener printListener = new ConsoleCPP14ParserListener();
@@ -345,9 +357,9 @@ public class Main {
 
         }
 
-        //RISCVParserListener listener = new RISCVParserListener();
-        //ConsoleRISCVParserListener listener = new ConsoleRISCVParserListener();
-        //FormattingRISCVParserListener listener = new FormattingRISCVParserListener();
+        // RISCVParserListener listener = new RISCVParserListener();
+        // ConsoleRISCVParserListener listener = new ConsoleRISCVParserListener();
+        // FormattingRISCVParserListener listener = new FormattingRISCVParserListener();
         RISCVRowListener listener = new RISCVRowListener();
 
         walker.walk(listener, root);
@@ -366,15 +378,13 @@ public class Main {
 
             // for (RISCVRow row : listener.getRows()) {
 
-            //     System.out.println(row);
-            //     System.out.println("");
+            // System.out.println(row);
+            // System.out.println("");
 
-            //     riscVProcessor.processRow(row);
+            // riscVProcessor.processRow(row);
             // }
         }
     }
-
-
 
     public static void preProcessor(String filename, List<String> processedIncludeFiles, StringBuilder stringBuilder)
             throws IOException {

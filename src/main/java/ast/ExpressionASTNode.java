@@ -14,7 +14,11 @@ public class ExpressionASTNode extends ASTNode {
         for (int i = 0; i < indent; i++) {
             stringBuilder.append("  ");
         }
-        stringBuilder.append("[EXPR] type='").append(expressionType).append("' ").append(value);
+        stringBuilder.append("[EXPR] type='").append(expressionType).append("' ");
+        
+        if (value != null) {
+            stringBuilder.append(value);
+        }
         stringBuilder.append("\n");
 
         // all children

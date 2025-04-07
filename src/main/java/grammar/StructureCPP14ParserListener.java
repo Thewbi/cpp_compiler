@@ -130,20 +130,23 @@ public class StructureCPP14ParserListener extends CPP14ParserBaseListener {
             return;
         }
 
-        ExpressionASTNode rhs = expressionStack.pop();
-        ExpressionASTNode lhs = expressionStack.pop();
+        for (int i = 1; i < ctx.children.size(); i += 2) {
 
-        ExpressionASTNode expressionASTNode = new ExpressionASTNode();
-        expressionASTNode.ctx = ctx;
-        expressionASTNode.value = ctx.getText();
-        expressionASTNode.expressionType = ExpressionType.Add;
-        expressionASTNode.lhs = lhs;
-        expressionASTNode.rhs = rhs;
+            ExpressionASTNode rhs = expressionStack.pop();
+            ExpressionASTNode lhs = expressionStack.pop();
 
-        connectToParent(expressionASTNode, lhs);
-        connectToParent(expressionASTNode, rhs);
+            ExpressionASTNode expressionASTNode = new ExpressionASTNode();
+            expressionASTNode.ctx = ctx;
+            // expressionASTNode.value = ctx.getText();
+            expressionASTNode.expressionType = ExpressionType.Add;
+            expressionASTNode.lhs = lhs;
+            expressionASTNode.rhs = rhs;
 
-        expressionStack.push(expressionASTNode);
+            connectToParent(expressionASTNode, lhs);
+            connectToParent(expressionASTNode, rhs);
+
+            expressionStack.push(expressionASTNode);
+        }
     }
 
     @Override
@@ -157,17 +160,30 @@ public class StructureCPP14ParserListener extends CPP14ParserBaseListener {
     @Override
     public void exitPostfixExpression(CPP14Parser.PostfixExpressionContext ctx) {
 
-        if ((ctx.children.size() == 1) || (ctx.children.size() == 3)) {
+        if (ctx.children.size() == 1) {
+            return;
+        }
+
+        if (ctx.children.size() == 3) {
+
+            // retrieve function name
+            ExpressionASTNode functionNameExpressionASTNode = expressionStack.pop();
+
+            PostFixExpressionASTNode postFixExpressionASTNode = new PostFixExpressionASTNode();
+            postFixExpressionASTNode.name = functionNameExpressionASTNode;
+
+            expressionStack.push(postFixExpressionASTNode);
+
             return;
         }
 
         // retrieve function name
-        ExpressionASTNode functionNameExpressionASTNode = expressionStack.pop();
         ExpressionASTNode expressionListASTNode = expressionStack.pop();
+        ExpressionASTNode functionNameExpressionASTNode = expressionStack.pop();
 
         PostFixExpressionASTNode postFixExpressionASTNode = new PostFixExpressionASTNode();
-        postFixExpressionASTNode.name = expressionListASTNode;
-        postFixExpressionASTNode.list = functionNameExpressionASTNode;
+        postFixExpressionASTNode.name = functionNameExpressionASTNode;
+        postFixExpressionASTNode.list = expressionListASTNode;
 
         expressionStack.push(postFixExpressionASTNode);
     }

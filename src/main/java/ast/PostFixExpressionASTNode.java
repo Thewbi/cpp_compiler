@@ -15,7 +15,9 @@ public class PostFixExpressionASTNode extends ExpressionASTNode {
         stringBuilder.append("[EXPR_POSTFIX] name='").append(name.value).append("' "); //.append(value);
         stringBuilder.append("\n");
 
-        list.printRecursive(stringBuilder, indent + 1);
+        if (list != null) {
+            list.printRecursive(stringBuilder, indent + 1);
+        }
 
         // all children
         for (ASTNode child : children) {

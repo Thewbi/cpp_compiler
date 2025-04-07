@@ -44,7 +44,9 @@ Proceed to initialization using function call expressions.
 int value = get_value();
 int value = get_value(1);
 int value = get_value(1, 2);
+int value = get_value_c(1, 2, 3 + 4 + 5);
 int value = get_value(1, get_value());
+int value = get_value_d(1, get_value(1, 2));
 ```
 
 Next declare and initialize pointers
