@@ -28,6 +28,7 @@ import com.cpp.grammar.PreprocessorParser.Code_fileContext;
 import com.cpp.grammar.RISCVParser.Asm_fileContext;
 
 import ast.ASTNode;
+import ast.ExpressionASTNode;
 import riscv.ExplicitRISCVProcessor;
 import riscv.RISCVInstructionDecoder;
 import riscv.RISCVInstructionEncoder;
@@ -67,8 +68,9 @@ public class Main {
         // final String filename =
         // "src/test/resources/WritingACCompilerNoraSandler/simplest.c";
 
-        final String filename = "src/test/resources/initialize_with_expressions.cpp";
-        //final String filename = "src/test/resources/initialize_pointers.cpp";
+        //final String filename = "src/test/resources/initialize_with_expressions.cpp";
+        final String filename = "src/test/resources/initialize_pointers.cpp";
+        //final String filename = "src/test/resources/initialize_arrays.cpp";
         // final String filename = "src/test/resources/palindrome_number.cpp";
         // final String filename = "src/test/resources/sample1.cpp";
         // final String filename = "src/test/resources/helloworld.cpp";
@@ -172,9 +174,9 @@ public class Main {
         // Create a generic parse tree walker that can trigger callbacks
         final ParseTreeWalker walker = new ParseTreeWalker();
 
-        boolean print = true;
-        // boolean print = false;
-        if (print) {
+        //boolean printParseTree = true;
+        boolean printParseTree = false;
+        if (printParseTree) {
             ConsoleCPP14ParserListener printListener = new ConsoleCPP14ParserListener();
             walker.walk(printListener, root);
         }
@@ -192,16 +194,23 @@ public class Main {
 
         // System.out.println(typeMap);
 
-        StringBuilder stringBuilder = new StringBuilder();
-        rootNode.printRecursive(stringBuilder, 0);
-        System.out.println(stringBuilder.toString());
+        boolean printAST = true;
+        if (printAST) {
+            StringBuilder stringBuilder = new StringBuilder();
+            rootNode.printRecursive(stringBuilder, 0);
+            System.out.println(stringBuilder.toString());
+        }
 
 
 
 
         // check if expression stack is empty
         if (listener instanceof StructureCPP14ParserListener) {
-            int exprStackSize = ((StructureCPP14ParserListener) listener).expressionStack.size();
+
+            StructureCPP14ParserListener tempStructureCPP14ParserListener = (StructureCPP14ParserListener) listener;
+            Stack<ExpressionASTNode> expressionStack = tempStructureCPP14ParserListener.expressionStack;
+
+            int exprStackSize = expressionStack.size();
             if (exprStackSize != 0) {
                 throw new RuntimeException("Expression Stack is not empty after AST parse!");
             } else {

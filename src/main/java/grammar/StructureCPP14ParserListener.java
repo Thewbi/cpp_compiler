@@ -100,10 +100,20 @@ public class StructureCPP14ParserListener extends CPP14ParserBaseListener {
 
     @Override
     public void exitNoPointerDeclarator(CPP14Parser.NoPointerDeclaratorContext ctx) {
+        // System.out.println("[" + ctx.hashCode() + "] " + ctx.getText());
         if (currentNode == null) {
             return;
         }
-        currentNode.value = ctx.getText();
+
+        if ((ctx.children.size() == 3) && (ctx.getChild(1).getText().equalsIgnoreCase("[")) && (ctx.getChild(2).getText().equalsIgnoreCase("]"))) {
+            ((DeclaratorASTNode) currentNode).isArray = true;
+        } else if ((ctx.children.size() > 3) && (ctx.getChild(1).getText().equalsIgnoreCase("[")) && (ctx.getChild(3).getText().equalsIgnoreCase("]"))) {
+            currentNode.value = ctx.getChild(0).getText();
+            ((DeclaratorASTNode) currentNode).isArray = true;
+            ((DeclaratorASTNode) currentNode).indexExpression = expressionStackPop();
+        } else {
+            currentNode.value = ctx.getText();
+        }
     }
 
     //
@@ -117,7 +127,7 @@ public class StructureCPP14ParserListener extends CPP14ParserBaseListener {
 
     @Override
     public void exitPrimaryExpression(CPP14Parser.PrimaryExpressionContext ctx) {
-        System.out.println("[" + ctx.hashCode() + "] " + ctx.getText());
+        // System.out.println("[" + ctx.hashCode() + "] " + ctx.getText());
         if (ctx.children.size() == 3) {
             if (ctx.children.get(0).getText().equalsIgnoreCase("(")
                     && ctx.children.get(2).getText().equalsIgnoreCase(")")) {
@@ -161,7 +171,7 @@ public class StructureCPP14ParserListener extends CPP14ParserBaseListener {
 
     @Override
     public void exitUnaryOperator(CPP14Parser.UnaryOperatorContext ctx) {
-        System.out.println("[" + ctx.hashCode() + "] " + ctx.getText());
+        // System.out.println("[" + ctx.hashCode() + "] " + ctx.getText());
         ExpressionType expressionType = null;
         if (ctx.getText().equalsIgnoreCase("&")) {
             expressionType = ExpressionType.AddressOperator;
@@ -170,20 +180,12 @@ public class StructureCPP14ParserListener extends CPP14ParserBaseListener {
         unaryOperatorExpressionASTNode.ctx = ctx;
         unaryOperatorExpressionASTNode.expressionType = expressionType;
         expressionStackPush(unaryOperatorExpressionASTNode);
-
     }
 
     @Override
     public void enterUnaryExpression(CPP14Parser.UnaryExpressionContext ctx) {
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * <p>
-     * The default implementation does nothing.
-     * </p>
-     */
     @Override
     public void exitUnaryExpression(CPP14Parser.UnaryExpressionContext ctx) {
         processUnaryOperatorCase(ctx.getChild(0));
@@ -199,7 +201,7 @@ public class StructureCPP14ParserListener extends CPP14ParserBaseListener {
      */
     @Override
     public void exitPostfixExpression(CPP14Parser.PostfixExpressionContext ctx) {
-        System.out.println("[" + ctx.hashCode() + "] " + ctx.getText());
+        // System.out.println("[" + ctx.hashCode() + "] " + ctx.getText());
 
         if (ctx.children.size() == 1) {
             // processUnaryOperatorCase();
@@ -303,7 +305,6 @@ public class StructureCPP14ParserListener extends CPP14ParserBaseListener {
 
     @Override
     public void exitJumpStatement(CPP14Parser.JumpStatementContext ctx) {
-
         JumpStatementASTNode jumpStatementASTNode = new JumpStatementASTNode();
         jumpStatementASTNode.ctx = ctx;
         jumpStatementASTNode.value = ctx.getText();
@@ -332,7 +333,7 @@ public class StructureCPP14ParserListener extends CPP14ParserBaseListener {
     }
 
     private void processExpressionOperator(ParserRuleContext ctx, ExpressionType expressionType) {
-        System.out.println("[" + ctx.hashCode() + "] " + ctx.getText());
+        // System.out.println("[" + ctx.hashCode() + "] " + ctx.getText());
         for (int i = 1; i < ctx.children.size(); i += 2) {
 
             ExpressionASTNode rhs = expressionStackPop();
