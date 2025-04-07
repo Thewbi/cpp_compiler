@@ -187,19 +187,29 @@ public class Main {
         // end the base scope
         structureCallback.endScope();
 
-        // check if expression stack is empty
-        if (listener instanceof StructureCPP14ParserListener) {
-            int exprStackSize = ((StructureCPP14ParserListener) listener).expressionStack.size();
-            if (exprStackSize != 0) {
-                throw new RuntimeException("Expression Stack is not empty after AST parse!");
-            }
-        }
+        
 
         // System.out.println(typeMap);
 
         StringBuilder stringBuilder = new StringBuilder();
         rootNode.printRecursive(stringBuilder, 0);
         System.out.println(stringBuilder.toString());
+
+
+
+
+        // check if expression stack is empty
+        if (listener instanceof StructureCPP14ParserListener) {
+            int exprStackSize = ((StructureCPP14ParserListener) listener).expressionStack.size();
+            if (exprStackSize != 0) {
+                throw new RuntimeException("Expression Stack is not empty after AST parse!");
+            } else {
+                System.out.println("Expression stack is empty!");
+            }
+        }
+
+
+
 
         boolean debugOutputListenerData = true;
         // boolean debugOutputListenerData = false;

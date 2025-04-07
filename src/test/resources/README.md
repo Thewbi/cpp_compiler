@@ -15,6 +15,24 @@ int main() {
 }
 ```
 
+## Expressions
+
+Make sure that the AST reflects operator precedence by nesting higher priority operations (e.g. Multiplication and Division) deeper (closer to the leafs) than lower operations (Addition and Subtraction).
+
+```
+int a = 1;
+int b = (1);
+int c = 1 + 2;
+int d = (1 + 2);
+int e = (1) + (2);
+int f = (1) + (2 + 3);
+int g = 1 + 2 * 3;
+int h = 1 * 2 + 3;
+int i = (1 * 2) + 3;
+int j = 1 + (2 * 3);
+int k = (1 + 2) * 3;
+```
+
 ## Return statements
 
 ```

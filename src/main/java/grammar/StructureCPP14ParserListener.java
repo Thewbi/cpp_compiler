@@ -2,6 +2,8 @@ package grammar;
 
 import java.util.Stack;
 
+import org.antlr.v4.runtime.ParserRuleContext;
+
 import com.cpp.grammar.CPP14Parser;
 import com.cpp.grammar.CPP14ParserBaseListener;
 
@@ -72,7 +74,7 @@ public class StructureCPP14ParserListener extends CPP14ParserBaseListener {
     @Override
     public void exitInitDeclarator(CPP14Parser.InitDeclaratorContext ctx) {
         if (!expressionStack.empty()) {
-            ((DeclaratorASTNode) currentNode).children.add(expressionStack.pop());
+            ((DeclaratorASTNode) currentNode).children.add(expressionStackPop());
         }
 
         // ascend
@@ -108,15 +110,25 @@ public class StructureCPP14ParserListener extends CPP14ParserBaseListener {
 
     @Override
     public void enterPrimaryExpression(CPP14Parser.PrimaryExpressionContext ctx) {
+        
     }
 
     @Override
     public void exitPrimaryExpression(CPP14Parser.PrimaryExpressionContext ctx) {
+
+        System.out.println("[" + ctx.hashCode() + "] " + ctx.getText());
+
+        if (ctx.children.size() == 3) {
+            if (ctx.children.get(0).getText().equalsIgnoreCase("(") && ctx.children.get(2).getText().equalsIgnoreCase(")")) {
+                return;
+            }
+        }
+
         ExpressionASTNode expressionASTNode = new ExpressionASTNode();
         expressionASTNode.ctx = ctx;
         expressionASTNode.value = ctx.getText();
         expressionASTNode.expressionType = ExpressionType.Primary;
-        expressionStack.push(expressionASTNode);
+        expressionStackPush(expressionASTNode);
     }
 
     @Override
@@ -130,23 +142,16 @@ public class StructureCPP14ParserListener extends CPP14ParserBaseListener {
             return;
         }
 
-        for (int i = 1; i < ctx.children.size(); i += 2) {
+        processExpressionOperator(ctx, ExpressionType.Add);
+    }
 
-            ExpressionASTNode rhs = expressionStack.pop();
-            ExpressionASTNode lhs = expressionStack.pop();
-
-            ExpressionASTNode expressionASTNode = new ExpressionASTNode();
-            expressionASTNode.ctx = ctx;
-            // expressionASTNode.value = ctx.getText();
-            expressionASTNode.expressionType = ExpressionType.Add;
-            expressionASTNode.lhs = lhs;
-            expressionASTNode.rhs = rhs;
-
-            connectToParent(expressionASTNode, lhs);
-            connectToParent(expressionASTNode, rhs);
-
-            expressionStack.push(expressionASTNode);
+    @Override
+    public void exitMultiplicativeExpression(CPP14Parser.MultiplicativeExpressionContext ctx) {
+        if (ctx.children.size() == 1) {
+            return;
         }
+
+        processExpressionOperator(ctx, ExpressionType.Mul);
     }
 
     @Override
@@ -167,41 +172,41 @@ public class StructureCPP14ParserListener extends CPP14ParserBaseListener {
         if (ctx.children.size() == 3) {
 
             // retrieve function name
-            ExpressionASTNode functionNameExpressionASTNode = expressionStack.pop();
+            ExpressionASTNode functionNameExpressionASTNode = expressionStackPop();
 
             PostFixExpressionASTNode postFixExpressionASTNode = new PostFixExpressionASTNode();
             postFixExpressionASTNode.name = functionNameExpressionASTNode;
 
-            expressionStack.push(postFixExpressionASTNode);
+            expressionStackPush(postFixExpressionASTNode);
 
             return;
         }
 
         // retrieve function name
-        ExpressionASTNode expressionListASTNode = expressionStack.pop();
-        ExpressionASTNode functionNameExpressionASTNode = expressionStack.pop();
+        ExpressionASTNode expressionListASTNode = expressionStackPop();
+        ExpressionASTNode functionNameExpressionASTNode = expressionStackPop();
 
         PostFixExpressionASTNode postFixExpressionASTNode = new PostFixExpressionASTNode();
         postFixExpressionASTNode.name = functionNameExpressionASTNode;
         postFixExpressionASTNode.list = expressionListASTNode;
 
-        expressionStack.push(postFixExpressionASTNode);
+        expressionStackPush(postFixExpressionASTNode);
     }
 
     @Override public void enterExpressionList(CPP14Parser.ExpressionListContext ctx) {
         // add a blocker
-        expressionStack.push(new ExpressionListBlockerASTNode());
+        expressionStackPush(new ExpressionListBlockerASTNode());
      }
 
 	@Override public void exitExpressionList(CPP14Parser.ExpressionListContext ctx) {
         ExpressionListASTNode expressionListASTNode = new ExpressionListASTNode();
         while (!(expressionStack.peek() instanceof ExpressionListBlockerASTNode)) {
-            ExpressionASTNode expressionASTNode = expressionStack.pop();
+            ExpressionASTNode expressionASTNode = expressionStackPop();
             expressionListASTNode.children.add(0, expressionASTNode);
         }
         // remove the blocker
-        expressionStack.pop();
-        expressionStack.push(expressionListASTNode);
+        expressionStackPop();
+        expressionStackPush(expressionListASTNode);
     }
 
     //
@@ -218,7 +223,7 @@ public class StructureCPP14ParserListener extends CPP14ParserBaseListener {
         JumpStatementASTNode jumpStatementASTNode = new JumpStatementASTNode();
         jumpStatementASTNode.ctx = ctx;
         jumpStatementASTNode.value = ctx.getText();
-        jumpStatementASTNode.children.add(expressionStack.pop());
+        jumpStatementASTNode.children.add(expressionStackPop());
         jumpStatementASTNode.type = JumpStatementType.valueOf(ctx.getChild(0).getText().toUpperCase());
 
         currentNode.children.add(jumpStatementASTNode);
@@ -232,5 +237,32 @@ public class StructureCPP14ParserListener extends CPP14ParserBaseListener {
         // connect parent and child
         parent.children.add(child);
         child.parent = parent;
+    }
+
+    private ExpressionASTNode expressionStackPop() {
+        return expressionStack.pop();
+    }
+
+    private void expressionStackPush(ExpressionASTNode expressionASTNode) {
+        expressionStack.push(expressionASTNode);
+    }
+
+    private void processExpressionOperator(ParserRuleContext ctx, ExpressionType expressionType) {
+        for (int i = 1; i < ctx.children.size(); i += 2) {
+
+            ExpressionASTNode rhs = expressionStackPop();
+            ExpressionASTNode lhs = expressionStackPop();
+
+            ExpressionASTNode expressionASTNode = new ExpressionASTNode();
+            expressionASTNode.ctx = ctx;
+            expressionASTNode.expressionType = expressionType;
+            expressionASTNode.lhs = lhs;
+            expressionASTNode.rhs = rhs;
+
+            connectToParent(expressionASTNode, lhs);
+            connectToParent(expressionASTNode, rhs);
+
+            expressionStackPush(expressionASTNode);
+        }
     }
 }
