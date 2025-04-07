@@ -10,6 +10,8 @@ public enum ExpressionType {
 
     Primary, // expressions that are not subdivided further
 
+    Cast, // used during cast operations. The type is stored in the rhs property
+
     Unknown;
 
 }

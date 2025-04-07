@@ -14,16 +14,25 @@ public class CastExpressionASTNode extends ExpressionASTNode {
         for (int i = 0; i < indent; i++) {
             stringBuilder.append("  ");
         }
-        stringBuilder.append("[CAST] ");
-        
-        stringBuilder.append("cast-target-type='");
-        castTypeExpression.printRecursive(stringBuilder, 0, false);
-        stringBuilder.append("' ");
-        
-        stringBuilder.append("type='");
-        rhs.printRecursive(stringBuilder, 0, false);
-        stringBuilder.append("'");
-        
+        stringBuilder.append("[CAST] \n");
+
+        for (int i = 0; i < indent+1; i++) {
+            stringBuilder.append("  ");
+        }
+        stringBuilder.append("cast-target-type: ");
+        // for (int i = 0; i < indent+2; i++) {
+        //     stringBuilder.append("  ");
+        // }
+        castTypeExpression.printRecursive(stringBuilder, 0, true);
+        // stringBuilder.append("' ");
+
+        for (int i = 0; i < indent+1; i++) {
+            stringBuilder.append("  ");
+        }
+        stringBuilder.append("type: ");
+        rhs.printRecursive(stringBuilder, 0, true);
+        // stringBuilder.append("'");
+
         // if (value != null) {
         //     stringBuilder.append(value);
         // }
@@ -34,5 +43,5 @@ public class CastExpressionASTNode extends ExpressionASTNode {
             child.printRecursive(stringBuilder, indent + 1);
         }
     }
-    
+
 }

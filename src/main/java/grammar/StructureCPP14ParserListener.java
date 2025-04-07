@@ -246,13 +246,13 @@ public class StructureCPP14ParserListener extends CPP14ParserBaseListener {
      * to achieve this, it is checkd if a unary operator expression is already
      * sitting on top of the stack when a expression is added to the stack. In that
      * case the operand is folded into the operator.
-     * 
+     *
      * As the UnaryOperator node appears a lot in the parse tree at several
      * locations that are indistinguishable from the correct parset tree node by
      * only looking at the expression stack, the correct spot in traversing the
      * parse tree is identified by passing in the parse tree node (ctx) that
      * contains the parent unary operator to fold the operand into.
-     * 
+     *
      * @param ctx context of the unary operator to fold operand into
      * @return
      */
@@ -316,9 +316,11 @@ public class StructureCPP14ParserListener extends CPP14ParserBaseListener {
 
         if (ctx.children.size() >= 3) {
 
-            // retrieve function name
             ExpressionASTNode expressionASTNode = expressionStackPop();
+
             ExpressionASTNode castTypeExpressionASTNode = expressionStackPop();
+            castTypeExpressionASTNode.expressionType = ExpressionType.Cast;
+
             CastExpressionASTNode castExpressionASTNode = new CastExpressionASTNode();
             castExpressionASTNode.rhs = expressionASTNode;
             castExpressionASTNode.castTypeExpression = castTypeExpressionASTNode;
