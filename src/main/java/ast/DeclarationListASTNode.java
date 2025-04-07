@@ -2,8 +2,6 @@ package ast;
 
 public class DeclarationListASTNode extends ASTNode {
 
-    public String type;
-
     public void printRecursive(final StringBuilder stringBuilder, final int indent) {
         printRecursive(stringBuilder, indent, true);
     }

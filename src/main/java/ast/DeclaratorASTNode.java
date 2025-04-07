@@ -18,7 +18,13 @@ public class DeclaratorASTNode extends ASTNode {
         for (int i = 0; i < indent; i++) {
             stringBuilder.append("  ");
         }
-        stringBuilder.append("[INIT_DECL] name='").append(value).append("' is-pointer=").append(isPointer).append("' is-array=").append(isArray);
+        stringBuilder.append("[INIT_DECL] ");
+        stringBuilder.append("name='").append(value).append("' ");
+        if (type != null) {
+        stringBuilder.append("type='").append(type).append("' ");
+    }
+        stringBuilder.append("is-pointer=").append(isPointer).append(" ");
+        stringBuilder.append("is-array=").append(isArray);
         stringBuilder.append("\n");
 
         // for array access

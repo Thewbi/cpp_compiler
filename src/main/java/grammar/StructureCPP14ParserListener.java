@@ -19,6 +19,8 @@ import ast.ExpressionType;
 import ast.FunctionDeclarationASTNode;
 import ast.JumpStatementASTNode;
 import ast.JumpStatementType;
+import ast.ParameterDeclarationASTNode;
+import ast.ParameterDeclarationListASTNode;
 import ast.PostFixExpressionASTNode;
 import ast.UnaryOperatorExpressionASTNode;
 
@@ -27,6 +29,10 @@ public class StructureCPP14ParserListener extends CPP14ParserBaseListener {
     public ASTNode currentNode;
 
     public Stack<ExpressionASTNode> expressionStack = new Stack<>();
+
+    //
+    // Functions and Parameters
+    //
 
     @Override
     public void enterFunctionDefinition(CPP14Parser.FunctionDefinitionContext ctx) {
@@ -41,7 +47,51 @@ public class StructureCPP14ParserListener extends CPP14ParserBaseListener {
 
     @Override
     public void exitFunctionDefinition(CPP14Parser.FunctionDefinitionContext ctx) {
+        // ascend
+        currentNode = currentNode.parent;
     }
+
+    @Override
+    public void enterParameterDeclarationList(CPP14Parser.ParameterDeclarationListContext ctx) {
+        ParameterDeclarationListASTNode parameterDeclarationListASTNode = new ParameterDeclarationListASTNode();
+        parameterDeclarationListASTNode.ctx = ctx;
+        connectToParent(currentNode, parameterDeclarationListASTNode);
+
+        // descend
+        currentNode = parameterDeclarationListASTNode;
+    }
+
+    @Override
+    public void exitParameterDeclarationList(CPP14Parser.ParameterDeclarationListContext ctx) {
+        // ascend
+        currentNode = currentNode.parent;
+    }
+
+    @Override
+    public void enterParameterDeclaration(CPP14Parser.ParameterDeclarationContext ctx) {
+        ParameterDeclarationASTNode parameterDeclarationASTNode = new ParameterDeclarationASTNode();
+        // parameterDeclarationASTNode.returnType = ctx.getChild(0).getText();
+        parameterDeclarationASTNode.ctx = ctx;
+        connectToParent(currentNode, parameterDeclarationASTNode);
+
+        // descend
+        currentNode = parameterDeclarationASTNode;
+    }
+
+    @Override
+    public void exitParameterDeclaration(CPP14Parser.ParameterDeclarationContext ctx) {
+        // ascend
+        currentNode = currentNode.parent;
+    }
+
+    //
+    // Type specifier
+    //
+
+    @Override public void enterTypeSpecifier(CPP14Parser.TypeSpecifierContext ctx) { }
+	@Override public void exitTypeSpecifier(CPP14Parser.TypeSpecifierContext ctx) {
+        currentNode.type = ctx.getChild(0).getText();
+     }
 
     //
     // Variable declarations
@@ -50,7 +100,7 @@ public class StructureCPP14ParserListener extends CPP14ParserBaseListener {
     @Override
     public void enterSimpleDeclaration(CPP14Parser.SimpleDeclarationContext ctx) {
         DeclarationListASTNode declarationListASTNode = new DeclarationListASTNode();
-        declarationListASTNode.type = ctx.getChild(0).getText();
+        // declarationListASTNode.type = ctx.getChild(0).getText();
         declarationListASTNode.ctx = ctx;
         connectToParent(currentNode, declarationListASTNode);
 
@@ -114,6 +164,12 @@ public class StructureCPP14ParserListener extends CPP14ParserBaseListener {
             currentNode.value = ctx.getChild(0).getText();
             ((DeclaratorASTNode) currentNode).isArray = true;
             ((DeclaratorASTNode) currentNode).indexExpression = expressionStackPop();
+        } else if (currentNode instanceof FunctionDeclarationASTNode) {
+            // do not copy trash into the value attribute. The function name is identified
+            // by a NoPointerDeclarator node that has a single child only
+            if (ctx.children.size() == 1) {
+                currentNode.value = ctx.getText();
+            }
         } else {
             currentNode.value = ctx.getText();
         }

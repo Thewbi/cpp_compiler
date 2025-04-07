@@ -68,10 +68,11 @@ public class Main {
         // final String filename =
         // "src/test/resources/WritingACCompilerNoraSandler/simplest.c";
 
-        // final String filename = "src/test/resources/initialize_with_expressions.cpp";
+        //final String filename = "src/test/resources/initialize_with_expressions.cpp";
         //final String filename = "src/test/resources/initialize_pointers.cpp";
         //final String filename = "src/test/resources/initialize_arrays.cpp";
         final String filename = "src/test/resources/inititalize_variable_cast.cpp";
+        //final String filename = "src/test/resources/initialize_function_declaration.cpp";
 
         // final String filename = "src/test/resources/palindrome_number.cpp";
         // final String filename = "src/test/resources/sample1.cpp";
@@ -150,16 +151,16 @@ public class Main {
          * SemantCPP14ParserListener semantCPP14ParserListener = new
          * SemantCPP14ParserListener();
          * semantCPP14ParserListener.setTypeMap(typeMap);
-         * 
+         *
          * Map<String, FuncDecl> funcDeclMap = new HashMap<>();
          * semantCPP14ParserListener.setFuncDeclMap(funcDeclMap);
-         * 
+         *
          * StackFrame baseStackFrame = new StackFrame();
          * Stack<StackFrame> executionStack = new Stack<>();
          * executionStack.push(baseStackFrame);
          * semantCPP14ParserListener.setExecutionStack(executionStack);
          * semantCPP14ParserListener.setStructureCallback(structureCallback);
-         * 
+         *
          * // semantCPP14ParserListener.getSemAntModeStack().push(SemAntMode.DEFAULT);
          * CPP14ParserListener listener = semantCPP14ParserListener;
          * // }
@@ -192,7 +193,7 @@ public class Main {
         // end the base scope
         structureCallback.endScope();
 
-        
+
 
         // System.out.println(typeMap);
 
