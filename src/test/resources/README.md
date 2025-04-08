@@ -179,6 +179,7 @@ see https://github.com/rui314/8cc/tree/master/test
 see https://www.codewithharry.com/blogpost/c-cheatsheet/
 see https://www.reddit.com/r/TheInsaneApp/comments/pk5163/c_and_c_cheat_sheets/#lightbox
 see https://github.com/rui314/8cc/tree/master/test
+see https://github.com/rui314/8cc/blob/master/test/control.c
 
 ## switch case
 
