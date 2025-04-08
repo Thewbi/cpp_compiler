@@ -30,12 +30,12 @@ public class MemberDeclarationASTNode extends DeclaratorASTNode {
             }
             stringBuilder.append("index-expression: \n");
             indexExpression.printRecursive(stringBuilder, indent + 1);
-            for (int i = 0; i < indent; i++) {
-                stringBuilder.append("  ");
-            }
         }
 
         if (children.size() > 0) {
+            for (int i = 0; i < indent; i++) {
+                stringBuilder.append("  ");
+            }
             stringBuilder.append("assigned-value: \n");
         }
 

@@ -165,22 +165,13 @@ public class StructureCPP14ParserListener extends CPP14ParserBaseListener {
 
     @Override
     public void exitDeclSpecifier(CPP14Parser.DeclSpecifierContext ctx) {
-        System.out.println("[" + ctx.hashCode() + "] " + ctx.getText());
+        // System.out.println("[" + ctx.hashCode() + "] " + ctx.getText());
 
         final String declSpecifierAsString = ctx.getText();
 
         if (declSpecifierAsString.equalsIgnoreCase("typedef")) {
             ((DeclarationListASTNode) currentNode).declarationSpecifier = DeclarationSpecifier.valueOf(ctx.getText());
         }
-    }
-
-    @Override
-    public void enterDeclSpecifierSeq(CPP14Parser.DeclSpecifierSeqContext ctx) {
-    }
-
-    @Override
-    public void exitDeclSpecifierSeq(CPP14Parser.DeclSpecifierSeqContext ctx) {
-        System.out.println("[" + ctx.hashCode() + "] " + ctx.getText());
     }
 
     //
@@ -243,7 +234,7 @@ public class StructureCPP14ParserListener extends CPP14ParserBaseListener {
 
     @Override
     public void exitNoPointerDeclarator(CPP14Parser.NoPointerDeclaratorContext ctx) {
-        System.out.println("[" + ctx.hashCode() + "] " + ctx.getText());
+        // System.out.println("[" + ctx.hashCode() + "] " + ctx.getText());
         if (currentNode == null) {
             return;
         }
