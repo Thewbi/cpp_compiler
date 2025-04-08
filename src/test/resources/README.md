@@ -149,7 +149,7 @@ scanf("%d", &a); // Store keyboard input in a variable with address (address of 
 printf("%d", a);
 ```
 
-## Statements using Unary operators
+## Statements using Unary Operators
 
 ```
 bytesTransmitted++;
