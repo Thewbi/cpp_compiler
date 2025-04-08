@@ -29,7 +29,7 @@ public class CastExpressionASTNode extends ExpressionASTNode {
         for (int i = 0; i < indent+1; i++) {
             stringBuilder.append("  ");
         }
-        stringBuilder.append("type: ");
+        stringBuilder.append("cast-source: ");
         rhs.printRecursive(stringBuilder, 0, true);
         // stringBuilder.append("'");
 

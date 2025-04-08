@@ -1,6 +1,10 @@
 package ast;
 
+import grammar.StorageSpecifier;
+
 public class DeclarationListASTNode extends ASTNode {
+
+    public StorageSpecifier storageSpecifier;
 
     public void printRecursive(final StringBuilder stringBuilder, final int indent) {
         printRecursive(stringBuilder, indent, true);
@@ -12,7 +16,11 @@ public class DeclarationListASTNode extends ASTNode {
         for (int i = 0; i < indent; i++) {
             stringBuilder.append("  ");
         }
-        stringBuilder.append("[DECL_LIST] type='").append(type).append("'");
+        stringBuilder.append("[DECL_LIST] ");
+        if ((null != storageSpecifier) && (StorageSpecifier.UNKNOWN != storageSpecifier)) {
+            stringBuilder.append("storage-spec='").append(storageSpecifier).append("' ");
+        }
+        stringBuilder.append("type='").append(type).append("' ");
         stringBuilder.append("\n");
 
         // all children

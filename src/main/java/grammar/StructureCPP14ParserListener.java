@@ -88,10 +88,14 @@ public class StructureCPP14ParserListener extends CPP14ParserBaseListener {
     // Type specifier
     //
 
-    @Override public void enterTypeSpecifier(CPP14Parser.TypeSpecifierContext ctx) { }
-	@Override public void exitTypeSpecifier(CPP14Parser.TypeSpecifierContext ctx) {
+    @Override
+    public void enterTypeSpecifier(CPP14Parser.TypeSpecifierContext ctx) {
+    }
+
+    @Override
+    public void exitTypeSpecifier(CPP14Parser.TypeSpecifierContext ctx) {
         currentNode.type = ctx.getChild(0).getText();
-     }
+    }
 
     //
     // Variable declarations
@@ -173,6 +177,16 @@ public class StructureCPP14ParserListener extends CPP14ParserBaseListener {
         } else {
             currentNode.value = ctx.getText();
         }
+    }
+
+    @Override
+    public void enterStorageClassSpecifier(CPP14Parser.StorageClassSpecifierContext ctx) {
+    }
+
+    @Override
+    public void exitStorageClassSpecifier(CPP14Parser.StorageClassSpecifierContext ctx) {
+        final String storageSpecifierAsString = ctx.getText();
+        ((DeclarationListASTNode)currentNode).storageSpecifier = StorageSpecifier.valueOf(storageSpecifierAsString.toUpperCase());
     }
 
     //

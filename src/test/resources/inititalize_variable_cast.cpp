@@ -5,6 +5,6 @@ int main() {
 
     int c = (float) d;
     int e = (custom_type) f;
-    int g = (custom_type) h;
-    
+    int g = (custom_type_2) h;
+
 }

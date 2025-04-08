@@ -4,6 +4,8 @@ In the first step, convert the parse tree into an AST by constructing the AST tr
 
 During AST construction step, do not care about semantic correctness. Do not check the amount of parameters to function calls. Do not check for type correctness, do not check anything, just construct the AST. Semantic analysis is part of a later step.
 
+Firstly, collect all bits of information while traversing the ParseTree. For example when parsing a cast, print the source variable of the case, print the target-type that the variable is cast into and print the target variable that will receive the cast value. In a second step, you can then maybe use a callback where the traversal places all these bits of information into a callback-method. The callback can then construct the AST using the information retrieved from the ParseTree traversal. Or alternatively, immediately build the AST during ParseTree traversal by constructing a tree of AST nodes directly.
+
 ## main() function
 
 Idealy, you would start with a main() function so you can place test data into the main() function later.
@@ -157,6 +159,21 @@ bytesLeft--;
 --bytesLeft;
 ```
 
+## struct declarations
+
+see https://www.codewithharry.com/blogpost/c-cheatsheet/
+see https://github.com/rui314/8cc/tree/master/test
+
+## typedef
+
+see https://www.codewithharry.com/blogpost/c-cheatsheet/
+see https://github.com/rui314/8cc/tree/master/test
+
+## FILE datatype
+
+see https://www.codewithharry.com/blogpost/c-cheatsheet/
+see https://github.com/rui314/8cc/tree/master/test
+
 ## if, if-else, if-elseif-else, nested if
 
 see https://www.codewithharry.com/blogpost/c-cheatsheet/
@@ -169,21 +186,6 @@ see https://www.codewithharry.com/blogpost/c-cheatsheet/
 see https://github.com/rui314/8cc/tree/master/test
 
 ## while-loop, for-loop, do-while-loop
-
-see https://www.codewithharry.com/blogpost/c-cheatsheet/
-see https://github.com/rui314/8cc/tree/master/test
-
-## struct declarations
-
-see https://www.codewithharry.com/blogpost/c-cheatsheet/
-see https://github.com/rui314/8cc/tree/master/test
-
-## typedef
-
-see https://www.codewithharry.com/blogpost/c-cheatsheet/
-see https://github.com/rui314/8cc/tree/master/test
-
-## FILE datatype
 
 see https://www.codewithharry.com/blogpost/c-cheatsheet/
 see https://github.com/rui314/8cc/tree/master/test

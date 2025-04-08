@@ -19,9 +19,9 @@ public class ExpressionASTNode extends ASTNode {
             stringBuilder.append("  ");
         }
         stringBuilder.append("[EXPR] type='").append(expressionType).append("' ");
-        
+
         if (value != null) {
-            stringBuilder.append(value);
+            stringBuilder.append("value='").append(value).append("' ");
         }
 
         if (addLineBreak) {
