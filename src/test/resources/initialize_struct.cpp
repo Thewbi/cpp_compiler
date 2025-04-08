@@ -1,8 +1,18 @@
 // C
 struct test_struct {
+
     int int_field;
     char char_field;
     float float_field;
+
+    int int_array_field[100];
+    char char_array_field[200];
+    float float_array_field[300];
+
+    int *int_ptr;
+    char *char_ptr;
+    float *float_ptr;
+
 };
 
 /*

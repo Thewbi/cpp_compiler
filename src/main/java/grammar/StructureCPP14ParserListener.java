@@ -10,6 +10,8 @@ import com.cpp.grammar.CPP14ParserBaseListener;
 
 import ast.ASTNode;
 import ast.CastExpressionASTNode;
+import ast.ClassSpecifierASTNode;
+import ast.ClassSpecifierType;
 import ast.DeclarationListASTNode;
 import ast.DeclaratorASTNode;
 import ast.ExpressionASTNode;
@@ -19,6 +21,7 @@ import ast.ExpressionType;
 import ast.FunctionDeclarationASTNode;
 import ast.JumpStatementASTNode;
 import ast.JumpStatementType;
+import ast.MemberDeclarationASTNode;
 import ast.ParameterDeclarationASTNode;
 import ast.ParameterDeclarationListASTNode;
 import ast.PostFixExpressionASTNode;
@@ -29,6 +32,61 @@ public class StructureCPP14ParserListener extends CPP14ParserBaseListener {
     public ASTNode currentNode;
 
     public Stack<ExpressionASTNode> expressionStack = new Stack<>();
+
+    //
+    // struct, class declarations
+    //
+
+    @Override
+    public void enterClassSpecifier(CPP14Parser.ClassSpecifierContext ctx) {
+        ClassSpecifierASTNode classSpecifierASTNode = new ClassSpecifierASTNode();
+        classSpecifierASTNode.ctx = ctx;
+        connectToParent(currentNode, classSpecifierASTNode);
+
+        // descend
+        currentNode = classSpecifierASTNode;
+    }
+
+    @Override
+    public void exitClassSpecifier(CPP14Parser.ClassSpecifierContext ctx) {
+        // ascend
+        currentNode = currentNode.parent;
+    }
+
+    @Override
+    public void enterClassKey(CPP14Parser.ClassKeyContext ctx) {
+    }
+
+    @Override
+    public void exitClassKey(CPP14Parser.ClassKeyContext ctx) {
+        // struct or class keyword
+        ((ClassSpecifierASTNode) currentNode).classSpecifierType = ClassSpecifierType.fromString(ctx.getText());
+    }
+
+    @Override
+    public void enterClassName(CPP14Parser.ClassNameContext ctx) {
+    }
+
+    @Override
+    public void exitClassName(CPP14Parser.ClassNameContext ctx) {
+        currentNode.value = ctx.getText();
+    }
+
+    @Override
+    public void enterMemberdeclaration(CPP14Parser.MemberdeclarationContext ctx) {
+        MemberDeclarationASTNode memberDeclarationASTNode = new MemberDeclarationASTNode();
+        memberDeclarationASTNode.ctx = ctx;
+        connectToParent(currentNode, memberDeclarationASTNode);
+
+        // descend
+        currentNode = memberDeclarationASTNode;
+    }
+
+    @Override
+    public void exitMemberdeclaration(CPP14Parser.MemberdeclarationContext ctx) {
+        // ascend
+        currentNode = currentNode.parent;
+    }
 
     //
     // Functions and Parameters
@@ -70,7 +128,6 @@ public class StructureCPP14ParserListener extends CPP14ParserBaseListener {
     @Override
     public void enterParameterDeclaration(CPP14Parser.ParameterDeclarationContext ctx) {
         ParameterDeclarationASTNode parameterDeclarationASTNode = new ParameterDeclarationASTNode();
-        // parameterDeclarationASTNode.returnType = ctx.getChild(0).getText();
         parameterDeclarationASTNode.ctx = ctx;
         connectToParent(currentNode, parameterDeclarationASTNode);
 
@@ -103,8 +160,9 @@ public class StructureCPP14ParserListener extends CPP14ParserBaseListener {
 
     @Override
     public void enterSimpleDeclaration(CPP14Parser.SimpleDeclarationContext ctx) {
+        // why declaration list? This produces confusing output when parsing initialize_struct.cpp
+        // For which case is this required?
         DeclarationListASTNode declarationListASTNode = new DeclarationListASTNode();
-        // declarationListASTNode.type = ctx.getChild(0).getText();
         declarationListASTNode.ctx = ctx;
         connectToParent(currentNode, declarationListASTNode);
 
@@ -186,7 +244,8 @@ public class StructureCPP14ParserListener extends CPP14ParserBaseListener {
     @Override
     public void exitStorageClassSpecifier(CPP14Parser.StorageClassSpecifierContext ctx) {
         final String storageSpecifierAsString = ctx.getText();
-        ((DeclarationListASTNode)currentNode).storageSpecifier = StorageSpecifier.valueOf(storageSpecifierAsString.toUpperCase());
+        ((DeclarationListASTNode) currentNode).storageSpecifier = StorageSpecifier
+                .valueOf(storageSpecifierAsString.toUpperCase());
     }
 
     //

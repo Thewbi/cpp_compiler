@@ -74,8 +74,8 @@ public class Main {
         //final String filename = "src/test/resources/inititalize_variable_cast.cpp";
         //final String filename = "src/test/resources/initialize_function_declaration.cpp";
         //final String filename = "src/test/resources/initialize_static_variables.cpp";
-        //final String filename = "src/test/resources/initialize_struct.cpp";
-        final String filename = "src/test/resources/initialize_class.cpp";
+        final String filename = "src/test/resources/initialize_struct.cpp";
+        // final String filename = "src/test/resources/initialize_class.cpp";
 
         // final String filename = "src/test/resources/palindrome_number.cpp";
         // final String filename = "src/test/resources/sample1.cpp";
