@@ -6,6 +6,8 @@ public class DeclarationListASTNode extends ASTNode {
 
     public StorageSpecifier storageSpecifier;
 
+    public DeclarationSpecifier declarationSpecifier;
+
     public void printRecursive(final StringBuilder stringBuilder, final int indent) {
         printRecursive(stringBuilder, indent, true);
     }
@@ -17,6 +19,9 @@ public class DeclarationListASTNode extends ASTNode {
             stringBuilder.append("  ");
         }
         stringBuilder.append("[DECL_LIST] ");
+        if ((null != declarationSpecifier) && (DeclarationSpecifier.UNKNOWN != declarationSpecifier)) {
+            stringBuilder.append("declaration-spec='").append(declarationSpecifier).append("' ");
+        }
         if ((null != storageSpecifier) && (StorageSpecifier.UNKNOWN != storageSpecifier)) {
             stringBuilder.append("storage-spec='").append(storageSpecifier).append("' ");
         }

@@ -37,6 +37,10 @@ public class DeclaratorASTNode extends ASTNode {
             for (int i = 0; i < indent; i++) {
                 stringBuilder.append("  ");
             }
+
+        }
+
+        if (children.size() > 0) {
             stringBuilder.append("assigned-value: \n");
         }
 

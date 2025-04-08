@@ -1,5 +1,8 @@
 int main() {
 
+    short int x;
+    short unsigned int x;
+
     int a = 1;
     int b = (2);
     int c = 1 + 2;
@@ -33,7 +36,7 @@ int main() {
     int value_6 = get_value_d(1, get_value(1, 2));
     int value_7 = get_value_d(1, get_value(1, (2 + 3) * 7));
 
-    return 100;    
+    return 100;
 
     return 1 + 2 + 3;
 

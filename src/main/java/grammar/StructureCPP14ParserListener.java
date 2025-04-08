@@ -13,6 +13,7 @@ import ast.CastExpressionASTNode;
 import ast.ClassSpecifierASTNode;
 import ast.ClassSpecifierType;
 import ast.DeclarationListASTNode;
+import ast.DeclarationSpecifier;
 import ast.DeclaratorASTNode;
 import ast.ExpressionASTNode;
 import ast.ExpressionListASTNode;
@@ -142,7 +143,7 @@ public class StructureCPP14ParserListener extends CPP14ParserBaseListener {
     }
 
     //
-    // Type specifier
+    // Type specifier (int, float, double, custom types ...)
     //
 
     @Override
@@ -155,12 +156,41 @@ public class StructureCPP14ParserListener extends CPP14ParserBaseListener {
     }
 
     //
+    // typedefs
+    //
+
+    @Override
+    public void enterDeclSpecifier(CPP14Parser.DeclSpecifierContext ctx) {
+    }
+
+    @Override
+    public void exitDeclSpecifier(CPP14Parser.DeclSpecifierContext ctx) {
+        System.out.println("[" + ctx.hashCode() + "] " + ctx.getText());
+
+        final String declSpecifierAsString = ctx.getText();
+
+        if (declSpecifierAsString.equalsIgnoreCase("typedef")) {
+            ((DeclarationListASTNode) currentNode).declarationSpecifier = DeclarationSpecifier.valueOf(ctx.getText());
+        }
+    }
+
+    @Override
+    public void enterDeclSpecifierSeq(CPP14Parser.DeclSpecifierSeqContext ctx) {
+    }
+
+    @Override
+    public void exitDeclSpecifierSeq(CPP14Parser.DeclSpecifierSeqContext ctx) {
+        System.out.println("[" + ctx.hashCode() + "] " + ctx.getText());
+    }
+
+    //
     // Variable declarations
     //
 
     @Override
     public void enterSimpleDeclaration(CPP14Parser.SimpleDeclarationContext ctx) {
-        // why declaration list? This produces confusing output when parsing initialize_struct.cpp
+        // why declaration list? This produces confusing output when parsing
+        // initialize_struct.cpp
         // For which case is this required?
         DeclarationListASTNode declarationListASTNode = new DeclarationListASTNode();
         declarationListASTNode.ctx = ctx;
@@ -213,7 +243,7 @@ public class StructureCPP14ParserListener extends CPP14ParserBaseListener {
 
     @Override
     public void exitNoPointerDeclarator(CPP14Parser.NoPointerDeclaratorContext ctx) {
-        // System.out.println("[" + ctx.hashCode() + "] " + ctx.getText());
+        System.out.println("[" + ctx.hashCode() + "] " + ctx.getText());
         if (currentNode == null) {
             return;
         }

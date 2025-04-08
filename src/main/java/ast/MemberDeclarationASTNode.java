@@ -23,6 +23,22 @@ public class MemberDeclarationASTNode extends DeclaratorASTNode {
         stringBuilder.append("is-array=").append(isArray);
         stringBuilder.append("\n");
 
+        // for array access
+        if (isArray && indexExpression != null) {
+            for (int i = 0; i < indent; i++) {
+                stringBuilder.append("  ");
+            }
+            stringBuilder.append("index-expression: \n");
+            indexExpression.printRecursive(stringBuilder, indent + 1);
+            for (int i = 0; i < indent; i++) {
+                stringBuilder.append("  ");
+            }
+        }
+
+        if (children.size() > 0) {
+            stringBuilder.append("assigned-value: \n");
+        }
+
         // all children
         for (ASTNode child : children) {
             child.printRecursive(stringBuilder, indent + 1);
