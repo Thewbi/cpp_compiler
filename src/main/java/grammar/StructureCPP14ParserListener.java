@@ -9,6 +9,7 @@ import com.cpp.grammar.CPP14Parser;
 import com.cpp.grammar.CPP14ParserBaseListener;
 
 import ast.ASTNode;
+import ast.CaseOrDefaultStatementASTNode;
 import ast.CastExpressionASTNode;
 import ast.ClassSpecifierASTNode;
 import ast.ClassSpecifierType;
@@ -28,6 +29,7 @@ import ast.ParameterDeclarationASTNode;
 import ast.ParameterDeclarationListASTNode;
 import ast.PostFixExpressionASTNode;
 import ast.StatementType;
+import ast.SwitchStatementASTNode;
 import ast.UnaryOperatorExpressionASTNode;
 
 public class StructureCPP14ParserListener extends CPP14ParserBaseListener {
@@ -395,9 +397,7 @@ public class StructureCPP14ParserListener extends CPP14ParserBaseListener {
         postFixExpressionASTNode.name = functionNameExpressionASTNode;
         postFixExpressionASTNode.list = expressionListASTNode;
 
-        // if (!processUnaryOperatorCase()) {
         expressionStackPush(postFixExpressionASTNode);
-        // }
     }
 
     /**
@@ -531,23 +531,53 @@ public class StructureCPP14ParserListener extends CPP14ParserBaseListener {
     }
 
     @Override
+    public void enterLabeledStatement(CPP14Parser.LabeledStatementContext ctx) {
+        //System.out.println("[" + ctx.hashCode() + "] " + ctx.getText());
+
+        CaseOrDefaultStatementASTNode caseOrDefaultStatementASTNode = new CaseOrDefaultStatementASTNode();
+        caseOrDefaultStatementASTNode.ctx = ctx;
+        caseOrDefaultStatementASTNode.value = ctx.getText();
+        caseOrDefaultStatementASTNode.statementType = StatementType.valueOf(ctx.getChild(0).getText().toUpperCase());
+
+        connectToParent(currentNode, caseOrDefaultStatementASTNode);
+
+        // descend
+        currentNode = caseOrDefaultStatementASTNode;
+    }
+
+    @Override
+    public void exitLabeledStatement(CPP14Parser.LabeledStatementContext ctx) {
+        // System.out.println("[" + ctx.hashCode() + "] " + ctx.getText());
+
+        if (((CaseOrDefaultStatementASTNode) currentNode).statementType == StatementType.CASE) {
+            ((CaseOrDefaultStatementASTNode) currentNode).expression = expressionStackPop();
+        }
+
+        // StringBuilder stringBuilder = new StringBuilder();
+        // ((CaseOrDefaultStatementASTNode) currentNode).printRecursive(stringBuilder, 0);
+        // System.out.println(stringBuilder.toString());
+
+        // ascend
+        currentNode = currentNode.parent;
+    }
+
+    @Override
     public void enterJumpStatement(CPP14Parser.JumpStatementContext ctx) {
     }
 
     @Override
     public void exitJumpStatement(CPP14Parser.JumpStatementContext ctx) {
+        //System.out.println("[" + ctx.hashCode() + "] " + ctx.getText());
 
         JumpStatementASTNode jumpStatementASTNode = new JumpStatementASTNode();
         jumpStatementASTNode.ctx = ctx;
         jumpStatementASTNode.value = ctx.getText();
-        jumpStatementASTNode.children.add(expressionStackPop());
         jumpStatementASTNode.statementType = StatementType.valueOf(ctx.getChild(0).getText().toUpperCase());
+        if (jumpStatementASTNode.statementType == StatementType.IF) {
+            jumpStatementASTNode.children.add(expressionStackPop());
+        }
 
-        // if (currentNode instanceof StatementASTNode) {
-        // ((StatementASTNode) currentNode).addStatement(jumpStatementASTNode);
-        // } else {
         currentNode.children.add(jumpStatementASTNode);
-        // }
     }
 
     @Override
@@ -565,6 +595,18 @@ public class StructureCPP14ParserListener extends CPP14ParserBaseListener {
             // descend
             currentNode = ifStatementASTNode;
 
+        } else if (ctx.getChild(0).getText().equalsIgnoreCase("switch")) {
+
+            SwitchStatementASTNode switchStatementASTNode = new SwitchStatementASTNode();
+            switchStatementASTNode.ctx = ctx;
+            switchStatementASTNode.value = ctx.getText();
+            switchStatementASTNode.statementType = StatementType.valueOf(ctx.getChild(0).getText().toUpperCase());
+
+            connectToParent(currentNode, switchStatementASTNode);
+
+            // descend
+            currentNode = switchStatementASTNode;
+
         } else {
             throw new RuntimeException("Unknown instruction: " + ctx.getChild(0).getText());
         }
@@ -574,6 +616,10 @@ public class StructureCPP14ParserListener extends CPP14ParserBaseListener {
     public void exitSelectionStatement(CPP14Parser.SelectionStatementContext ctx) {
 
         if (ctx.getChild(0).getText().equalsIgnoreCase("if")) {
+
+            // ascend
+            currentNode = currentNode.parent;
+        } else if (ctx.getChild(0).getText().equalsIgnoreCase("switch")) {
 
             // ascend
             currentNode = currentNode.parent;
@@ -588,10 +634,15 @@ public class StructureCPP14ParserListener extends CPP14ParserBaseListener {
 
     @Override
     public void exitCondition(CPP14Parser.ConditionContext ctx) {
+        // System.out.println("[" + ctx.hashCode() + "] " + ctx.getText());
 
         if (currentNode instanceof IfStatementASTNode) {
 
-            ((IfStatementASTNode) currentNode).expression = expressionStack.pop();
+            ((IfStatementASTNode) currentNode).expression = expressionStackPop();
+
+        } else if (currentNode instanceof SwitchStatementASTNode) {
+
+            ((SwitchStatementASTNode) currentNode).expression = expressionStackPop();
 
         } else {
             throw new RuntimeException("Unknown instruction: " + ctx.getChild(0).getText());
