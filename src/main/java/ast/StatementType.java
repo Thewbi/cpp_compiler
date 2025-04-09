@@ -1,6 +1,8 @@
 package ast;
 
-public enum JumpStatementType {
+public enum StatementType {
+
+    IF,
 
     RETURN,
 

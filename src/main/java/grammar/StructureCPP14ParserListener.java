@@ -12,6 +12,7 @@ import ast.ASTNode;
 import ast.CastExpressionASTNode;
 import ast.ClassSpecifierASTNode;
 import ast.ClassSpecifierType;
+import ast.CompoundStatementASTNode;
 import ast.DeclarationListASTNode;
 import ast.DeclarationSpecifier;
 import ast.DeclaratorASTNode;
@@ -20,12 +21,13 @@ import ast.ExpressionListASTNode;
 import ast.ExpressionListBlockerASTNode;
 import ast.ExpressionType;
 import ast.FunctionDeclarationASTNode;
+import ast.IfStatementASTNode;
 import ast.JumpStatementASTNode;
-import ast.JumpStatementType;
 import ast.MemberDeclarationASTNode;
 import ast.ParameterDeclarationASTNode;
 import ast.ParameterDeclarationListASTNode;
 import ast.PostFixExpressionASTNode;
+import ast.StatementType;
 import ast.UnaryOperatorExpressionASTNode;
 
 public class StructureCPP14ParserListener extends CPP14ParserBaseListener {
@@ -319,6 +321,15 @@ public class StructureCPP14ParserListener extends CPP14ParserBaseListener {
     }
 
     @Override
+    public void exitEqualityExpression(CPP14Parser.EqualityExpressionContext ctx) {
+        // System.out.println("[" + ctx.hashCode() + "] " + ctx.getText());
+        if (ctx.children.size() == 1) {
+            return;
+        }
+        processExpressionOperator(ctx, ExpressionType.Equality);
+    }
+
+    @Override
     public void enterUnaryOperator(CPP14Parser.UnaryOperatorContext ctx) {
     }
 
@@ -501,18 +512,90 @@ public class StructureCPP14ParserListener extends CPP14ParserBaseListener {
     //
 
     @Override
+    public void enterCompoundStatement(CPP14Parser.CompoundStatementContext ctx) {
+
+        CompoundStatementASTNode compoundStatementASTNode = new CompoundStatementASTNode();
+        compoundStatementASTNode.ctx = ctx;
+
+        connectToParent(currentNode, compoundStatementASTNode);
+
+        // descend
+        currentNode = compoundStatementASTNode;
+    }
+
+    @Override
+    public void exitCompoundStatement(CPP14Parser.CompoundStatementContext ctx) {
+
+        // ascend
+        currentNode = currentNode.parent;
+    }
+
+    @Override
     public void enterJumpStatement(CPP14Parser.JumpStatementContext ctx) {
     }
 
     @Override
     public void exitJumpStatement(CPP14Parser.JumpStatementContext ctx) {
+
         JumpStatementASTNode jumpStatementASTNode = new JumpStatementASTNode();
         jumpStatementASTNode.ctx = ctx;
         jumpStatementASTNode.value = ctx.getText();
         jumpStatementASTNode.children.add(expressionStackPop());
-        jumpStatementASTNode.type = JumpStatementType.valueOf(ctx.getChild(0).getText().toUpperCase());
+        jumpStatementASTNode.statementType = StatementType.valueOf(ctx.getChild(0).getText().toUpperCase());
 
+        // if (currentNode instanceof StatementASTNode) {
+        // ((StatementASTNode) currentNode).addStatement(jumpStatementASTNode);
+        // } else {
         currentNode.children.add(jumpStatementASTNode);
+        // }
+    }
+
+    @Override
+    public void enterSelectionStatement(CPP14Parser.SelectionStatementContext ctx) {
+
+        if (ctx.getChild(0).getText().equalsIgnoreCase("if")) {
+
+            IfStatementASTNode ifStatementASTNode = new IfStatementASTNode();
+            ifStatementASTNode.ctx = ctx;
+            ifStatementASTNode.value = ctx.getText();
+            ifStatementASTNode.statementType = StatementType.valueOf(ctx.getChild(0).getText().toUpperCase());
+
+            connectToParent(currentNode, ifStatementASTNode);
+
+            // descend
+            currentNode = ifStatementASTNode;
+
+        } else {
+            throw new RuntimeException("Unknown instruction: " + ctx.getChild(0).getText());
+        }
+    }
+
+    @Override
+    public void exitSelectionStatement(CPP14Parser.SelectionStatementContext ctx) {
+
+        if (ctx.getChild(0).getText().equalsIgnoreCase("if")) {
+
+            // ascend
+            currentNode = currentNode.parent;
+        } else {
+            throw new RuntimeException("Unknown instruction: " + ctx.getChild(0).getText());
+        }
+    }
+
+    @Override
+    public void enterCondition(CPP14Parser.ConditionContext ctx) {
+    }
+
+    @Override
+    public void exitCondition(CPP14Parser.ConditionContext ctx) {
+
+        if (currentNode instanceof IfStatementASTNode) {
+
+            ((IfStatementASTNode) currentNode).expression = expressionStack.pop();
+
+        } else {
+            throw new RuntimeException("Unknown instruction: " + ctx.getChild(0).getText());
+        }
     }
 
     //

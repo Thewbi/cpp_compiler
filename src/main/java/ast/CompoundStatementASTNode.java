@@ -1,14 +1,6 @@
 package ast;
 
-/**
- * return, ...
- */
-public class JumpStatementASTNode extends StatementASTNode {
-
-    // @Override
-    // public void addStatement(StatementASTNode statementASTNode) {
-    //     throw new UnsupportedOperationException("Unimplemented method 'addStatement'");
-    // }
+public class CompoundStatementASTNode extends StatementASTNode {
 
     public void printRecursive(final StringBuilder stringBuilder, final int indent) {
         printRecursive(stringBuilder, indent, true);
@@ -20,8 +12,7 @@ public class JumpStatementASTNode extends StatementASTNode {
         for (int i = 0; i < indent; i++) {
             stringBuilder.append("  ");
         }
-        stringBuilder.append("[JUMP_STMT] type=").append(statementType);
-        stringBuilder.append("\n");
+        stringBuilder.append("[COMPOUND_STMT]").append("\n");
 
         // all children
         for (ASTNode child : children) {
