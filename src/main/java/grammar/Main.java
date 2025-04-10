@@ -80,6 +80,8 @@ public class Main {
         //final String filename = "src/test/resources/initialize_if_elseif_else.cpp";
         //final String filename = "src/test/resources/initialize_switch_case.cpp";
         final String filename = "src/test/resources/initialize_for_loop.cpp";
+        //final String filename = "src/test/resources/initialize_while_loop.cpp";
+        //final String filename = "src/test/resources/initialize_do_while_loop.cpp";
 
         // final String filename = "src/test/resources/palindrome_number.cpp";
         // final String filename = "src/test/resources/sample1.cpp";
