@@ -2,6 +2,8 @@ package ast;
 
 public enum StatementType {
 
+    FOR,
+
     IF,
 
     SWITCH,

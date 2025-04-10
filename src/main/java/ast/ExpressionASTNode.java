@@ -2,7 +2,7 @@ package ast;
 
 public class ExpressionASTNode extends ASTNode {
 
-    public ExpressionType expressionType = ExpressionType.Unknown;
+    public ExpressionType expressionType = ExpressionType.UNKNOWN;
 
     public ExpressionASTNode lhs;
 
@@ -19,6 +19,14 @@ public class ExpressionASTNode extends ASTNode {
             stringBuilder.append("  ");
         }
         stringBuilder.append("[EXPR] type='").append(expressionType).append("' ");
+
+        // if ((lhs != null) && (rhs != null)) {
+        //     // stringBuilder.append("lhs=");
+        //     stringBuilder.append("\n");
+        //     lhs.printRecursive(stringBuilder, indent + 1);
+        //     // stringBuilder.append("rhs=");
+        //     rhs.printRecursive(stringBuilder, indent + 1);
+        // }
 
         if (value != null) {
             stringBuilder.append("value='").append(value).append("' ");

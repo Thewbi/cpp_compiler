@@ -23,6 +23,7 @@ import ast.ExpressionListBlockerASTNode;
 import ast.ExpressionType;
 import ast.FunctionDeclarationASTNode;
 import ast.IfStatementASTNode;
+import ast.IterationStatementASTNode;
 import ast.JumpStatementASTNode;
 import ast.MemberDeclarationASTNode;
 import ast.ParameterDeclarationASTNode;
@@ -298,6 +299,39 @@ public class StructureCPP14ParserListener extends CPP14ParserBaseListener {
         expressionStackPush(expressionASTNode);
     }
 
+    @Override
+    public void enterAssignmentExpression(CPP14Parser.AssignmentExpressionContext ctx) {
+    }
+
+    /**
+     * Exists in for loops in the first part where the variable is initialized.
+     *
+     * <pre>
+     * for (i = 0, ...) {
+     * }
+     * </pre>
+     */
+    @Override
+    public void exitAssignmentExpression(CPP14Parser.AssignmentExpressionContext ctx) {
+        if (ctx.children.size() == 1) {
+            return;
+        }
+
+        ExpressionASTNode expressionASTNode = new ExpressionASTNode();
+        expressionASTNode.ctx = ctx;
+
+        expressionASTNode.rhs = expressionStackPop();
+        expressionASTNode.lhs = expressionStackPop();
+
+        expressionASTNode.children.add(expressionASTNode.lhs);
+        expressionASTNode.children.add(expressionASTNode.rhs);
+
+
+
+        expressionASTNode.expressionType = ExpressionType.Assignment;
+        expressionStackPush(expressionASTNode);
+    }
+
     //
     // Operators in Expressions
     //
@@ -332,12 +366,21 @@ public class StructureCPP14ParserListener extends CPP14ParserBaseListener {
     }
 
     @Override
+    public void exitRelationalExpression(CPP14Parser.RelationalExpressionContext ctx) {
+        //System.out.println("[" + ctx.hashCode() + "] " + ctx.getText());
+        if (ctx.children.size() == 1) {
+            return;
+        }
+        processExpressionOperator(ctx, ExpressionType.fromString(ctx.children.get(1).getText()));
+    }
+
+    @Override
     public void enterUnaryOperator(CPP14Parser.UnaryOperatorContext ctx) {
     }
 
     @Override
     public void exitUnaryOperator(CPP14Parser.UnaryOperatorContext ctx) {
-        // System.out.println("[" + ctx.hashCode() + "] " + ctx.getText());
+        //System.out.println("[" + ctx.hashCode() + "] " + ctx.getText());
         ExpressionType expressionType = null;
         if (ctx.getText().equalsIgnoreCase("&")) {
             expressionType = ExpressionType.AddressOperator;
@@ -367,11 +410,24 @@ public class StructureCPP14ParserListener extends CPP14ParserBaseListener {
      */
     @Override
     public void exitPostfixExpression(CPP14Parser.PostfixExpressionContext ctx) {
-        // System.out.println("[" + ctx.hashCode() + "] " + ctx.getText());
+        //System.out.println("[" + ctx.hashCode() + "] " + ctx.getText());
 
         if (ctx.children.size() == 1) {
-            // processUnaryOperatorCase();
             return;
+        }
+
+        if (ctx.children.size() == 2) {
+            if (ctx.children.get(1).getText().equalsIgnoreCase("++")) {
+                //System.out.println("[" + ctx.hashCode() + "] " + ctx.getText());
+
+                PostFixExpressionASTNode postFixExpressionASTNode = new PostFixExpressionASTNode();
+                postFixExpressionASTNode.lhs = expressionStackPop();
+                postFixExpressionASTNode.expressionType = ExpressionType.fromString("++");
+
+                expressionStackPush(postFixExpressionASTNode);
+                return;
+            }
+
         }
 
         if (ctx.children.size() == 3) {
@@ -382,9 +438,7 @@ public class StructureCPP14ParserListener extends CPP14ParserBaseListener {
             PostFixExpressionASTNode postFixExpressionASTNode = new PostFixExpressionASTNode();
             postFixExpressionASTNode.name = functionNameExpressionASTNode;
 
-            // if (!processUnaryOperatorCase()) {
             expressionStackPush(postFixExpressionASTNode);
-            // }
 
             return;
         }
@@ -532,7 +586,7 @@ public class StructureCPP14ParserListener extends CPP14ParserBaseListener {
 
     @Override
     public void enterLabeledStatement(CPP14Parser.LabeledStatementContext ctx) {
-        //System.out.println("[" + ctx.hashCode() + "] " + ctx.getText());
+        // System.out.println("[" + ctx.hashCode() + "] " + ctx.getText());
 
         CaseOrDefaultStatementASTNode caseOrDefaultStatementASTNode = new CaseOrDefaultStatementASTNode();
         caseOrDefaultStatementASTNode.ctx = ctx;
@@ -554,7 +608,8 @@ public class StructureCPP14ParserListener extends CPP14ParserBaseListener {
         }
 
         // StringBuilder stringBuilder = new StringBuilder();
-        // ((CaseOrDefaultStatementASTNode) currentNode).printRecursive(stringBuilder, 0);
+        // ((CaseOrDefaultStatementASTNode) currentNode).printRecursive(stringBuilder,
+        // 0);
         // System.out.println(stringBuilder.toString());
 
         // ascend
@@ -567,7 +622,7 @@ public class StructureCPP14ParserListener extends CPP14ParserBaseListener {
 
     @Override
     public void exitJumpStatement(CPP14Parser.JumpStatementContext ctx) {
-        //System.out.println("[" + ctx.hashCode() + "] " + ctx.getText());
+        // System.out.println("[" + ctx.hashCode() + "] " + ctx.getText());
 
         JumpStatementASTNode jumpStatementASTNode = new JumpStatementASTNode();
         jumpStatementASTNode.ctx = ctx;
@@ -634,7 +689,7 @@ public class StructureCPP14ParserListener extends CPP14ParserBaseListener {
 
     @Override
     public void exitCondition(CPP14Parser.ConditionContext ctx) {
-        // System.out.println("[" + ctx.hashCode() + "] " + ctx.getText());
+        //System.out.println("[" + ctx.hashCode() + "] " + ctx.getText());
 
         if (currentNode instanceof IfStatementASTNode) {
 
@@ -644,9 +699,85 @@ public class StructureCPP14ParserListener extends CPP14ParserBaseListener {
 
             ((SwitchStatementASTNode) currentNode).expression = expressionStackPop();
 
+        } else if (currentNode instanceof IterationStatementASTNode) {
+
+//            ((IterationStatementASTNode) currentNode).expression = expressionStackPop();
+            ((IterationStatementASTNode) currentNode).condition = expressionStackPop();
+
         } else {
             throw new RuntimeException("Unknown instruction: " + ctx.getChild(0).getText());
         }
+    }
+
+    @Override
+    public void enterIterationStatement(CPP14Parser.IterationStatementContext ctx) {
+
+        IterationStatementASTNode iterationStatementASTNode = new IterationStatementASTNode();
+        iterationStatementASTNode.ctx = ctx;
+        iterationStatementASTNode.value = ctx.getText();
+        iterationStatementASTNode.statementType = StatementType.valueOf(ctx.getChild(0).getText().toUpperCase());
+
+        connectToParent(currentNode, iterationStatementASTNode);
+
+        // descend
+        currentNode = iterationStatementASTNode;
+    }
+
+    @Override
+    public void exitIterationStatement(CPP14Parser.IterationStatementContext ctx) {
+        // System.out.println("[" + ctx.hashCode() + "] " + ctx.getText());
+
+        IterationStatementASTNode iterationStatementASTNode = (IterationStatementASTNode) currentNode;
+
+        if (iterationStatementASTNode.statementType == StatementType.FOR) {
+
+            // iterationStatementASTNode.expression = expressionStackPop();
+
+            // // DEBUG
+            // StringBuilder stringBuilder = new StringBuilder();
+            // iterationStatementASTNode.expression.printRecursive(stringBuilder, 0);
+            // System.out.println(stringBuilder.toString());
+
+//            iterationStatementASTNode.condition = expressionStackPop();
+            iterationStatementASTNode.expression = expressionStackPop();
+
+            // // DEBUG
+            // StringBuilder stringBuilder = new StringBuilder();
+            // iterationStatementASTNode.condition.printRecursive(stringBuilder,
+            //         0);
+            // System.out.println(stringBuilder.toString());
+
+            // stringBuilder = new StringBuilder();
+            // iterationStatementASTNode.expression.printRecursive(stringBuilder,
+            //         0);
+            // System.out.println(stringBuilder.toString());
+        }
+
+        // ascend
+        currentNode = currentNode.parent;
+    }
+
+    @Override
+    public void enterForInitStatement(CPP14Parser.ForInitStatementContext ctx) {
+    }
+
+    @Override
+    public void exitForInitStatement(CPP14Parser.ForInitStatementContext ctx) {
+        //System.out.println("[" + ctx.hashCode() + "] " + ctx.getText());
+
+        // ExpressionASTNode expression = expressionStackPop();
+        // StringBuilder stringBuilder = new StringBuilder();
+        // expression.printRecursive(stringBuilder, 0);
+        // System.out.println(stringBuilder.toString());
+
+        // expression = expressionStackPop();
+        // stringBuilder = new StringBuilder();
+        // expression.printRecursive(stringBuilder, 0);
+        // System.out.println(stringBuilder.toString());
+
+        ExpressionASTNode expression = expressionStackPop();
+
+        ((IterationStatementASTNode) currentNode).initExpression = expression;
     }
 
     //

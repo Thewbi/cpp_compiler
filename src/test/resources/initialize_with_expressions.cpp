@@ -37,6 +37,13 @@ int main() {
     int value_6 = get_value_d(1, get_value(1, 2));
     int value_7 = get_value_d(1, get_value(1, (2 + 3) * 7));
 
+
+    int value_8 = get_value_8()++;
+    int value_9 = ++get_value_9();
+    int value_9 = get_value_9() + 123;
+    int value_9 = 123 + get_value_9();
+    int value_9 = 123 + get_value_9() + 123;
+
     return 100;
 
     return 1 + 2 + 3;
