@@ -1,3 +1,11 @@
+# Goals
+
+The purpose of intermediate code is to provide an abstract layer that is agnostic to the source language and also agnostic to the target platform. The gain is to have a layer that can be reused when the source language or the target platform is changed.
+
+Another important function is, once a source and target agnostic layer is available, it is worthwhile to spend considerable amount of resources on creating optimizations that modify this abstract layer.
+
+The optimized intermediate language code is then forwareded to the code generation for a specific target.
+
 # Machine Model
 
 - Infinite registers. All registers are general purpose, none of them has any special meaning.
@@ -15,9 +23,9 @@ int main() {
 	int i;
 
 	for (i = 0; i < 5; i++) {
-	  printf("%d\n", i);
+	    printf("%d\n", i);
 	}
-	
+
 	return 123;
 }
 ```
@@ -39,27 +47,26 @@ When a new variable is declared, the variable is inserted into the current stack
 VariableStackFrameEntry {
 	name: i
 	type: int
-//	value: N/A
 	register: register_index
 }
 ```
 
-The register_index is the index of one of the registers of the machine model. 
-This register is used to work with the variable. 
-The register_index has to be retrieved by calling getNextRegisterIndex(). 
+The register_index is the index of one of the registers of the machine model.
+This register is used to work with the variable.
+The register_index has to be retrieved by calling getNextRegisterIndex().
 The job if getNextRegisterIndex() is to determine the first register that is currently unused.
 
-Code Generation will produce:
+Intermediate Code Generation will produce:
 
 ```
 addStackFrameEntry(i, int, register_index)
-``` 
+```
 
 ## Action: i = 0;
 
 First the system searches the variable 'i' in the current stackframe. Now the system has access to the 'register_index' value.
 
-Code Generation produces the instruction:
+Intermediate Code Generation produces the instruction:
 
 ```
 loadRegister(register_index, 0)
@@ -69,7 +76,7 @@ At this point, the register is loaded with value 0 which means the variable is i
 
 ## Action: i < 5;
 
-Code Generation produces the instruction:
+Intermediate Code Generation produces the instruction:
 
 ```
 loop_start: 	bge(i, 5, loop_end)
@@ -92,7 +99,7 @@ loop_end:
 
 A new stack frame is created.
 
-Code Generation produces the instruction:
+Intermediate Code Generation produces the instruction:
 
 ```
 pushStackFrame()
@@ -100,7 +107,7 @@ pushStackFrame()
 
 ## Action: printf("%d\n", i);
 
-Code Generation: see function_call main() and also just body blocks in general.
+Intermediate Code Generation: see function_call main() and also just body blocks in general.
 
 ```
 pushStackFrame()
@@ -108,7 +115,7 @@ pushStackFrame()
 popStackFrame()
 ```
 
-or 
+or
 
 ```
 call(printf, "%d\n", i.register_index)
@@ -128,7 +135,7 @@ The instruction i++ is executed:
 
 First the system searches the variable 'i' in the current stackframe. Now the system has access to the 'register_index' value.
 
-Code Generation produces the instruction:
+Intermediate Code Generation produces the instruction:
 
 ```
 addi(i, i, 1)
