@@ -108,6 +108,12 @@ myNumbers[0] = 33;
 printf("%d", myNumbers[0]);
 ```
 
+## Pointer usage
+
+```
+dev->addPath(newpoly);
+```
+
 ## Variable assignments
 
 ```

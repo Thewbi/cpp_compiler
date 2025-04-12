@@ -1,5 +1,10 @@
 # cpp_compiler
+
 C++ compiler written in Java
+
+## TODO
+
+Learn about SSA (Static Single Assignment). See https://yosyshq.readthedocs.io/projects/yosys/en/latest/appendix/primer.html
 
 ## Phases
 
@@ -39,7 +44,7 @@ large .cpp file is compiled into a single object file.
 
 Linking of the object files is not part of this compiler.
 
-## TODO 
+## TODO
 
 ```
 add true/false constants
@@ -62,7 +67,7 @@ Goal: Build a RISC V assembler, instruciton decoder and simulator.
 
 1. A lexer/parser that parses a GAS syntax input file into line objects
 1. A preprocessor takes line objects and resolves .inc assembly instructions. This will create a single large preprocessed.s file
-1. The preprocessed.s file goes through the lexer/parser once again which again produces line objects. 
+1. The preprocessed.s file goes through the lexer/parser once again which again produces line objects.
 1. The assembler takes instructions in the form of line objects and produces binary files where instructions are encoded in machine language.
 1. The instruction decoder can read and decode binary files and it produces instructions in the form of line objects.
 1. The simulator executes instructions in the form of line objects.
@@ -102,7 +107,7 @@ is the binary file.
 11. Write a Decoder (see riscv.RISCVInstructionDecoder) and assign it to the CPU. The Decoder has to access the code memory at the location stored in the CPU's program counter (PC).
 12. The Decoder has to convert a machine code instruction into another RowType (see grammar.ExplicitRISCVRow). The Decoder has to have a methode which takes the machine instruction as input, decodes it and returns the resulting RowType (e.g. grammar.ExplicitRISCVRow). The RowType will provide the opcode, registers, immediate values, offsets in a convenient manner.
 13. Implement the CPU. The CPU will have a PC (program counter) register that points into the code memory onto the next instruction to execute. The CPU will fetch the word of machine code at the current PC. It will decode that word of machine code into a row (e.g. grammar.ExplicitRISCVRow). It will then execute that machine instruction.
-14. Write a driver (= fancy word for a main() function that executes your code) which parses the source code, calls the encoder on the rows and then assigns the memory to your CPU. Then run the CPU in the driver. 
+14. Write a driver (= fancy word for a main() function that executes your code) which parses the source code, calls the encoder on the rows and then assigns the memory to your CPU. Then run the CPU in the driver.
 15. Implement the UI. Implement the interfaces common.IRegisterFile and common.IMemory. As templates, check out riscv.DefaultMemory and riscv.DefaultRegisterFile.
 16. Follow ide.App.start(Stage primaryStage) as a template to see how to put together a GUI.
 17. Implement the Assemble and the Step Buttons. Assemble will call the parser on the source code currently pasted into the GUI. Step will make the CPU perform a single step (exceute the machine code at the current PC).

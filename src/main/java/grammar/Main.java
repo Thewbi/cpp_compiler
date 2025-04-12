@@ -69,7 +69,12 @@ public class Main {
         // "src/test/resources/WritingACCompilerNoraSandler/simplest.c";
 
         //final String filename = "src/test/resources/initialize_with_expressions.cpp";
+
         //final String filename = "src/test/resources/initialize_pointers.cpp";
+
+        // test
+        //final String filename = "src/test/resources/initialize_use_pointers.cpp";
+
         //final String filename = "src/test/resources/initialize_arrays.cpp";
         //final String filename = "src/test/resources/inititalize_variable_cast.cpp";
         //final String filename = "src/test/resources/initialize_function_declaration.cpp";
@@ -78,10 +83,12 @@ public class Main {
         //final String filename = "src/test/resources/initialize_class.cpp";
         //final String filename = "src/test/resources/initialize_typedef.cpp";
         //final String filename = "src/test/resources/initialize_if_elseif_else.cpp";
-        //final String filename = "src/test/resources/initialize_switch_case.cpp";
-        final String filename = "src/test/resources/initialize_for_loop.cpp";
+        final String filename = "src/test/resources/initialize_switch_case.cpp";
+        //final String filename = "src/test/resources/initialize_for_loop.cpp";
         //final String filename = "src/test/resources/initialize_while_loop.cpp";
         //final String filename = "src/test/resources/initialize_do_while_loop.cpp";
+
+        //final String filename = "src/test/resources/drawPath.cpp";
 
         // final String filename = "src/test/resources/palindrome_number.cpp";
         // final String filename = "src/test/resources/sample1.cpp";

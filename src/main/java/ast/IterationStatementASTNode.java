@@ -17,7 +17,7 @@ public class IterationStatementASTNode extends StatementASTNode {
         for (int i = 0; i < indent; i++) {
             stringBuilder.append("  ");
         }
-        stringBuilder.append("[FOR] ");
+        stringBuilder.append("[" + statementType.name() + "] ");
         stringBuilder.append("\n");
 
         // for-loop first part

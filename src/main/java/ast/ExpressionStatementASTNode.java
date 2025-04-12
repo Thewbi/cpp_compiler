@@ -1,6 +1,6 @@
 package ast;
 
-public class SwitchStatementASTNode extends StatementASTNode {
+public class ExpressionStatementASTNode extends ExpressionASTNode {
 
     public ExpressionASTNode expression;
 
@@ -14,11 +14,16 @@ public class SwitchStatementASTNode extends StatementASTNode {
         for (int i = 0; i < indent; i++) {
             stringBuilder.append("  ");
         }
-        stringBuilder.append("[SWITCH-STMT]").append("\n");
+        stringBuilder.append("[EXPR-STMT] type='").append(expressionType).append("' ");
+        stringBuilder.append("\n");
+
+        if (expression != null) {
+            expression.printRecursive(stringBuilder, indent + 1);
+        }
 
         // all children
         for (ASTNode child : children) {
-            child.printRecursive(stringBuilder, indent + 1);
+            child.printRecursive(stringBuilder, indent + 1, addLineBreak);
         }
     }
 

@@ -4,6 +4,10 @@ public enum StatementType {
 
     FOR,
 
+    WHILE,
+
+    DO,
+
     IF,
 
     SWITCH,

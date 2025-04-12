@@ -14,8 +14,11 @@ public enum ExpressionType {
     /** == */
     Equality,
 
-    /** <= */
+    /** < */
     LessThen,
+
+    /** <= */
+    LessThenOrEquals,
 
     /** & */
     AddressOperator,
@@ -41,6 +44,8 @@ public enum ExpressionType {
             return Equality;
         } else if (tempData.equalsIgnoreCase("<")) {
             return LessThen;
+        } else if (tempData.equalsIgnoreCase("<=")) {
+            return LessThenOrEquals;
         } else if (tempData.equalsIgnoreCase("*")) {
             return Mul;
         } else if (tempData.equalsIgnoreCase("&")) {
