@@ -3,8 +3,9 @@
 Writing a C Compiler: Build a Real Programming Language from Scratch (1st Edition, 20 Aug. 2024)
 Nora Sandler
 Buy on Amazon:
-https://www.amazon.com/-/en/Writing-Compiler-Programming-Language-Scratch/dp/1718500424
-https://www.amazon.de/-/en/Writing-Compiler-Programming-Language-Scratch/dp/1718500424
+
+* https://www.amazon.com/-/en/Writing-Compiler-Programming-Language-Scratch/dp/1718500424
+* https://www.amazon.de/-/en/Writing-Compiler-Programming-Language-Scratch/dp/1718500424
 
 # TACKY Intermediate Language Statements
 
@@ -38,7 +39,7 @@ Constant(int)
 val = Constant(int)
 ```
 
-Example
+Example:
 
 ```
 v1 = Constant(1)
@@ -106,6 +107,15 @@ binary_operator = Add | Subtract | Multiply | Divide | Remainder | Equal | NotEq
 val_src = Var(identifier) | Constant(int)
 val_dst = Constant(int)
 Binary(binary_operator, val_src src1, val_src src2, val_dst dst)
+```
+
+Example:
+
+```
+var_a = Var("a")
+var_b = Var("b")
+Copy(Constant(6), var_b)
+Binary(Add, var_b, Constant(2), var_a)
 ```
 
 ## Local Variables (Page 111)
@@ -182,15 +192,27 @@ Return(Var("tmp"))
 
 ## Jump (Page 75)
 
+The grammar is:
+
 ```
 | Jump(identifier target)
 | JumpIfZero(val condition, identifier target)
 | JumpIfNotZero(val condition, identifier target)
 ```
 
+Example:
+
+```
+TODO:
+```
+
 ### JumpIfZero(condition, target) (Page 87)
 
+TODO
+
 ### JumpIfNotZero(condition, target) (Page 87)
+
+TODO
 
 ## Function Definition
 
@@ -289,7 +311,7 @@ Label(end)
 
 ```
 start:
-        for (<instructions for init> ; continue_label:  <instructions for condition> ; continue_label: <instructions for post>)
+        for (<instructions for init> ; continue_label: <instructions for condition> ; continue_label: <instructions for post>)
         {
             <instructions for body>
         }
