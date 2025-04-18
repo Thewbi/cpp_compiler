@@ -83,14 +83,15 @@ public class Main {
         //final String filename = "src/test/resources/initialize_class.cpp";
         //final String filename = "src/test/resources/initialize_typedef.cpp";
         //final String filename = "src/test/resources/initialize_if_elseif_else.cpp";
-        final String filename = "src/test/resources/initialize_switch_case.cpp";
+        //final String filename = "src/test/resources/initialize_switch_case.cpp";
         //final String filename = "src/test/resources/initialize_for_loop.cpp";
         //final String filename = "src/test/resources/initialize_while_loop.cpp";
         //final String filename = "src/test/resources/initialize_do_while_loop.cpp";
 
         //final String filename = "src/test/resources/drawPath.cpp";
 
-        // final String filename = "src/test/resources/palindrome_number.cpp";
+        final String filename = "src/test/resources/palindrome_number.cpp";
+
         // final String filename = "src/test/resources/sample1.cpp";
         // final String filename = "src/test/resources/helloworld.cpp";
         // final String filename = "src/test/resources/interface.h";
@@ -108,7 +109,7 @@ public class Main {
         // final String filename = "src/test/resources/for_loop.cpp";
         // final String filename = "src/test/resources/function_definition.cpp";
         // final String filename = "src/test/resources/function_call.cpp";
-        // final String filename = "src/test/resources/while.cpp";
+        //final String filename = "src/test/resources/while.cpp";
         // final String filename = "src/test/resources/app1.cpp";
         // final String filename = "src/test/resources/ECO32/ECO32_1.cpp";
 

@@ -1,15 +1,15 @@
-int funcInt() {
-    return 3;
-}
+// int funcInt() {
+//     return 3;
+// }
 
-char funcChar() {
-    return 'c';
-}
+// char funcChar() {
+//     return 'c';
+// }
 
 int main()
 {
     // ok
-    while (true) {
+    //while (true) {
     //while (false) {
     //while (!true) {
     //while (!false) {
@@ -21,6 +21,7 @@ int main()
     //while ('c' > funcChar()) {
     //while (funcInt() == funcInt()) {
     //while (funcInt() != funcInt()) {
+    while (n != 1) {
 
     // error
     //while ('c') {

@@ -11,8 +11,14 @@ public enum ExpressionType {
     /** Multiplication: * */
     Mul,
 
+    /** Division Assignment: /= */
+    Div_Assign,
+
     /** == */
     Equality,
+
+    /** != */
+    Not_Equal,
 
     /** < */
     LessThen,
@@ -22,6 +28,9 @@ public enum ExpressionType {
 
     /** & */
     AddressOperator,
+
+    /** % */
+    Modulo,
 
     Primary, // expressions that are not subdivided further
 
@@ -40,8 +49,12 @@ public enum ExpressionType {
             return UnaryIncrement;
         } else if (tempData.equalsIgnoreCase("*")) {
             return Mul;
+        } else if (tempData.equalsIgnoreCase("/=")) {
+            return Div_Assign;
         } else if (tempData.equalsIgnoreCase("==")) {
             return Equality;
+        } else if (tempData.equalsIgnoreCase("!=")) {
+            return Not_Equal;
         } else if (tempData.equalsIgnoreCase("<")) {
             return LessThen;
         } else if (tempData.equalsIgnoreCase("<=")) {
@@ -50,29 +63,11 @@ public enum ExpressionType {
             return Mul;
         } else if (tempData.equalsIgnoreCase("&")) {
             return AddressOperator;
-        } else if (tempData.equalsIgnoreCase("*")) {
-            return Mul;
+        } else if (tempData.equalsIgnoreCase("%")) {
+            return Modulo;
         }
-        // else if (tempData.equalsIgnoreCase("*")) {
-        //     return Mul;
-        // } else if (tempData.equalsIgnoreCase("*")) {
-        //     return Mul;
-        // } else if (tempData.equalsIgnoreCase("*")) {
-        //     return Mul;
-        // } else if (tempData.equalsIgnoreCase("*")) {
-        //     return Mul;
-        // } else if (tempData.equalsIgnoreCase("*")) {
-        //     return Mul;
-        // } else if (tempData.equalsIgnoreCase("*")) {
-        //     return Mul;
-        // } else if (tempData.equalsIgnoreCase("*")) {
-        //     return Mul;
-        // } else if (tempData.equalsIgnoreCase("*")) {
-        //     return Mul;
-        // }
         else {
             throw new RuntimeException("Unknown type: " + data);
-            //return UNKNOWN;
         }
     }
 

@@ -11,6 +11,10 @@ public class IterationStatementASTNode extends StatementASTNode {
     /* right expression of a for loop */
     public ExpressionASTNode expression;
 
+    public void printRecursive(final StringBuilder stringBuilder, final int indent) {
+        printRecursive(stringBuilder, indent, true);
+    }
+
     public void printRecursive(final StringBuilder stringBuilder, final int indent, final boolean addLineBreak) {
 
         // indent and operator or symbol

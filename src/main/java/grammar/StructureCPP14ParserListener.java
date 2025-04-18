@@ -314,6 +314,8 @@ public class StructureCPP14ParserListener extends CPP14ParserBaseListener {
      */
     @Override
     public void exitAssignmentExpression(CPP14Parser.AssignmentExpressionContext ctx) {
+        System.out.println("[" + ctx.hashCode() + "] " + ctx.getText());
+
         if (ctx.children.size() == 1) {
             return;
         }
@@ -327,7 +329,8 @@ public class StructureCPP14ParserListener extends CPP14ParserBaseListener {
         expressionASTNode.children.add(expressionASTNode.lhs);
         expressionASTNode.children.add(expressionASTNode.rhs);
 
-        expressionASTNode.expressionType = ExpressionType.Assignment;
+        String operatorAsString = ctx.getChild(1).getText();
+        expressionASTNode.expressionType = ExpressionType.fromString(operatorAsString);
         expressionStackPush(expressionASTNode);
     }
 
@@ -349,19 +352,22 @@ public class StructureCPP14ParserListener extends CPP14ParserBaseListener {
 
     @Override
     public void exitMultiplicativeExpression(CPP14Parser.MultiplicativeExpressionContext ctx) {
+        System.out.println("[" + ctx.hashCode() + "] " + ctx.getText());
         if (ctx.children.size() == 1) {
             return;
         }
-        processExpressionOperator(ctx, ExpressionType.Mul);
+        String operatorAsString = ctx.getChild(1).getText();
+        processExpressionOperator(ctx, ExpressionType.fromString(operatorAsString));
     }
 
     @Override
     public void exitEqualityExpression(CPP14Parser.EqualityExpressionContext ctx) {
-        // System.out.println("[" + ctx.hashCode() + "] " + ctx.getText());
+        System.out.println("[" + ctx.hashCode() + "] " + ctx.getText());
         if (ctx.children.size() == 1) {
             return;
         }
-        processExpressionOperator(ctx, ExpressionType.Equality);
+        String operatorAsString = ctx.getChild(1).getText();
+        processExpressionOperator(ctx, ExpressionType.fromString(operatorAsString));
     }
 
     @Override
@@ -426,7 +432,6 @@ public class StructureCPP14ParserListener extends CPP14ParserBaseListener {
                 expressionStackPush(postFixExpressionASTNode);
                 return;
             }
-
         }
 
         // is hit
@@ -636,13 +641,17 @@ public class StructureCPP14ParserListener extends CPP14ParserBaseListener {
 
     @Override
     public void exitJumpStatement(CPP14Parser.JumpStatementContext ctx) {
-        // System.out.println("[" + ctx.hashCode() + "] " + ctx.getText());
+        System.out.println("[" + ctx.hashCode() + "] " + ctx.getText());
 
         JumpStatementASTNode jumpStatementASTNode = new JumpStatementASTNode();
         jumpStatementASTNode.ctx = ctx;
         jumpStatementASTNode.value = ctx.getText();
         jumpStatementASTNode.statementType = StatementType.valueOf(ctx.getChild(0).getText().toUpperCase());
+
         if (jumpStatementASTNode.statementType == StatementType.IF) {
+            jumpStatementASTNode.children.add(expressionStackPop());
+        } else if (jumpStatementASTNode.statementType == StatementType.RETURN && ctx.children.size() > 2) {
+            // for return; statements, do not retrieve the return value from the expression stack!
             jumpStatementASTNode.children.add(expressionStackPop());
         }
 
