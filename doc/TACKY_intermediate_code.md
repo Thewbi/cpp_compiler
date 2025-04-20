@@ -9,7 +9,10 @@ Buy on Amazon:
 
 # TACKY Intermediate Language Statements
 
-Some general things that are important to know
+TACKY is the intermediate language that separates the source language (C) from the target language (target assembly).
+First, C is parsed into a parse tree. The parse tree is then converted into the more condensed AST. The C-AST is converted into a TACKY-AST. The TACKY-AST is converted to target assembly which is where the compiler has achieved it's goal.
+
+Some general things that are important to know about TACKY itself:
 
 * Variables have to be declared first before they can be used. Exceptions are temporary variable that are usable via tmp.<index>.
 * Variables can be assigned values using the Copy() operation or by using them as destinations of Unary() and Binary() operations.
@@ -29,6 +32,8 @@ How to handle ...
 * enums?
 * arrays?
 * switch-case statement?
+
+Part II of the book answers those questions. The first part of the book only deals with the int type.
 
 ## Constants (Page 36)
 
@@ -243,7 +248,7 @@ The [ ... ] notation is used to define a list of statements.
 Currently the separator between statements is the comma-character ','.
 
 ```
-function_definition_1 = Function("main",
+Function("main",
     [
         // int a; a = 1;
         //Binary(Add, Constant(0), Constant(1), Var(a)),

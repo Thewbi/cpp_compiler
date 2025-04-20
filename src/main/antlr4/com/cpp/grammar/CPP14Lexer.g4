@@ -30,10 +30,10 @@ StringLiteral:
 
 // fix according to https://stackoverflow.com/questions/64108151/how-to-resolve-parsing-error-in-antlr-cpp14-grammar
 StringLiteral
-   : Encodingprefix? '"' Schar* '"'
-   | Encodingprefix? '"' Schar* '" GST_TIME_FORMAT'
-   | Encodingprefix? 'R' Rawstring
- ;
+    : Encodingprefix? '"' Schar* '"'
+    | Encodingprefix? '"' Schar* '" GST_TIME_FORMAT'
+    | Encodingprefix? 'R' Rawstring
+    ;
 
 BooleanLiteral: False_ | True_;
 

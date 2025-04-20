@@ -1,0 +1,138 @@
+/*
+unsigned int one_hundred = 100u;
+        unsigned int large_uint = 4294967294u;
+        unsigned long one_hundred_ulong = 100ul;
+        unsigned long large_ulong = 4294967294ul;
+        int main(void) {
+            if (large_uint < one_hundred)
+                return 1;
+            if (large_uint <= one_hundred)
+                return 2;
+            if (one_hundred >= large_uint)
+                return 3;
+            if (one_hundred > large_uint)
+                return 4;
+            if (!(one_hundred <= large_uint))
+                return 5;
+            if (!(one_hundred < large_uint))
+                return 6;
+            if (!(large_uint > one_hundred))
+                return 7;
+            if (!(large_uint >= one_hundred))
+                return 8;
+            if (large_ulong < one_hundred_ulong)
+                return 9;
+            if (large_ulong <= one_hundred_ulong)
+                return 10;
+            if (one_hundred_ulong >= large_ulong)
+                return 11;
+            if (one_hundred_ulong > large_ulong)
+                return 12;
+            if (!(one_hundred_ulong <= large_ulong))
+                return 13;
+            if (!(one_hundred_ulong < large_ulong))
+                return 14;
+            if (!(large_ulong > one_hundred_ulong))
+                return 15;
+            if (!(large_ulong >= one_hundred_ulong))
+                return 16;
+            return 0;
+        }
+*/
+
+global function main() {
+            tmp.0 = large_uint < one_hundred
+            if !tmp.0 jump end_if_0
+            return 1
+
+          end_if_0:
+            tmp.1 = large_uint <= one_hundred
+            if !tmp.1 jump end_if_2
+            return 2
+
+          end_if_2:
+            tmp.2 = one_hundred >= large_uint
+            if !tmp.2 jump end_if_4
+            return 3
+
+          end_if_4:
+            tmp.3 = one_hundred > large_uint
+            if !tmp.3 jump end_if_6
+            return 4
+
+          end_if_6:
+            tmp.4 = one_hundred <= large_uint
+            tmp.5 = ! tmp.4
+            if !tmp.5 jump end_if_8
+            return 5
+
+          end_if_8:
+            tmp.6 = one_hundred < large_uint
+            tmp.7 = ! tmp.6
+            if !tmp.7 jump end_if_10
+            return 6
+
+          end_if_10:
+            tmp.8 = large_uint > one_hundred
+            tmp.9 = ! tmp.8
+            if !tmp.9 jump end_if_12
+            return 7
+
+          end_if_12:
+            tmp.10 = large_uint >= one_hundred
+            tmp.11 = ! tmp.10
+            if !tmp.11 jump end_if_14
+            return 8
+
+          end_if_14:
+            tmp.12 = large_ulong < one_hundred_ulong
+            if !tmp.12 jump end_if_16
+            return 9
+
+          end_if_16:
+            tmp.13 = large_ulong <= one_hundred_ulong
+            if !tmp.13 jump end_if_18
+            return 10
+
+          end_if_18:
+            tmp.14 = one_hundred_ulong >= large_ulong
+            if !tmp.14 jump end_if_20
+            return 11
+
+          end_if_20:
+            tmp.15 = one_hundred_ulong > large_ulong
+            if !tmp.15 jump end_if_22
+            return 12
+
+          end_if_22:
+            tmp.16 = one_hundred_ulong <= large_ulong
+            tmp.17 = ! tmp.16
+            if !tmp.17 jump end_if_24
+            return 13
+
+          end_if_24:
+            tmp.18 = one_hundred_ulong < large_ulong
+            tmp.19 = ! tmp.18
+            if !tmp.19 jump end_if_26
+            return 14
+
+          end_if_26:
+            tmp.20 = large_ulong > one_hundred_ulong
+            tmp.21 = ! tmp.20
+            if !tmp.21 jump end_if_28
+            return 15
+
+          end_if_28:
+            tmp.22 = large_ulong >= one_hundred_ulong
+            tmp.23 = ! tmp.22
+            if !tmp.23 jump end_if_30
+            return 16
+
+          end_if_30:
+            return 0
+            return 0
+        }
+        static global large_uint: Unsigned Int = 4294967294U
+        static global large_ulong: Unsigned Long = 4294967294UL
+        static global one_hundred: Unsigned Int = 100U
+        static global one_hundred_ulong: Unsigned Long = 100UL
