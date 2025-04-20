@@ -1,0 +1,10 @@
+Program("test")
+
+StaticVariable(testIntStaticVar, true, int, INTINIT(123))
+StaticVariable(testBoolStaticVar, true, bool, INTINIT(0))
+
+Function("test", true,
+
+    return(Constant(0))
+
+)

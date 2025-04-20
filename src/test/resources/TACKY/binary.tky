@@ -1,5 +1,5 @@
 Program("test")
-Function("test",
+Function("test", true,
 
     Binary(Add, Constant(8), Constant(8), Var("tmp.0"))
 

@@ -1,5 +1,5 @@
 Program("test")
-Function("test",
+Function("test", true,
 
     result = 1
 

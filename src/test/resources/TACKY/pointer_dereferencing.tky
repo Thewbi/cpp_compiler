@@ -1,0 +1,21 @@
+// page 371
+
+Program("test")
+Function("test", true,
+
+    // dereference pointer (page 371)
+    <instructions for exp>
+    ptr = <result of exp>
+    result = Load(ptr)
+
+    // assignment to pointer (page 371)
+    <instructions for left>
+    ptr = <result of left>
+    <instructions for right>
+    372 Chapter 14
+    result = <result of right>
+    Store(result, ptr)
+
+    return(Constant(0))
+
+)

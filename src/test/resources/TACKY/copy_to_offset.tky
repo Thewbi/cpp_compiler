@@ -1,0 +1,12 @@
+// page 440
+
+CopyToOffset(Constant(ConstChar(97)), "letters", 0)
+CopyToOffset(Constant(ConstChar(98)), "letters", 1)
+CopyToOffset(Constant(ConstChar(99)), "letters", 2)
+CopyToOffset(Constant(ConstChar(100)), "letters", 3)
+CopyToOffset(Constant(ConstChar(101)), "letters", 4)
+CopyToOffset(Constant(ConstChar(0)), "letters", 5)
+
+CopyToOffset(Constant(ConstInt(1684234849)), "letters", 0)
+CopyToOffset(Constant(ConstChar(101)), "letters", 4)
+CopyToOffset(Constant(ConstChar(0)), "letters", 5)

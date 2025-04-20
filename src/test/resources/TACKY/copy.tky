@@ -1,5 +1,5 @@
 Program("test")
-Function("test",
+Function("test", true,
 
     Copy(Var(tmp.0), Var(abc))
 

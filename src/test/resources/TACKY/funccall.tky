@@ -1,6 +1,8 @@
 Program("test")
-Function("test",
+Function("test", true,
 
-    funccall(test_function, Constant(0), tmp.0)
+    funccall(test_function, false, Constant(0), tmp.0)
+
+    return(Constant(0))
 
 )

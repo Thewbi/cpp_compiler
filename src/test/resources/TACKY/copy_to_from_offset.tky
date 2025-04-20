@@ -1,0 +1,3 @@
+// page 513 ff
+
+result = CopyFromOffset("my_struct", 8)

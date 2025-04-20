@@ -7,7 +7,7 @@ options {
 }
 
 tacky_file
-    : ( program function_definition+ )
+    : ( program top_level+ )
     EOF
     ;
 
@@ -15,8 +15,36 @@ program
     : PROGRAM LEFT_PAREN StringLiteral RIGHT_PAREN
     ;
 
+top_level
+    : function_definition
+    | static_variable
+    ;
+
+// page 259
+static_variable
+    : STATICVARIABLE LEFT_PAREN Identifier COMMA ( TRUE | FALSE ) COMMA type COMMA static_init_list RIGHT_PAREN
+    ;
+
+type
+    : INT
+    | BOOL
+    ;
+
+static_init_list
+    : static_init static_init_list
+    | static_init
+    ;
+
+static_init
+    : INTINIT LEFT_PAREN IntegerLiteral RIGHT_PAREN
+    | LONGINIT LEFT_PAREN IntegerLiteral RIGHT_PAREN
+    | UINTINIT LEFT_PAREN IntegerLiteral RIGHT_PAREN
+    | ULONGINIT LEFT_PAREN IntegerLiteral RIGHT_PAREN
+    ;
+
+// page 281
 function_definition
-    : FUNCTION LEFT_PAREN StringLiteral COMMA statement_list RIGHT_PAREN
+    : FUNCTION LEFT_PAREN StringLiteral COMMA ( TRUE | FALSE ) COMMA statement_list RIGHT_PAREN
     ;
 
 /*
@@ -45,7 +73,7 @@ statement
     | binary
     | copy
 
-/* page 371
+/* page 370, 371
 | GetAddress(val src, val dst)
 | Load(val src_ptr, val dst)
 | Store(val src, val dst_ptr)
@@ -54,6 +82,10 @@ statement
 /* page 407
 | AddPtr(val ptr, val index, int scale, val dst)
 | CopyToOffset(val src, identifier dst, int offset)
+*/
+
+/* page 513
+| CopyFromOffset(identifier src, int offset, val dst)
 */
     | jump
     | jump_if_zero
@@ -65,7 +97,7 @@ statement
     ;
 
 return_statement
-    : RETURN LEFT_PAREN val RIGHT_PAREN
+    : RETURN LEFT_PAREN ( val )? RIGHT_PAREN
     ;
 
 unary
@@ -139,8 +171,9 @@ expr
     | IntegerLiteral
     ;
 
+// page 479
 func_call
-    : FUNCCALL LEFT_PAREN Identifier ( COMMA arg_list )? COMMA val RIGHT_PAREN
+    : FUNCCALL LEFT_PAREN Identifier COMMA ( TRUE | FALSE ) ( COMMA arg_list )? ( COMMA val )? RIGHT_PAREN
     ;
 
 arg_list

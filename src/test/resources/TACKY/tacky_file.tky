@@ -1,2 +1,6 @@
 Program("test")
-Function("test", return(Constant(0)))
+Function("test", true,
+
+    return(Constant(0))
+
+)

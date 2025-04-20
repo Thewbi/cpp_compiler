@@ -30,6 +30,7 @@ fragment Z:[zZ];
 ADD : A D D ;
 
 BINARY : B I N A R Y ;
+BOOL : B O O L ;
 
 COMPLEMENT : C O M P L E M E N T ;
 CONSTANT : C O N S T A N T ;
@@ -39,12 +40,16 @@ DIVIDE : D I V I D E ;
 
 EQUAL : E Q U A L ;
 
+FALSE : F A L S E ;
 FUNCCALL : F U N C C A L L ;
 FUNCTION : F U N C T I O N ;
 
 GLOBAL : G L O B A L ;
 GREATERTHAN : G R E A T E R T H A N ;
 GREATEROREQUAL : G R E A T E R O R E Q U A L ;
+
+INTINIT : I N T I N I T ;
+INT : I N T ;
 
 JUMP : J U M P ;
 JUMPIFZERO : J U M P I F Z E R O ;
@@ -53,6 +58,7 @@ JUMPIFNOTZERO : J U M P I F N O T Z E R O ;
 LABEL : L A B E L ;
 LESSTHAN : L E S S T H A N ;
 LESSOREQUAL : L E S S O R E Q U A L ;
+LONGINIT : L O N G I N I T ;
 
 MULTIPLY : M U L T I P L Y ;
 
@@ -65,9 +71,14 @@ PROGRAM : P R O G R A M ;
 REMAINDER : R E M A I N D E R ;
 RETURN : R E T U R N ;
 
+STATICVARIABLE : S T A T I C V A R I A B L E ;
 SUBTRACT : S U B T R A C T ;
 
+TRUE : T R U E ;
+
 UNARY : U N A R Y ;
+UINTINIT : U I N T I N I T ;
+ULONGINIT : U L O N G I N I T ;
 
 VAR : V A R ;
 

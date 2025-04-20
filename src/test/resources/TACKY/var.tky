@@ -1,5 +1,5 @@
 Program("test")
-Function("test",
+Function("test", true,
 
     tmp.0 = Var(tmp.0)
     abc = Var(abc)

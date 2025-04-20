@@ -1,0 +1,33 @@
+// page 407
+
+<instructions for ptr>
+p = <result of ptr>
+<instructions for int>
+i = <result of int>
+result = AddPtr(p, i, <size of referenced type of ptr>)
+
+
+
+
+
+// page 408
+
+<instructions for ptr>
+p = <result of ptr>
+<instructions for int>
+i = <result of int>
+j = Unary(Negate, i)
+result = AddPtr(p, j, <size of referenced type of ptr>)
+
+
+
+
+
+// page 408
+
+<instructions for ptr1>
+p1 = <result of ptr1>
+<instructions for ptr2>
+p2 = <result of ptr2>
+diff = Binary(Subtract, p1, p2)
+result = Binary(Divide, diff, <size of referenced type of ptr1>)
