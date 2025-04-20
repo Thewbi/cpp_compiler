@@ -1,0 +1,10 @@
+Program("test")
+Function("test",
+
+    Jump(target_label)
+    JumpIfZero(Constant(0), target_label)
+    JumpIfNotZero(Constant(0), target_label)
+
+    return(Constant(0))
+
+)

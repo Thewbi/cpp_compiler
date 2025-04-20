@@ -1,0 +1,9 @@
+Program("test")
+Function("test",
+
+    Label(identifier)
+
+    Return(b.0)
+    return(Constant(0))
+
+)

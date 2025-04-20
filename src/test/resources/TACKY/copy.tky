@@ -1,0 +1,8 @@
+Program("test")
+Function("test",
+
+    Copy(Var(tmp.0), Var(abc))
+
+    return(Constant(0))
+
+)

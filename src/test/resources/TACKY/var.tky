@@ -1,0 +1,9 @@
+Program("test")
+Function("test",
+
+    tmp.0 = Var(tmp.0)
+    abc = Var(abc)
+
+    Return(Var(b.0))
+
+)

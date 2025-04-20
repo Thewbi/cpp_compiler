@@ -2,7 +2,9 @@ Program("test")
 Function("test",
 
     Unary(Negate, Constant(8), Var("tmp.0"))
+    Unary(Complement, Var("tmp.0"), Var("tmp.1"))
 
     return(Constant(0))
+    Return(Var("tmp.2"))
 
 )

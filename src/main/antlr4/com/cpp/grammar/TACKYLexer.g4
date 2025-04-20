@@ -27,18 +27,44 @@ fragment X:[xX];
 fragment Y:[yY];
 fragment Z:[zZ];
 
+ADD : A D D ;
+
+BINARY : B I N A R Y ;
+
 COMPLEMENT : C O M P L E M E N T ;
 CONSTANT : C O N S T A N T ;
+COPY : C O P Y ;
+
+DIVIDE : D I V I D E ;
+
+EQUAL : E Q U A L ;
 
 FUNCTION : F U N C T I O N ;
 
 GLOBAL : G L O B A L ;
+GREATERTHAN : G R E A T E R T H A N ;
+GREATEROREQUAL : G R E A T E R O R E Q U A L ;
+
+JUMP : J U M P ;
+JUMPIFZERO : J U M P I F Z E R O ;
+JUMPIFNOTZERO : J U M P I F N O T Z E R O ;
+
+LABEL : L A B E L ;
+LESSTHAN : L E S S T H A N ;
+LESSOREQUAL : L E S S O R E Q U A L ;
+
+MULTIPLY : M U L T I P L Y ;
 
 NEGATE : N E G A T E ;
+NOT : N O T ;
+NOTEQUAL : N O T E Q U A L ;
 
 PROGRAM : P R O G R A M ;
 
+REMAINDER : R E M A I N D E R ;
 RETURN : R E T U R N ;
+
+SUBTRACT : S U B T R A C T ;
 
 UNARY : U N A R Y ;
 
@@ -78,7 +104,7 @@ Identifier
 	/*
 	 Identifiernondigit | Identifier Identifiernondigit | Identifier DIGIT
 	 */
-	Identifiernondigit ( Identifiernondigit | DIGIT )*
+	Identifiernondigit ( DOT | Identifiernondigit | DIGIT )*
     ;
 
 fragment Identifiernondigit: NONDIGIT | Universalcharactername;
@@ -151,7 +177,26 @@ fragment Hexadecimalescapesequence
     : '\\x' HEXADECIMALDIGIT+
     ;
 
-COMMA: ',';
+ASTERISK : '*' ;
+AMPERSAND_DOUBLE : '&&' ;
+
+BAR_DOUBLE : '||' ;
+
+COMMA : ',' ;
+
+DOT : '.' ;
+
+EQUAL_OPERATOR : '==' ;
+EQUAL_SIGN : '=' ;
+
+LESS_THAN : '<' ;
+LESS_THAN_OR_EQUAL : '<=' ;
+GREATER_THAN_OR_EQUAL : '>=' ;
+GREATER_THAN : '>' ;
+
+MINUS : '-' ;
+
+PLUS : '+' ;
 
 LEFT_PAREN : '(' ;
 
@@ -164,6 +209,8 @@ RIGHT_BRACKET : ']' ;
 LEFT_BRACE : '{' ;
 
 RIGHT_BRACE : '}' ;
+
+SLASH : '/' ;
 
 // fix according to https://stackoverflow.com/questions/64108151/how-to-resolve-parsing-error-in-antlr-cpp14-grammar
 fragment Rawstring
