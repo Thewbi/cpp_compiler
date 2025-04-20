@@ -39,6 +39,7 @@ DIVIDE : D I V I D E ;
 
 EQUAL : E Q U A L ;
 
+FUNCCALL : F U N C C A L L ;
 FUNCTION : F U N C T I O N ;
 
 GLOBAL : G L O B A L ;

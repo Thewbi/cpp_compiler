@@ -32,15 +32,36 @@ statement_list
 
 statement
     : return_statement
+/* page 309
+    | SignExtend(val src, val dst)
+    | Truncate(val src, val dst)
+    | ZeroExtend(val src, val dst)
+    | DoubleToInt(val src, val dst)
+    | DoubleToUInt(val src, val dst)
+    | IntToDouble(val src, val dst)
+    | UIntToDouble(val src, val dst)
+*/
     | unary
     | binary
     | copy
+
+/* page 371
+| GetAddress(val src, val dst)
+| Load(val src_ptr, val dst)
+| Store(val src, val dst_ptr)
+*/
+
+/* page 407
+| AddPtr(val ptr, val index, int scale, val dst)
+| CopyToOffset(val src, identifier dst, int offset)
+*/
     | jump
     | jump_if_zero
     | jump_if_not_zero
     | label
     | var_declaration_statement
     | assignment_statement
+    | func_call
     ;
 
 return_statement
@@ -116,6 +137,15 @@ expr
 //    | expr '(' exprList? ')'
     | Identifier
     | IntegerLiteral
+    ;
+
+func_call
+    : FUNCCALL LEFT_PAREN Identifier ( COMMA arg_list )? COMMA val RIGHT_PAREN
+    ;
+
+arg_list
+    : val COMMA arg_list
+    | val
     ;
 
 // VAR are either created using StringLiterals (page 37, e.g. Var("tmp.1")) or via identifiers (page )

@@ -7,4 +7,9 @@ Function("test",
     return(Constant(0))
     Return(Var("tmp.2"))
 
+
+    Unary(Complement, Constant(2), Var("main.0"))
+    Unary(Negate, Var("main.0"), Var("main.1"))
+    Return(Var("main.1"))
+
 )

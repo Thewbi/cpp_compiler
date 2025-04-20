@@ -1,0 +1,6 @@
+Program("test")
+Function("test",
+
+    funccall(test_function, Constant(0), tmp.0)
+
+)
