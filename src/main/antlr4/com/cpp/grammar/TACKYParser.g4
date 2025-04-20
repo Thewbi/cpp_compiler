@@ -7,8 +7,7 @@ options {
 }
 
 tacky_file
-    : program
-    | function_definition
+    : ( program function_definition+ )
     EOF
     ;
 
@@ -17,7 +16,7 @@ program
     ;
 
 function_definition
-    : FUNCTION Identifier LeftParen Identifier COMMA statement_list RightParen
+    : FUNCTION LeftParen StringLiteral Comma statement_list RightParen
     ;
 
 /*
@@ -32,5 +31,14 @@ statement_list
     ;
 
 statement
-    : RETURN
+    : return_statement
+    ;
+
+return_statement
+    : RETURN LeftParen val RightParen
+    ;
+
+val
+    : CONSTANT LeftParen IntegerLiteral RightParen
+    | VAR LeftParen Identifier RightParen
     ;

@@ -27,7 +27,7 @@ fragment X:[xX];
 fragment Y:[yY];
 fragment Z:[zZ];
 
-COMMA : C O M M A ;
+CONSTANT : C O N S T A N T ;
 
 FUNCTION : F U N C T I O N ;
 
@@ -36,6 +36,15 @@ GLOBAL : G L O B A L ;
 PROGRAM : P R O G R A M ;
 
 RETURN : R E T U R N ;
+
+VAR : V A R ;
+
+IntegerLiteral
+	: DecimalLiteral Integersuffix?
+	| OctalLiteral Integersuffix?
+	| HexadecimalLiteral Integersuffix?
+	| BinaryLiteral Integersuffix?
+    ;
 
 // fix according to https://stackoverflow.com/questions/64108151/how-to-resolve-parsing-error-in-antlr-cpp14-grammar
 StringLiteral
@@ -72,6 +81,29 @@ fragment Identifiernondigit: NONDIGIT | Universalcharactername;
 fragment NONDIGIT: [a-zA-Z_];
 
 fragment DIGIT: [0-9];
+
+DecimalLiteral: NONZERODIGIT ('\''? DIGIT)*;
+
+OctalLiteral: '0' ('\''? OCTALDIGIT)*;
+
+HexadecimalLiteral: ('0x' | '0X') HEXADECIMALDIGIT (
+		'\''? HEXADECIMALDIGIT
+	)*;
+
+Integersuffix
+	: Unsignedsuffix Longsuffix?
+	| Unsignedsuffix Longlongsuffix?
+	| Longsuffix Unsignedsuffix?
+	| Longlongsuffix Unsignedsuffix?
+    ;
+
+fragment Unsignedsuffix: [uU];
+
+fragment Longsuffix: [lL];
+
+fragment Longlongsuffix: 'll' | 'LL';
+
+BinaryLiteral: ('0b' | '0B') BINARYDIGIT ('\''? BINARYDIGIT)*;
 
 fragment NONZERODIGIT: [1-9];
 
@@ -113,6 +145,8 @@ fragment Octalescapesequence
 fragment Hexadecimalescapesequence
     : '\\x' HEXADECIMALDIGIT+
     ;
+
+Comma: ',';
 
 LeftParen : '(' ;
 

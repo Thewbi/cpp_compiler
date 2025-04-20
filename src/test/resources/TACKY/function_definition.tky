@@ -1,0 +1,2 @@
+Program("test")
+Function("test", return(Constant(0)))
