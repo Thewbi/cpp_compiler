@@ -27,15 +27,20 @@ fragment X:[xX];
 fragment Y:[yY];
 fragment Z:[zZ];
 
+COMPLEMENT : C O M P L E M E N T ;
 CONSTANT : C O N S T A N T ;
 
 FUNCTION : F U N C T I O N ;
 
 GLOBAL : G L O B A L ;
 
+NEGATE : N E G A T E ;
+
 PROGRAM : P R O G R A M ;
 
 RETURN : R E T U R N ;
+
+UNARY : U N A R Y ;
 
 VAR : V A R ;
 
@@ -146,19 +151,19 @@ fragment Hexadecimalescapesequence
     : '\\x' HEXADECIMALDIGIT+
     ;
 
-Comma: ',';
+COMMA: ',';
 
-LeftParen : '(' ;
+LEFT_PAREN : '(' ;
 
-RightParen : ')' ;
+RIGHT_PAREN : ')' ;
 
-LeftBracket : '[' ;
+LEFT_BRACKET : '[' ;
 
-RightBracket : ']' ;
+RIGHT_BRACKET : ']' ;
 
-LeftBrace : '{' ;
+LEFT_BRACE : '{' ;
 
-RightBrace : '}' ;
+RIGHT_BRACE : '}' ;
 
 // fix according to https://stackoverflow.com/questions/64108151/how-to-resolve-parsing-error-in-antlr-cpp14-grammar
 fragment Rawstring

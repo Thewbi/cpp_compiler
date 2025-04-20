@@ -12,16 +12,16 @@ tacky_file
     ;
 
 program
-    : PROGRAM LeftParen StringLiteral RightParen
+    : PROGRAM LEFT_PAREN StringLiteral RIGHT_PAREN
     ;
 
 function_definition
-    : FUNCTION LeftParen StringLiteral Comma statement_list RightParen
+    : FUNCTION LEFT_PAREN StringLiteral COMMA statement_list RIGHT_PAREN
     ;
 
 /*
 block_scope
-    : LeftBrace statement_list RightBrace
+    : LEFT_BRACE statement_list RIGHT_BRACE
     ;
 */
 
@@ -32,13 +32,23 @@ statement_list
 
 statement
     : return_statement
+    | unary
     ;
 
 return_statement
-    : RETURN LeftParen val RightParen
+    : RETURN LEFT_PAREN val RIGHT_PAREN
+    ;
+
+unary
+    : UNARY LEFT_PAREN unary_operator COMMA val COMMA val RIGHT_PAREN
+    ;
+
+unary_operator
+    : COMPLEMENT
+    | NEGATE
     ;
 
 val
-    : CONSTANT LeftParen IntegerLiteral RightParen
-    | VAR LeftParen Identifier RightParen
+    : CONSTANT LEFT_PAREN IntegerLiteral RIGHT_PAREN
+    | VAR LEFT_PAREN ( Identifier | StringLiteral ) RIGHT_PAREN
     ;
