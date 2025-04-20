@@ -94,6 +94,7 @@ statement
     | var_declaration_statement
     | assignment_statement
     | func_call
+    | printf_call
     ;
 
 return_statement
@@ -174,6 +175,10 @@ expr
 // page 479
 func_call
     : FUNCCALL LEFT_PAREN Identifier COMMA ( TRUE | FALSE ) ( COMMA arg_list )? ( COMMA val )? RIGHT_PAREN
+    ;
+
+printf_call
+    : PRINTF LEFT_PAREN StringLiteral RIGHT_PAREN
     ;
 
 arg_list

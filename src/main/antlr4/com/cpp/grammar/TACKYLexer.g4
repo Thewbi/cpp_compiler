@@ -66,6 +66,7 @@ NEGATE : N E G A T E ;
 NOT : N O T ;
 NOTEQUAL : N O T E Q U A L ;
 
+PRINTF : P R I N T F ;
 PROGRAM : P R O G R A M ;
 
 REMAINDER : R E M A I N D E R ;
