@@ -1,0 +1,115 @@
+// page 441
+//
+// When we encounter a string literal outside of an array initializer, we’ll add
+// it to the symbol table as a constant string. Then, we’ll use its identifier as
+// a TACKY Var.
+//
+// Let’s revisit Listing 16-9, which returns a pointer to the first
+// character in a string:
+//
+// ```
+// return "A profound statement.";
+// ```
+//
+// The parser and type checker transform this into the following AST node:
+//
+// ```
+// Return(AddrOf(String("A profound statement.")))
+// ```
+//
+// To convert this AST node to TACKY, we first define "A profound statement."
+// in the symbol table:
+//
+// ```
+// name="string.1"
+// type=Array(Char, 22)
+// attrs=ConstantAttr(StringInit("A profound statement.", True))
+// ```
+//
+// This entry is no different from the constant strings we defined in the
+// type checker. It has a globally unique, automatically generated label. It’s a
+// char array that’s just large enough to contain the whole string, including the
+// terminating null byte. It’s initialized with the new ConstantAttr construct
+// because we’ll ultimately store it in read-only memory.
+//
+// Now we can refer to the identifier we just defined, string.1, in this
+// example, to load the string’s address:
+//
+// ```
+// GetAddress(Var("string.1"), Var("tmp2"))
+// Return(Var("tmp2"))
+// ```
+//
+// In simple terms: when implementing
+//
+// ```
+// return "A profound statement.";
+// ```
+//
+// The assembly application has to store "A profound statement." somewhere
+// inside the binary and has to access the data from that storage address.
+//
+// To manage this, the symbol table is used in AST notation.
+// An entry is inserted for the
+// string literal. The entry has an identifier to refer to it, an address
+// where the data is stored and an attribute that marks the entry as constant,
+// because the string literal is in fact constant and used in read-only fashion.
+//
+// In TACKY, there is no symbol table. Instead StaticConstant() is used to
+// define a static constant for each entry in the symbol table.
+// StaticConstant also defines an identifier, a type and a static init value.
+// The StaticConstant() value is obviously a constant and can only be used
+// read only.
+//
+// GetAddress() is called with the StaticConstant()'s identifier to retrieve
+// the value stored in the entry inside the StaticConstant(). The address
+// is then stored
+// in some temporary variable, then that address is returned using that
+// temporary variable.
+//
+// Below is the AST/TACKY source code for the steps described above.
+
+// this will create the SymbolTable entry using AST notation
+// name = "string.1"
+// type = Array(Char, 22)
+// attrs = ConstantAttr(StringInit("A profound statement.", True))
+
+// The three lines above have to be converted to static_constants in the
+// TACKY source code. This is done by traversing the symbol table and creating
+// a TACKY StaticConstant statement for each entry!
+//
+// Syntax is:
+// StaticConstant(identifier, type t, static_init init)
+
+// example TACKY StaticConstant() usage:
+StaticConstant("string.1", ASCIIZ, STRINGINIT("A profound statement.", true))
+
+// retrieve and return the address of the symbol table entry
+GetAddress(Var("string.1"), Var("tmp2"))
+Return(Var("tmp2"))
+
+
+
+
+// Another example is available on page 439
+
+// The AST contains:
+//
+// name = "string.0"
+// type = Array(Char, 7)
+// attrs = ConstantAttr(StringInit("Hello!", True))
+//
+// The TACKY StaticConstant code resulting from this symbol table entry is:
+
+StaticConstant("string.0", ASCIIZ, STRINGINIT("Hello!", true))
+
+// The AST contains:
+// name = "message"
+// type = Pointer(Char)
+// attrs = StaticAttr(init=Initial([PointerInit("string.0")]), global=False)
+//
+// The TACKY StaticConstant code resulting from this symbol table entry is:
+
+TODO ????
+
+

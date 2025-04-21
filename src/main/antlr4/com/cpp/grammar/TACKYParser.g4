@@ -18,6 +18,7 @@ program
 top_level
     : function_definition
     | static_variable
+    | static_constant
     ;
 
 // page 259
@@ -25,9 +26,16 @@ static_variable
     : STATICVARIABLE LEFT_PAREN Identifier COMMA ( TRUE | FALSE ) COMMA type COMMA static_init_list RIGHT_PAREN
     ;
 
+// page 442
+static_constant
+    : STATICCONSTANT LEFT_PAREN ( Identifier | StringLiteral ) COMMA type COMMA static_init RIGHT_PAREN
+    ;
+
 type
     : INT
     | BOOL
+    | ASCII
+    | ASCIIZ
     ;
 
 static_init_list
@@ -35,16 +43,49 @@ static_init_list
     | static_init
     ;
 
+// page 437
 static_init
     : INTINIT LEFT_PAREN IntegerLiteral RIGHT_PAREN
     | LONGINIT LEFT_PAREN IntegerLiteral RIGHT_PAREN
     | UINTINIT LEFT_PAREN IntegerLiteral RIGHT_PAREN
     | ULONGINIT LEFT_PAREN IntegerLiteral RIGHT_PAREN
+/* I think this is not TACKY but AST! But is is also needed in TACKY to define the type of a static init variable!
+     | IntInit(int)
+     | LongInit(int)
+    | UIntInit(int)
+    | ULongInit(int)
+    */
+    | CHARINIT LEFT_PAREN IntegerLiteral RIGHT_PAREN
+    | UCHARINIT LEFT_PAREN IntegerLiteral RIGHT_PAREN
+    | DOUBLEINIT LEFT_PAREN FloatingLiteral RIGHT_PAREN
+    | ZEROINIT LEFT_PAREN IntegerLiteral RIGHT_PAREN
+    | STRINGINIT LEFT_PAREN StringLiteral ( TRUE | FALSE ) RIGHT_PAREN
+    | POINTERINIT LEFT_PAREN StringLiteral RIGHT_PAREN
     ;
 
-// page 281
+/*
+// page 438 - I think this is not TACKY but AST!
+identifier_attrs
+    : FunAttr(bool defined, bool global)
+    | StaticAttr(initial_value init, bool global)
+    | ConstantAttr(static_init init)
+    | LocalAttr
+    ;
+*/
+
+// page 281, page 481
+//
+// In TACKY, the function definition does not contain a parameter for the return value.
+// Only the function call will contain a parameter for a function return value!
 function_definition
-    : FUNCTION LEFT_PAREN StringLiteral COMMA ( TRUE | FALSE ) COMMA statement_list RIGHT_PAREN
+//    : FUNCTION LEFT_PAREN StringLiteral COMMA ( TRUE | FALSE ) ( COMMA param_list )? COMMA statement_list RIGHT_PAREN
+//    : FUNCTION LEFT_PAREN StringLiteral COMMA ( TRUE | FALSE ) COMMA statement_list RIGHT_PAREN
+    : FUNCTION LEFT_PAREN StringLiteral COMMA ( TRUE | FALSE ) ( param_list )? COMMA LEFT_BRACKET statement_list RIGHT_BRACKET RIGHT_PAREN
+    ;
+
+param_list
+    : COMMA Identifier param_list
+    | COMMA Identifier
     ;
 
 /*
@@ -186,9 +227,24 @@ arg_list
     | val
     ;
 
+/*
 // VAR are either created using StringLiterals (page 37, e.g. Var("tmp.1")) or via identifiers (page )
 val
     : CONSTANT LEFT_PAREN IntegerLiteral RIGHT_PAREN
+    | VAR LEFT_PAREN ( Identifier | StringLiteral ) RIGHT_PAREN
+    | Identifier
+    ;
+*/
+
+// VAR are either created using StringLiterals (page 37, e.g. Var("tmp.1")) or via identifiers (page )
+val
+    : CONSTANT LEFT_PAREN CONSTCHAR LEFT_PAREN IntegerLiteral RIGHT_PAREN RIGHT_PAREN
+    | CONSTANT LEFT_PAREN CONSTUCHAR LEFT_PAREN IntegerLiteral RIGHT_PAREN RIGHT_PAREN
+    | CONSTANT LEFT_PAREN CONSTINT LEFT_PAREN IntegerLiteral RIGHT_PAREN RIGHT_PAREN
+    | CONSTANT LEFT_PAREN CONSTUINT LEFT_PAREN IntegerLiteral RIGHT_PAREN RIGHT_PAREN
+    | CONSTANT LEFT_PAREN CONSTLONG LEFT_PAREN IntegerLiteral RIGHT_PAREN RIGHT_PAREN
+    | CONSTANT LEFT_PAREN CONSTULONG LEFT_PAREN IntegerLiteral RIGHT_PAREN RIGHT_PAREN
+    | CONSTANT LEFT_PAREN CONSTDOUBLE LEFT_PAREN IntegerLiteral RIGHT_PAREN RIGHT_PAREN
     | VAR LEFT_PAREN ( Identifier | StringLiteral ) RIGHT_PAREN
     | Identifier
     ;

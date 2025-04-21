@@ -1,0 +1,10 @@
+Program("test")
+
+StaticConstant("string.0", ASCIIZ, STRINGINIT("Hello!", true))
+StaticConstant("string.1", ASCIIZ, STRINGINIT("A profound statement.", true))
+
+Function("test", true,
+
+    return(Constant(0))
+
+)

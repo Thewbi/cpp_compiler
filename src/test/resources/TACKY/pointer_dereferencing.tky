@@ -1,7 +1,7 @@
 // page 371
 
 Program("test")
-Function("test", true,
+Function("test", true, [
 
     // dereference pointer (page 371)
     <instructions for exp>
@@ -16,6 +16,6 @@ Function("test", true,
     result = <result of right>
     Store(result, ptr)
 
-    return(Constant(0))
+    return(Constant(ConstInt(0)))
 
-)
+])

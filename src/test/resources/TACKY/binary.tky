@@ -1,8 +1,8 @@
 Program("test")
-Function("test", true,
+Function("test", true, [
 
-    Binary(Add, Constant(8), Constant(8), Var("tmp.0"))
+    Binary(Add, Constant(ConstInt(8)), Constant(ConstInt(8)), Var("tmp.0"))
 
-    return(Constant(0))
+    return(Constant(ConstInt(0)))
 
-)
+])

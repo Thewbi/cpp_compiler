@@ -5,35 +5,35 @@
 // "}"
 
 Program("test")
-Function("test", true,
+Function("test", true, [
 
-    Binary(LessThan, Constant(1), Constant(2), Var("main.5"))
-    Binary(GreaterThan, Constant(3), Constant(4), Var("main.6"))
+    Binary(LessThan, Constant(ConstInt(1)), Constant(ConstInt(2)), Var("main.5"))
+    Binary(GreaterThan, Constant(ConstInt(3)), Constant(ConstInt(4)), Var("main.6"))
     Binary(NotEqual, Var("main.5"), Var("main.6"), Var("main.7"))
     JumpIfZero(Var("main.7"), main.8_false_label)
-    Binary(LessOrEqual, Constant(5), Constant(6), Var("main.9"))
-    Binary(GreaterOrEqual, Constant(7), Constant(8), Var("main.10"))
+    Binary(LessOrEqual, Constant(ConstInt(5)), Constant(ConstInt(6)), Var("main.9"))
+    Binary(GreaterOrEqual, Constant(ConstInt(7)), Constant(ConstInt(8)), Var("main.10"))
     Binary(Equal, Var("main.9"), Var("main.10"), Var("main.11"))
     JumpIfZero(Var("main.11"), main.8_false_label)
-    Copy(Constant(1), Var("main.12"))
+    Copy(Constant(ConstInt(1)), Var("main.12"))
     Jump(main.13)
 
     Label(main.8_false_label)
-    Copy(Constant(0), Var("main.12"))
+    Copy(Constant(ConstInt(0)), Var("main.12"))
 
     Label(main.13)
     JumpIfNotZero(Var("main.12"), main.14_false_label)
-    Unary(Not, Constant(2), Var("main.15"))
+    Unary(Not, Constant(ConstInt(2)), Var("main.15"))
     JumpIfNotZero(Var("main.15"), main.14_false_label)
-    Copy(Constant(0), Var("main.16"))
+    Copy(Constant(ConstInt(0)), Var("main.16"))
     Jump(main.17)
 
     Label(main.14_false_label)
-    Copy(Constant(1), Var("main.16"))
+    Copy(Constant(ConstInt(1)), Var("main.16"))
 
     Label(main.17)
     Return(Var("main.16"))
 
-    return(Constant(0))
+    return(Constant(ConstInt(0)))
 
-)
+])

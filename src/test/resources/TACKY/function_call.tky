@@ -1,0 +1,26 @@
+Program("test")
+
+// Function
+// Name: "test"
+// Global: true
+// Parameters: None
+Function("test", true, [
+
+        tmp.0 = Var("tmp.0")
+
+        // Function Call
+        // provide actual parameters for both arguments
+        // provide a parameter for the return value
+        funccall(test_function, false, Constant(ConstInt(2)), Constant(ConstInt(3)), tmp.0)
+
+        return(Constant(ConstInt(0)))
+
+])
+
+// Function
+// Name: "test_function"
+// Global: true
+// Parameters: param_a, param_b
+Function("test_function", true, param_a, param_b, [
+    return(Constant(ConstInt(0)))
+])

@@ -1,8 +1,8 @@
 Program("test")
-Function("test", true,
+Function("test", true, [
 
     Label(identifier)
 
-    return(Constant(0))
+    return(Constant(ConstInt(0)))
 
-)
+])

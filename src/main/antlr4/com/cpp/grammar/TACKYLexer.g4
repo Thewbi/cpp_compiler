@@ -28,15 +28,26 @@ fragment Y:[yY];
 fragment Z:[zZ];
 
 ADD : A D D ;
+ASCII : A S C I I ;
+ASCIIZ : A S C I I Z ;
 
 BINARY : B I N A R Y ;
 BOOL : B O O L ;
 
+CHARINIT : C H A R I N I T ;
 COMPLEMENT : C O M P L E M E N T ;
 CONSTANT : C O N S T A N T ;
+CONSTINT : C O N S T I N T ;
+CONSTUINT : C O N S T U I N T ;
+CONSTCHAR : C O N S T C H A R ;
+CONSTUCHAR : C O N S T U C H A R ;
+CONSTLONG : C O N S T L O N G ;
+CONSTULONG : C O N S T U L O N G ;
+CONSTDOUBLE : C O N S T D O U B L E ;
 COPY : C O P Y ;
 
 DIVIDE : D I V I D E ;
+DOUBLEINIT : D O U B L E I N I T ;
 
 EQUAL : E Q U A L ;
 
@@ -66,22 +77,28 @@ NEGATE : N E G A T E ;
 NOT : N O T ;
 NOTEQUAL : N O T E Q U A L ;
 
+POINTERINIT : P O I N T E R I N I T ;
 PRINTF : P R I N T F ;
 PROGRAM : P R O G R A M ;
 
 REMAINDER : R E M A I N D E R ;
 RETURN : R E T U R N ;
 
+STATICCONSTANT : S T A T I C C O N S T A N T ;
 STATICVARIABLE : S T A T I C V A R I A B L E ;
+STRINGINIT : S T R I N G I N I T ;
 SUBTRACT : S U B T R A C T ;
 
 TRUE : T R U E ;
 
+UCHARINIT : U C H A R I N I T ;
 UNARY : U N A R Y ;
 UINTINIT : U I N T I N I T ;
 ULONGINIT : U L O N G I N I T ;
 
 VAR : V A R ;
+
+ZEROINIT : Z E R O I N I T ;
 
 IntegerLiteral
 	: DecimalLiteral Integersuffix?
@@ -89,6 +106,10 @@ IntegerLiteral
 	| HexadecimalLiteral Integersuffix?
 	| BinaryLiteral Integersuffix?
     ;
+
+FloatingLiteral:
+	Fractionalconstant Exponentpart? Floatingsuffix?
+	| Digitsequence Exponentpart Floatingsuffix?;
 
 // fix according to https://stackoverflow.com/questions/64108151/how-to-resolve-parsing-error-in-antlr-cpp14-grammar
 StringLiteral
@@ -189,6 +210,20 @@ fragment Octalescapesequence
 fragment Hexadecimalescapesequence
     : '\\x' HEXADECIMALDIGIT+
     ;
+
+fragment Fractionalconstant:
+	Digitsequence? '.' Digitsequence
+	| Digitsequence '.';
+
+fragment Exponentpart:
+	'e' SIGN? Digitsequence
+	| 'E' SIGN? Digitsequence;
+
+fragment SIGN: [+-];
+
+fragment Digitsequence: DIGIT ('\''? DIGIT)*;
+
+fragment Floatingsuffix: [flFL];
 
 ASTERISK : '*' ;
 AMPERSAND_DOUBLE : '&&' ;

@@ -1,0 +1,11 @@
+// page 480
+
+t = get_type(inner)
+result = size(t)
+return PlainOperand(Constant(ConstULong(result)))
+
+
+
+
+result = size(t)
+return PlainOperand(Constant(ConstULong(result)))

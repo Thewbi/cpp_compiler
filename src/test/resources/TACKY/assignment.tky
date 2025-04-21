@@ -1,5 +1,5 @@
 Program("test")
-Function("test", true,
+Function("test", true, [
 
     result = 1
 
@@ -11,4 +11,4 @@ Function("test", true,
 
     Return(Var(b.0))
 
-)
+])

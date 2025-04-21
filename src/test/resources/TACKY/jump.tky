@@ -1,10 +1,10 @@
 Program("test")
-Function("test", true,
+Function("test", true, [
 
     Jump(target_label)
-    JumpIfZero(Constant(0), target_label)
-    JumpIfNotZero(Constant(0), target_label)
+    JumpIfZero(Constant(ConstInt(0)), target_label)
+    JumpIfNotZero(Constant(ConstInt(0)), target_label)
 
-    return(Constant(0))
+    return(Constant(ConstInt(0)))
 
-)
+])
