@@ -49,9 +49,9 @@ static_init
     | LONGINIT LEFT_PAREN IntegerLiteral RIGHT_PAREN
     | UINTINIT LEFT_PAREN IntegerLiteral RIGHT_PAREN
     | ULONGINIT LEFT_PAREN IntegerLiteral RIGHT_PAREN
-/* I think this is not TACKY but AST! But is is also needed in TACKY to define the type of a static init variable!
-     | IntInit(int)
-     | LongInit(int)
+    /* I think this is not TACKY but AST! But is is also needed in TACKY to define the type of a static init variable!
+    | IntInit(int)
+    | LongInit(int)
     | UIntInit(int)
     | ULongInit(int)
     */
@@ -101,33 +101,26 @@ statement_list
 
 statement
     : return_statement
-/* page 309
-    | SignExtend(val src, val dst)
-    | Truncate(val src, val dst)
-    | ZeroExtend(val src, val dst)
-    | DoubleToInt(val src, val dst)
-    | DoubleToUInt(val src, val dst)
-    | IntToDouble(val src, val dst)
-    | UIntToDouble(val src, val dst)
-*/
+/* page 309 */
+    | sign_extend
+    | truncate
+    | zero_extend
+    | double_to_int
+    | double_to_uint
+    | int_to_double
+    | uint_to_double
     | unary
     | binary
     | copy
-
-/* page 370, 371
-| GetAddress(val src, val dst)
-| Load(val src_ptr, val dst)
-| Store(val src, val dst_ptr)
-*/
-
-/* page 407
-| AddPtr(val ptr, val index, int scale, val dst)
-| CopyToOffset(val src, identifier dst, int offset)
-*/
-
-/* page 513
-| CopyFromOffset(identifier src, int offset, val dst)
-*/
+    /* page 370, 371*/
+    | get_address
+    | load
+    | store
+    /* page 407 */
+    | add_ptr
+    | copy_to_offset
+    /* page 513 */
+    | copy_from_offset
     | jump
     | jump_if_zero
     | jump_if_not_zero
@@ -136,6 +129,58 @@ statement
     | assignment_statement
     | func_call
     | printf_call
+    ;
+
+sign_extend
+    : SIGNEXTEND LEFT_PAREN val COMMA val RIGHT_PAREN
+    ;
+
+truncate
+    : TRUNCATE LEFT_PAREN val COMMA val RIGHT_PAREN
+    ;
+
+zero_extend
+    : ZEROEXTEND LEFT_PAREN val COMMA val RIGHT_PAREN
+    ;
+
+double_to_int
+    : DOUBLETOINT LEFT_PAREN val COMMA val RIGHT_PAREN
+    ;
+
+double_to_uint
+    : DOUBLETOUINT LEFT_PAREN val COMMA val RIGHT_PAREN
+    ;
+
+int_to_double
+    : INTTODOUBLE LEFT_PAREN val COMMA val RIGHT_PAREN
+    ;
+
+uint_to_double
+    : UINTTODOUBLE LEFT_PAREN val COMMA val RIGHT_PAREN
+    ;
+
+get_address
+    : GETADDRESS LEFT_PAREN val COMMA val RIGHT_PAREN
+    ;
+
+load
+    : LOAD LEFT_PAREN val COMMA val RIGHT_PAREN
+    ;
+
+store
+    : STORE LEFT_PAREN val COMMA val RIGHT_PAREN
+    ;
+
+add_ptr
+    : ADDPTR LEFT_PAREN val COMMA val COMMA IntegerLiteral COMMA val RIGHT_PAREN
+    ;
+
+copy_to_offset
+    : COPYTOOFFSET val COMMA Identifier COMMA IntegerLiteral RIGHT_PAREN
+    ;
+
+copy_from_offset
+    : COPYFROMOFFSET Identifier COMMA IntegerLiteral COMMA val RIGHT_PAREN
     ;
 
 return_statement
@@ -204,10 +249,10 @@ assignment_statement
     ;
 
 expr
-    : expr (ASTERISK | SLASH) expr
-    | expr (PLUS | MINUS) expr
-    | expr (LESS_THAN | LESS_THAN_OR_EQUAL | GREATER_THAN_OR_EQUAL | GREATER_THAN | EQUAL_OPERATOR) expr
-    | expr ( AMPERSAND_DOUBLE | BAR_DOUBLE) expr
+    : expr ( ASTERISK | SLASH ) expr
+    | expr ( PLUS | MINUS ) expr
+    | expr ( LESS_THAN | LESS_THAN_OR_EQUAL | GREATER_THAN_OR_EQUAL | GREATER_THAN | EQUAL_OPERATOR ) expr
+    | expr ( AMPERSAND_DOUBLE | BAR_DOUBLE ) expr
 //    | expr '(' exprList? ')'
     | Identifier
     | IntegerLiteral
@@ -238,13 +283,23 @@ val
 
 // VAR are either created using StringLiterals (page 37, e.g. Var("tmp.1")) or via identifiers (page )
 val
-    : CONSTANT LEFT_PAREN CONSTCHAR LEFT_PAREN IntegerLiteral RIGHT_PAREN RIGHT_PAREN
-    | CONSTANT LEFT_PAREN CONSTUCHAR LEFT_PAREN IntegerLiteral RIGHT_PAREN RIGHT_PAREN
-    | CONSTANT LEFT_PAREN CONSTINT LEFT_PAREN IntegerLiteral RIGHT_PAREN RIGHT_PAREN
-    | CONSTANT LEFT_PAREN CONSTUINT LEFT_PAREN IntegerLiteral RIGHT_PAREN RIGHT_PAREN
-    | CONSTANT LEFT_PAREN CONSTLONG LEFT_PAREN IntegerLiteral RIGHT_PAREN RIGHT_PAREN
-    | CONSTANT LEFT_PAREN CONSTULONG LEFT_PAREN IntegerLiteral RIGHT_PAREN RIGHT_PAREN
-    | CONSTANT LEFT_PAREN CONSTDOUBLE LEFT_PAREN IntegerLiteral RIGHT_PAREN RIGHT_PAREN
+    : CONSTANT const RIGHT_PAREN
+    | CONSTANT const RIGHT_PAREN
+    | CONSTANT const RIGHT_PAREN
+    | CONSTANT const RIGHT_PAREN
+    | CONSTANT const RIGHT_PAREN
+    | CONSTANT const RIGHT_PAREN
+    | CONSTANT const RIGHT_PAREN
     | VAR LEFT_PAREN ( Identifier | StringLiteral ) RIGHT_PAREN
     | Identifier
+    ;
+
+const
+    : LEFT_PAREN CONSTCHAR LEFT_PAREN IntegerLiteral RIGHT_PAREN
+    | LEFT_PAREN CONSTUCHAR LEFT_PAREN IntegerLiteral RIGHT_PAREN
+    | LEFT_PAREN CONSTINT LEFT_PAREN IntegerLiteral RIGHT_PAREN
+    | LEFT_PAREN CONSTUINT LEFT_PAREN IntegerLiteral RIGHT_PAREN
+    | LEFT_PAREN CONSTLONG LEFT_PAREN IntegerLiteral RIGHT_PAREN
+    | LEFT_PAREN CONSTULONG LEFT_PAREN IntegerLiteral RIGHT_PAREN
+    | LEFT_PAREN CONSTDOUBLE LEFT_PAREN IntegerLiteral RIGHT_PAREN
     ;
