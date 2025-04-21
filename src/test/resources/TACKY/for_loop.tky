@@ -1,5 +1,5 @@
-Program("test")
-Function("test", true, [
+Program("for_loop_test")
+Function("for_loop_test", true, [
 
 
 //start:

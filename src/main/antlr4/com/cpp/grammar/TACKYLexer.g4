@@ -1,4 +1,4 @@
-lexer grammar TACKY;
+lexer grammar TACKYLexer;
 
 fragment A:[aA];
 fragment B:[bB];

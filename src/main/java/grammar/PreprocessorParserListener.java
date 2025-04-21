@@ -12,6 +12,8 @@ import org.apache.commons.lang3.StringUtils;
 import com.cpp.grammar.PreprocessorParser;
 import com.cpp.grammar.PreprocessorParserBaseListener;
 
+import main.Main;
+
 public class PreprocessorParserListener extends PreprocessorParserBaseListener {
 
     private int indent;

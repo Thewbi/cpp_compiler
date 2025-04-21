@@ -6,6 +6,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "Main",
+            "request": "launch",
+            "mainClass": "main.Main",
+            "projectName": "compiler"
+        },
+        {
+            "type": "java",
             "name": "MainMIPS",
             "request": "launch",
             "mainClass": "grammar.MainMIPS",

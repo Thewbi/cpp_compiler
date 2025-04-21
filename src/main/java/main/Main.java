@@ -1,4 +1,4 @@
-package grammar;
+package main;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,6 +12,7 @@ import java.nio.file.Paths;
 
 import java.io.File;
 
+import org.antlr.v4.parse.v4ParserException;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -26,9 +27,22 @@ import com.cpp.grammar.PreprocessorParser;
 import com.cpp.grammar.CPP14Parser.TranslationUnitContext;
 import com.cpp.grammar.PreprocessorParser.Code_fileContext;
 import com.cpp.grammar.RISCVParser.Asm_fileContext;
+import com.cpp.grammar.TACKYParser.Tacky_fileContext;
+import com.cpp.grammar.TACKYParserListener;
+import com.cpp.grammar.TACKYParser;
 
 import ast.ASTNode;
 import ast.ExpressionASTNode;
+import grammar.ConsoleCPP14ParserListener;
+import grammar.ConsoleTACKYParserListener;
+import grammar.PreprocessorParserListener;
+import grammar.RISCVRow;
+import grammar.RISCVRowListener;
+import grammar.RISCVRowParam;
+import grammar.SemantCPP14ParserListener;
+import grammar.StructureCPP14ParserListener;
+import grammar.StructureTACKYParserListener;
+import grammar.SyntaxErrorListener;
 import riscv.ExplicitRISCVProcessor;
 import riscv.RISCVInstructionDecoder;
 import riscv.RISCVInstructionEncoder;
@@ -36,6 +50,7 @@ import riscv.RISCVProcessor;
 
 import com.cpp.grammar.RISCVLexer;
 import com.cpp.grammar.RISCVParser;
+import com.cpp.grammar.TACKYLexer;
 
 import structure.DefaultStructureCallback;
 import types.FuncDecl;
@@ -51,16 +66,86 @@ public class Main {
         System.out.println("Start");
 
         // preprocessor();
-        translationUnit();
+        //translationUnit();
         // riscvassembler();
         // riscvdecoder();
         // riscvencoder();
+        tacky();
 
         // ide();
 
-        System.out.println("\nEnd");
+        System.out.println("End");
     }
 
+    private static void tacky() throws IOException {
+
+        final String filename = "src/test/resources/TACKY/for_loop.tky";
+
+        final CharStream charStream = CharStreams
+                .fromFileName(filename);
+
+        final TACKYLexer lexer = new TACKYLexer(charStream);
+
+        // create a buffer of tokens pulled from the lexer
+        final CommonTokenStream tokens = new CommonTokenStream(lexer);
+
+        final TACKYParser parser = new TACKYParser(tokens);
+
+        // parse
+        Tacky_fileContext root = parser.tacky_file();
+
+
+
+        // Create a generic parse tree walker that can trigger callbacks
+        final ParseTreeWalker walker = new ParseTreeWalker();
+
+        // DEBUG output parse tree
+        boolean printParseTree = true;
+        // boolean printParseTree = false;
+        if (printParseTree) {
+            ConsoleTACKYParserListener printListener = new ConsoleTACKYParserListener();
+            walker.walk(printListener, root);
+        }
+
+
+
+
+        ASTNode rootNode = new ASTNode();
+        rootNode.value = "[tacky_file] root";
+
+
+        StructureTACKYParserListener structureTACKYParserListener = new StructureTACKYParserListener();
+        structureTACKYParserListener.currentNode = rootNode;
+
+        TACKYParserListener listener = structureTACKYParserListener;
+
+
+        // start the base scope
+        //structureCallback.startScope();
+
+        // Walk the tree created during the parse, trigger callbacks
+        walker.walk(listener, root);
+
+        // end the base scope
+        //structureCallback.endScope();
+
+
+
+        // System.out.println(typeMap);
+
+        boolean printAST = true;
+        // boolean printAST = false;
+        if (printAST) {
+            StringBuilder stringBuilder = new StringBuilder();
+            rootNode.printRecursive(stringBuilder, 0, false);
+            System.out.print(stringBuilder.toString());
+        }
+    }
+
+    /**
+     * C/CPP translation unit
+     * @throws IOException
+     */
     private static void translationUnit() throws IOException {
 
         System.out.println("translationUnit");
