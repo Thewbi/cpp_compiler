@@ -2,7 +2,7 @@ package tacky.ast;
 
 import ast.ASTNode;
 
-public class ProgramASTNode extends ASTNode {
+public class ProgramASTNode extends TACKYASTNode {
 
     public void printRecursive(final StringBuilder stringBuilder, final int indent) {
         printRecursive(stringBuilder, indent, true);

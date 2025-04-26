@@ -5,11 +5,6 @@ package ast;
  */
 public class JumpStatementASTNode extends StatementASTNode {
 
-    // @Override
-    // public void addStatement(StatementASTNode statementASTNode) {
-    //     throw new UnsupportedOperationException("Unimplemented method 'addStatement'");
-    // }
-
     public void printRecursive(final StringBuilder stringBuilder, final int indent) {
         printRecursive(stringBuilder, indent, true);
     }

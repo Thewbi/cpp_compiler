@@ -45,7 +45,7 @@ public enum ExpressionType {
         String tempData = data.trim().toLowerCase();
         if (tempData.equalsIgnoreCase("+")) {
             return Add;
-        } if (tempData.equalsIgnoreCase("++")) {
+        } else if (tempData.equalsIgnoreCase("++")) {
             return UnaryIncrement;
         } else if (tempData.equalsIgnoreCase("*")) {
             return Mul;
@@ -65,8 +65,7 @@ public enum ExpressionType {
             return AddressOperator;
         } else if (tempData.equalsIgnoreCase("%")) {
             return Modulo;
-        }
-        else {
+        } else {
             throw new RuntimeException("Unknown type: " + data);
         }
     }

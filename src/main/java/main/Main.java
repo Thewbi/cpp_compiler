@@ -53,6 +53,9 @@ import com.cpp.grammar.RISCVParser;
 import com.cpp.grammar.TACKYLexer;
 
 import structure.DefaultStructureCallback;
+import tacky.ast.FunctionDefinitionASTNode;
+import tacky.ast.ProgramASTNode;
+import tacky.runtime.DefaultTACKYExecutor;
 import types.FuncDecl;
 import types.StackFrame;
 import types.Type;
@@ -94,8 +97,6 @@ public class Main {
         // parse
         Tacky_fileContext root = parser.tacky_file();
 
-
-
         // Create a generic parse tree walker that can trigger callbacks
         final ParseTreeWalker walker = new ParseTreeWalker();
 
@@ -107,18 +108,13 @@ public class Main {
             walker.walk(printListener, root);
         }
 
-
-
-
         ASTNode rootNode = new ASTNode();
         rootNode.value = "[tacky_file] root";
-
 
         StructureTACKYParserListener structureTACKYParserListener = new StructureTACKYParserListener();
         structureTACKYParserListener.currentNode = rootNode;
 
         TACKYParserListener listener = structureTACKYParserListener;
-
 
         // start the base scope
         //structureCallback.startScope();
@@ -129,17 +125,29 @@ public class Main {
         // end the base scope
         //structureCallback.endScope();
 
-
-
         // System.out.println(typeMap);
 
         boolean printAST = true;
         // boolean printAST = false;
         if (printAST) {
             StringBuilder stringBuilder = new StringBuilder();
-            rootNode.printRecursive(stringBuilder, 0, false);
+            rootNode.printRecursive(stringBuilder, 0, true);
             System.out.print(stringBuilder.toString());
         }
+
+        // run the TACKY code
+
+        // find the 'program' statement
+        ProgramASTNode program = (ProgramASTNode) rootNode.children.stream().filter(e -> e instanceof ProgramASTNode).findFirst().get();
+        String mainEntryPointName = program.value;
+
+        System.out.println("MainEntryPoint is \"" + mainEntryPointName + "\"");
+        FunctionDefinitionASTNode mainFunction = (FunctionDefinitionASTNode) rootNode.children.stream().filter(e -> ((e instanceof FunctionDefinitionASTNode) && (e.value.equalsIgnoreCase(mainEntryPointName)))).findFirst().get();
+
+        System.out.println("mainFunction found is \"" + mainFunction.value + "\"");
+
+        DefaultTACKYExecutor tackyExecutor = new DefaultTACKYExecutor();
+        tackyExecutor.executeFunction(rootNode, 0, mainFunction);
     }
 
     /**

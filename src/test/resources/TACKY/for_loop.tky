@@ -1,15 +1,12 @@
 Program("for_loop_test")
 Function("for_loop_test", true, [
 
-
 //start:
 //        for (<instructions for init> ; continue_label: <instructions for condition> ; continue_label: <instructions for post>)
 //        {
 //            <instructions for body>
 //        }
 //break_label:
-
-
 
     // <instructions for init>
     i = Var("i")

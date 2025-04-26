@@ -1,15 +1,8 @@
 package tacky.ast;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import ast.ASTNode;
 
-public class FunctionDefinitionASTNode extends TACKYASTNode {
-
-    public List<VariableDeclarationASTNode> localVariables = new ArrayList<>();
-
-    public boolean global;
+public class LabelASTNode extends TACKYASTNode {
 
     public void printRecursive(final StringBuilder stringBuilder, final int indent) {
         printRecursive(stringBuilder, indent, true);
@@ -21,20 +14,15 @@ public class FunctionDefinitionASTNode extends TACKYASTNode {
         for (int i = 0; i < indent; i++) {
             stringBuilder.append("  ");
         }
-        stringBuilder.append("[function_definition] ").append(value).append(" global: ").append(global);
+        stringBuilder.append("[label] ").append(value);
 
         if (addLineBreak) {
             stringBuilder.append("\n");
         }
 
-        // // all local variables
-        // for (ASTNode localVariable : localVariables) {
-        //     localVariable.printRecursive(stringBuilder, indent + 1);
-        // }
-
         // all children
         for (ASTNode child : children) {
-            child.printRecursive(stringBuilder, indent + 1);
+            child.printRecursive(stringBuilder, indent + 1, true);
         }
     }
 
