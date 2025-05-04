@@ -12,10 +12,13 @@ Function("for_loop_test", true, [
     i = Var("i")
     i = 0
 
+    tmp.0 = Var("tmp.0")
+    tmp.1 = Var("tmp.1")
+
 Label(start)
     // <instructions for condition>
     //    v = <result of condition>
-    tmp.0 = Var("tmp.0")
+//    tmp.0 = Var("tmp.0")
     tmp.0 = i < 10
 
     // JumpIfZero(v, break_label)
@@ -26,7 +29,7 @@ Label(start)
 
 Label(continue_label)
     // <instructions for post>
-    tmp.1 = Var("tmp.1")
+//    tmp.1 = Var("tmp.1")
     tmp.1 = i + 1
     i = tmp.1
 

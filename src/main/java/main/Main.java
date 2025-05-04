@@ -69,11 +69,11 @@ public class Main {
         System.out.println("Start");
 
         // preprocessor();
-        //translationUnit();
+        translationUnit();
         // riscvassembler();
         // riscvdecoder();
         // riscvencoder();
-        tacky();
+        //tacky();
 
         // ide();
 
@@ -183,7 +183,8 @@ public class Main {
 
         //final String filename = "src/test/resources/drawPath.cpp";
 
-        final String filename = "src/test/resources/palindrome_number.cpp";
+        //final String filename = "src/test/resources/palindrome_number.cpp";
+        final String filename = "src/test/resources/array_example.c";
 
         // final String filename = "src/test/resources/sample1.cpp";
         // final String filename = "src/test/resources/helloworld.cpp";

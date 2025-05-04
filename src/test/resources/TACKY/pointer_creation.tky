@@ -1,0 +1,25 @@
+// page 371
+
+Program("test")
+Function("test", true, [
+
+    // create pointer (page 370) -- *<exp>
+
+    a_var = Var("a_var")
+    a_var = 17
+
+    //<instructions for exp>
+    //ptr = <result of exp>
+    //result = Load(ptr)
+
+    ptr = Var("ptr")
+
+    // GetAddress(val src, val dst)
+    GetAddress(a_var, ptr)
+
+    result = Var("result")
+    Load(ptr, result)
+
+    return(Constant(ConstInt(0)))
+
+])

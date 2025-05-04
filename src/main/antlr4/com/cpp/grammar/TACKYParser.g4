@@ -1,4 +1,6 @@
 // http://lab.antlr.org/
+//
+// Start rule: tacky_file
 
 parser grammar TACKYParser;
 
@@ -171,10 +173,20 @@ store
     : STORE LEFT_PAREN val COMMA val RIGHT_PAREN
     ;
 
+// Book, page 406
+// Add an integer to a ptr (not adding a ptr to a ptr)
+//
+// At runtime, the program will multiply 'index' by 'scale' to determine how many bytes to add to the base pointer.
+//
+// 1st val - ptr - the base pointer to add/remove to/from (input parameter, not modified)
+// 2nd val - index - The index operand tells us how many elements forward or back to move from the base pointer.
+// 3rd val - scale - The scale operand is the size, in bytes, of each element in the array that ptr points into
+// 4th val - dst - the resulting pointer (out parameter)
 add_ptr
     : ADDPTR LEFT_PAREN val COMMA val COMMA IntegerLiteral COMMA val RIGHT_PAREN
     ;
 
+// Book, page 406
 copy_to_offset
     : COPYTOOFFSET val COMMA Identifier COMMA IntegerLiteral RIGHT_PAREN
     ;

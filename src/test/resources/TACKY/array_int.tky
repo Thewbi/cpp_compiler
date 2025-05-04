@@ -1,0 +1,13 @@
+// int int_array[3];
+// int six_ints[6] = {1, 2, 3, 4, 5, 6};
+
+Program("test")
+Function("test", true, [
+
+    // NOTE: there is no information about the amount of elements stored in this array!
+    // The memory module has already processed the array size and has allocated enough memory for the array
+    array_1 = Var("array_1")
+
+    return(Constant(ConstInt(0)))
+
+])

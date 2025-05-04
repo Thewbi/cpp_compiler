@@ -9,4 +9,6 @@ public class TACKYStackFrame {
 
     public HashMap<String, Integer> variables = new HashMap<>();
 
+    public HashMap<String, Integer> labels = new HashMap<>();
+
 }

@@ -4,17 +4,34 @@ Program("test")
 Function("test", true, [
 
     // dereference pointer (page 371)
-    <instructions for exp>
-    ptr = <result of exp>
-    result = Load(ptr)
+    //<instructions for exp>
+    //ptr = <result of exp>
+    //result = Load(ptr)
 
     // assignment to pointer (page 371)
-    <instructions for left>
-    ptr = <result of left>
-    <instructions for right>
-    372 Chapter 14
-    result = <result of right>
-    Store(result, ptr)
+    //<instructions for left>
+    //ptr = <result of left>
+    //<instructions for right>
+    //372 Chapter 14
+    //result = <result of right>
+    //Store(result, ptr)
+
+
+
+    // int a  = 17;
+    // int* ptr = &a;
+    // *ptr = 18
+
+    a_var = Var("a_var")
+    a_var = 17
+
+    ptr = Var("ptr")
+    GetAddress(a_var, ptr)
+
+    b_var = Var("b_var")
+    b_var = 18
+
+    Store(b_var, ptr)
 
     return(Constant(ConstInt(0)))
 
