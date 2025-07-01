@@ -4,7 +4,7 @@ The purpose of intermediate code is to provide an abstract layer that is agnosti
 
 Another important function is, once a source and target agnostic layer is available, it is worthwhile to spend considerable amount of resources on creating optimizations that modify this abstract layer.
 
-The optimized intermediate language code is then forwareded to the code generation for a specific target.
+The optimized intermediate language code is then forwarded to the code generation for a specific target.
 
 # Machine Model
 
