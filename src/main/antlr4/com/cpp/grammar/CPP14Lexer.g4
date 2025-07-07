@@ -547,7 +547,7 @@ fragment Udsuffix: Identifier;
 
 Whitespace: [ \t]+ -> skip;
 
-Newline: ('\r' '\n'? | '\n') -> skip;
+Newline: ('\r' '\n'? | '\n') -> channel(HIDDEN);
 
 BlockComment: '/*' .*? '*/' -> skip;
 

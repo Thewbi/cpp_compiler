@@ -56,4 +56,16 @@ public class TACKYASTNodeFactory {
         return node;
     }
 
+    public GetAddressASTNode createGetAddressASTNode() {
+        GetAddressASTNode node = new GetAddressASTNode();
+        node.nodeType = NodeType.GetAddress;
+        return node;
+    }
+
+    public LoadFromAddressASTNode createLoadFromAddressASTNode() {
+        LoadFromAddressASTNode node = new LoadFromAddressASTNode();
+        node.nodeType = NodeType.LoadFromAddress;
+        return node;
+    }
+
 }

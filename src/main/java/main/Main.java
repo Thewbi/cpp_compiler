@@ -9,9 +9,10 @@ import java.util.Stack;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-
+import java.io.Console;
 import java.io.File;
 
+import org.antlr.v4.runtime.Token;
 import org.antlr.v4.parse.v4ParserException;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
@@ -68,8 +69,9 @@ public class Main {
     public static void main(String[] args) throws IOException {
         System.out.println("Start");
 
-        // preprocessor();
-        translationUnit();
+        //preprocessor();
+        preprocessor_2();
+        //translationUnit();
         // riscvassembler();
         // riscvdecoder();
         // riscvencoder();
@@ -82,7 +84,9 @@ public class Main {
 
     private static void tacky() throws IOException {
 
-        final String filename = "src/test/resources/TACKY/for_loop.tky";
+        //final String filename = "src/test/resources/TACKY/for_loop.tky";
+        //final String filename = "src/test/resources/TACKY/pointer_creation.tky";
+        final String filename = "src/test/resources/TACKY/array_int.tky";
 
         final CharStream charStream = CharStreams
                 .fromFileName(filename);
@@ -397,6 +401,67 @@ public class Main {
 
         System.out.println(stringBuilder.toString());
         Files.writeString(Paths.get("preprocessed.cpp"), stringBuilder.toString());
+    }
+
+    private static void preprocessor_2() throws IOException {
+
+        final String filename = "src/test/resources/array_example.c";
+
+        // final String filename = "src/test/resources/sample1.cpp";
+        // final String filename = "src/test/resources/helloworld.cpp";
+        // final String filename = "src/test/resources/interface.h";
+        // final String filename = "src/test/resources/main.cpp";
+        // final String filename = "src/test/resources/pragma.h";
+        // final String filename = "src/test/resources/preprocessor.cpp";
+        // final String filename = "src/test/resources/scratchpad.h";
+        // final String filename = "src/test/resources/template.h";
+        // final String filename = "src/test/resources/test_f.cpp";
+        // final String filename = "src/test/resources/variables.cpp";
+        // final String filename = "src/test/resources/declaration_type_error.cpp";
+        // final String filename = "src/test/resources/declaration.cpp";
+        // final String filename = "src/test/resources/arrays.cpp";
+        // final String filename = "src/test/resources/if.cpp";
+        // final String filename = "src/test/resources/for_loop.cpp";
+        // final String filename = "src/test/resources/function_definition.cpp";
+        // final String filename = "src/test/resources/function_call.cpp";
+        //final String filename = "src/test/resources/while.cpp";
+        // final String filename = "src/test/resources/app1.cpp";
+        // final String filename = "src/test/resources/ECO32/ECO32_1.cpp";
+
+        final CharStream charStream = CharStreams
+                .fromFileName(filename);
+
+        final CPP14Lexer lexer = new CPP14Lexer(charStream);
+
+        CommonTokenStream commonTokenStream = new CommonTokenStream(lexer);
+        //commonTokenStream.size();
+
+        for (int i = 0; i  <10; i++) {
+
+        List<Token> tokenList = commonTokenStream.get( 0, commonTokenStream.size() );
+
+
+        for ( Token t : tokenList )
+        {
+           System.out.println(
+                "" + t.getChannel() + "[" + t.getTokenIndex() + "] : " + t.getText()
+                );
+        }
+
+        commonTokenStream.consume();
+
+        }
+
+        // Token token = lexer.nextToken();
+        // while ((token!= null) && (token.getType() != Token.EOF)) {
+
+        //     System.out.println(token.getText());
+
+        //     token = lexer.nextToken();
+
+        //     // TODO: do not put new_line into the hidden channel! So we can detect it here!
+        //     if (token.getType() == Token.New)
+        // }
     }
 
     private static void ide() {
