@@ -24,6 +24,7 @@ import com.cpp.grammar.CPP14Lexer;
 import com.cpp.grammar.CPP14Parser;
 import com.cpp.grammar.CPP14ParserListener;
 import com.cpp.grammar.PreprocessorLexer;
+import com.cpp.grammar.PreprocessorLexer2;
 import com.cpp.grammar.PreprocessorParser;
 import com.cpp.grammar.CPP14Parser.TranslationUnitContext;
 import com.cpp.grammar.PreprocessorParser.Code_fileContext;
@@ -58,7 +59,6 @@ import tacky.ast.FunctionDefinitionASTNode;
 import tacky.ast.ProgramASTNode;
 import tacky.runtime.DefaultTACKYExecutor;
 import types.FuncDecl;
-import types.StackFrame;
 import types.Type;
 
 /**
@@ -69,13 +69,13 @@ public class Main {
     public static void main(String[] args) throws IOException {
         System.out.println("Start");
 
-        //preprocessor();
+        // preprocessor();
         preprocessor_2();
-        //translationUnit();
+        // translationUnit();
         // riscvassembler();
         // riscvdecoder();
         // riscvencoder();
-        //tacky();
+        // tacky();
 
         // ide();
 
@@ -84,8 +84,8 @@ public class Main {
 
     private static void tacky() throws IOException {
 
-        //final String filename = "src/test/resources/TACKY/for_loop.tky";
-        //final String filename = "src/test/resources/TACKY/pointer_creation.tky";
+        // final String filename = "src/test/resources/TACKY/for_loop.tky";
+        // final String filename = "src/test/resources/TACKY/pointer_creation.tky";
         final String filename = "src/test/resources/TACKY/array_int.tky";
 
         final CharStream charStream = CharStreams
@@ -121,13 +121,13 @@ public class Main {
         TACKYParserListener listener = structureTACKYParserListener;
 
         // start the base scope
-        //structureCallback.startScope();
+        // structureCallback.startScope();
 
         // Walk the tree created during the parse, trigger callbacks
         walker.walk(listener, root);
 
         // end the base scope
-        //structureCallback.endScope();
+        // structureCallback.endScope();
 
         // System.out.println(typeMap);
 
@@ -142,11 +142,14 @@ public class Main {
         // run the TACKY code
 
         // find the 'program' statement
-        ProgramASTNode program = (ProgramASTNode) rootNode.children.stream().filter(e -> e instanceof ProgramASTNode).findFirst().get();
+        ProgramASTNode program = (ProgramASTNode) rootNode.children.stream().filter(e -> e instanceof ProgramASTNode)
+                .findFirst().get();
         String mainEntryPointName = program.value;
 
         System.out.println("MainEntryPoint is \"" + mainEntryPointName + "\"");
-        FunctionDefinitionASTNode mainFunction = (FunctionDefinitionASTNode) rootNode.children.stream().filter(e -> ((e instanceof FunctionDefinitionASTNode) && (e.value.equalsIgnoreCase(mainEntryPointName)))).findFirst().get();
+        FunctionDefinitionASTNode mainFunction = (FunctionDefinitionASTNode) rootNode.children.stream().filter(
+                e -> ((e instanceof FunctionDefinitionASTNode) && (e.value.equalsIgnoreCase(mainEntryPointName))))
+                .findFirst().get();
 
         System.out.println("mainFunction found is \"" + mainFunction.value + "\"");
 
@@ -156,6 +159,7 @@ public class Main {
 
     /**
      * C/CPP translation unit
+     *
      * @throws IOException
      */
     private static void translationUnit() throws IOException {
@@ -165,29 +169,30 @@ public class Main {
         // final String filename =
         // "src/test/resources/WritingACCompilerNoraSandler/simplest.c";
 
-        //final String filename = "src/test/resources/initialize_with_expressions.cpp";
+        // final String filename = "src/test/resources/initialize_with_expressions.cpp";
 
-        //final String filename = "src/test/resources/initialize_pointers.cpp";
+        // final String filename = "src/test/resources/initialize_pointers.cpp";
 
         // test
-        //final String filename = "src/test/resources/initialize_use_pointers.cpp";
+        // final String filename = "src/test/resources/initialize_use_pointers.cpp";
 
-        //final String filename = "src/test/resources/initialize_arrays.cpp";
-        //final String filename = "src/test/resources/inititalize_variable_cast.cpp";
-        //final String filename = "src/test/resources/initialize_function_declaration.cpp";
-        //final String filename = "src/test/resources/initialize_static_variables.cpp";
-        //final String filename = "src/test/resources/initialize_struct.cpp";
-        //final String filename = "src/test/resources/initialize_class.cpp";
-        //final String filename = "src/test/resources/initialize_typedef.cpp";
-        //final String filename = "src/test/resources/initialize_if_elseif_else.cpp";
-        //final String filename = "src/test/resources/initialize_switch_case.cpp";
-        //final String filename = "src/test/resources/initialize_for_loop.cpp";
-        //final String filename = "src/test/resources/initialize_while_loop.cpp";
-        //final String filename = "src/test/resources/initialize_do_while_loop.cpp";
+        // final String filename = "src/test/resources/initialize_arrays.cpp";
+        // final String filename = "src/test/resources/inititalize_variable_cast.cpp";
+        // final String filename =
+        // "src/test/resources/initialize_function_declaration.cpp";
+        // final String filename = "src/test/resources/initialize_static_variables.cpp";
+        // final String filename = "src/test/resources/initialize_struct.cpp";
+        // final String filename = "src/test/resources/initialize_class.cpp";
+        // final String filename = "src/test/resources/initialize_typedef.cpp";
+        // final String filename = "src/test/resources/initialize_if_elseif_else.cpp";
+        // final String filename = "src/test/resources/initialize_switch_case.cpp";
+        // final String filename = "src/test/resources/initialize_for_loop.cpp";
+        // final String filename = "src/test/resources/initialize_while_loop.cpp";
+        // final String filename = "src/test/resources/initialize_do_while_loop.cpp";
 
-        //final String filename = "src/test/resources/drawPath.cpp";
+        // final String filename = "src/test/resources/drawPath.cpp";
 
-        //final String filename = "src/test/resources/palindrome_number.cpp";
+        // final String filename = "src/test/resources/palindrome_number.cpp";
         final String filename = "src/test/resources/array_example.c";
 
         // final String filename = "src/test/resources/sample1.cpp";
@@ -207,7 +212,7 @@ public class Main {
         // final String filename = "src/test/resources/for_loop.cpp";
         // final String filename = "src/test/resources/function_definition.cpp";
         // final String filename = "src/test/resources/function_call.cpp";
-        //final String filename = "src/test/resources/while.cpp";
+        // final String filename = "src/test/resources/while.cpp";
         // final String filename = "src/test/resources/app1.cpp";
         // final String filename = "src/test/resources/ECO32/ECO32_1.cpp";
 
@@ -308,8 +313,6 @@ public class Main {
         // end the base scope
         structureCallback.endScope();
 
-
-
         // System.out.println(typeMap);
 
         boolean printAST = true;
@@ -318,9 +321,6 @@ public class Main {
             rootNode.printRecursive(stringBuilder, 0);
             System.out.println(stringBuilder.toString());
         }
-
-
-
 
         // check if expression stack is empty
         if (listener instanceof StructureCPP14ParserListener) {
@@ -335,9 +335,6 @@ public class Main {
                 System.out.println("Expression stack is empty!");
             }
         }
-
-
-
 
         boolean debugOutputListenerData = true;
         // boolean debugOutputListenerData = false;
@@ -405,63 +402,165 @@ public class Main {
 
     private static void preprocessor_2() throws IOException {
 
-        final String filename = "src/test/resources/array_example.c";
-
-        // final String filename = "src/test/resources/sample1.cpp";
-        // final String filename = "src/test/resources/helloworld.cpp";
-        // final String filename = "src/test/resources/interface.h";
-        // final String filename = "src/test/resources/main.cpp";
-        // final String filename = "src/test/resources/pragma.h";
-        // final String filename = "src/test/resources/preprocessor.cpp";
-        // final String filename = "src/test/resources/scratchpad.h";
-        // final String filename = "src/test/resources/template.h";
-        // final String filename = "src/test/resources/test_f.cpp";
-        // final String filename = "src/test/resources/variables.cpp";
-        // final String filename = "src/test/resources/declaration_type_error.cpp";
-        // final String filename = "src/test/resources/declaration.cpp";
-        // final String filename = "src/test/resources/arrays.cpp";
-        // final String filename = "src/test/resources/if.cpp";
-        // final String filename = "src/test/resources/for_loop.cpp";
-        // final String filename = "src/test/resources/function_definition.cpp";
-        // final String filename = "src/test/resources/function_call.cpp";
-        //final String filename = "src/test/resources/while.cpp";
-        // final String filename = "src/test/resources/app1.cpp";
-        // final String filename = "src/test/resources/ECO32/ECO32_1.cpp";
+        final String filename = "src/test/resources/preprocessor/square.pp";
 
         final CharStream charStream = CharStreams
                 .fromFileName(filename);
 
-        final CPP14Lexer lexer = new CPP14Lexer(charStream);
+        //final CPP14Lexer lexer = new CPP14Lexer(charStream);
+        final PreprocessorLexer2 lexer = new PreprocessorLexer2(charStream);
 
-        CommonTokenStream commonTokenStream = new CommonTokenStream(lexer);
-        //commonTokenStream.size();
+        // CommonTokenStream commonTokenStream = new CommonTokenStream(lexer);
+        // for (int i = 0; i < 10; i++) {
 
-        for (int i = 0; i  <10; i++) {
+        //     List<Token> tokenList = commonTokenStream.get(0, commonTokenStream.size());
+        //     for (Token t : tokenList) {
+        //         System.out.println(
+        //                 "" + t.getChannel() + "[" + t.getTokenIndex() + "] : " + t.getText());
+        //     }
 
-        List<Token> tokenList = commonTokenStream.get( 0, commonTokenStream.size() );
+        //     commonTokenStream.consume();
 
-
-        for ( Token t : tokenList )
-        {
-           System.out.println(
-                "" + t.getChannel() + "[" + t.getTokenIndex() + "] : " + t.getText()
-                );
-        }
-
-        commonTokenStream.consume();
-
-        }
-
-        // Token token = lexer.nextToken();
-        // while ((token!= null) && (token.getType() != Token.EOF)) {
-
-        //     System.out.println(token.getText());
-
-        //     token = lexer.nextToken();
-
-        //     // TODO: do not put new_line into the hidden channel! So we can detect it here!
-        //     if (token.getType() == Token.New)
         // }
+
+        /**/
+        ASTNode rootNode = new ASTNode();
+        rootNode.value = "root____";
+        rootNode.parent = null;
+
+        ASTNode currentNode = rootNode;
+
+        boolean isDefine = false;
+
+        Token token = lexer.nextToken();
+        while ((token != null) && (token.getType() != Token.EOF)) {
+
+            // System.out.println(token);
+            System.out.println(
+                    " " + token.getChannel() + "[" + token.getTokenIndex() + "] : " + token.getText());
+
+            if (token.getText().equalsIgnoreCase("#define")) {
+                isDefine = true;
+
+                token = lexer.nextToken();
+                continue;
+            }
+
+            ASTNode node = new ASTNode();
+
+            String text = token.getText();
+
+            if (text.equalsIgnoreCase("(")) {
+
+                node.value = "sub";
+
+                currentNode.children.add(node);
+                node.parent = currentNode;
+
+                // descend
+                currentNode = node;
+
+                node = new ASTNode();
+                node.value = "(";
+                currentNode.children.add(node);
+
+            } else if (text.equalsIgnoreCase(")")) {
+
+                if (currentNode.parent == null) {
+
+                    token = lexer.nextToken();
+                    continue;
+                }
+
+                // // ascend ( into sub )
+                // currentNode = currentNode.parent;
+
+                node = new ASTNode();
+                node.value = ")";
+                currentNode.children.add(node);
+                node.parent = currentNode;
+
+                if (currentNode.parent == null) {
+
+                    token = lexer.nextToken();
+                    continue;
+                }
+
+                // ascend ( out of sub into parent )
+                currentNode = currentNode.parent;
+
+            } else if (text.equalsIgnoreCase(" ")) {
+
+                if (currentNode.parent == null) {
+
+                    token = lexer.nextToken();
+                    continue;
+                }
+
+                // ascend
+                //currentNode = currentNode.parent;
+
+            } else if (token.getType() == PreprocessorLexer2.Newline) {
+
+                System.out.println("Newline");
+
+                // deal with completely empty lines (the node is still the root node and it has no children)
+                if (rootNode.children.size() == 0) {
+
+                    token = lexer.nextToken();
+
+                    continue;
+                }
+
+                StringBuilder stringBuilder = new StringBuilder();
+                int indent = 0;
+                rootNode.printRecursive(stringBuilder, indent);
+
+                System.out.println(stringBuilder.toString());
+
+                // todo insert into define map
+
+                isDefine = false;
+
+                // start a new root
+                rootNode = new ASTNode();
+                rootNode.value = "root____";
+                rootNode.parent = null;
+
+                currentNode = rootNode;
+
+            } else {
+
+                node.value = text;
+
+                currentNode.children.add(node);
+                node.parent = currentNode;
+
+                // descend
+                //currentNode = node;
+
+            }
+
+            token = lexer.nextToken();
+
+            // TODO: do not put new_line into the hidden channel! So we can detect it here!
+            // if (token.getType() == Token.New)
+
+        }
+
+
+
+
+        // output the very last node
+        if (rootNode.children.size() != 0) {
+
+            StringBuilder stringBuilder = new StringBuilder();
+            int indent = 0;
+            rootNode.printRecursive(stringBuilder, indent);
+
+            System.out.println(stringBuilder.toString());
+        }
+
     }
 
     private static void ide() {

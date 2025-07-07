@@ -127,10 +127,13 @@ printf("ORPHS= %7d%7d%7d%7d%7d%7d\n",
 ```
 
 The symbol P(x) is converted to the AST:
+
+```
 P
     (
         x
     )
+```
 
 Input:
 
@@ -183,6 +186,9 @@ newsta_ (),
 ```
 
 the line = { 2164, 0, 4200, 0, 15160, 0, 1600, 0, 2160, 0, 32325, 0,
+
+Q: Is this line parsed at all? There is no #define, we do not need to parse it!
+A: Yes, we need to parse the line since it might contain defines that need to be matched and replaced!
 
 is parsed into the asymetrical AST because there is not closing } bracket!
 Asymetrical AST may exist!
