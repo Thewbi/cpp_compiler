@@ -402,7 +402,8 @@ public class Main {
 
     private static void preprocessor_2() throws IOException {
 
-        final String filename = "src/test/resources/preprocessor/square.pp";
+        //final String filename = "src/test/resources/preprocessor/define_square.pp";
+        final String filename = "src/test/resources/preprocessor/printf_test_1.pp";
 
         final CharStream charStream = CharStreams
                 .fromFileName(filename);
@@ -440,6 +441,7 @@ public class Main {
                     " " + token.getChannel() + "[" + token.getTokenIndex() + "] : " + token.getText());
 
             if (token.getText().equalsIgnoreCase("#define")) {
+
                 isDefine = true;
 
                 token = lexer.nextToken();
@@ -518,7 +520,11 @@ public class Main {
 
                 System.out.println(stringBuilder.toString());
 
-                // todo insert into define map
+                //
+                if (isDefine) {
+                    // todo insert into define map
+                }
+
 
                 isDefine = false;
 

@@ -7,6 +7,28 @@ and applies this knowledge while it processes input.
 In general none of the processor commands ever is copied to the output! Once the preprocessor is
 done, the output contains pure C.
 
+## All Statements
+
+https://www.cprogramming.com/reference/preprocessor/
+
+```
+#include
+#define
+#undef
+#if
+#ifdef
+#ifndef
+#error
+__FILE__
+__LINE__
+__DATE__
+__TIME__
+__TIMESTAMP__
+pragma
+# macro operator
+## macro operator
+```
+
 ## include
 
 ```

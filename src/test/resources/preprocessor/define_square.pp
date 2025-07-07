@@ -1,4 +1,4 @@
-#define SQUARE(x) ((x)* (x))
+#define SQUARE(x) ((x) * (x))
 
 int main() {
   printf("Square of 4: %d\n", SQUARE(4));
