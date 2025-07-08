@@ -26,6 +26,14 @@ PREPROC_DEFINE :
     '#define'
     ;
 
+PREPROC_IF :
+    '#if'
+    ;
+
+PREPROC_ENDIF :
+    '#endif'
+    ;
+
 // fix according to https://stackoverflow.com/questions/64108151/how-to-resolve-parsing-error-in-antlr-cpp14-grammar
 StringLiteral
     : Encodingprefix? '"' Schar* '"'

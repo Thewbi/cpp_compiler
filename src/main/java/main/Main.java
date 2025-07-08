@@ -23,6 +23,10 @@ import org.apache.commons.lang3.StringUtils;
 import com.cpp.grammar.CPP14Lexer;
 import com.cpp.grammar.CPP14Parser;
 import com.cpp.grammar.CPP14ParserListener;
+import com.cpp.grammar.CPreprocessorLexer;
+import com.cpp.grammar.CPreprocessorLexerRule;
+import com.cpp.grammar.CPreprocessorParser;
+import com.cpp.grammar.CPreprocessorParser.ProgramContext;
 import com.cpp.grammar.PreprocessorLexer;
 import com.cpp.grammar.PreprocessorLexer2;
 import com.cpp.grammar.PreprocessorParser;
@@ -36,6 +40,7 @@ import com.cpp.grammar.TACKYParser;
 import ast.ASTNode;
 import ast.ExpressionASTNode;
 import grammar.ConsoleCPP14ParserListener;
+import grammar.ConsoleCPreprocessorParserListener;
 import grammar.ConsoleTACKYParserListener;
 import grammar.PreprocessorParserListener;
 import grammar.RISCVRow;
@@ -70,7 +75,8 @@ public class Main {
         System.out.println("Start");
 
         // preprocessor();
-        preprocessor_2();
+        //preprocessor_2();
+        preprocessor_3();
         // translationUnit();
         // riscvassembler();
         // riscvdecoder();
@@ -403,7 +409,8 @@ public class Main {
     private static void preprocessor_2() throws IOException {
 
         //final String filename = "src/test/resources/preprocessor/define_square.pp";
-        final String filename = "src/test/resources/preprocessor/printf_test_1.pp";
+        //final String filename = "src/test/resources/preprocessor/printf_test_1.pp";
+        final String filename = "src/test/resources/preprocessor/if_defined.pp";
 
         final CharStream charStream = CharStreams
                 .fromFileName(filename);
@@ -491,6 +498,40 @@ public class Main {
                 // ascend ( out of sub into parent )
                 currentNode = currentNode.parent;
 
+                if (currentNode.value.equalsIgnoreCase("defined")) {
+                    // ascend ( out of sub into parent )
+                    currentNode = currentNode.parent;
+                }
+
+            } else if (text.equalsIgnoreCase("defined")) {
+
+                node = new ASTNode();
+                node.value = "defined";
+                currentNode.children.add(node);
+                node.parent = currentNode;
+
+                // descend
+                currentNode = node;
+
+            } else if (text.equalsIgnoreCase("||")) {
+
+                int size = currentNode.children.size();
+                ASTNode lhs = currentNode.children.get(size - 1);
+
+                currentNode.children.remove(lhs);
+
+                node = new ASTNode();
+                node.value = "||";
+                currentNode.children.add(node);
+                node.parent = currentNode;
+
+                // reparent
+                node.children.add(lhs);
+                lhs.parent = node;
+
+                // descend
+                currentNode = node;
+
             } else if (text.equalsIgnoreCase(" ")) {
 
                 if (currentNode.parent == null) {
@@ -545,6 +586,11 @@ public class Main {
                 // descend
                 //currentNode = node;
 
+                if (currentNode.value.equalsIgnoreCase("defined")) {
+                    // ascend ( out of sub into parent )
+                    currentNode = currentNode.parent;
+                }
+
             }
 
             token = lexer.nextToken();
@@ -565,6 +611,37 @@ public class Main {
             rootNode.printRecursive(stringBuilder, indent);
 
             System.out.println(stringBuilder.toString());
+        }
+
+    }
+
+    private static void preprocessor_3() throws IOException {
+/**/
+        //final String filename = "src/test/resources/preprocessor/if_defined.pp";
+        final String filename = "src/test/resources/preprocessor/scratchpad.pp";
+
+        final CharStream charStream = CharStreams
+                .fromFileName(filename);
+
+        //final CPreprocessorLexerRule lexer = new CPreprocessorLexerRule(charStream);
+        final CPreprocessorLexer lexer = new CPreprocessorLexer(charStream);
+
+        // create a buffer of tokens pulled from the lexer
+        final CommonTokenStream tokens = new CommonTokenStream(lexer);
+
+        final CPreprocessorParser parser = new CPreprocessorParser(tokens);
+
+        // parse
+        ProgramContext root = parser.program();
+
+        // Create a generic parse tree walker that can trigger callbacks
+        final ParseTreeWalker walker = new ParseTreeWalker();
+
+        boolean printParseTree = true;
+        //boolean printParseTree = false;
+        if (printParseTree) {
+            ConsoleCPreprocessorParserListener printListener = new ConsoleCPreprocessorParserListener();
+            walker.walk(printListener, root);
         }
 
     }

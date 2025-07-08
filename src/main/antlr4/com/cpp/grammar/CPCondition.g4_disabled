@@ -1,0 +1,42 @@
+grammar CPCondition;
+
+// FROM: https://wrice.blogspot.com/2013/12/antlr-grammar-for-cc-preprocessor.html
+
+//import CPConditionLexerRule;
+
+options {
+	tokenVocab = PreprocessorLexer;
+}
+
+// Assumptions:
+// 1. Lexer will remove white spaces.
+
+condition    : expression ;
+
+// Indirect left-recursion for binary/ternary expressions is solved by "direct" left-recursion
+expression    :    PAREN_OPEN    expression    PAREN_CLOSE                                                    # ceParen
+            |    unaryExpression                                                                        # ceUnary
+            |    expression    op=(AOP_MUL|AOP_DIV|AOP_MOD)        expression                            # ceMulDivMod
+            |    expression    op=(AOP_ADD|AOP_SUB)                expression                            # ceAddSub
+            |    expression    op=(BOP_SHL|BOP_SHR)                expression                            # ceShlShr
+            |    expression    op=(CMP_LE|CMP_LT|CMP_GE|CMP_GT)    expression                            # ceCmpLeLtGeGt
+            |    expression    op=(CMP_EQ|CMP_NE)                    expression                            # ceCmpEqNe
+            |    expression    BOP_AND                                expression                            # ceBitAnd
+            |    expression    BOP_XOR                                expression                            # ceBitXor
+            |    expression    BOP_OR                                expression                            # ceBitOr
+            |    expression    LOP_AND                                expression                            # ceLogicAnd
+            |    expression    LOP_OR                                expression                            # ceLogicOr
+            |    expression    TER_IF                                expression    TER_ELS    expression        # ceTerIf
+            |    value                                                                                # ceValue
+            ;
+
+unaryExpression    :    op=(AOP_ADD|AOP_SUB|BOP_NOT|LOP_NOT)    expression    ;
+
+value    :    val=FLOAT
+        |    val=INT
+        |    val=HEX
+        |    val=OCT
+        |    val=TRUE
+        |    val=FALSE
+        |    val=ID    // error
+        ;

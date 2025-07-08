@@ -1,5 +1,7 @@
 parser grammar PreprocessorParser;
 
+// start-symbol: code_file
+
 options {
 	tokenVocab = PreprocessorLexer;
 }

@@ -104,6 +104,9 @@ Copy these lines to the output.
 
 ## ifdef
 
+https://gcc.gnu.org/onlinedocs/gcc-3.0.2/cpp_4.html
+https://stackoverflow.com/questions/3390603/can-boolean-operators-be-used-with-the-preprocessor
+
 ```
 #ifdef <SYMBOL>
 	<BLOCK>
