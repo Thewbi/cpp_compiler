@@ -280,3 +280,40 @@ https://github.com/hirrolot/metalang99
 3. Implement asymetric AST generation from input line
 4. Implement node search against define-map
 5. Implement replace
+
+# Processing if-statements
+
+```
+#define _DEBUG
+#define _UNIT_TEST
+
+#define _DEBUG_INNER
+#define _UNIT_TEST_INNER
+
+#define _DEBUG_INNER_2
+#define _UNIT_TEST_INNER_2
+
+#if defined(_DEBUG) || defined(_UNIT_TEST)
+  printf("a");
+  #if defined(_DEBUG_INNER) || defined(_UNIT_TEST_INNER)
+    printf("b");
+  #elif defined(_DEBUG_INNER_2) || defined(_UNIT_TEST_INNER_2)
+    printf("c");
+  #else
+    printf("d");
+  #endif
+#else
+  printf("e");
+#endif
+```
+
+An #if is detected: A new stackframe is placed on the scope-stack
+
+The #if, #elif is detected:
+    If the ifProcessed flag is true, no evaluation is performed, no output is produced
+    If the ifProcessed flag is false, the expression is evaluated.
+        If the expression yields a true result, the flag ifProcessed is set to true in the current scope-stack frame.
+        Output for that branch is produced.
+        If the expression yields a false result, proceed to the next #if, #elif
+
+An #endif is detected: The current stackframe is popped from the scope-stack

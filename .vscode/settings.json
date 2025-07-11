@@ -1,5 +1,5 @@
 {
     "java.debug.settings.onBuildFailureProceed": true,
-    "editor.renderWhitespace": "none",
+    "editor.renderWhitespace": "all",
     "java.configuration.updateBuildConfiguration": "interactive",
 }

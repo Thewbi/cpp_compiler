@@ -8,6 +8,7 @@ import com.cpp.grammar.TACKYParserBaseListener;
 import ast.ASTNode;
 import ast.ExpressionASTNode;
 import ast.ExpressionType;
+import common.StringUtil;
 import tacky.ast.AssignmentASTNode;
 import tacky.ast.ConstIntASTNode;
 import tacky.ast.ConstantDeclarationASTNode;
@@ -44,7 +45,7 @@ public class StructureTACKYParserListener extends TACKYParserBaseListener {
         ProgramASTNode programASTNode = tackyASTNodeFactory.createProgramASTNode();
 
         String wrappedName = ctx.getChild(2).getText();
-        String unwrappedName = unwrap(wrappedName);
+        String unwrappedName = StringUtil.unwrap(wrappedName);
         programASTNode.value = unwrappedName;
 
         currentNode.children.add(programASTNode);
@@ -55,7 +56,7 @@ public class StructureTACKYParserListener extends TACKYParserBaseListener {
         FunctionDefinitionASTNode functionDefinitionASTNode = tackyASTNodeFactory.createFunctionDefinitionASTNode();
 
         String wrappedName = ctx.getChild(2).getText();
-        String unwrappedName = unwrap(wrappedName);
+        String unwrappedName = StringUtil.unwrap(wrappedName);
         functionDefinitionASTNode.value = unwrappedName;
         functionDefinitionASTNode.global = Boolean.parseBoolean(ctx.getChild(4).getText());
 
@@ -84,7 +85,7 @@ public class StructureTACKYParserListener extends TACKYParserBaseListener {
         // System.out.println("[" + ctx.hashCode() + "] " + ctx.getText());
 
         String variableSymbolName = ctx.getChild(0).getText();
-        String variableName = unwrap(ctx.getChild(4).getText());
+        String variableName = StringUtil.unwrap(ctx.getChild(4).getText());
 
         // System.out.println("variableSymbolName=\"" + variableSymbolName + "\",
         // variableName=\"" + variableName + "\"");
@@ -357,10 +358,6 @@ public class StructureTACKYParserListener extends TACKYParserBaseListener {
 
     private void expressionStackPush(ExpressionASTNode expressionASTNode) {
         expressionStack.push(expressionASTNode);
-    }
-
-    private String unwrap(String wrapped) {
-        return wrapped.substring(1, wrapped.length() - 1);
     }
 
 }

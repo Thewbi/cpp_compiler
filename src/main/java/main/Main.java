@@ -50,6 +50,8 @@ import grammar.SemantCPP14ParserListener;
 import grammar.StructureCPP14ParserListener;
 import grammar.StructureTACKYParserListener;
 import grammar.SyntaxErrorListener;
+import preprocessor.DefaultFileStackFrameCallback;
+import preprocessor.FileStackFrame;
 import riscv.ExplicitRISCVProcessor;
 import riscv.RISCVInstructionDecoder;
 import riscv.RISCVInstructionEncoder;
@@ -75,8 +77,8 @@ public class Main {
         System.out.println("Start");
 
         // preprocessor();
-        //preprocessor_2();
-        preprocessor_3();
+        preprocessor_2();
+        //preprocessor_3();
         // translationUnit();
         // riscvassembler();
         // riscvdecoder();
@@ -408,210 +410,38 @@ public class Main {
 
     private static void preprocessor_2() throws IOException {
 
+        //final String filename = "src/test/resources/preprocessor/if_defined.pp";
+        final String filename = "src/test/resources/preprocessor/if_nested.pp";
+        //final String filename = "src/test/resources/preprocessor/include.pp";
+        //final String filename = "src/test/resources/preprocessor/scratchpad.pp";
+
+        // TODO: next
         //final String filename = "src/test/resources/preprocessor/define_square.pp";
         //final String filename = "src/test/resources/preprocessor/printf_test_1.pp";
-        final String filename = "src/test/resources/preprocessor/if_defined.pp";
 
-        final CharStream charStream = CharStreams
-                .fromFileName(filename);
+        ASTNode dummyASTNode = new ASTNode();
+        dummyASTNode.value = "__DUMMY___11223344__";
 
-        //final CPP14Lexer lexer = new CPP14Lexer(charStream);
-        final PreprocessorLexer2 lexer = new PreprocessorLexer2(charStream);
+        StringBuilder outputStringBuilder = new StringBuilder();
+        Map<String, ASTNode> defineMap = new HashMap<>();
 
-        // CommonTokenStream commonTokenStream = new CommonTokenStream(lexer);
-        // for (int i = 0; i < 10; i++) {
+        DefaultFileStackFrameCallback defaultfileStackFrameCallback = new DefaultFileStackFrameCallback();
+        defaultfileStackFrameCallback.defineMap = defineMap;
+        defaultfileStackFrameCallback.dummyASTNode = dummyASTNode;
 
-        //     List<Token> tokenList = commonTokenStream.get(0, commonTokenStream.size());
-        //     for (Token t : tokenList) {
-        //         System.out.println(
-        //                 "" + t.getChannel() + "[" + t.getTokenIndex() + "] : " + t.getText());
-        //     }
+        FileStackFrame fileStackFrame = new FileStackFrame();
+        fileStackFrame.callback = defaultfileStackFrameCallback;
+        fileStackFrame.filename = filename;
+        fileStackFrame.outputStringBuilder = outputStringBuilder;
 
-        //     commonTokenStream.consume();
+        Stack<FileStackFrame> fileStack = new Stack<>();
+        fileStack.push(fileStackFrame);
 
-        // }
+        fileStackFrame.fileStack = fileStack;
 
-        /**/
-        ASTNode rootNode = new ASTNode();
-        rootNode.value = "root____";
-        rootNode.parent = null;
+        fileStackFrame.start();
 
-        ASTNode currentNode = rootNode;
-
-        boolean isDefine = false;
-
-        Token token = lexer.nextToken();
-        while ((token != null) && (token.getType() != Token.EOF)) {
-
-            // System.out.println(token);
-            System.out.println(
-                    " " + token.getChannel() + "[" + token.getTokenIndex() + "] : " + token.getText());
-
-            if (token.getText().equalsIgnoreCase("#define")) {
-
-                isDefine = true;
-
-                token = lexer.nextToken();
-                continue;
-            }
-
-            ASTNode node = new ASTNode();
-
-            String text = token.getText();
-
-            if (text.equalsIgnoreCase("(")) {
-
-                node.value = "sub";
-
-                currentNode.children.add(node);
-                node.parent = currentNode;
-
-                // descend
-                currentNode = node;
-
-                node = new ASTNode();
-                node.value = "(";
-                currentNode.children.add(node);
-
-            } else if (text.equalsIgnoreCase(")")) {
-
-                if (currentNode.parent == null) {
-
-                    token = lexer.nextToken();
-                    continue;
-                }
-
-                // // ascend ( into sub )
-                // currentNode = currentNode.parent;
-
-                node = new ASTNode();
-                node.value = ")";
-                currentNode.children.add(node);
-                node.parent = currentNode;
-
-                if (currentNode.parent == null) {
-
-                    token = lexer.nextToken();
-                    continue;
-                }
-
-                // ascend ( out of sub into parent )
-                currentNode = currentNode.parent;
-
-                if (currentNode.value.equalsIgnoreCase("defined")) {
-                    // ascend ( out of sub into parent )
-                    currentNode = currentNode.parent;
-                }
-
-            } else if (text.equalsIgnoreCase("defined")) {
-
-                node = new ASTNode();
-                node.value = "defined";
-                currentNode.children.add(node);
-                node.parent = currentNode;
-
-                // descend
-                currentNode = node;
-
-            } else if (text.equalsIgnoreCase("||")) {
-
-                int size = currentNode.children.size();
-                ASTNode lhs = currentNode.children.get(size - 1);
-
-                currentNode.children.remove(lhs);
-
-                node = new ASTNode();
-                node.value = "||";
-                currentNode.children.add(node);
-                node.parent = currentNode;
-
-                // reparent
-                node.children.add(lhs);
-                lhs.parent = node;
-
-                // descend
-                currentNode = node;
-
-            } else if (text.equalsIgnoreCase(" ")) {
-
-                if (currentNode.parent == null) {
-
-                    token = lexer.nextToken();
-                    continue;
-                }
-
-                // ascend
-                //currentNode = currentNode.parent;
-
-            } else if (token.getType() == PreprocessorLexer2.Newline) {
-
-                System.out.println("Newline");
-
-                // deal with completely empty lines (the node is still the root node and it has no children)
-                if (rootNode.children.size() == 0) {
-
-                    token = lexer.nextToken();
-
-                    continue;
-                }
-
-                StringBuilder stringBuilder = new StringBuilder();
-                int indent = 0;
-                rootNode.printRecursive(stringBuilder, indent);
-
-                System.out.println(stringBuilder.toString());
-
-                //
-                if (isDefine) {
-                    // todo insert into define map
-                }
-
-
-                isDefine = false;
-
-                // start a new root
-                rootNode = new ASTNode();
-                rootNode.value = "root____";
-                rootNode.parent = null;
-
-                currentNode = rootNode;
-
-            } else {
-
-                node.value = text;
-
-                currentNode.children.add(node);
-                node.parent = currentNode;
-
-                // descend
-                //currentNode = node;
-
-                if (currentNode.value.equalsIgnoreCase("defined")) {
-                    // ascend ( out of sub into parent )
-                    currentNode = currentNode.parent;
-                }
-
-            }
-
-            token = lexer.nextToken();
-
-            // TODO: do not put new_line into the hidden channel! So we can detect it here!
-            // if (token.getType() == Token.New)
-
-        }
-
-
-
-
-        // output the very last node
-        if (rootNode.children.size() != 0) {
-
-            StringBuilder stringBuilder = new StringBuilder();
-            int indent = 0;
-            rootNode.printRecursive(stringBuilder, indent);
-
-            System.out.println(stringBuilder.toString());
-        }
+        System.out.println(outputStringBuilder.toString());
 
     }
 

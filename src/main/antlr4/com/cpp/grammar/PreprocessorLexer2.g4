@@ -26,8 +26,24 @@ PREPROC_DEFINE :
     '#define'
     ;
 
+PREPROC_INCLUDE :
+    '#include'
+    ;
+
+PREPROC_IFDEF :
+    '#ifdef'
+    ;
+
 PREPROC_IF :
     '#if'
+    ;
+
+PREPROC_ELIF :
+    '#elif'
+    ;
+
+PREPROC_ELSE :
+    '#else'
     ;
 
 PREPROC_ENDIF :
