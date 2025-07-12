@@ -76,17 +76,9 @@ public class FileStackFrame {
         Token token = lexer.nextToken();
         while ((token != null) && (token.getType() != Token.EOF)) {
 
-            // System.out.println(token);
-            System.out.println(
-                    " " + token.getChannel() + "[" + token.getTokenIndex() + "] : " + token.getText());
-
-            // if (token.getText().equalsIgnoreCase("#define")) {
-
-            //     isDefine = true;
-
-            //     token = lexer.nextToken();
-            //     continue;
-            // }
+            // DEBUG
+            // System.out.println(
+            //         " " + token.getChannel() + "[" + token.getTokenIndex() + "] : " + token.getText());
 
             ASTNode node = new ASTNode();
 
@@ -118,12 +110,37 @@ public class FileStackFrame {
                 // descend
                 currentNode = node;
 
+            } else if (text.equalsIgnoreCase("#if")) {
+
+                node = new ASTNode();
+                node.value = "#if";
+                currentNode.children.add(node);
+                node.parent = currentNode;
+
+                // descend
+                currentNode = node;
+
+            } else if (text.equalsIgnoreCase("#elif")) {
+
+                node = new ASTNode();
+                node.value = "#elif";
+                currentNode.children.add(node);
+                node.parent = currentNode;
+
+                // descend
+                currentNode = node;
+
+            } else if (text.equalsIgnoreCase("#else")) {
+
+                node = new ASTNode();
+                node.value = "#else";
+                currentNode.children.add(node);
+                node.parent = currentNode;
+
+                // descend
+                currentNode = node;
+
             }
-            // else if (text.equalsIgnoreCase("#if")) {
-
-            //     System.out.println("if");
-
-            //     // TODO: continue here
 
             // } else if (text.equalsIgnoreCase("#ifdef")) {
 
@@ -141,7 +158,8 @@ public class FileStackFrame {
 
                 includeFile = StringUtil.unwrap(includeFile);
 
-                System.out.println("Processing include file: \"" + includeFile + "\"");
+                // DEBUG
+                //System.out.println("Processing include file: \"" + includeFile + "\"");
 
                 FileStackFrame fileStackFrame = new FileStackFrame();
                 fileStackFrame.filename = includeFile;
@@ -172,11 +190,11 @@ public class FileStackFrame {
 
             } else if (text.equalsIgnoreCase(")")) {
 
-                if (currentNode.parent == null) {
+                // if (currentNode.parent == null) {
 
-                    token = lexer.nextToken();
-                    continue;
-                }
+                //     token = lexer.nextToken();
+                //     continue;
+                // }
 
                 // // ascend ( into sub )
                 // currentNode = currentNode.parent;
@@ -236,8 +254,6 @@ public class FileStackFrame {
                 currentNode = node;
 
             } else if (token.getType() == PreprocessorLexer2.Newline) {
-
-                System.out.println("Newline");
 
                 // deal with completely empty lines (the node is still the root node and it has
                 // no children)

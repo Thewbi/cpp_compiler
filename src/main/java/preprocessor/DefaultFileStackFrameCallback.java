@@ -16,49 +16,167 @@ public class DefaultFileStackFrameCallback implements FileStackFrameCallback {
     @Override
     public void execute(ASTNode astNode) {
 
-        // DEBUG
-        StringBuilder stringBuilder = new StringBuilder();
-        int indent = 0;
-        astNode.printRecursive(stringBuilder, indent);
-        System.out.println(stringBuilder.toString());
+        // // DEBUG
+        // StringBuilder hierarchyStringBuilder = new StringBuilder();
+        // int indent = 0;
+        // astNode.printRecursive(hierarchyStringBuilder, indent);
+        // System.out.println(hierarchyStringBuilder.toString());
 
+        ASTNode node = null;
         // add defines into the define map
-        if (isDefine(astNode)) {
-            processDefine(astNode);
-        }
+        if (isDefine(astNode) != null) {
+            processDefine(isDefine(astNode));
+        } else if ((node = isIf(astNode)) != null) {
+            processIf(node);
+        } else if ((node = isElif(astNode)) != null) {
+            processElif(node);
+        } else if ((node = isElse(astNode)) != null) {
+            processElse(node);
+        } else if ((node = isEndif(astNode)) != null) {
+            processEndif(node);
+        } else if (ifStack.isEmpty() || ifStack.peek().performOutput) {
 
-        if (isIf(astNode)) {
-            processIf(astNode);
-        }
+            // StringBuilder stringBuilder = new StringBuilder();
+            // outputASTNode(astNode, stringBuilder);
 
-        if (isElif(astNode)) {
-            processElif(astNode);
-        }
+            // System.out.println(stringBuilder);
+            // DEBUG
+            StringBuilder stringBuilder = new StringBuilder();
+            outputASTNode(astNode, stringBuilder);
+            System.out.println(stringBuilder.toString());
 
-        if (isElse(astNode)) {
-            processElse(astNode);
         }
     }
 
-    private boolean isIf(ASTNode astNode) {
+    private ASTNode isIf(ASTNode astNode) {
         int i = 0;
         while (astNode.children.get(i).value.isBlank()) {
             i++;
         }
-        return "#if".equalsIgnoreCase(astNode.children.get(i).value);
+        if ("#if".equalsIgnoreCase(astNode.children.get(i).value)) {
+            return astNode.children.get(i);
+        }
+        return null;
     }
 
     private void processIf(ASTNode astNode) {
+
         IfStackFrame ifStackFrame = new IfStackFrame();
+
+        if (!ifStack.empty() && ifStack.peek().performOutput == false) {
+            ifStackFrame.blocked = true;
+        }
+
         ifStack.push(ifStackFrame);
 
-        boolean evaluationResult = evaluate(astNode.children.get(1));
+        ifStack.peek().performOutput = false;
 
+        // evaluate expression and enable output content for the branch
+        boolean evaluationResult = evaluate(astNode.children.get(0));
         ifStackFrame.processed = evaluationResult;
-
         if (evaluationResult) {
-            // TODO:output the content of the if branch!
-            System.out.println("test");
+            ifStackFrame.performOutput = true;
+        }
+    }
+
+    private ASTNode isElif(ASTNode astNode) {
+        int i = 0;
+        while (astNode.children.get(i).value.isBlank()) {
+            i++;
+        }
+        if ("#elif".equalsIgnoreCase(astNode.children.get(i).value)) {
+            return astNode.children.get(i);
+        }
+       return null;
+    }
+
+    private void processElif(ASTNode astNode) {
+
+        ifStack.peek().performOutput = false;
+
+        if (ifStack.peek().processed) {
+            return;
+        }
+
+        // evaluate expression and enable output content for the branch
+        boolean evaluationResult = evaluate(astNode.children.get(0));
+        ifStack.peek().processed = evaluationResult;
+        if (evaluationResult) {
+            ifStack.peek().performOutput = true;
+        }
+    }
+
+    private ASTNode isElse(ASTNode astNode) {
+        int i = 0;
+        while (astNode.children.get(i).value.isBlank()) {
+            i++;
+        }
+        if ("#else".equalsIgnoreCase(astNode.children.get(i).value)) {
+            // ifStack.peek().performOutput = false;
+            return astNode.children.get(i);
+        }
+        return null;
+    }
+
+    private void processElse(ASTNode astNode) {
+
+        ifStack.peek().performOutput = false;
+
+        if (ifStack.peek().processed) {
+            return;
+        }
+
+        // enable output content for the branch
+        ifStack.peek().performOutput = true;
+    }
+
+    private ASTNode isEndif(ASTNode astNode) {
+        int i = 0;
+        while (astNode.children.get(i).value.isBlank()) {
+            i++;
+        }
+        if ("#endif".equalsIgnoreCase(astNode.children.get(i).value)) {
+            // ifStack.peek().performOutput = false;
+            return astNode.children.get(i);
+        }
+        return null;
+    }
+
+    private void processEndif(ASTNode astNode) {
+
+        // enable output content for the branch
+        ifStack.peek().performOutput = false;
+
+        // if (ifStack.peek().processed) {
+        //     return;
+        // }
+
+        ifStack.pop();
+    }
+
+    private ASTNode isDefine(ASTNode astNode) {
+        int i = 0;
+        while (astNode.children.get(i).value.isBlank()) {
+            i++;
+        }
+        if ("#define".equalsIgnoreCase(astNode.children.get(i).value)) {
+            return astNode.children.get(i);
+        }
+        return null;
+    }
+
+    private void processDefine(ASTNode astNode) {
+
+        // ASTNode defineASTNode = astNode.children.get(0);
+
+        // insert into define map
+        ASTNode keyASTNode = astNode.children.get(0);
+        ASTNode valueASTNode = null;
+        if (astNode.children.size() > 1) {
+            valueASTNode = astNode.children.get(1);
+            defineMap.put(keyASTNode.value, valueASTNode);
+        } else {
+            defineMap.put(keyASTNode.value, dummyASTNode);
         }
     }
 
@@ -71,64 +189,26 @@ public class DefaultFileStackFrameCallback implements FileStackFrameCallback {
             ASTNode dataASTNode = astNode.children.get(1);
             return defineMap.containsKey(dataASTNode.value);
         }
-        return false;
+        throw new RuntimeException("Not implemented yet! " + astNode.value);
+        // return false;
     }
 
-    private boolean isElif(ASTNode astNode) {
-        int i = 0;
-        while (astNode.children.get(i).value.isBlank()) {
-            i++;
-        }
-        return "#elif".equalsIgnoreCase(astNode.children.get(i).value);
-    }
+    private void outputASTNode(ASTNode astNode, StringBuilder stringBuilder) {
 
-    private void processElif(ASTNode astNode) {
-        if (ifStack.peek().processed) {
+        if (ifStack.peek().blocked) {
             return;
         }
 
-        // TODO: evaluate expression and output content of the branch
-    }
+        for (ASTNode childNode : astNode.children) {
 
-    private boolean isElse(ASTNode astNode) {
-        int i = 0;
-        while (astNode.children.get(i).value.isBlank()) {
-            i++;
-        }
-        return "#else".equalsIgnoreCase(astNode.children.get(i).value);
-    }
+            if (childNode.children.size() == 0) {
+                stringBuilder.append(childNode.value).append(" ");
+            } else {
+                outputASTNode(childNode, stringBuilder);
+            }
 
-    private void processElse(ASTNode astNode) {
-        if (ifStack.peek().processed) {
-            return;
         }
 
-        // TODO: output the content of the if branch!
-        System.out.println("test");
-    }
-
-    private boolean isDefine(ASTNode astNode) {
-        int i = 0;
-        while (astNode.children.get(i).value.isBlank()) {
-            i++;
-        }
-        return "#define".equalsIgnoreCase(astNode.children.get(i).value);
-    }
-
-    private void processDefine(ASTNode astNode) {
-
-        // System.out.println("define");
-        ASTNode defineASTNode = astNode.children.get(0);
-
-        // insert into define map
-        ASTNode keyASTNode = defineASTNode.children.get(0);
-        ASTNode valueASTNode = null;
-        if (defineASTNode.children.size() > 1) {
-            valueASTNode = defineASTNode.children.get(1);
-            defineMap.put(keyASTNode.value, valueASTNode);
-        } else {
-            defineMap.put(keyASTNode.value, dummyASTNode);
-        }
     }
 
 }
