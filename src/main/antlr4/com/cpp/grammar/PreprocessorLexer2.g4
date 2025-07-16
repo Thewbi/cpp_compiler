@@ -34,6 +34,10 @@ PREPROC_IFDEF :
     '#ifdef'
     ;
 
+PREPROC_IFNDEF :
+    '#ifndef'
+    ;
+
 PREPROC_IF :
     '#if'
     ;

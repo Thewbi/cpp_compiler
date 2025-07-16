@@ -99,9 +99,6 @@ public class FileStackFrame {
                     continue;
                 }
 
-                // ascend
-                // currentNode = currentNode.parent;
-
             } else if (text.equalsIgnoreCase("#define")) {
 
                 defineMode = true;
@@ -115,17 +112,6 @@ public class FileStackFrame {
 
                 // descend
                 currentNode = node;
-
-                // Add first define child for the key:
-
-                // node = new ASTNode();
-                // node.value = "define_key___";
-
-                // currentNode.children.add(node);
-                // node.parent = currentNode;
-
-                // // descend
-                // currentNode = node;
 
                 node = new ASTNode();
 
@@ -161,8 +147,6 @@ public class FileStackFrame {
 
             } else if (text.equalsIgnoreCase("#ifdef")) {
 
-                // System.out.println("ifdef");
-
                 node = new ASTNode();
                 node.value = "#ifdef";
                 currentNode.children.add(node);
@@ -171,13 +155,17 @@ public class FileStackFrame {
                 // descend
                 currentNode = node;
 
-            // // TODO: continue here
+            } else if (text.equalsIgnoreCase("#ifndef")) {
 
-            }
-            // else if (text.equalsIgnoreCase("#endif")) {
-            //     System.out.println("endif");
-            // }
-            else if (text.equalsIgnoreCase("#include")) {
+                node = new ASTNode();
+                node.value = "#ifndef";
+                currentNode.children.add(node);
+                node.parent = currentNode;
+
+                // descend
+                currentNode = node;
+
+            } else if (text.equalsIgnoreCase("#include")) {
 
                 String includeFile = "";
                 while (includeFile.isBlank()) {

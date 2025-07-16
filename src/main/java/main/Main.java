@@ -413,11 +413,14 @@ public class Main {
 
         //final String filename = "src/test/resources/preprocessor/define.pp";
 
+        final String filename = "src/test/resources/preprocessor/ifndef.pp";
         //final String filename = "src/test/resources/preprocessor/if_defined.pp";
-        final String filename = "src/test/resources/preprocessor/if_defined_nested.pp";
+        //final String filename = "src/test/resources/preprocessor/if_defined_nested.pp";
         //final String filename = "src/test/resources/preprocessor/ifdef_else.pp";
         //final String filename = "src/test/resources/preprocessor/include.pp";
         //final String filename = "src/test/resources/preprocessor/scratchpad.pp";
+
+        //final String filename = "src/test/resources/preprocessor/funcs.pp";
 
         // TODO: next
         //final String filename = "src/test/resources/preprocessor/define_square.pp";

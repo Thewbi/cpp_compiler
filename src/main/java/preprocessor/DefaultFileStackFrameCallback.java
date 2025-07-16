@@ -37,6 +37,10 @@ public class DefaultFileStackFrameCallback implements FileStackFrameCallback {
 
             processIfdef(node);
 
+        } else if ((node = isIfndef(astNode)) != null) {
+
+            processIfndef(node);
+
         } else if ((node = isElif(astNode)) != null) {
 
             processElif(node);
@@ -125,6 +129,39 @@ public class DefaultFileStackFrameCallback implements FileStackFrameCallback {
         ifStack.peek().performOutput = isDefined;
 
         ifStack.peek().processed = isDefined;
+    }
+
+    private ASTNode isIfndef(ASTNode astNode) {
+        int i = 0;
+        while ((i < astNode.children.size()) && astNode.children.get(i).value.isBlank()) {
+            i++;
+        }
+        if (i >= astNode.children.size()) {
+            return null;
+        }
+        if ("#ifndef".equalsIgnoreCase(astNode.children.get(i).value)) {
+            return astNode.children.get(i);
+        }
+        return null;
+    }
+
+    private void processIfndef(ASTNode astNode) {
+
+        ASTNode dataASTNode = astNode.children.get(0);
+
+        boolean isDefined = defineMap.containsKey(dataASTNode.value);
+
+        IfStackFrame ifStackFrame = new IfStackFrame();
+
+        if (!ifStack.empty() && ifStack.peek().performOutput == false) {
+            ifStackFrame.blocked = true;
+        }
+
+        ifStack.push(ifStackFrame);
+
+        ifStack.peek().performOutput = !isDefined;
+
+        ifStack.peek().processed = !isDefined;
     }
 
     private ASTNode isElif(ASTNode astNode) {
