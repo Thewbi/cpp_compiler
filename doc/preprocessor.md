@@ -72,6 +72,26 @@ Example:
 
 Place <SYMBOL_A> into the define-Map and map it to the <SYMBOL_B>-symbol.
 
+```
+#define SQUARE(x) ((x) * (x))
+```
+Tree:
+root___
+    1.#define
+    2.SQUARE
+        (
+            x
+        )
+    3.(
+        (
+            x
+        )
+        *
+        (
+            x
+        )
+    )
+
 ## Usage of a symbol
 
 Example:

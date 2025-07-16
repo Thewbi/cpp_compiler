@@ -211,6 +211,19 @@ public class StructureTACKYParserListener extends TACKYParserBaseListener {
     }
 
     //
+    // Function Call
+    //
+
+	@Override public void enterFunc_call(TACKYParser.Func_callContext ctx) {
+        // TODO: implement function call (with stack frames)
+        throw new RuntimeException();
+    }
+
+	@Override public void exitFunc_call(TACKYParser.Func_callContext ctx) {
+        throw new RuntimeException();
+     }
+
+    //
     // Label
     //
 

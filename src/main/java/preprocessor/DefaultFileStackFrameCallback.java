@@ -11,6 +11,8 @@ public class DefaultFileStackFrameCallback implements FileStackFrameCallback {
 
     public Map<String, ASTNode> defineMap;
 
+    public Map<String, ASTNode> defineKeyMap;
+
     public Stack<IfStackFrame> ifStack = new Stack<>();
 
     @Override
@@ -23,26 +25,36 @@ public class DefaultFileStackFrameCallback implements FileStackFrameCallback {
         // System.out.println(hierarchyStringBuilder.toString());
 
         ASTNode node = null;
-        // add defines into the define map
         if (isDefine(astNode) != null) {
+
             processDefine(isDefine(astNode));
+
         } else if ((node = isIf(astNode)) != null) {
+
             processIf(node);
+
+        } else if ((node = isIfdef(astNode)) != null) {
+
+            processIfdef(node);
+
         } else if ((node = isElif(astNode)) != null) {
+
             processElif(node);
+
         } else if ((node = isElse(astNode)) != null) {
+
             processElse(node);
+
         } else if ((node = isEndif(astNode)) != null) {
+
             processEndif(node);
+
         } else if (ifStack.isEmpty() || ifStack.peek().performOutput) {
 
-            // StringBuilder stringBuilder = new StringBuilder();
-            // outputASTNode(astNode, stringBuilder);
-
-            // System.out.println(stringBuilder);
-            // DEBUG
             StringBuilder stringBuilder = new StringBuilder();
             outputASTNode(astNode, stringBuilder);
+
+            // DEBUG
             System.out.println(stringBuilder.toString());
 
         }
@@ -50,8 +62,11 @@ public class DefaultFileStackFrameCallback implements FileStackFrameCallback {
 
     private ASTNode isIf(ASTNode astNode) {
         int i = 0;
-        while (astNode.children.get(i).value.isBlank()) {
+        while ((i < astNode.children.size()) && astNode.children.get(i).value.isBlank()) {
             i++;
+        }
+        if (i >= astNode.children.size()) {
+            return null;
         }
         if ("#if".equalsIgnoreCase(astNode.children.get(i).value)) {
             return astNode.children.get(i);
@@ -79,10 +94,46 @@ public class DefaultFileStackFrameCallback implements FileStackFrameCallback {
         }
     }
 
+    private ASTNode isIfdef(ASTNode astNode) {
+        int i = 0;
+        while ((i < astNode.children.size()) && astNode.children.get(i).value.isBlank()) {
+            i++;
+        }
+        if (i >= astNode.children.size()) {
+            return null;
+        }
+        if ("#ifdef".equalsIgnoreCase(astNode.children.get(i).value)) {
+            return astNode.children.get(i);
+        }
+        return null;
+    }
+
+    private void processIfdef(ASTNode astNode) {
+
+        ASTNode dataASTNode = astNode.children.get(0);
+
+        boolean isDefined = defineMap.containsKey(dataASTNode.value);
+
+        IfStackFrame ifStackFrame = new IfStackFrame();
+
+        if (!ifStack.empty() && ifStack.peek().performOutput == false) {
+            ifStackFrame.blocked = true;
+        }
+
+        ifStack.push(ifStackFrame);
+
+        ifStack.peek().performOutput = isDefined;
+
+        ifStack.peek().processed = isDefined;
+    }
+
     private ASTNode isElif(ASTNode astNode) {
         int i = 0;
-        while (astNode.children.get(i).value.isBlank()) {
+        while ((i < astNode.children.size()) && astNode.children.get(i).value.isBlank()) {
             i++;
+        }
+        if (i >= astNode.children.size()) {
+            return null;
         }
         if ("#elif".equalsIgnoreCase(astNode.children.get(i).value)) {
             return astNode.children.get(i);
@@ -108,11 +159,13 @@ public class DefaultFileStackFrameCallback implements FileStackFrameCallback {
 
     private ASTNode isElse(ASTNode astNode) {
         int i = 0;
-        while (astNode.children.get(i).value.isBlank()) {
+        while ((i < astNode.children.size()) && astNode.children.get(i).value.isBlank()) {
             i++;
         }
+        if (i >= astNode.children.size()) {
+            return null;
+        }
         if ("#else".equalsIgnoreCase(astNode.children.get(i).value)) {
-            // ifStack.peek().performOutput = false;
             return astNode.children.get(i);
         }
         return null;
@@ -132,11 +185,13 @@ public class DefaultFileStackFrameCallback implements FileStackFrameCallback {
 
     private ASTNode isEndif(ASTNode astNode) {
         int i = 0;
-        while (astNode.children.get(i).value.isBlank()) {
+        while ((i < astNode.children.size()) && astNode.children.get(i).value.isBlank()) {
             i++;
         }
+        if (i >= astNode.children.size()) {
+            return null;
+        }
         if ("#endif".equalsIgnoreCase(astNode.children.get(i).value)) {
-            // ifStack.peek().performOutput = false;
             return astNode.children.get(i);
         }
         return null;
@@ -156,8 +211,11 @@ public class DefaultFileStackFrameCallback implements FileStackFrameCallback {
 
     private ASTNode isDefine(ASTNode astNode) {
         int i = 0;
-        while (astNode.children.get(i).value.isBlank()) {
+        while ((i < astNode.children.size()) && astNode.children.get(i).value.isBlank()) {
             i++;
+        }
+        if (i >= astNode.children.size()) {
+            return null;
         }
         if ("#define".equalsIgnoreCase(astNode.children.get(i).value)) {
             return astNode.children.get(i);
@@ -167,48 +225,118 @@ public class DefaultFileStackFrameCallback implements FileStackFrameCallback {
 
     private void processDefine(ASTNode astNode) {
 
-        // ASTNode defineASTNode = astNode.children.get(0);
-
         // insert into define map
         ASTNode keyASTNode = astNode.children.get(0);
         ASTNode valueASTNode = null;
         if (astNode.children.size() > 1) {
             valueASTNode = astNode.children.get(1);
             defineMap.put(keyASTNode.value, valueASTNode);
+            defineKeyMap.put(keyASTNode.value, keyASTNode);
         } else {
             defineMap.put(keyASTNode.value, dummyASTNode);
+            defineKeyMap.put(keyASTNode.value, keyASTNode);
         }
     }
 
     private boolean evaluate(ASTNode astNode) {
+
         if ("||".equalsIgnoreCase(astNode.value)) {
-            boolean lhsValue = evaluate(astNode.children.get(0));
-            boolean rhsValue = evaluate(astNode.children.get(1));
+
+            ASTNode lhs = astNode.children.get(0);
+            boolean lhsValue = evaluate(lhs);
+
+            ASTNode rhs = astNode.children.get(1);
+            boolean rhsValue = evaluate(rhs);
+
             return lhsValue || rhsValue;
+
         } else if ("defined".equalsIgnoreCase(astNode.value)) {
-            ASTNode dataASTNode = astNode.children.get(1);
+
+            ASTNode sub = astNode.children.get(0);
+
+            ASTNode dataASTNode = sub.children.get(1);
             return defineMap.containsKey(dataASTNode.value);
+
         }
+
         throw new RuntimeException("Not implemented yet! " + astNode.value);
-        // return false;
     }
 
     private void outputASTNode(ASTNode astNode, StringBuilder stringBuilder) {
 
-        if (ifStack.peek().blocked) {
+        // when inside a if-branch which is skipped (= blocked) because the
+        // expression did evaluate to false, the do not output the line
+        if (!ifStack.empty() && ifStack.peek().blocked) {
             return;
+        }
+
+        int index = 0;
+        for (ASTNode childNode : astNode.children) {
+
+            if (defineMap.containsKey(childNode.value)) {
+
+                // 0. retrieve the key ASTNode from the map
+                ASTNode key = defineKeyMap.get(childNode.value);
+
+                // 1. retrieve the value ASTNode from the map
+                ASTNode definedReplacementOriginal = defineMap.get(childNode.value);
+
+                // 2. clone it
+                ASTNode definedReplacement = definedReplacementOriginal.deepClone();
+
+                // 3. Inside the clone, replace the variable with the actual parameter value
+
+                // find actual parameter (find the sub node that contains the actual parameter)
+                ASTNode actualParameterNewValueSubNode = astNode.children.get(index + 1);
+                ASTNode actualParameterNewValue = actualParameterNewValueSubNode.children.get(1); // assume a single actual parameter
+
+                // find the formal parameter
+                ASTNode formalParameterSubNode = key.children.get(0);
+                String formalParameter = formalParameterSubNode.children.get(1).value;
+
+                // 4. output the value
+                replaceActualParameterByValue(definedReplacement, formalParameter, actualParameterNewValue.value);
+
+                // 5. exchange the original node with the replacement
+                childNode.children.clear();
+                childNode.children.add(definedReplacement);
+                definedReplacement.parent = childNode;
+
+                //
+                // Also remove the next three nodes because the contain '(' <FORMAL_PAREMTER> ')'
+                // which has been replaced
+                //
+
+                astNode.children.get(index + 1).purge();
+
+            }
+
+            index++;
+
         }
 
         for (ASTNode childNode : astNode.children) {
 
             if (childNode.children.size() == 0) {
-                stringBuilder.append(childNode.value).append(" ");
+                String val = childNode.value;
+                if (val != null) {
+                    stringBuilder.append(val).append(" ");
+                }
+
             } else {
                 outputASTNode(childNode, stringBuilder);
             }
-
         }
 
+    }
+
+    private void replaceActualParameterByValue(ASTNode definedReplacement, String formalParameterIdentifier, String newValue) {
+        if (definedReplacement.value.equalsIgnoreCase(formalParameterIdentifier)) {
+            definedReplacement.value = newValue;
+        }
+        for (ASTNode childASTNode : definedReplacement.children) {
+            replaceActualParameterByValue(childASTNode, formalParameterIdentifier, newValue);
+        }
     }
 
 }

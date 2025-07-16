@@ -16,7 +16,7 @@ import common.StringUtil;
 
 public class FileStackFrame {
 
-    private static final boolean ADD_SUB_NODE = false;
+    private static final boolean ADD_SUB_NODE = true;
 
     public String filename;
 
@@ -27,6 +27,11 @@ public class FileStackFrame {
     public Path basePath;
 
     public FileStackFrameCallback callback;
+
+    public boolean defineMode;
+
+    public boolean defineModeKey;
+    public boolean defineModeValue;
 
     public void start() throws IOException {
 
@@ -78,7 +83,8 @@ public class FileStackFrame {
 
             // DEBUG
             // System.out.println(
-            //         " " + token.getChannel() + "[" + token.getTokenIndex() + "] : " + token.getText());
+            // " " + token.getChannel() + "[" + token.getTokenIndex() + "] : " +
+            // token.getText());
 
             ASTNode node = new ASTNode();
 
@@ -96,11 +102,11 @@ public class FileStackFrame {
                 // ascend
                 // currentNode = currentNode.parent;
 
-            }
-            else if (text.equalsIgnoreCase("#define")) {
+            } else if (text.equalsIgnoreCase("#define")) {
 
-                //token = lexer.nextToken();
-                //processDefine(rootNode);
+                defineMode = true;
+                defineModeKey = true;
+                defineModeValue = false;
 
                 node = new ASTNode();
                 node.value = "#define";
@@ -109,6 +115,19 @@ public class FileStackFrame {
 
                 // descend
                 currentNode = node;
+
+                // Add first define child for the key:
+
+                // node = new ASTNode();
+                // node.value = "define_key___";
+
+                // currentNode.children.add(node);
+                // node.parent = currentNode;
+
+                // // descend
+                // currentNode = node;
+
+                node = new ASTNode();
 
             } else if (text.equalsIgnoreCase("#if")) {
 
@@ -140,14 +159,23 @@ public class FileStackFrame {
                 // descend
                 currentNode = node;
 
+            } else if (text.equalsIgnoreCase("#ifdef")) {
+
+                // System.out.println("ifdef");
+
+                node = new ASTNode();
+                node.value = "#ifdef";
+                currentNode.children.add(node);
+                node.parent = currentNode;
+
+                // descend
+                currentNode = node;
+
+            // // TODO: continue here
+
             }
-
-            // } else if (text.equalsIgnoreCase("#ifdef")) {
-
-            //     System.out.println("ifdef");
-
-            //     // TODO: continue here
-
+            // else if (text.equalsIgnoreCase("#endif")) {
+            //     System.out.println("endif");
             // }
             else if (text.equalsIgnoreCase("#include")) {
 
@@ -159,7 +187,7 @@ public class FileStackFrame {
                 includeFile = StringUtil.unwrap(includeFile);
 
                 // DEBUG
-                //System.out.println("Processing include file: \"" + includeFile + "\"");
+                // System.out.println("Processing include file: \"" + includeFile + "\"");
 
                 FileStackFrame fileStackFrame = new FileStackFrame();
                 fileStackFrame.filename = includeFile;
@@ -185,19 +213,11 @@ public class FileStackFrame {
 
                     node = new ASTNode();
                 }
+
                 node.value = "(";
                 currentNode.children.add(node);
 
             } else if (text.equalsIgnoreCase(")")) {
-
-                // if (currentNode.parent == null) {
-
-                //     token = lexer.nextToken();
-                //     continue;
-                // }
-
-                // // ascend ( into sub )
-                // currentNode = currentNode.parent;
 
                 node = new ASTNode();
                 node.value = ")";
@@ -215,10 +235,57 @@ public class FileStackFrame {
                     currentNode = currentNode.parent;
                 }
 
-                if (currentNode.value.equalsIgnoreCase("defined")) {
+                if (currentNode.value != null && currentNode.value.equalsIgnoreCase("defined")) {
                     // ascend ( out of sub into parent )
                     currentNode = currentNode.parent;
                 }
+
+                if ("define_key___".equalsIgnoreCase(currentNode.type)) {
+
+                    currentNode = currentNode.parent;
+                    defineModeKey = false;
+                    defineModeValue = true;
+
+                    node = new ASTNode();
+
+                    currentNode.children.add(node);
+                    node.parent = currentNode;
+
+                    node.value = "define_value___";
+                    node.type = "define_value___";
+
+                    // descend into key
+                    currentNode = node;
+
+                }
+
+                // //if (defineMode && currentNode.value.equalsIgnoreCase("define_key___")) {
+                // if (defineMode) {
+
+                // // go back to the define node
+                // currentNode = currentNode.parent;
+                // if ("define_key___".equalsIgnoreCase(currentNode.type)) {
+
+                // }
+                // currentNode = currentNode.parent;
+
+                // defineModeKey = false;
+                // defineModeValue = true;
+
+                // // Add second define child for the value:
+
+                // node = new ASTNode();
+                // node.value = "define_value___";
+
+                // currentNode.children.add(node);
+                // node.parent = currentNode;
+
+                // // descend
+                // currentNode = node;
+
+                // node = new ASTNode();
+
+                // }
 
             } else if (text.equalsIgnoreCase("defined")) {
 
@@ -271,15 +338,63 @@ public class FileStackFrame {
 
                 currentNode = rootNode;
 
+                defineMode = false;
+
             } else {
 
                 node.value = text;
 
+                if ("define_key___".equalsIgnoreCase(currentNode.type)) {
+
+                    node.type = "define_value___";
+
+                    currentNode = currentNode.parent;
+
+                    currentNode.children.add(node);
+                    node.parent = currentNode;
+
+                    token = lexer.nextToken();
+                    continue;
+                }
+
                 currentNode.children.add(node);
                 node.parent = currentNode;
 
-                // descend
+                if (defineMode && defineModeKey) {
+
+                    node.type = "define_key___";
+                    // node.parent = currentNode;
+                    // currentNode.children.add(node);
+
+                    // descend into key
+                    currentNode = node;
+
+                    defineModeKey = false;
+
+                }
+                // else if (defineMode && !defineModeKey &&
+                // "define_key___".equalsIgnoreCase(currentNode.type)) {
+
+                // // if the value arrives but we are still stuck in the key node, create a
+                // value node
+                // System.out.println("value");
+
+                // currentNode = currentNode.parent;
+
+                // currentNode.children.add(node);
+                // node.parent = currentNode;
+
+                // node.type = "define_value___";
+
+                // // descend
                 // currentNode = node;
+
+                // } else {
+
+                // currentNode.children.add(node);
+                // node.parent = currentNode;
+
+                // }
 
                 if (ADD_SUB_NODE) {
                     if (currentNode.value.equalsIgnoreCase("defined")) {
@@ -292,9 +407,6 @@ public class FileStackFrame {
 
             token = lexer.nextToken();
 
-            // TODO: do not put new_line into the hidden channel! So we can detect it here!
-            // if (token.getType() == Token.New)
-
         }
 
         // output the very last node
@@ -305,7 +417,5 @@ public class FileStackFrame {
 
         fileStack.pop();
     }
-
-
 
 }

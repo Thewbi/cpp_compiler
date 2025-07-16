@@ -1,31 +1,34 @@
-
-#if defined(_DEBUG) || defined(_UNIT_TEST)
-  //Code here
-#endif
 /**/
+#if defined(_DEBUG) || defined(_UNIT_TEST)
+  // Code here
+#endif
+
 
 /*
 #if defined _DEBUG || defined _UNIT_TEST
-  //Code here
+  // Code here
 #endif
 */
 
 /*
 #if !defined _DEBUG && defined _UNIT_TEST
-  //Code here
+  // Code here
 #endif
 */
+
 /*
 #if defined BUFSIZE && BUFSIZE >= 1024
-  //Code here
+  // Code here
 #endif
 */
 
 /*
 #if defined (__vax__) || defined (__ns16000__)
-  //Code here
+  // Code here
 #endif
 */
+
+/*
 #if X == 1
 ...
 #else // X != 1
@@ -35,4 +38,4 @@
 ...
 #endif // X != 2
 #endif // X != 1
-
+*/

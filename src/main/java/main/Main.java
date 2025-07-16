@@ -76,14 +76,14 @@ public class Main {
     public static void main(String[] args) throws IOException {
         System.out.println("Start");
 
-        // preprocessor();
+        //preprocessor();
         preprocessor_2();
         //preprocessor_3();
-        // translationUnit();
-        // riscvassembler();
-        // riscvdecoder();
-        // riscvencoder();
-        // tacky();
+        //translationUnit();
+        //riscvassembler();
+        //riscvdecoder();
+        //riscvencoder();
+        //tacky();
 
         // ide();
 
@@ -94,7 +94,8 @@ public class Main {
 
         // final String filename = "src/test/resources/TACKY/for_loop.tky";
         // final String filename = "src/test/resources/TACKY/pointer_creation.tky";
-        final String filename = "src/test/resources/TACKY/array_int.tky";
+        //final String filename = "src/test/resources/TACKY/array_int.tky";
+        final String filename = "src/test/resources/TACKY/function_call.tky";
 
         final CharStream charStream = CharStreams
                 .fromFileName(filename);
@@ -410,8 +411,11 @@ public class Main {
 
     private static void preprocessor_2() throws IOException {
 
+        //final String filename = "src/test/resources/preprocessor/define.pp";
+
         //final String filename = "src/test/resources/preprocessor/if_defined.pp";
-        final String filename = "src/test/resources/preprocessor/if_nested.pp";
+        final String filename = "src/test/resources/preprocessor/if_defined_nested.pp";
+        //final String filename = "src/test/resources/preprocessor/ifdef_else.pp";
         //final String filename = "src/test/resources/preprocessor/include.pp";
         //final String filename = "src/test/resources/preprocessor/scratchpad.pp";
 
@@ -424,9 +428,11 @@ public class Main {
 
         StringBuilder outputStringBuilder = new StringBuilder();
         Map<String, ASTNode> defineMap = new HashMap<>();
+        Map<String, ASTNode> defineKeyMap = new HashMap<>();
 
         DefaultFileStackFrameCallback defaultfileStackFrameCallback = new DefaultFileStackFrameCallback();
         defaultfileStackFrameCallback.defineMap = defineMap;
+        defaultfileStackFrameCallback.defineKeyMap = defineKeyMap;
         defaultfileStackFrameCallback.dummyASTNode = dummyASTNode;
 
         FileStackFrame fileStackFrame = new FileStackFrame();
@@ -446,7 +452,7 @@ public class Main {
     }
 
     private static void preprocessor_3() throws IOException {
-/**/
+
         //final String filename = "src/test/resources/preprocessor/if_defined.pp";
         final String filename = "src/test/resources/preprocessor/scratchpad.pp";
 

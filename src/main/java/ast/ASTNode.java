@@ -39,4 +39,32 @@ public class ASTNode {
         }
     }
 
+    public ASTNode deepClone() {
+
+        ASTNode clone = new ASTNode();
+        clone.parent = parent;
+        clone.value = value;
+        clone.type = type;
+        clone.ctx = ctx;
+
+        if (!children.isEmpty()) {
+
+            for (ASTNode childNode : children) {
+
+                ASTNode childNodeClone = childNode.deepClone();
+                childNodeClone.parent = clone;
+                clone.children.add(childNodeClone);
+            }
+        }
+
+        return clone;
+    }
+
+    public void purge() {
+        children.clear();
+        parent = null;
+        value = null;
+        type = null;
+    }
+
 }
