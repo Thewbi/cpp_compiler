@@ -7,6 +7,8 @@
  * const.
  */
 
+#define __STDC__
+
 #ifdef __STDC__
 #define P(x) x
 #else
@@ -87,7 +89,7 @@ extern integer
 	fights_ P((integer, logical)),
 	fwim_ P((integer, integer, integer, integer, integer, logical)),
 	getobj_ P((integer, integer, integer)),
-	schlst_ P((integer, integer, integer, integer,  integer, integer)),
+	schlst_ P((integer, integer, integer, integer, integer, integer)),
 	mrhere_ P((integer)),
 	oactor_ P((integer)),
 	rnd_ P((integer)),

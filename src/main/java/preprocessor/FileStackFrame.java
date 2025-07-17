@@ -56,30 +56,22 @@ public class FileStackFrame {
         // final CPP14Lexer lexer = new CPP14Lexer(charStream);
         final PreprocessorLexer2 lexer = new PreprocessorLexer2(charStream);
 
-        // CommonTokenStream commonTokenStream = new CommonTokenStream(lexer);
-        // for (int i = 0; i < 10; i++) {
-
-        // List<Token> tokenList = commonTokenStream.get(0, commonTokenStream.size());
-        // for (Token t : tokenList) {
-        // System.out.println(
-        // "" + t.getChannel() + "[" + t.getTokenIndex() + "] : " + t.getText());
-        // }
-
-        // commonTokenStream.consume();
-
-        // }
-
-        /**/
         ASTNode rootNode = new ASTNode();
         rootNode.value = "root____";
         rootNode.parent = null;
 
         ASTNode currentNode = rootNode;
 
-        // boolean isDefine = false;
+        int line = 1;
+        //System.out.println("Line: " + line);
 
         Token token = lexer.nextToken();
         while ((token != null) && (token.getType() != Token.EOF)) {
+
+            if (line != token.getLine()) {
+                line = token.getLine();
+                //System.out.println("Line: " + line);
+            }
 
             // DEBUG
             // System.out.println(
@@ -247,34 +239,6 @@ public class FileStackFrame {
 
                 }
 
-                // //if (defineMode && currentNode.value.equalsIgnoreCase("define_key___")) {
-                // if (defineMode) {
-
-                // // go back to the define node
-                // currentNode = currentNode.parent;
-                // if ("define_key___".equalsIgnoreCase(currentNode.type)) {
-
-                // }
-                // currentNode = currentNode.parent;
-
-                // defineModeKey = false;
-                // defineModeValue = true;
-
-                // // Add second define child for the value:
-
-                // node = new ASTNode();
-                // node.value = "define_value___";
-
-                // currentNode.children.add(node);
-                // node.parent = currentNode;
-
-                // // descend
-                // currentNode = node;
-
-                // node = new ASTNode();
-
-                // }
-
             } else if (text.equalsIgnoreCase("defined")) {
 
                 node = new ASTNode();
@@ -351,8 +315,6 @@ public class FileStackFrame {
                 if (defineMode && defineModeKey) {
 
                     node.type = "define_key___";
-                    // node.parent = currentNode;
-                    // currentNode.children.add(node);
 
                     // descend into key
                     currentNode = node;
@@ -360,29 +322,6 @@ public class FileStackFrame {
                     defineModeKey = false;
 
                 }
-                // else if (defineMode && !defineModeKey &&
-                // "define_key___".equalsIgnoreCase(currentNode.type)) {
-
-                // // if the value arrives but we are still stuck in the key node, create a
-                // value node
-                // System.out.println("value");
-
-                // currentNode = currentNode.parent;
-
-                // currentNode.children.add(node);
-                // node.parent = currentNode;
-
-                // node.type = "define_value___";
-
-                // // descend
-                // currentNode = node;
-
-                // } else {
-
-                // currentNode.children.add(node);
-                // node.parent = currentNode;
-
-                // }
 
                 if (ADD_SUB_NODE) {
                     if (currentNode.value.equalsIgnoreCase("defined")) {
