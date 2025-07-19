@@ -27,13 +27,18 @@ public class ASTNode {
         for (int i = 0; i < indent; i++) {
             stringBuilder.append("  ");
         }
+
+        // output this node
         stringBuilder.append(value);
+        if (value.equalsIgnoreCase("||")) {
+            System.out.println("test");
+        }
 
         if (addLineBreak) {
             stringBuilder.append("\n");
         }
 
-        // all children
+        // output all children
         for (ASTNode child : children) {
             child.printRecursive(stringBuilder, indent + 1, true);
         }

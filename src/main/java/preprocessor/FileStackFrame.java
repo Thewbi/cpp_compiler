@@ -1,8 +1,18 @@
 package preprocessor;
 
 import java.io.IOException;
+import java.nio.file.FileSystems;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.PathMatcher;
+import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Stack;
 
 import org.antlr.v4.runtime.CharStream;
@@ -20,11 +30,27 @@ public class FileStackFrame {
 
     public String filename;
 
+    /**
+     * When angle brackets / chevrons are used, the include file
+     * is resolved using the include-path. The include-path is a variable
+     * combining several folders where include files are searched.
+     *
+     * If this variable is set to true, then the application looks for the
+     * include file in the include-path.
+     *
+     * If this variable is set to false, then the application looks for the
+     * include file in relative paths, relative to the basePath variable which
+     * is also defined in this class.
+     */
+    public boolean useIncludePathResolution;
+
+    public List<Path> includePath = new ArrayList<>();
+
+    public Path basePath;
+
     public StringBuilder outputStringBuilder;
 
     public Stack<FileStackFrame> fileStack;
-
-    public Path basePath;
 
     public FileStackFrameCallback callback;
 
@@ -33,17 +59,32 @@ public class FileStackFrame {
     public boolean defineModeKey;
     public boolean defineModeValue;
 
+    public static Optional<Path> match(String glob, String location) throws IOException {
+        PathMatcher pathMatcher = FileSystems.getDefault().getPathMatcher(glob);
+        return Files.walk(Paths.get(location)).filter(pathMatcher::matches).findFirst();
+    }
+
     public void start() throws IOException {
 
         CharStream charStream = null;
 
-        if (basePath == null) {
+        if (useIncludePathResolution) {
+
+            for (Path path : includePath) {
+                Optional<Path> result = match("glob:**/stdio.h", path.toAbsolutePath().toString());
+                if (result.isPresent()) {
+                    String foundFile = result.get().toAbsolutePath().toString();
+                    System.out.println("Result: \"" + foundFile + "\"");
+                    charStream = CharStreams.fromFileName(foundFile);
+                    break;
+                }
+            }
+
+        } else if (basePath == null) {
 
             basePath = Path.of(filename);
-            System.out.println("BasePath: \"" + basePath.getParent().toString() + "\"");
-
-            charStream = CharStreams
-                    .fromFileName(filename);
+            //System.out.println("BasePath: \"" + basePath.getParent().toString() + "\"");
+            charStream = CharStreams .fromFileName(filename);
 
         } else {
 
@@ -53,7 +94,6 @@ public class FileStackFrame {
 
         }
 
-        // final CPP14Lexer lexer = new CPP14Lexer(charStream);
         final PreprocessorLexer2 lexer = new PreprocessorLexer2(charStream);
 
         ASTNode rootNode = new ASTNode();
@@ -63,14 +103,14 @@ public class FileStackFrame {
         ASTNode currentNode = rootNode;
 
         int line = 1;
-        //System.out.println("Line: " + line);
+        // System.out.println("Line: " + line);
 
         Token token = lexer.nextToken();
         while ((token != null) && (token.getType() != Token.EOF)) {
 
             if (line != token.getLine()) {
                 line = token.getLine();
-                //System.out.println("Line: " + line);
+                // System.out.println("Line: " + line);
             }
 
             // DEBUG
@@ -159,22 +199,65 @@ public class FileStackFrame {
 
             } else if (text.equalsIgnoreCase("#include")) {
 
-                String includeFile = "";
-                while (includeFile.isBlank()) {
-                    includeFile = lexer.nextToken().getText();
+                String temp = "";
+                boolean useIncludePathResolution = false;
+
+                StringBuilder includeFilePreprocessorCommand = new StringBuilder();
+
+                boolean includeFileStringAssembled = false;
+                while (!includeFileStringAssembled) {
+
+                    while (temp.isBlank()) {
+                        temp = lexer.nextToken().getText();
+                    }
+
+                    if (temp.equalsIgnoreCase("<")) {
+
+                        includeFilePreprocessorCommand.append(temp);
+
+                        // when angle brackets / chevrons are used, the include file
+                        // is resolved using the include-path. The include-path is a variable
+                        // combining several folders where include files are searched
+                        useIncludePathResolution = true;
+
+                    } else if (temp.equalsIgnoreCase(">")) {
+
+                        includeFilePreprocessorCommand.append(temp);
+                        includeFileStringAssembled = true;
+
+                    } else if (temp.startsWith("\"")) {
+
+                        includeFilePreprocessorCommand.append(temp);
+                        includeFileStringAssembled = true;
+
+                    } else {
+
+                        includeFilePreprocessorCommand.append(temp);
+
+                        // throw new RuntimeException("Cannot parse include-file preprocessor
+                        // command!");
+
+                    }
+
+                    temp = "";
+
                 }
 
-                includeFile = StringUtil.unwrap(includeFile);
+                String includeFile = StringUtil.unwrap(includeFilePreprocessorCommand.toString());
 
                 // DEBUG
                 // System.out.println("Processing include file: \"" + includeFile + "\"");
 
+                ((DefaultFileStackFrameCallback) callback).stringBuilder = outputStringBuilder;
+
                 FileStackFrame fileStackFrame = new FileStackFrame();
                 fileStackFrame.filename = includeFile;
+                fileStackFrame.useIncludePathResolution = useIncludePathResolution;
+                fileStackFrame.includePath.add(basePath.getParent()); // fake dummy include path using the basepath
+                fileStackFrame.basePath = basePath;
                 fileStackFrame.outputStringBuilder = outputStringBuilder;
                 fileStackFrame.callback = callback;
                 fileStackFrame.fileStack = fileStack;
-                fileStackFrame.basePath = basePath;
 
                 fileStack.push(fileStackFrame);
 
@@ -274,6 +357,11 @@ public class FileStackFrame {
 
             } else if (token.getType() == PreprocessorLexer2.Newline) {
 
+                // DEBUG
+                StringBuilder debugStringBuilder = new StringBuilder();
+                rootNode.printRecursive(debugStringBuilder, 0);
+                System.out.println(debugStringBuilder.toString());
+
                 // deal with completely empty lines (the node is still the root node and it has
                 // no children)
                 if (rootNode.children.size() == 0) {
@@ -281,6 +369,7 @@ public class FileStackFrame {
                     continue;
                 }
 
+                ((DefaultFileStackFrameCallback) callback).stringBuilder = outputStringBuilder;
                 callback.execute(rootNode);
 
                 // start a new root

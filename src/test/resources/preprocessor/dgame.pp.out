@@ -1,0 +1,409 @@
+typedef int integer ; 
+typedef int logical ; 
+extern logical 
+	 protected ( void )  , 
+	 wizard ( void )  ; 
+extern void 
+	 more_init ( void )  , 
+	 more_output ( const char * )  , 
+	 more_input ( void )  ; 
+extern void 
+	 bug_ ( integer , integer )  , 
+	 cevapp_ ( integer )  , 
+	 cpgoto_ ( integer )  , 
+	 cpinfo_ ( integer , integer )  , 
+	 encryp_ ( const char * , char * )  , 
+	 exit_ ( void )  , 
+	 fightd_ ( void )  , 
+	 game_ ( void )  , 
+	 gdt_ ( void )  , 
+	 gttime_ ( integer * )  , 
+	 invent_ ( integer )  , 
+	 itime_ ( integer * , integer * , integer * )  , 
+	 jigsup_ ( integer )  , 
+	 newsta_ ( integer , integer , integer , integer , integer )  , 
+	 orphan_ ( integer , integer , integer , integer , integer )  , 
+	 princo_ ( integer , integer )  , 
+	 princr_ ( logical , integer )  , 
+	 rdline_ ( char * , integer )  , 
+	 rspeak_ ( integer )  , 
+	 rspsb2_ ( integer , integer , integer )  , 
+	 rspsub_ ( integer , integer )  , 
+	 rstrgm_ ( void )  , 
+	 savegm_ ( void )  , 
+	 score_ ( logical )  , 
+	 scrupd_ ( integer )  , 
+	 swordd_ ( void )  , 
+	 thiefd_ ( void )  , 
+	 valuac_ ( integer )  ; 
+extern integer 
+	 blow_ ( integer , integer , integer , logical , integer )  , 
+	 fights_ ( integer , logical )  , 
+	 fwim_ ( integer , integer , integer , integer , integer , logical )  , 
+	 getobj_ ( integer , integer , integer )  , 
+	 schlst_ ( integer , integer , integer , integer , integer , integer )  , 
+	 mrhere_ ( integer )  , 
+	 oactor_ ( integer )  , 
+	 rnd_ ( integer )  , 
+	 robadv_ ( integer , integer , integer , integer )  , 
+	 robrm_ ( integer , integer , integer , integer , integer )  , 
+	 sparse_ ( const integer * , integer , logical )  , 
+	 vilstr_ ( integer )  , 
+	 weight_ ( integer , integer , integer )  ; 
+extern logical 
+	 aappli_ ( integer )  , 
+	 ballop_ ( integer )  , 
+	 clockd_ ( void )  , 
+	 cyclop_ ( integer )  , 
+	 drop_ ( logical )  , 
+	 findxt_ ( integer , integer )  , 
+	 ghere_ ( integer , integer )  , 
+	 init_ ( void )  , 
+	 lightp_ ( integer )  , 
+	 lit_ ( integer )  , 
+	 moveto_ ( integer , integer )  , 
+	 nobjs_ ( integer , integer )  , 
+	 oappli_ ( integer , integer )  , 
+	 objact_ ( void )  , 
+	 opncls_ ( integer , integer , integer )  , 
+	 parse_ ( char * , logical )  , 
+	 prob_ ( integer , integer )  , 
+	 put_ ( logical )  , 
+	 rappli_ ( integer )  , 
+	 rappl1_ ( integer )  , 
+	 rappl2_ ( integer )  , 
+	 rmdesc_ ( integer )  , 
+	 sobjs_ ( integer , integer )  , 
+	 sverbs_ ( integer )  , 
+	 synmch_ ( void )  , 
+	 take_ ( logical )  , 
+	 thiefp_ ( integer )  , 
+	 trollp_ ( integer )  , 
+	 qempty_ ( integer )  , 
+	 qhere_ ( integer , integer )  , 
+	 vappli_ ( integer )  , 
+	 walk_ ( void )  , 
+	 winnin_ ( integer , integer )  , 
+	 yesno_ ( integer , integer , integer )  ; 
+extern struct { 
+     integer prsa , prsi , prso ; 
+     logical prswon ; 
+     integer prscon ; 
+} prsvec_ ; 
+extern struct { 
+     integer oflag , oact , oslot , oprep , oname ; 
+} orphs_ ; 
+extern struct { 
+     integer lastit ; 
+} last_ ; 
+extern struct { 
+     integer winner , here ; 
+     logical telflg ; 
+} play_ ; 
+extern struct { 
+     integer rlnt , rdesc1 [ 200 ] , rdesc2 [ 200 ] , rexit [ 200 ] , ractio [ 200 ] , 
+	     rval [ 200 ] , rflag [ 200 ] ; 
+} rooms_ ; 
+extern const struct { 
+     integer whous , lroom , cella , mtrol , maze1 , mgrat , maz15 , fore1 , fore3 , 
+	     clear , reser , strea , egypt , echor , tshaf , bshaf , mmach , dome , 
+	     mtorc , carou , riddl , lld2 , temp1 , temp2 , maint , blroo , treas , 
+	     rivr1 , rivr2 , rivr3 , mcycl , rivr4 , rivr5 , fchmp , falls , mbarr , 
+	     mrain , pog , vlbot , vair1 , vair2 , vair3 , vair4 , ledg2 , ledg3 , 
+	     ledg4 , msafe , cager , caged , twell , bwell , alice , alism , alitr , 
+	     mtree , bkent , bkvw , bktwi , bkvau , bkbox , crypt , tstrs , mrant , 
+	     mreye , mra , mrb , mrc , mrg , mrd , fdoor , mrae , mrce , mrcw , mrge , 
+	     mrgw , mrdw , inmir , scorr , ncorr , parap , cell , pcell , ncell , cpant , 
+	     cpout , cpuzz ; 
+} rindex_ 
+	 ; 
+extern const struct { 
+     integer xmin , xmax , xdown , xup , xnorth , xsouth , xenter , xexit , xeast , 
+	     xwest ; 
+} xsrch_ 
+	 ; 
+extern struct { 
+     integer olnt , odesc1 [ 220 ] , odesc2 [ 220 ] , odesco [ 220 ] , oactio [ 220 ] , oflag1 [ 
+	     220 ] , oflag2 [ 220 ] , ofval [ 220 ] , otval [ 220 ] , osize [ 220 ] , ocapac [ 220 ] 
+	     , oroom [ 220 ] , oadv [ 220 ] , ocan [ 220 ] , oread [ 220 ] ; 
+} objcts_ ; 
+extern struct { 
+     integer r2lnt , oroom2 [ 20 ] , rroom2 [ 20 ] ; 
+} oroom2_ ; 
+extern const struct { 
+     integer garli , food , gunk , coal , machi , diamo , tcase , bottl , water , rope , 
+	     knife , sword , lamp , blamp , rug , leave , troll , axe , rknif , keys , 
+	     ice , bar , coffi , torch , tbask , fbask , irbox , ghost , trunk , bell , 
+	     book , candl , match , tube , putty , wrenc , screw , cyclo , chali , 
+	     thief , still , windo , grate , door , hpole , leak , rbutt , raili , pot , 
+	     statu , iboat , dboat , pump , rboat , stick , buoy , shove , ballo , 
+	     recep , guano , brope , hook1 , hook2 , safe , sslot , brick , fuse , 
+	     gnome , blabe , dball , tomb , lcase , cage , rcage , spher , sqbut , 
+	     flask , pool , saffr , bucke , ecake , orice , rdice , blice , robot , 
+	     ftree , bills , portr , scol , zgnom , egg , begg , baubl , canar , bcana , 
+	     ylwal , rdwal , pindr , rbeam , odoor , qdoor , cdoor , num1 , num8 , 
+	     warni , cslit , gcard , stldr , hands , wall , lungs , sailo , aviat , 
+	     teeth , itobj , every , valua , oplay , wnort , gwate , master ; 
+} oindex_ 
+	 ; 
+extern struct { 
+     integer clnt , ctick [ 25 ] , cactio [ 25 ] ; 
+     logical cflag [ 25 ] ; 
+} cevent_ ; 
+extern const struct { 
+     integer cevcur , cevmnt , cevlnt , cevmat , cevcnd , cevbal , cevbrn , cevfus , 
+	     cevled , cevsaf , cevvlg , cevgno , cevbuc , cevsph , cevegh , cevfor , 
+	     cevscl , cevzgi , cevzgo , cevste , cevmrs , cevpin , cevinq , cevfol ; 
+} cindex_ 
+	 ; 
+extern struct { 
+     integer alnt , aroom [ 4 ] , ascore [ 4 ] , avehic [ 4 ] , aobj [ 4 ] , aactio [ 4 ] , astren [ 
+	     4 ] , aflag [ 4 ] ; 
+} advs_ ; 
+extern const struct { 
+     integer astag ; 
+} aflags_ 
+	 ; 
+extern const struct { 
+     integer player , arobot , amastr ; 
+} aindex_ 
+	 ; 
+extern const struct { 
+     integer cintw , deadxw , frstqw , inxw , outxw , walkiw , fightw , foow , meltw , 
+	     readw , inflaw , deflaw , alarmw , exorcw , plugw , kickw , wavew , 
+	     raisew , lowerw , rubw , pushw , untiew , tiew , tieupw , turnw , breatw , 
+	     knockw , lookw , examiw , shakew , movew , trnonw , trnofw , openw , 
+	     closew , findw , waitw , spinw , boardw , unboaw , takew , invenw , fillw , 
+	      eatw , drinkw , burnw , mungw , killw , attacw , swingw , walkw , tellw , 
+	     putw , dropw , givew , pourw , throww , digw , leapw , stayw , follow , 
+	     hellow , lookiw , lookuw , pumpw , windw , clmbw , clmbuw , clmbdw , 
+	     trntow ; 
+} vindex_ 
+	 ; 
+extern struct { 
+     logical trollf , cagesf , bucktf , caroff , carozf , lwtidf , domef , glacrf , 
+	     echof , riddlf , lldf , cyclof , magicf , litldf , safef , gnomef , 
+	     gnodrf , mirrmf , egyptf , onpolf , blabf , brieff , superf , buoyf , 
+	     grunlf , gatef , rainbf , cagetf , empthf , deflaf , glacmf , frobzf , 
+	     endgmf , badlkf , thfenf , singsf , mrpshf , mropnf , wdopnf , mr1f , 
+	     mr2f , inqstf , follwf , spellf , cpoutf , cpushf ; 
+     integer btief , binff , rvmnt , rvclr , rvcyc , rvsnd , rvgua , orrug , orcand , 
+	     ormtch , orlamp , mdir , mloc , poleuf , quesno , nqatt , corrct , lcell , 
+	     pnumb , acell , dcell , cphere ; 
+} findex_ ; 
+extern struct { 
+     integer dbgflg , prsflg , gdtflg ; 
+} debug_ ; 
+extern struct { 
+     integer thfpos ; 
+     logical thfflg , thfact , swdact ; 
+     integer swdsta ; 
+} hack_ ; 
+extern struct { 
+     integer vlnt , villns [ 4 ] , vprob [ 4 ] , vopps [ 4 ] , vbest [ 4 ] , vmelee [ 4 ] ; 
+} vill_ ; 
+extern struct { 
+     integer moves , deaths , rwscor , mxscor , mxload , ltshft , bloc , mungrm , hs , 
+	     egscor , egmxsc ; 
+} state_ ; 
+extern struct { 
+     integer xtype , xroom1 , xstrng , xactio , xobj ; 
+} curxt_ ; 
+extern const struct { 
+     integer xrmask , xdmask , xfmask , xfshft , xashft , xelnt [ 4 ] , xnorm , xno , 
+	     xcond , xdoor , xlflag ; 
+} xpars_ 
+	 ; 
+extern struct { 
+     integer mbase , strbit ; 
+} star_ ; 
+extern struct { 
+     integer inlnt ; 
+     char inbuf [ 78 ] ; 
+} input_ ; 
+extern struct { 
+     integer fromdr , scolrm , scolac ; 
+     const integer scoldr [ 8 ] , scolwl [ 12 ] ; 
+} screen_ 
+	 ; 
+extern struct { 
+     integer mlnt , mrloc , rtext [ 1050 ] ; 
+} rmsg_ ; 
+extern const struct { 
+     integer vmaj , vmin , vedit ; 
+} vers_ 
+	 ; 
+extern struct { 
+     integer pltime , shour , smin , ssec ; 
+} time_ ; 
+extern const struct { 
+     integer hfactr ; 
+} hyper_ 
+	 ; 
+extern struct { 
+     integer xlnt , travel [ 900 ] ; 
+} exits_ ; 
+extern struct { 
+     const integer cpdr [ 16 ] , cpwl [ 8 ] ; 
+     integer cpvec [ 64 ] ; 
+} puzzle_ 
+	 ; 
+extern const struct { 
+     const integer batdrp [ 9 ] ; 
+} bats_ 
+	 ; 
+extern int strcmp ( const char * , const char * )  ; 
+static logical xvehic_ ( integer )  ; 
+static void xendmv_ ( logical )  ; 
+void game_ ( ) 
+{ 
+     
+     logical f ; 
+     integer i ; 
+     rspeak_ ( 1 ) ; 
+     f = rmdesc_ ( 3 ) ; 
+L100 : 
+     play_ . winner = aindex_ . player ; 
+     play_ . telflg = define_value___ ; 
+     if ( prsvec_ . prscon <= 1 ) { 
+	 rdline_ ( input_ . inbuf , 1 ) ; 
+     } 
+     ++ state_ . moves ; 
+     prsvec_ . prswon = parse_ ( input_ . inbuf , 1 ) ; 
+     if ( ! prsvec_ . prswon ) { 
+	 goto L400 ; 
+     } 
+     if ( xvehic_ ( 1 ) ) { 
+	 goto L400 ; 
+     } 
+     if ( prsvec_ . prsa == vindex_ . tellw ) { 
+	 goto L2000 ; 
+     } 
+L300 : 
+     if ( prsvec_ . prso == oindex_ . valua prsvec_ . prso == oindex_ . every ) { 
+	 goto L900 ; 
+     } 
+     if ( ! vappli_ ( prsvec_ . prsa ) ) { 
+	 goto L400 ; 
+     } 
+L350 : 
+     if ( ! findex_ . echof play_ . here == rindex_ . echor ) { 
+	 goto L1000 ; 
+     } 
+     f = rappli_ ( rooms_ . ractio [ play_ . here - 1 ] ) ; 
+L400 : 
+     xendmv_ ( play_ . telflg ) ; 
+     if ( ! lit_ ( play_ . here ) ) { 
+	 prsvec_ . prscon = 1 ; 
+     } 
+     goto L100 ; 
+L900 : 
+     valuac_ ( oindex_ . valua ) ; 
+     goto L350 ; 
+L1000 : 
+     rdline_ ( input_ . inbuf , 0 ) ; 
+     ++ state_ . moves ; 
+     if ( strcmp ( input_ . inbuf , "ECHO" ) != 0 ) 
+	 goto L1300 ; 
+     rspeak_ ( 571 ) ; 
+     findex_ . echof = define_value___ ; 
+     objcts_ . oflag2 [ oindex_ . bar - 1 ] &= ~ define_value___ ; 
+     prsvec_ . prswon = define_value___ ; 
+     prsvec_ . prscon = 1 ; 
+     goto L400 ; 
+L1300 : 
+     prsvec_ . prswon = parse_ ( input_ . inbuf , 0 ) ; 
+     if ( ! prsvec_ . prswon prsvec_ . prsa != vindex_ . walkw ) { 
+	 goto L1400 ; 
+     } 
+     if ( findxt_ ( prsvec_ . prso , play_ . here ) ) { 
+	 goto L300 ; 
+     } 
+L1400 : 
+     more_output ( input_ . inbuf ) ; 
+     play_ . telflg = define_value___ ; 
+     goto L1000 ; 
+L2000 : 
+     if ( ( objcts_ . oflag2 [ prsvec_ . prso - 1 ] & define_value___ ) != 0 ) { 
+	 goto L2100 ; 
+     } 
+     rspeak_ ( 602 ) ; 
+     goto L350 ; 
+L2100 : 
+     play_ . winner = oactor_ ( prsvec_ . prso ) ; 
+     play_ . here = advs_ . aroom [ play_ . winner - 1 ] ; 
+     if ( prsvec_ . prscon <= 1 ) { 
+	 goto L2700 ; 
+     } 
+     if ( parse_ ( input_ . inbuf , 1 ) ) { 
+	 goto L2150 ; 
+     } 
+L2700 : 
+     i = 341 ; 
+     if ( play_ . telflg ) { 
+	 i = 604 ; 
+     } 
+     rspeak_ ( i ) ; 
+L2600 : 
+     play_ . winner = aindex_ . player ; 
+     play_ . here = advs_ . aroom [ play_ . winner - 1 ] ; 
+     goto L350 ; 
+L2150 : 
+     if ( aappli_ ( advs_ . aactio [ play_ . winner - 1 ] ) ) { 
+	 goto L2400 ; 
+     } 
+     if ( xvehic_ ( 1 ) ) { 
+	 goto L2400 ; 
+     } 
+     if ( prsvec_ . prso == oindex_ . valua prsvec_ . prso == oindex_ . every ) { 
+	 goto L2900 ; 
+     } 
+     if ( ! vappli_ ( prsvec_ . prsa ) ) { 
+	 goto L2400 ; 
+     } 
+     f = rappli_ ( rooms_ . ractio [ play_ . here - 1 ] ) ; 
+L2400 : 
+     xendmv_ ( play_ . telflg ) ; 
+     goto L2600 ; 
+L2900 : 
+     valuac_ ( oindex_ . valua ) ; 
+     goto L350 ; 
+} 
+static void xendmv_ ( flag ) 
+logical flag ; 
+{ 
+     
+     logical f ; 
+     if ( ! ( flag ) ) { 
+	 rspeak_ ( 341 ) ; 
+     } 
+     if ( hack_ . thfact ) { 
+	 thiefd_ ( ) ; 
+     } 
+     if ( prsvec_ . prswon ) { 
+	 fightd_ ( ) ; 
+     } 
+     if ( hack_ . swdact ) { 
+	 swordd_ ( ) ; 
+     } 
+     if ( prsvec_ . prswon ) { 
+	 f = clockd_ ( ) ; 
+     } 
+     if ( prsvec_ . prswon ) { 
+	 f = xvehic_ ( 2 ) ; 
+     } 
+} 
+static logical xvehic_ ( n ) 
+integer n ; 
+{ 
+     
+     logical ret_val ; 
+     
+     integer av ; 
+     ret_val = define_value___ ; 
+     av = advs_ . avehic [ play_ . winner - 1 ] ; 
+     if ( av != 0 ) { 
+	 ret_val = oappli_ ( objcts_ . oactio [ av - 1 ] , n ) ; 
+     } 
+     return ret_val ; 
+} 

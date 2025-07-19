@@ -8,6 +8,7 @@ import java.util.Stack;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.io.Console;
 import java.io.File;
@@ -420,7 +421,10 @@ public class Main {
         //final String filename = "src/test/resources/preprocessor/include.pp";
         //final String filename = "src/test/resources/preprocessor/scratchpad.pp";
 
-        final String filename = "src/test/resources/preprocessor/funcs.pp";
+        //final String filename = "src/test/resources/preprocessor/funcs.h";
+        //final String filename = "src/test/resources/preprocessor/vars.h";
+        //final String filename = "src/test/resources/preprocessor/dgame.pp";
+        final String filename = "src/test/resources/preprocessor/if.pp";
 
         //final String filename = "src/test/resources/preprocessor/ifdef_2.pp";
 
@@ -455,7 +459,10 @@ public class Main {
 
         fileStackFrame.start();
 
-        System.out.println(outputStringBuilder.toString());
+        String result = outputStringBuilder.toString();
+        System.out.println(result);
+
+        Files.writeString(Paths.get(filename + ".out"), result);
 
     }
 

@@ -15,6 +15,8 @@ public class DefaultFileStackFrameCallback implements FileStackFrameCallback {
 
     public Stack<IfStackFrame> ifStack = new Stack<>();
 
+    public StringBuilder stringBuilder;
+
     @Override
     public void execute(ASTNode astNode) {
 
@@ -55,11 +57,12 @@ public class DefaultFileStackFrameCallback implements FileStackFrameCallback {
 
         } else if (ifStack.isEmpty() || ifStack.peek().performOutput) {
 
-            StringBuilder stringBuilder = new StringBuilder();
+            // StringBuilder stringBuilder = new StringBuilder();
             outputASTNode(astNode, stringBuilder);
+            stringBuilder.append("\n");
 
             // DEBUG
-            System.out.println(stringBuilder.toString());
+            // System.out.println(stringBuilder.toString());
 
         }
     }
