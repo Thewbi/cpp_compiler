@@ -30,9 +30,11 @@ public class ASTNode {
 
         // output this node
         stringBuilder.append(value);
-        if (value.equalsIgnoreCase("||")) {
-            System.out.println("test");
-        }
+
+        // debug
+        //if (value.equalsIgnoreCase("||")) {
+            // System.out.println("test");
+        //}
 
         if (addLineBreak) {
             stringBuilder.append("\n");

@@ -337,6 +337,13 @@ public class DefaultFileStackFrameCallback implements FileStackFrameCallback {
 
     private void outputASTNode(ASTNode astNode, StringBuilder stringBuilder) {
 
+       // DEBUG
+        StringBuilder debugStringBuilder = new StringBuilder();
+        astNode.printRecursive(debugStringBuilder, 0);
+        System.out.println(debugStringBuilder.toString());
+        System.out.println("");
+
+
         try {
 
             // when inside a if-branch which is skipped (= blocked) because the

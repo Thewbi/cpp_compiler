@@ -14,6 +14,7 @@ import java.io.Console;
 import java.io.File;
 
 import org.antlr.v4.runtime.Token;
+import org.antlr.runtime.tree.Tree;
 import org.antlr.v4.parse.v4ParserException;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
@@ -51,12 +52,16 @@ import grammar.SemantCPP14ParserListener;
 import grammar.StructureCPP14ParserListener;
 import grammar.StructureTACKYParserListener;
 import grammar.SyntaxErrorListener;
+import preprocessor.AbstractFileStackFrame;
+import preprocessor.DefaultFileStackFrame;
 import preprocessor.DefaultFileStackFrameCallback;
-import preprocessor.FileStackFrame;
+import preprocessor.ExprTreeFileStackFrame;
 import riscv.ExplicitRISCVProcessor;
 import riscv.RISCVInstructionDecoder;
 import riscv.RISCVInstructionEncoder;
 import riscv.RISCVProcessor;
+import preprocessor.IFileStackFrame;
+import preprocessor.TreeNode;
 
 import com.cpp.grammar.RISCVLexer;
 import com.cpp.grammar.RISCVParser;
@@ -78,18 +83,277 @@ public class Main {
         System.out.println("Start");
 
         //preprocessor();
-        preprocessor_2();
+        // continue here:
+        //preprocessor_2();
         //preprocessor_3();
         //translationUnit();
         //riscvassembler();
         //riscvdecoder();
         //riscvencoder();
         //tacky();
+        //manualExpressionParsing();
+        manualExpressionParsing2();
 
         // ide();
 
         System.out.println("End");
     }
+
+    private static void manualExpressionParsing2() {
+        List<String> tokens = new ArrayList<>();
+
+        // tokens.add("a");
+        // tokens.add(".");
+        // tokens.add("b");
+        // tokens.add("==");
+        // tokens.add("c");
+        // tokens.add(".");
+        // tokens.add("d");
+        // tokens.add("||");
+        // tokens.add("e");
+        // tokens.add(".");
+        // tokens.add("f");
+        // tokens.add("==");
+        // tokens.add("g");
+        // tokens.add(".");
+        // tokens.add("h");
+
+        // tokens.add("a");
+        // tokens.add(">");
+        // tokens.add("b");
+        // tokens.add("==");
+        // tokens.add("c");
+        // tokens.add("<");
+        // tokens.add("d");
+
+        // tokens.add("a");
+        // tokens.add(">");
+        // tokens.add("b");
+        // tokens.add(">");
+        // tokens.add("c");
+
+        tokens.add("(");
+        tokens.add("a");
+        tokens.add("+");
+        tokens.add("b");
+        tokens.add(")");
+        tokens.add("*");
+        tokens.add("c");
+
+        System.out.println("--------------------------------------");
+
+        TreeNode rootNode = null;
+
+        for (int i = 0; i < tokens.size(); i++) {
+
+            String currentToken = tokens.get(i);
+            rootNode = insertTokenIntoTree(rootNode, currentToken);
+
+            // DEBUG
+            StringBuilder stringBuilder = new StringBuilder();
+            rootNode.printRecursive(stringBuilder, 0);
+            System.out.println(stringBuilder.toString());
+
+            System.out.println("--------------------------------------");
+        }
+    }
+
+    private static TreeNode insertTokenIntoTree(TreeNode node, String token) {
+
+        if (node == null) {
+            TreeNode newTreeNode = new TreeNode();
+            newTreeNode.value = token;
+            return newTreeNode;
+        }
+
+        if (comparePriority(node.value, token) < 0) {
+            System.out.println("existing node is heavier");
+
+            TreeNode newNode = new TreeNode();
+            newNode.value = token;
+
+            newNode.reparent(node);
+
+            return newNode;
+
+        } else {
+
+            System.out.println("existing node is lighter");
+
+            if ((node.lhs != null) && (node.rhs != null)) {
+                insertTokenIntoTree(node.rhs, token);
+                return node;
+            }
+
+            TreeNode newNode = new TreeNode();
+            newNode.value = token;
+            node.addChild(newNode);
+
+            return node;
+
+        }
+
+    }
+
+    private static void manualExpressionParsing() {
+
+        List<String> tokens = new ArrayList<>();
+        tokens.add("a");
+        tokens.add(".");
+        tokens.add("b");
+        tokens.add("==");
+        tokens.add("c");
+        tokens.add(".");
+        tokens.add("d");
+
+        tokens.add("||");
+
+        tokens.add("e");
+        tokens.add(".");
+        tokens.add("f");
+        tokens.add("==");
+        tokens.add("g");
+        tokens.add(".");
+        tokens.add("h");
+
+        TreeNode rootNode = null;
+
+        TreeNode currentNode = null;
+        TreeNode currentOperator = null;
+
+        boolean done = false;
+        int i = 0;
+        while (!done) {
+        //for (int i = 0; i < tokens.size(); i++) {
+
+
+            System.out.println("--------------------------------------");
+            if (rootNode != null) {
+                // DEBUG
+                StringBuilder stringBuilder = new StringBuilder();
+                rootNode.printRecursive(stringBuilder, 0);
+                System.out.println(stringBuilder.toString());
+            }
+
+            String currentToken = tokens.get(i);
+            String lookaheadToken = (i + 1) < tokens.size() ? tokens.get(i + 1) : null;
+
+            System.out.println("CurrToken: " + currentToken);
+            System.out.println("LookaheadToken: " + lookaheadToken);
+            System.out.println("--------------------------------------");
+
+            if (AbstractFileStackFrame.isBinaryOperator(currentToken)) {
+
+                TreeNode newNode = new TreeNode();
+                newNode.value = currentToken;
+
+                newNode.addChild(currentNode);
+
+                currentNode = newNode;
+
+                currentOperator = currentNode;
+
+                // if (rootNode == null) {
+                //     rootNode = newNode;
+                // }
+
+                rootNode = currentOperator;
+
+            } else {
+
+                TreeNode newNode = null;
+                if (currentNode == null) {
+                    currentNode = new TreeNode();
+                    currentNode.value = currentToken;
+                } else {
+                    newNode = new TreeNode();
+                    newNode.value = currentToken;
+
+                    currentNode.addChild(newNode);
+                }
+
+                // if (rootNode == null) {
+                //     rootNode = currentNode;
+                // }
+
+                boolean shifted = false;
+                if ((lookaheadToken != null) && (AbstractFileStackFrame.isBinaryOperator(lookaheadToken)) && (currentOperator != null)) {
+                    if (comparePriority(currentOperator.value, lookaheadToken) < 0) {
+                        System.out.println("SHIFT");
+                        //currentNode = newNode;
+
+
+                        TreeNode newOperatorNode = new TreeNode();
+                        newOperatorNode.value = lookaheadToken;
+                        currentOperator = newOperatorNode;
+
+                        newOperatorNode.reparent(newNode);
+                        currentNode = newOperatorNode;
+
+                        //newNode.value = currentToken;
+
+                        // DEBUG
+                        StringBuilder stringBuilder = new StringBuilder();
+                        rootNode.printRecursive(stringBuilder, 0);
+                        System.out.println(stringBuilder.toString());
+
+                        i++;
+                        shifted = true;
+                    }
+                    // else {
+                    //     TreeNode newOperatorNode = new TreeNode();
+                    //     newOperatorNode.value = lookaheadToken;
+                    //     currentOperator = newOperatorNode;
+
+                    //     newOperatorNode.reparent(newNode);
+                    //     currentNode = newOperatorNode;
+                    // }
+                }
+
+                if (!shifted) {
+                    System.out.println("REDUCE");
+
+                    // while (AbstractFileStackFrame.isBinaryOperator(currentNode.value)) {
+                    //     if (currentNode.parent == null) {
+                    //         break;
+                    //     }
+
+                    //     currentNode = (TreeNode) currentNode.parent;
+                    //     currentOperator = currentNode;
+
+                    // }
+
+                }
+
+            }
+
+            i++;
+
+            if (i >= tokens.size()) {
+                done = true;
+                continue;
+            }
+
+        }
+
+        // DEBUG
+        StringBuilder stringBuilder = new StringBuilder();
+        rootNode.printRecursive(stringBuilder, 0);
+        System.out.println(stringBuilder.toString());
+
+        System.out.println("end");
+    }
+
+    private static int comparePriority(String lhs, String rhs) {
+
+        int priorityLHS = AbstractFileStackFrame.getPriority(lhs);
+        int priorityRHS = AbstractFileStackFrame.getPriority(rhs);
+
+        return priorityRHS - priorityLHS;
+
+    }
+
+
 
     private static void tacky() throws IOException {
 
@@ -447,12 +711,13 @@ public class Main {
         defaultfileStackFrameCallback.defineKeyMap = defineKeyMap;
         defaultfileStackFrameCallback.dummyASTNode = dummyASTNode;
 
-        FileStackFrame fileStackFrame = new FileStackFrame();
+        ExprTreeFileStackFrame fileStackFrame = new ExprTreeFileStackFrame();
+        //DefaultFileStackFrame fileStackFrame = new DefaultFileStackFrame();
         fileStackFrame.callback = defaultfileStackFrameCallback;
         fileStackFrame.filename = filename;
         fileStackFrame.outputStringBuilder = outputStringBuilder;
 
-        Stack<FileStackFrame> fileStack = new Stack<>();
+        Stack<IFileStackFrame> fileStack = new Stack<>();
         fileStack.push(fileStackFrame);
 
         fileStackFrame.fileStack = fileStack;
