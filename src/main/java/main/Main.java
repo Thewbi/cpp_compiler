@@ -82,16 +82,16 @@ public class Main {
     public static void main(String[] args) throws IOException {
         System.out.println("Start");
 
-        //preprocessor();
+        // preprocessor();
         // continue here:
-        //preprocessor_2();
-        //preprocessor_3();
-        //translationUnit();
-        //riscvassembler();
-        //riscvdecoder();
-        //riscvencoder();
-        //tacky();
-        //manualExpressionParsing();
+        // preprocessor_2();
+        // preprocessor_3();
+        // translationUnit();
+        // riscvassembler();
+        // riscvdecoder();
+        // riscvencoder();
+        // tacky();
+        // manualExpressionParsing();
         manualExpressionParsing2();
 
         // ide();
@@ -318,15 +318,12 @@ public class Main {
 
                 if (identifier) {
                     System.out.println("function call detected: " + lastIdentifier);
-                    //throw new RuntimeException();
                     rootNode.functionCall = true;
                 }
-                //else {
 
-                    customWeight += 1000;
-                    continue;
+                customWeight += 1000;
+                continue;
 
-                //}
             }
             if (currentToken.equalsIgnoreCase(")")) {
                 customWeight -= 1000;
@@ -336,7 +333,8 @@ public class Main {
             identifier = AbstractFileStackFrame.isIdentifier(currentToken);
             lastIdentifier = currentToken;
 
-            rootNode = insertTokenIntoTree(rootNode, currentToken, customWeight, rootNode != null ? rootNode.functionCall : false);
+            rootNode = insertTokenIntoTree(rootNode, currentToken, customWeight,
+                    rootNode != null ? rootNode.functionCall : false);
 
             // DEBUG
             StringBuilder stringBuilder = new StringBuilder();
@@ -347,6 +345,17 @@ public class Main {
         }
     }
 
+    /**
+     * This function contains the basic idea of the algorithm. The purpose of the
+     * algorithm is to parse expressions without a parse, using a lexer and token
+     * only.
+     * The expression is expressed using a binary tree.
+     * To build the tree, all token types are identified and if the token is a C/C++
+     * operator, the precedence of that operator is used as a weight. The heavier
+     * the node (higher precedence) the deeper the token will sink into the tree.
+     * Literals have the highest weight and will sink down and act as the leafs of
+     * the tree (Leaf == no children).
+     */
     private static TreeNode insertTokenIntoTree(TreeNode node, String token, int customWeight, boolean functionCall) {
 
         if (node == null) {
@@ -359,6 +368,7 @@ public class Main {
         }
 
         if (comparePriority(functionCall, node.customWeight, node.value, token) < 0) {
+
             System.out.println("existing node is heavier");
 
             TreeNode newNode = new TreeNode();
@@ -459,7 +469,8 @@ public class Main {
                 }
 
                 boolean shifted = false;
-                if ((lookaheadToken != null) && (AbstractFileStackFrame.isBinaryOperator(lookaheadToken)) && (currentOperator != null)) {
+                if ((lookaheadToken != null) && (AbstractFileStackFrame.isBinaryOperator(lookaheadToken))
+                        && (currentOperator != null)) {
                     if (comparePriority(false, 0, currentOperator.value, lookaheadToken) < 0) {
                         System.out.println("SHIFT");
 
@@ -539,7 +550,7 @@ public class Main {
 
         // final String filename = "src/test/resources/TACKY/for_loop.tky";
         // final String filename = "src/test/resources/TACKY/pointer_creation.tky";
-        //final String filename = "src/test/resources/TACKY/array_int.tky";
+        // final String filename = "src/test/resources/TACKY/array_int.tky";
         final String filename = "src/test/resources/TACKY/function_call.tky";
 
         final CharStream charStream = CharStreams
@@ -856,28 +867,29 @@ public class Main {
 
     private static void preprocessor_2() throws IOException {
 
-        //final String filename = "src/test/resources/preprocessor/define.pp";
+        // final String filename = "src/test/resources/preprocessor/define.pp";
 
-        //final String filename = "src/test/resources/preprocessor/ifndef.pp";
-        //final String filename = "src/test/resources/preprocessor/if_defined.pp";
-        //final String filename = "src/test/resources/preprocessor/if_defined_nested.pp";
-        //final String filename = "src/test/resources/preprocessor/ifdef_else.pp";
-        //final String filename = "src/test/resources/preprocessor/include.pp";
-        //final String filename = "src/test/resources/preprocessor/scratchpad.pp";
+        // final String filename = "src/test/resources/preprocessor/ifndef.pp";
+        // final String filename = "src/test/resources/preprocessor/if_defined.pp";
+        // final String filename =
+        // "src/test/resources/preprocessor/if_defined_nested.pp";
+        // final String filename = "src/test/resources/preprocessor/ifdef_else.pp";
+        // final String filename = "src/test/resources/preprocessor/include.pp";
+        // final String filename = "src/test/resources/preprocessor/scratchpad.pp";
 
-        //final String filename = "src/test/resources/preprocessor/funcs.h";
-        //final String filename = "src/test/resources/preprocessor/vars.h";
-        //final String filename = "src/test/resources/preprocessor/dgame.pp";
+        // final String filename = "src/test/resources/preprocessor/funcs.h";
+        // final String filename = "src/test/resources/preprocessor/vars.h";
+        // final String filename = "src/test/resources/preprocessor/dgame.pp";
         final String filename = "src/test/resources/preprocessor/if.pp";
 
-        //final String filename = "src/test/resources/preprocessor/ifdef_2.pp";
+        // final String filename = "src/test/resources/preprocessor/ifdef_2.pp";
 
-        //final String filename = "src/test/resources/preprocessor/replace_1.pp";
-        //final String filename = "src/test/resources/preprocessor/replace_2.pp";
+        // final String filename = "src/test/resources/preprocessor/replace_1.pp";
+        // final String filename = "src/test/resources/preprocessor/replace_2.pp";
 
         // TODO: next
-        //final String filename = "src/test/resources/preprocessor/define_square.pp";
-        //final String filename = "src/test/resources/preprocessor/printf_test_1.pp";
+        // final String filename = "src/test/resources/preprocessor/define_square.pp";
+        // final String filename = "src/test/resources/preprocessor/printf_test_1.pp";
 
         ASTNode dummyASTNode = new ASTNode();
         dummyASTNode.value = "__DUMMY___11223344__";
@@ -892,7 +904,7 @@ public class Main {
         defaultfileStackFrameCallback.dummyASTNode = dummyASTNode;
 
         ExprTreeFileStackFrame fileStackFrame = new ExprTreeFileStackFrame();
-        //DefaultFileStackFrame fileStackFrame = new DefaultFileStackFrame();
+        // DefaultFileStackFrame fileStackFrame = new DefaultFileStackFrame();
         fileStackFrame.callback = defaultfileStackFrameCallback;
         fileStackFrame.filename = filename;
         fileStackFrame.outputStringBuilder = outputStringBuilder;
@@ -913,13 +925,13 @@ public class Main {
 
     private static void preprocessor_3() throws IOException {
 
-        //final String filename = "src/test/resources/preprocessor/if_defined.pp";
+        // final String filename = "src/test/resources/preprocessor/if_defined.pp";
         final String filename = "src/test/resources/preprocessor/scratchpad.pp";
 
         final CharStream charStream = CharStreams
                 .fromFileName(filename);
 
-        //final CPreprocessorLexerRule lexer = new CPreprocessorLexerRule(charStream);
+        // final CPreprocessorLexerRule lexer = new CPreprocessorLexerRule(charStream);
         final CPreprocessorLexer lexer = new CPreprocessorLexer(charStream);
 
         // create a buffer of tokens pulled from the lexer
@@ -934,7 +946,7 @@ public class Main {
         final ParseTreeWalker walker = new ParseTreeWalker();
 
         boolean printParseTree = true;
-        //boolean printParseTree = false;
+        // boolean printParseTree = false;
         if (printParseTree) {
             ConsoleCPreprocessorParserListener printListener = new ConsoleCPreprocessorParserListener();
             walker.walk(printListener, root);
