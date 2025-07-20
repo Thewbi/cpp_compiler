@@ -1,5 +1,7 @@
 package preprocessor;
 
+import org.stringtemplate.v4.compiler.STParser.ifstat_return;
+
 import ast.ASTNode;
 
 public class TreeNode extends ASTNode {
@@ -12,16 +14,32 @@ public class TreeNode extends ASTNode {
 
     public int customWeight = 0;
 
+    public boolean unaryOperator;
+
     public void addChild(TreeNode node) {
 
-        if (lhs == null) {
-            lhs = node;
-            node.side = true;
-        } else if (rhs == null) {
-            rhs = node;
-            node.side = false;
+        if (unaryOperator) {
+
+            if (lhs == null) {
+                lhs = node;
+                rhs = node;
+                node.side = true;
+            } else {
+                throw new RuntimeException("Error");
+            }
+
         } else {
-            throw new RuntimeException("Error");
+
+            if (lhs == null) {
+                lhs = node;
+                node.side = true;
+            } else if (rhs == null) {
+                rhs = node;
+                node.side = false;
+            } else {
+                throw new RuntimeException("Error");
+            }
+
         }
 
         node.parent = this;
@@ -30,12 +48,31 @@ public class TreeNode extends ASTNode {
     public void reparent(TreeNode node) {
         this.parent = node.parent;
 
-        if (node.parent != null) {
-            if (node.side == true) {
-                ((TreeNode) this.parent).lhs = this;
-            } else {
-                ((TreeNode) this.parent).rhs = this;
+        if (unaryOperator) {
+
+            throw new RuntimeException();
+
+        } else {
+
+            if (node.parent != null) {
+
+                TreeNode parent = ((TreeNode) this.parent);
+
+                if (parent.unaryOperator) {
+
+                    parent.lhs = this;
+                    parent.rhs = this;
+
+                } else {
+
+                    if (node.side == true) {
+                        parent.lhs = this;
+                    } else {
+                        parent.rhs = this;
+                    }
+                }
             }
+
         }
         addChild(node);
     }
@@ -58,14 +95,18 @@ public class TreeNode extends ASTNode {
             stringBuilder.append("\n");
         }
 
-        // output all children
-        if (lhs != null) {
-            //stringBuilder.append("LHS: ");
-            lhs.printRecursive(stringBuilder, indent + 1, true);
-        }
-        if (rhs != null) {
-            //stringBuilder.append("RHS: ");
-            rhs.printRecursive(stringBuilder, indent + 1, true);
+        if (unaryOperator) {
+            if (lhs != null) {
+                lhs.printRecursive(stringBuilder, indent + 1, true);
+            }
+        } else {
+            // output all children
+            if (lhs != null) {
+                lhs.printRecursive(stringBuilder, indent + 1, true);
+            }
+            if (rhs != null) {
+                rhs.printRecursive(stringBuilder, indent + 1, true);
+            }
         }
     }
 

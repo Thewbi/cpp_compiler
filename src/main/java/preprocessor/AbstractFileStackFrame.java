@@ -82,28 +82,37 @@ public abstract class AbstractFileStackFrame implements IFileStackFrame {
         return charStream;
     }
 
-    public static boolean isBinaryOperator(String text) {
+    public static boolean isBinaryOperator(String token) {
 
         return
-        text.equalsIgnoreCase("+")
+        token.equalsIgnoreCase("%")
         ||
-        text.equalsIgnoreCase("*")
+        token.equalsIgnoreCase("+")
         ||
-        text.equalsIgnoreCase(".")
+        token.equalsIgnoreCase("*")
         ||
-        text.equalsIgnoreCase("||")
+        token.equalsIgnoreCase(".")
         ||
-        text.equalsIgnoreCase("&&")
+        token.equalsIgnoreCase("||")
         ||
-        text.equalsIgnoreCase(">")
+        token.equalsIgnoreCase("&&")
         ||
-        text.equalsIgnoreCase(">=")
+        token.equalsIgnoreCase(">")
         ||
-        text.equalsIgnoreCase("<")
+        token.equalsIgnoreCase(">=")
         ||
-        text.equalsIgnoreCase("<=")
+        token.equalsIgnoreCase("<")
         ||
-        text.equalsIgnoreCase("==");
+        token.equalsIgnoreCase("<=")
+        ||
+        token.equalsIgnoreCase("==")
+        ||
+        token.equalsIgnoreCase("!=");
+    }
+
+    public static boolean isUnaryOperator(String token) {
+        return
+        token.equalsIgnoreCase("!");
     }
 
     /**
@@ -112,7 +121,10 @@ public abstract class AbstractFileStackFrame implements IFileStackFrame {
      * @return
      */
     public static int getPriority(String operator) {
-        if (operator.equalsIgnoreCase("+")) {
+        if (operator.equalsIgnoreCase("%")) {
+            return 1000 - 3;
+        }
+        else if (operator.equalsIgnoreCase("+")) {
             return 1000 - 4;
         }
         else if (operator.equalsIgnoreCase("*")) {
@@ -142,7 +154,14 @@ public abstract class AbstractFileStackFrame implements IFileStackFrame {
         else if (operator.equalsIgnoreCase("==")) {
             return 1000 - 7;
         }
+        else if (operator.equalsIgnoreCase("!=")) {
+            return 1000 - 7;
+        }
+        else if (operator.equalsIgnoreCase("!")) {
+            return 1000 - 2;
+        }
         return Integer.MAX_VALUE - 100000;
     }
+
 
 }

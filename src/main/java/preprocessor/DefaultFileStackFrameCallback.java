@@ -343,7 +343,6 @@ public class DefaultFileStackFrameCallback implements FileStackFrameCallback {
         System.out.println(debugStringBuilder.toString());
         System.out.println("");
 
-
         try {
 
             // when inside a if-branch which is skipped (= blocked) because the

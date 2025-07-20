@@ -102,22 +102,24 @@ public class Main {
     private static void manualExpressionParsing2() {
         List<String> tokens = new ArrayList<>();
 
-        // tokens.add("a");
-        // tokens.add(".");
-        // tokens.add("b");
-        // tokens.add("==");
-        // tokens.add("c");
-        // tokens.add(".");
-        // tokens.add("d");
-        // tokens.add("||");
-        // tokens.add("e");
-        // tokens.add(".");
-        // tokens.add("f");
-        // tokens.add("==");
-        // tokens.add("g");
-        // tokens.add(".");
-        // tokens.add("h");
+        // a.b == c.d || e.f == g.h
+        tokens.add("a");
+        tokens.add(".");
+        tokens.add("b");
+        tokens.add("==");
+        tokens.add("c");
+        tokens.add(".");
+        tokens.add("d");
+        tokens.add("||");
+        tokens.add("e");
+        tokens.add(".");
+        tokens.add("f");
+        tokens.add("==");
+        tokens.add("g");
+        tokens.add(".");
+        tokens.add("h");
 
+        // // a > b == c < d
         // tokens.add("a");
         // tokens.add(">");
         // tokens.add("b");
@@ -126,18 +128,21 @@ public class Main {
         // tokens.add("<");
         // tokens.add("d");
 
+        // // a > b > c
         // tokens.add("a");
         // tokens.add(">");
         // tokens.add("b");
         // tokens.add(">");
         // tokens.add("c");
 
+        // // a + b * c
         // tokens.add("a");
         // tokens.add("+");
         // tokens.add("b");
         // tokens.add("*");
         // tokens.add("c");
 
+        // // ( a + b ) * c
         // tokens.add("(");
         // tokens.add("a");
         // tokens.add("+");
@@ -146,12 +151,75 @@ public class Main {
         // tokens.add("*");
         // tokens.add("c");
 
+        // // n <= 20 && n >= 10
+        // tokens.add("n");
+        // tokens.add("<=");
+        // tokens.add("20");
+        // tokens.add("&&");
+        // tokens.add("n");
+        // tokens.add(">=");
+        // tokens.add("10");
+
+        // // n % 2 == 0
+        // tokens.add("n");
+        // tokens.add("%");
+        // tokens.add("2");
+        // tokens.add("==");
+        // tokens.add("0");
+
+        // // prsvec_1.prscon <= 1
+        // tokens.add("prsvec_1");
+        // tokens.add(".");
+        // tokens.add("prscon");
+        // tokens.add("<=");
+        // tokens.add("1");
+
+        // // prsvec_1.prso == oindex_1.valua || prsvec_1.prso == oindex_1.every
+        // tokens.add("prsvec_1");
+        // tokens.add(".");
+        // tokens.add("prso");
+        // tokens.add("==");
+        // tokens.add("oindex_1");
+        // tokens.add(".");
+        // tokens.add("valua");
+        // tokens.add("||");
+        // tokens.add("prsvec_1");
+        // tokens.add(".");
+        // tokens.add("prso");
+        // tokens.add("==");
+        // tokens.add("oindex_1");
+        // tokens.add(".");
+        // tokens.add("every");
+
+        // ! a
+        // tokens.add("!");
+        // tokens.add("a");
+
+        // ! prsvec_1.prswon
+        // tokens.add("!");
+        // tokens.add("prsvec_1");
+        // tokens.add(".");
+        // tokens.add("prswon");
+
+        // // ! prsvec_1.prswon || prsvec_1.prsa != vindex_1.walkw
+        // tokens.add("!");
+        // tokens.add("prsvec_1");
+        // tokens.add(".");
+        // tokens.add("prswon");
+        // tokens.add("||");
+        // tokens.add("prsvec_1");
+        // tokens.add(".");
+        // tokens.add("prsa");
+        // tokens.add("!=");
+        // tokens.add("vindex_1");
+        // tokens.add(".");
+        // tokens.add("walkw");
+
         System.out.println("--------------------------------------");
 
         int customWeight = 0;
 
         TreeNode rootNode = null;
-        Stack<TreeNode> nodeStack = new Stack<>();
 
         for (int i = 0; i < tokens.size(); i++) {
 
@@ -166,15 +234,7 @@ public class Main {
                 continue;
             }
 
-            // if (rootNode != null) {
-            //     rootNode.customWeight = customWeight;
-            // }
-
             rootNode = insertTokenIntoTree(rootNode, currentToken, customWeight);
-
-            // if (rootNode != null) {
-            //     rootNode.customWeight = customWeight;
-            // }
 
             // DEBUG
             StringBuilder stringBuilder = new StringBuilder();
@@ -187,14 +247,12 @@ public class Main {
 
     private static TreeNode insertTokenIntoTree(TreeNode node, String token, int customWeight) {
 
-        // if (token.equalsIgnoreCase("*")) {
-        //     System.out.println("test");
-        // }
-
         if (node == null) {
             TreeNode newTreeNode = new TreeNode();
             newTreeNode.value = token;
+            newTreeNode.unaryOperator = AbstractFileStackFrame.isUnaryOperator(token);
             newTreeNode.customWeight = customWeight;
+
             return newTreeNode;
         }
 
@@ -239,9 +297,7 @@ public class Main {
         tokens.add("c");
         tokens.add(".");
         tokens.add("d");
-
         tokens.add("||");
-
         tokens.add("e");
         tokens.add(".");
         tokens.add("f");
@@ -258,8 +314,6 @@ public class Main {
         boolean done = false;
         int i = 0;
         while (!done) {
-        //for (int i = 0; i < tokens.size(); i++) {
-
 
             System.out.println("--------------------------------------");
             if (rootNode != null) {
@@ -287,10 +341,6 @@ public class Main {
 
                 currentOperator = currentNode;
 
-                // if (rootNode == null) {
-                //     rootNode = newNode;
-                // }
-
                 rootNode = currentOperator;
 
             } else {
@@ -306,16 +356,10 @@ public class Main {
                     currentNode.addChild(newNode);
                 }
 
-                // if (rootNode == null) {
-                //     rootNode = currentNode;
-                // }
-
                 boolean shifted = false;
                 if ((lookaheadToken != null) && (AbstractFileStackFrame.isBinaryOperator(lookaheadToken)) && (currentOperator != null)) {
                     if (comparePriority(0, currentOperator.value, lookaheadToken) < 0) {
                         System.out.println("SHIFT");
-                        //currentNode = newNode;
-
 
                         TreeNode newOperatorNode = new TreeNode();
                         newOperatorNode.value = lookaheadToken;
@@ -323,8 +367,6 @@ public class Main {
 
                         newOperatorNode.reparent(newNode);
                         currentNode = newOperatorNode;
-
-                        //newNode.value = currentToken;
 
                         // DEBUG
                         StringBuilder stringBuilder = new StringBuilder();
@@ -334,28 +376,20 @@ public class Main {
                         i++;
                         shifted = true;
                     }
-                    // else {
-                    //     TreeNode newOperatorNode = new TreeNode();
-                    //     newOperatorNode.value = lookaheadToken;
-                    //     currentOperator = newOperatorNode;
-
-                    //     newOperatorNode.reparent(newNode);
-                    //     currentNode = newOperatorNode;
-                    // }
                 }
 
                 if (!shifted) {
                     System.out.println("REDUCE");
 
-                    // while (AbstractFileStackFrame.isBinaryOperator(currentNode.value)) {
-                    //     if (currentNode.parent == null) {
-                    //         break;
-                    //     }
+                    while (AbstractFileStackFrame.isBinaryOperator(currentNode.value)) {
+                        if (currentNode.parent == null) {
+                            break;
+                        }
 
-                    //     currentNode = (TreeNode) currentNode.parent;
-                    //     currentOperator = currentNode;
+                        currentNode = (TreeNode) currentNode.parent;
+                        currentOperator = currentNode;
 
-                    // }
+                    }
 
                 }
 
@@ -386,8 +420,6 @@ public class Main {
         return priorityRHS - priorityLHS;
 
     }
-
-
 
     private static void tacky() throws IOException {
 
