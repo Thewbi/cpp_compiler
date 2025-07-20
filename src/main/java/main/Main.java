@@ -100,24 +100,25 @@ public class Main {
     }
 
     private static void manualExpressionParsing2() {
+
         List<String> tokens = new ArrayList<>();
 
-        // a.b == c.d || e.f == g.h
-        tokens.add("a");
-        tokens.add(".");
-        tokens.add("b");
-        tokens.add("==");
-        tokens.add("c");
-        tokens.add(".");
-        tokens.add("d");
-        tokens.add("||");
-        tokens.add("e");
-        tokens.add(".");
-        tokens.add("f");
-        tokens.add("==");
-        tokens.add("g");
-        tokens.add(".");
-        tokens.add("h");
+        // // a.b == c.d || e.f == g.h
+        // tokens.add("a");
+        // tokens.add(".");
+        // tokens.add("b");
+        // tokens.add("==");
+        // tokens.add("c");
+        // tokens.add(".");
+        // tokens.add("d");
+        // tokens.add("||");
+        // tokens.add("e");
+        // tokens.add(".");
+        // tokens.add("f");
+        // tokens.add("==");
+        // tokens.add("g");
+        // tokens.add(".");
+        // tokens.add("h");
 
         // // a > b == c < d
         // tokens.add("a");
@@ -191,11 +192,11 @@ public class Main {
         // tokens.add(".");
         // tokens.add("every");
 
-        // ! a
+        // // ! a
         // tokens.add("!");
         // tokens.add("a");
 
-        // ! prsvec_1.prswon
+        // // ! prsvec_1.prswon
         // tokens.add("!");
         // tokens.add("prsvec_1");
         // tokens.add(".");
@@ -215,26 +216,127 @@ public class Main {
         // tokens.add(".");
         // tokens.add("walkw");
 
+        // // ! findex_1.echof && play_1.here == rindex_1.echor
+        // tokens.add("!");
+        // tokens.add("findex_1");
+        // tokens.add(".");
+        // tokens.add("echof");
+        // tokens.add("&&");
+        // tokens.add("play_1");
+        // tokens.add(".");
+        // tokens.add("here");
+        // tokens.add("==");
+        // tokens.add("rindex_1");
+        // tokens.add(".");
+        // tokens.add("echor");
+
+        // // strcmp(input_1.inbuf, "ECHO") != 0
+        // tokens.add("strcmp");
+        // tokens.add("(");
+        // tokens.add("input_1");
+        // tokens.add(".");
+        // tokens.add("inbuf");
+        // tokens.add(",");
+        // tokens.add("\"ECHO\"");
+        // tokens.add(")");
+        // tokens.add("!=");
+        // tokens.add("0");
+
+        // // strcmp(a)
+        // tokens.add("strcmp");
+        // tokens.add("(");
+        // tokens.add("a");
+        // tokens.add(")");
+
+        // // strcmp(a, b)
+        // tokens.add("strcmp");
+        // tokens.add("(");
+        // tokens.add("a");
+        // tokens.add(",");
+        // tokens.add("b");
+        // tokens.add(")");
+
+        // // strcmp(a, b, c)
+        // tokens.add("strcmp");
+        // tokens.add("(");
+        // tokens.add("a");
+        // tokens.add(",");
+        // tokens.add("b");
+        // tokens.add(",");
+        // tokens.add("c");
+        // tokens.add(")");
+
+        // // strcmp(a, b, c, d)
+        // tokens.add("strcmp");
+        // tokens.add("(");
+        // tokens.add("a");
+        // tokens.add(",");
+        // tokens.add("b");
+        // tokens.add(",");
+        // tokens.add("c");
+        // tokens.add(",");
+        // tokens.add("d");
+        // tokens.add(")");
+
+        // // strcmp(input_1.inbuf, "ECHO")
+        // tokens.add("strcmp");
+        // tokens.add("(");
+        // tokens.add("input_1");
+        // tokens.add(".");
+        // tokens.add("inbuf");
+        // tokens.add(",");
+        // tokens.add("\"ECHO\"");
+        // tokens.add(")");
+
+        // // defined(_DEBUG) || defined(_UNIT_TEST)
+        // tokens.add("defined");
+        // tokens.add("(");
+        // tokens.add("_DEBUG");
+        // tokens.add(")");
+        // tokens.add("||");
+        // tokens.add("defined");
+        // tokens.add("(");
+        // tokens.add("_UNIT_TEST");
+        // tokens.add(")");
+
         System.out.println("--------------------------------------");
 
         int customWeight = 0;
 
         TreeNode rootNode = null;
 
+        boolean identifier = false;
+        String lastIdentifier = null;
+
+        // boolean functionCall = false;
+
         for (int i = 0; i < tokens.size(); i++) {
 
             String currentToken = tokens.get(i);
 
             if (currentToken.equalsIgnoreCase("(")) {
-                customWeight = 1000;
-                continue;
+
+                if (identifier) {
+                    System.out.println("function call detected: " + lastIdentifier);
+                    //throw new RuntimeException();
+                    rootNode.functionCall = true;
+                }
+                //else {
+
+                    customWeight += 1000;
+                    continue;
+
+                //}
             }
             if (currentToken.equalsIgnoreCase(")")) {
-                customWeight = 0;
+                customWeight -= 1000;
                 continue;
             }
 
-            rootNode = insertTokenIntoTree(rootNode, currentToken, customWeight);
+            identifier = AbstractFileStackFrame.isIdentifier(currentToken);
+            lastIdentifier = currentToken;
+
+            rootNode = insertTokenIntoTree(rootNode, currentToken, customWeight, rootNode != null ? rootNode.functionCall : false);
 
             // DEBUG
             StringBuilder stringBuilder = new StringBuilder();
@@ -245,7 +347,7 @@ public class Main {
         }
     }
 
-    private static TreeNode insertTokenIntoTree(TreeNode node, String token, int customWeight) {
+    private static TreeNode insertTokenIntoTree(TreeNode node, String token, int customWeight, boolean functionCall) {
 
         if (node == null) {
             TreeNode newTreeNode = new TreeNode();
@@ -256,7 +358,7 @@ public class Main {
             return newTreeNode;
         }
 
-        if (comparePriority(node.customWeight, node.value, token) < 0) {
+        if (comparePriority(functionCall, node.customWeight, node.value, token) < 0) {
             System.out.println("existing node is heavier");
 
             TreeNode newNode = new TreeNode();
@@ -272,7 +374,7 @@ public class Main {
             System.out.println("existing node is lighter");
 
             if ((node.lhs != null) && (node.rhs != null)) {
-                insertTokenIntoTree(node.rhs, token, customWeight);
+                insertTokenIntoTree(node.rhs, token, customWeight, false);
                 return node;
             }
 
@@ -358,7 +460,7 @@ public class Main {
 
                 boolean shifted = false;
                 if ((lookaheadToken != null) && (AbstractFileStackFrame.isBinaryOperator(lookaheadToken)) && (currentOperator != null)) {
-                    if (comparePriority(0, currentOperator.value, lookaheadToken) < 0) {
+                    if (comparePriority(false, 0, currentOperator.value, lookaheadToken) < 0) {
                         System.out.println("SHIFT");
 
                         TreeNode newOperatorNode = new TreeNode();
@@ -412,10 +514,22 @@ public class Main {
         System.out.println("end");
     }
 
-    private static int comparePriority(int customWeight, String lhs, String rhs) {
+    private static int comparePriority(boolean functionCall, int customWeight, String lhs, String rhs) {
 
-        int priorityLHS = customWeight + AbstractFileStackFrame.getPriority(lhs);
-        int priorityRHS = AbstractFileStackFrame.getPriority(rhs);
+        int priorityLHS = 0;
+        int priorityRHS = 0;
+
+        if (functionCall) {
+
+            priorityLHS = 1000 - 2;
+            priorityRHS = AbstractFileStackFrame.getPriority(rhs);
+
+        } else {
+
+            priorityLHS = customWeight + AbstractFileStackFrame.getPriority(lhs);
+            priorityRHS = AbstractFileStackFrame.getPriority(rhs);
+
+        }
 
         return priorityRHS - priorityLHS;
 

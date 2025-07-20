@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Stack;
+import java.util.regex.Pattern;
 
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
@@ -85,6 +86,8 @@ public abstract class AbstractFileStackFrame implements IFileStackFrame {
     public static boolean isBinaryOperator(String token) {
 
         return
+        token.equalsIgnoreCase(",")
+        ||
         token.equalsIgnoreCase("%")
         ||
         token.equalsIgnoreCase("+")
@@ -160,7 +163,33 @@ public abstract class AbstractFileStackFrame implements IFileStackFrame {
         else if (operator.equalsIgnoreCase("!")) {
             return 1000 - 2;
         }
+        else if (operator.equalsIgnoreCase(",")) {
+            //return 1000 - 17;
+            return Integer.MAX_VALUE - 200000;
+        }
         return Integer.MAX_VALUE - 100000;
+    }
+
+    static Pattern isNumericPattern = Pattern.compile("-?\\d+(\\.\\d+)?");
+    static Pattern isBracePattern = Pattern.compile("[\\[\\]\\{\\}\\()\\)]");
+
+    public static boolean isIdentifier(String token) {
+
+        if (token.isBlank()) {
+            return false;
+        }
+        if (token.startsWith("\"")) {
+            return false;
+        }
+        if (isNumericPattern.matcher(token).matches()) {
+            return false;
+        }
+        if (isBracePattern.matcher(token).matches()) {
+            return false;
+        }
+
+        return true;
+
     }
 
 

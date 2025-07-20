@@ -16,6 +16,8 @@ public class TreeNode extends ASTNode {
 
     public boolean unaryOperator;
 
+    public boolean functionCall;
+
     public void addChild(TreeNode node) {
 
         if (unaryOperator) {
@@ -90,6 +92,9 @@ public class TreeNode extends ASTNode {
 
         // output this node
         stringBuilder.append(value);
+        if (functionCall) {
+            stringBuilder.append(" (functionCall)");
+        }
 
         if (addLineBreak) {
             stringBuilder.append("\n");
