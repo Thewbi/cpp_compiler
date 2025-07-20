@@ -132,22 +132,49 @@ public class Main {
         // tokens.add(">");
         // tokens.add("c");
 
-        tokens.add("(");
-        tokens.add("a");
-        tokens.add("+");
-        tokens.add("b");
-        tokens.add(")");
-        tokens.add("*");
-        tokens.add("c");
+        // tokens.add("a");
+        // tokens.add("+");
+        // tokens.add("b");
+        // tokens.add("*");
+        // tokens.add("c");
+
+        // tokens.add("(");
+        // tokens.add("a");
+        // tokens.add("+");
+        // tokens.add("b");
+        // tokens.add(")");
+        // tokens.add("*");
+        // tokens.add("c");
 
         System.out.println("--------------------------------------");
 
+        int customWeight = 0;
+
         TreeNode rootNode = null;
+        Stack<TreeNode> nodeStack = new Stack<>();
 
         for (int i = 0; i < tokens.size(); i++) {
 
             String currentToken = tokens.get(i);
-            rootNode = insertTokenIntoTree(rootNode, currentToken);
+
+            if (currentToken.equalsIgnoreCase("(")) {
+                customWeight = 1000;
+                continue;
+            }
+            if (currentToken.equalsIgnoreCase(")")) {
+                customWeight = 0;
+                continue;
+            }
+
+            // if (rootNode != null) {
+            //     rootNode.customWeight = customWeight;
+            // }
+
+            rootNode = insertTokenIntoTree(rootNode, currentToken, customWeight);
+
+            // if (rootNode != null) {
+            //     rootNode.customWeight = customWeight;
+            // }
 
             // DEBUG
             StringBuilder stringBuilder = new StringBuilder();
@@ -158,19 +185,25 @@ public class Main {
         }
     }
 
-    private static TreeNode insertTokenIntoTree(TreeNode node, String token) {
+    private static TreeNode insertTokenIntoTree(TreeNode node, String token, int customWeight) {
+
+        // if (token.equalsIgnoreCase("*")) {
+        //     System.out.println("test");
+        // }
 
         if (node == null) {
             TreeNode newTreeNode = new TreeNode();
             newTreeNode.value = token;
+            newTreeNode.customWeight = customWeight;
             return newTreeNode;
         }
 
-        if (comparePriority(node.value, token) < 0) {
+        if (comparePriority(node.customWeight, node.value, token) < 0) {
             System.out.println("existing node is heavier");
 
             TreeNode newNode = new TreeNode();
             newNode.value = token;
+            newNode.customWeight = customWeight;
 
             newNode.reparent(node);
 
@@ -181,12 +214,13 @@ public class Main {
             System.out.println("existing node is lighter");
 
             if ((node.lhs != null) && (node.rhs != null)) {
-                insertTokenIntoTree(node.rhs, token);
+                insertTokenIntoTree(node.rhs, token, customWeight);
                 return node;
             }
 
             TreeNode newNode = new TreeNode();
             newNode.value = token;
+            newNode.customWeight = customWeight;
             node.addChild(newNode);
 
             return node;
@@ -278,7 +312,7 @@ public class Main {
 
                 boolean shifted = false;
                 if ((lookaheadToken != null) && (AbstractFileStackFrame.isBinaryOperator(lookaheadToken)) && (currentOperator != null)) {
-                    if (comparePriority(currentOperator.value, lookaheadToken) < 0) {
+                    if (comparePriority(0, currentOperator.value, lookaheadToken) < 0) {
                         System.out.println("SHIFT");
                         //currentNode = newNode;
 
@@ -344,9 +378,9 @@ public class Main {
         System.out.println("end");
     }
 
-    private static int comparePriority(String lhs, String rhs) {
+    private static int comparePriority(int customWeight, String lhs, String rhs) {
 
-        int priorityLHS = AbstractFileStackFrame.getPriority(lhs);
+        int priorityLHS = customWeight + AbstractFileStackFrame.getPriority(lhs);
         int priorityRHS = AbstractFileStackFrame.getPriority(rhs);
 
         return priorityRHS - priorityLHS;

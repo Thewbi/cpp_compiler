@@ -10,6 +10,8 @@ public class TreeNode extends ASTNode {
 
     public TreeNode rhs;
 
+    public int customWeight = 0;
+
     public void addChild(TreeNode node) {
 
         if (lhs == null) {

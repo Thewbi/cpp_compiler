@@ -85,6 +85,10 @@ public abstract class AbstractFileStackFrame implements IFileStackFrame {
     public static boolean isBinaryOperator(String text) {
 
         return
+        text.equalsIgnoreCase("+")
+        ||
+        text.equalsIgnoreCase("*")
+        ||
         text.equalsIgnoreCase(".")
         ||
         text.equalsIgnoreCase("||")
@@ -108,7 +112,13 @@ public abstract class AbstractFileStackFrame implements IFileStackFrame {
      * @return
      */
     public static int getPriority(String operator) {
-        if (operator.equalsIgnoreCase(".")) {
+        if (operator.equalsIgnoreCase("+")) {
+            return 1000 - 4;
+        }
+        else if (operator.equalsIgnoreCase("*")) {
+            return 1000 - 3;
+        }
+        else if (operator.equalsIgnoreCase(".")) {
             return 1000 - 1;
         }
         else if (operator.equalsIgnoreCase("||")) {
@@ -132,7 +142,7 @@ public abstract class AbstractFileStackFrame implements IFileStackFrame {
         else if (operator.equalsIgnoreCase("==")) {
             return 1000 - 7;
         }
-        return Integer.MAX_VALUE;
+        return Integer.MAX_VALUE - 100000;
     }
 
 }
