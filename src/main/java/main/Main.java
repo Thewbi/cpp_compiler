@@ -84,7 +84,9 @@ public class Main {
 
         // preprocessor();
         // continue here:
-        // preprocessor_2();
+
+        preprocessor_2();
+
         // preprocessor_3();
         // translationUnit();
         // riscvassembler();
@@ -92,7 +94,8 @@ public class Main {
         // riscvencoder();
         // tacky();
         // manualExpressionParsing();
-        manualExpressionParsing2();
+
+        //manualExpressionParsing2();
 
         // ide();
 
@@ -175,22 +178,22 @@ public class Main {
         // tokens.add("<=");
         // tokens.add("1");
 
-        // // prsvec_1.prso == oindex_1.valua || prsvec_1.prso == oindex_1.every
-        // tokens.add("prsvec_1");
-        // tokens.add(".");
-        // tokens.add("prso");
-        // tokens.add("==");
-        // tokens.add("oindex_1");
-        // tokens.add(".");
-        // tokens.add("valua");
-        // tokens.add("||");
-        // tokens.add("prsvec_1");
-        // tokens.add(".");
-        // tokens.add("prso");
-        // tokens.add("==");
-        // tokens.add("oindex_1");
-        // tokens.add(".");
-        // tokens.add("every");
+        // prsvec_1.prso == oindex_1.valua || prsvec_1.prso == oindex_1.every
+        tokens.add("prsvec_1");
+        tokens.add(".");
+        tokens.add("prso");
+        tokens.add("==");
+        tokens.add("oindex_1");
+        tokens.add(".");
+        tokens.add("valua");
+        tokens.add("||");
+        tokens.add("prsvec_1");
+        tokens.add(".");
+        tokens.add("prso");
+        tokens.add("==");
+        tokens.add("oindex_1");
+        tokens.add(".");
+        tokens.add("every");
 
         // // ! a
         // tokens.add("!");
@@ -307,8 +310,6 @@ public class Main {
 
         boolean identifier = false;
         String lastIdentifier = null;
-
-        // boolean functionCall = false;
 
         for (int i = 0; i < tokens.size(); i++) {
 
@@ -880,7 +881,9 @@ public class Main {
         // final String filename = "src/test/resources/preprocessor/funcs.h";
         // final String filename = "src/test/resources/preprocessor/vars.h";
         // final String filename = "src/test/resources/preprocessor/dgame.pp";
-        final String filename = "src/test/resources/preprocessor/if.pp";
+
+        //final String filename = "src/test/resources/preprocessor/if.pp";
+        final String filename = "src/test/resources/preprocessor/ifdef.pp";
 
         // final String filename = "src/test/resources/preprocessor/ifdef_2.pp";
 

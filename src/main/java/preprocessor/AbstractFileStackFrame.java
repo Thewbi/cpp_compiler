@@ -124,6 +124,7 @@ public abstract class AbstractFileStackFrame implements IFileStackFrame {
      * @return
      */
     public static int getPriority(String operator) {
+
         if (operator.equalsIgnoreCase("%")) {
             return 1000 - 3;
         }

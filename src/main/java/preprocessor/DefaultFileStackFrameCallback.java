@@ -62,7 +62,7 @@ public class DefaultFileStackFrameCallback implements FileStackFrameCallback {
             stringBuilder.append("\n");
 
             // DEBUG
-            // System.out.println(stringBuilder.toString());
+            System.out.println(stringBuilder.toString());
 
         }
     }
@@ -335,13 +335,30 @@ public class DefaultFileStackFrameCallback implements FileStackFrameCallback {
         throw new RuntimeException("Not implemented yet! " + astNode.value);
     }
 
+    // private void outputASTNode(ASTNode astNode, StringBuilder stringBuilder) {
+
+    //     // when inside a if-branch which is skipped (= blocked) because the
+    //     // expression did evaluate to false, then do not output the line
+    //     if (!ifStack.empty() && ifStack.peek().blocked) {
+    //         return;
+    //     }
+
+    //     // add the parents value
+    //     stringBuilder.append(astNode.value);
+
+    //     // finally output children
+    //     for (ASTNode childNode : astNode.getChildren()) {
+    //         outputASTNode(childNode, stringBuilder);
+    //     }
+    // }
+
     private void outputASTNode(ASTNode astNode, StringBuilder stringBuilder) {
 
-       // DEBUG
-        StringBuilder debugStringBuilder = new StringBuilder();
-        astNode.printRecursive(debugStringBuilder, 0);
-        System.out.println(debugStringBuilder.toString());
-        System.out.println("");
+        // // DEBUG
+        // StringBuilder debugStringBuilder = new StringBuilder();
+        // astNode.printRecursive(debugStringBuilder, 0);
+        // System.out.println(debugStringBuilder.toString());
+        // System.out.println("");
 
         try {
 
@@ -363,7 +380,7 @@ public class DefaultFileStackFrameCallback implements FileStackFrameCallback {
             int index = 0;
             for (ASTNode childNode : astNode.children) {
 
-                // if the child node
+                // if the child node is not a symbol go to next child
                 if (!defineMap.containsKey(childNode.value)) {
                     index++;
                     continue;
@@ -397,7 +414,6 @@ public class DefaultFileStackFrameCallback implements FileStackFrameCallback {
                     String formalParameter = formalParameterSubNode.children.get(1).value;
 
                     // 4. output the value
-                    // String newValue = actualParameterNewValue.value;
                     StringBuilder internalStringBuilder = new StringBuilder();
                     outputASTNode(actualParameterNewValue, internalStringBuilder);
                     String newValue = internalStringBuilder.toString();
@@ -409,9 +425,8 @@ public class DefaultFileStackFrameCallback implements FileStackFrameCallback {
                     definedReplacement.parent = childNode;
 
                     //
-                    // Also remove the next three nodes because the contain '(' <FORMAL_PAREMTER>
-                    // ')'
-                    // which has been replaced
+                    // Also remove the next three nodes because they contain '(' <FORMAL_PARAMETER>
+                    // ')' which has been replaced
                     //
 
                     astNode.children.get(index + 1).purge();
@@ -422,15 +437,29 @@ public class DefaultFileStackFrameCallback implements FileStackFrameCallback {
 
             }
 
-            // finally output replaced children
+            // // finally output children
+            // for (ASTNode childNode : astNode.children) {
+
+            //     if (childNode.children.size() == 0) {
+            //         String val = childNode.value;
+            //         if (val != null) {
+            //             stringBuilder.append(val).append(" ");
+            //         }
+            //     } else {
+            //         outputASTNode(childNode, stringBuilder);
+            //     }
+
+            // }
+
+            // finally output children
             for (ASTNode childNode : astNode.children) {
 
-                if (childNode.children.size() == 0) {
-                    String val = childNode.value;
-                    if (val != null) {
-                        stringBuilder.append(val).append(" ");
-                    }
-                } else {
+                String val = childNode.value;
+                if (val != null) {
+                    stringBuilder.append(val).append(" ");
+                }
+
+                if (childNode.children.size() != 0) {
                     outputASTNode(childNode, stringBuilder);
                 }
 
@@ -439,7 +468,6 @@ public class DefaultFileStackFrameCallback implements FileStackFrameCallback {
         } catch (IndexOutOfBoundsException e) {
             e.printStackTrace();
         }
-
     }
 
     private void replaceActualParameterByValue(ASTNode definedReplacement, String formalParameterIdentifier,

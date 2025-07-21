@@ -1,3 +1,3 @@
-if ( prsvec_1 . prso == oindex_1 . valua prsvec_1 . prso == oindex_1 . every ) { 
+if ( prsvec_1 . prso == oindex_1 . valua || prsvec_1 . prso == oindex_1 . every ) { 
 	 goto L900 ; 
 } 

@@ -1,5 +1,7 @@
 package preprocessor;
 
+import java.util.List;
+
 import org.stringtemplate.v4.compiler.STParser.ifstat_return;
 
 import ast.ASTNode;
@@ -18,6 +20,8 @@ public class TreeNode extends ASTNode {
 
     public boolean functionCall;
 
+    public int balance;
+
     public void addChild(TreeNode node) {
 
         if (unaryOperator) {
@@ -26,6 +30,8 @@ public class TreeNode extends ASTNode {
                 lhs = node;
                 rhs = node;
                 node.side = true;
+
+                children.add(node);
             } else {
                 throw new RuntimeException("Error");
             }
@@ -112,6 +118,33 @@ public class TreeNode extends ASTNode {
             if (rhs != null) {
                 rhs.printRecursive(stringBuilder, indent + 1, true);
             }
+        }
+    }
+
+    public List<ASTNode> getChildren() {
+
+        if ((lhs != null) && (rhs != null)) {
+            return List.of(lhs, rhs);
+        }
+
+        if (lhs != null) {
+            return List.of(lhs);
+        }
+
+        if (rhs != null) {
+            return List.of(rhs);
+        }
+
+        return children;
+    }
+
+    public void linearAddInto(List<ASTNode> target) {
+        if (lhs != null) {
+            lhs.linearAddInto(target);
+        }
+        target.add(this);
+        if (rhs != null) {
+            rhs.linearAddInto(target);
         }
     }
 

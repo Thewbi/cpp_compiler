@@ -74,4 +74,8 @@ public class ASTNode {
         type = null;
     }
 
+    public List<ASTNode> getChildren() {
+        return children;
+    }
+
 }

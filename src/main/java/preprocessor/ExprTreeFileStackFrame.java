@@ -9,6 +9,7 @@ import org.antlr.v4.runtime.Token;
 import com.cpp.grammar.PreprocessorLexer2;
 
 import ast.ASTNode;
+import ast.ExpressionType;
 import common.StringUtil;
 
 public class ExprTreeFileStackFrame extends AbstractFileStackFrame {
@@ -21,8 +22,13 @@ public class ExprTreeFileStackFrame extends AbstractFileStackFrame {
 
     private ParserMode parserMode = ParserMode.NORMAL;
 
-    public TreeNode rootTreeNode;
+    // public TreeNode rootTreeNode;
     // public TreeNode currentTreeNode;
+
+    private TreeNode expressionRootNode = null;
+    private int customWeight = 0;
+    private boolean identifier = false;
+    private String lastIdentifier = null;
 
     @Override
     public void start() throws IOException {
@@ -55,9 +61,6 @@ public class ExprTreeFileStackFrame extends AbstractFileStackFrame {
             ASTNode node = new ASTNode();
 
             String text = token.getText();
-
-
-
 
             if (text.equalsIgnoreCase(" ")) {
 
@@ -96,8 +99,10 @@ public class ExprTreeFileStackFrame extends AbstractFileStackFrame {
 
                 parserMode = ParserMode.EXPRESSION;
 
-                rootTreeNode = new TreeNode();
-                // currentTreeNode = rootTreeNode;
+                //processExpressionNode(text);
+
+                // skip bracket
+                token = lexer.nextToken();
 
                 token = lexer.nextToken();
                 continue;
@@ -211,7 +216,9 @@ public class ExprTreeFileStackFrame extends AbstractFileStackFrame {
             } else if (text.equalsIgnoreCase("(")) {
 
                 if (parserMode == ParserMode.EXPRESSION) {
-                    // ignore brackets
+
+                    processExpressionNode(text);
+
                 } else {
 
                     if (ADD_SUB_NODE) {
@@ -233,43 +240,72 @@ public class ExprTreeFileStackFrame extends AbstractFileStackFrame {
 
             } else if (text.equalsIgnoreCase(")")) {
 
-                node = new ASTNode();
-                node.value = ")";
-                currentNode.children.add(node);
-                node.parent = currentNode;
+                if (parserMode == ParserMode.EXPRESSION) {
 
-                if (currentNode.parent == null) {
+                    // an if-statement is finished
+                    if (expressionRootNode.balance == 0) {
 
-                    token = lexer.nextToken();
-                    continue;
-                }
+                        //currentNode.children.add(expressionRootNode);
+                        expressionRootNode.linearAddInto(currentNode.children);
+                        expressionRootNode = null;
 
-                if (ADD_SUB_NODE) {
-                    // ascend ( out of sub into parent )
-                    currentNode = currentNode.parent;
-                }
+                        node = new ASTNode();
+                        node.value = token.getText();
+                        currentNode.children.add(node);
 
-                if (currentNode.value != null && currentNode.value.equalsIgnoreCase("defined")) {
-                    // ascend ( out of sub into parent )
-                    currentNode = currentNode.parent;
-                }
+                        // ((DefaultFileStackFrameCallback) callback).stringBuilder = outputStringBuilder;
+                        // callback.execute(rootNode);
 
-                if ("define_key___".equalsIgnoreCase(currentNode.type)) {
+                        // go back to the root node
+                        currentNode = currentNode.parent;
 
-                    currentNode = currentNode.parent;
-                    defineModeKey = false;
-                    defineModeValue = true;
+                        parserMode = ParserMode.NORMAL;
+
+                    } else {
+                        processExpressionNode(text);
+                    }
+
+                } else {
 
                     node = new ASTNode();
-
+                    node.value = ")";
                     currentNode.children.add(node);
                     node.parent = currentNode;
 
-                    node.value = "define_value___";
-                    node.type = "define_value___";
+                    if (currentNode.parent == null) {
 
-                    // descend into key
-                    currentNode = node;
+                        token = lexer.nextToken();
+                        continue;
+                    }
+
+                    if (ADD_SUB_NODE) {
+                        // ascend ( out of sub into parent )
+                        currentNode = currentNode.parent;
+                    }
+
+                    if (currentNode.value != null && currentNode.value.equalsIgnoreCase("defined")) {
+                        // ascend ( out of sub into parent )
+                        currentNode = currentNode.parent;
+                    }
+
+                    if ("define_key___".equalsIgnoreCase(currentNode.type)) {
+
+                        currentNode = currentNode.parent;
+                        defineModeKey = false;
+                        defineModeValue = true;
+
+                        node = new ASTNode();
+
+                        currentNode.children.add(node);
+                        node.parent = currentNode;
+
+                        node.value = "define_value___";
+                        node.type = "define_value___";
+
+                        // descend into key
+                        currentNode = node;
+
+                    }
 
                 }
 
@@ -283,49 +319,45 @@ public class ExprTreeFileStackFrame extends AbstractFileStackFrame {
                 // descend
                 currentNode = node;
 
-            } else if (
-                    isBinaryOperator(text)
-            ) {
+            }
+            // else if (isBinaryOperator(text)) {
 
-                if (parserMode == ParserMode.EXPRESSION) {
+            //     if (parserMode == ParserMode.EXPRESSION) {
 
-                    TreeNode treeNode = new TreeNode();
-                    treeNode.parent = null;
-                    treeNode.value = text;
+            //         TreeNode treeNode = new TreeNode();
+            //         treeNode.parent = null;
+            //         treeNode.value = text;
 
-                    treeNode.addChild(rootTreeNode);
+            //         treeNode.addChild(rootTreeNode);
 
-                    rootTreeNode = treeNode;
+            //         rootTreeNode = treeNode;
 
-                    // currentTreeNode = treeNode;
+            //     } else {
 
-                } else {
+            //         int size = currentNode.children.size();
+            //         ASTNode lhs = currentNode.children.get(size - 1);
 
-                    int size = currentNode.children.size();
-                    ASTNode lhs = currentNode.children.get(size - 1);
+            //         currentNode.children.remove(lhs);
 
-                    currentNode.children.remove(lhs);
+            //         node = new ASTNode();
+            //         node.value = text;
+            //         currentNode.children.add(node);
+            //         node.parent = currentNode;
 
-                    node = new ASTNode();
-                    node.value = text;
-                    currentNode.children.add(node);
-                    node.parent = currentNode;
+            //         // reparent
+            //         node.children.add(lhs);
+            //         lhs.parent = node;
 
-                    // reparent
-                    node.children.add(lhs);
-                    lhs.parent = node;
+            //         // descend
+            //         currentNode = node;
 
-                    // descend
-                    currentNode = node;
+            //     }
 
-                }
-
-            } else if (token.getType() == PreprocessorLexer2.Newline) {
+            // }
+            else if (token.getType() == PreprocessorLexer2.Newline) {
 
                 // DEBUG
-                StringBuilder debugStringBuilder = new StringBuilder();
-                rootNode.printRecursive(debugStringBuilder, 0);
-                System.out.println(debugStringBuilder.toString());
+                //outputRootNode(rootNode);
 
                 // deal with completely empty lines (the node is still the root node and it has
                 // no children)
@@ -352,36 +384,33 @@ public class ExprTreeFileStackFrame extends AbstractFileStackFrame {
 
                 if (text.equalsIgnoreCase("if")) {
 
+                    TreeNode treeNode = new TreeNode();
+                    treeNode.value = text;
+
+                    currentNode.children.add(treeNode);
+                    treeNode.parent = currentNode;
+
+                    currentNode = treeNode;
+
                     parserMode = ParserMode.EXPRESSION;
 
-                    //rootTreeNode = new TreeNode();
-                    //rootTreeNode.parent = null;
-                    //rootTreeNode.value = "if";
+                    // skip bracket
+                    do {
+                        token = lexer.nextToken();
+                    } while (!token.getText().equalsIgnoreCase("("));
 
-                    //currentTreeNode = new TreeNode();
-                    //rootNode = currentTreeNode;
-
-                    //rootTreeNode.addChild(currentTreeNode);
+                    node = new ASTNode();
+                    node.value = token.getText();
+                    currentNode.children.add(node);
 
                     token = lexer.nextToken();
+
                     continue;
                 }
 
                 if (parserMode == ParserMode.EXPRESSION) {
 
-                    // nothing
-                    //currentTreeNode.value = text;
-
-                    TreeNode treeNode = new TreeNode();
-                    treeNode.value = text;
-
-                    if (rootTreeNode == null) {
-                        rootTreeNode = treeNode;
-                    } else {
-                        rootTreeNode.addChild(treeNode);
-                    }
-
-
+                    processExpressionNode(text);
 
                 } else {
 
@@ -432,10 +461,130 @@ public class ExprTreeFileStackFrame extends AbstractFileStackFrame {
         // output the very last node
         if (rootNode.children.size() != 0) {
 
+            // ((DefaultFileStackFrameCallback) callback).stringBuilder = outputStringBuilder;
             callback.execute(rootNode);
         }
 
         fileStack.pop();
+
+    }
+
+    private void outputRootNode(ASTNode rootNode) {
+        StringBuilder debugStringBuilder = new StringBuilder();
+        rootNode.printRecursive(debugStringBuilder, 0);
+        System.out.println(debugStringBuilder.toString());
+    }
+
+    private void processExpressionNode(String currentToken) {
+
+        if (currentToken.equalsIgnoreCase("(")) {
+
+            expressionRootNode.balance++;
+
+            if (identifier) {
+                System.out.println("function call detected: " + lastIdentifier);
+                expressionRootNode.functionCall = true;
+            }
+
+            customWeight += 1000;
+            return;
+
+        }
+        if (currentToken.equalsIgnoreCase(")")) {
+
+            expressionRootNode.balance--;
+
+            customWeight -= 1000;
+            return;
+        }
+
+        identifier = AbstractFileStackFrame.isIdentifier(currentToken);
+        lastIdentifier = currentToken;
+
+        expressionRootNode = insertTokenIntoTree(expressionRootNode, currentToken, customWeight,
+                expressionRootNode != null ? expressionRootNode.functionCall : false);
+
+        // // DEBUG
+        // StringBuilder stringBuilder = new StringBuilder();
+        // expressionRootNode.printRecursive(stringBuilder, 0);
+        // System.out.println(stringBuilder.toString());
+
+        // System.out.println("--------------------------------------");
+    }
+
+    /**
+     * This function contains the basic idea of the algorithm. The purpose of the
+     * algorithm is to parse expressions without a parse, using a lexer and token
+     * only.
+     * The expression is expressed using a binary tree.
+     * To build the tree, all token types are identified and if the token is a C/C++
+     * operator, the precedence of that operator is used as a weight. The heavier
+     * the node (higher precedence) the deeper the token will sink into the tree.
+     * Literals have the highest weight and will sink down and act as the leafs of
+     * the tree (Leaf == no children).
+     */
+    private static TreeNode insertTokenIntoTree(TreeNode node, String token, int customWeight, boolean functionCall) {
+
+        if (node == null) {
+
+            TreeNode newTreeNode = new TreeNode();
+            newTreeNode.value = token;
+            newTreeNode.unaryOperator = AbstractFileStackFrame.isUnaryOperator(token);
+            newTreeNode.customWeight = customWeight;
+
+            return newTreeNode;
+        }
+
+        if (comparePriority(functionCall, node.customWeight, node.value, token) < 0) {
+
+            //System.out.println("existing node is heavier");
+
+            TreeNode newNode = new TreeNode();
+            newNode.value = token;
+            newNode.customWeight = customWeight;
+
+            newNode.reparent(node);
+
+            return newNode;
+
+        } else {
+
+            //System.out.println("existing node is lighter");
+
+            if ((node.lhs != null) && (node.rhs != null)) {
+                insertTokenIntoTree(node.rhs, token, customWeight, false);
+                return node;
+            }
+
+            TreeNode newNode = new TreeNode();
+            newNode.value = token;
+            newNode.customWeight = customWeight;
+            node.addChild(newNode);
+
+            return node;
+
+        }
+
+    }
+
+    private static int comparePriority(boolean functionCall, int customWeight, String lhs, String rhs) {
+
+        int priorityLHS = 0;
+        int priorityRHS = 0;
+
+        if (functionCall) {
+
+            priorityLHS = 1000 - 2;
+            priorityRHS = AbstractFileStackFrame.getPriority(rhs);
+
+        } else {
+
+            priorityLHS = customWeight + AbstractFileStackFrame.getPriority(lhs);
+            priorityRHS = AbstractFileStackFrame.getPriority(rhs);
+
+        }
+
+        return priorityRHS - priorityLHS;
 
     }
 
