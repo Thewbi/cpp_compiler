@@ -318,7 +318,10 @@ public class Main {
             if (currentToken.equalsIgnoreCase("(")) {
 
                 if (identifier) {
-                    System.out.println("function call detected: " + lastIdentifier);
+
+                    // DEBUG
+                    //System.out.println("function call detected: " + lastIdentifier);
+
                     rootNode.functionCall = true;
                 }
 
@@ -868,22 +871,25 @@ public class Main {
 
     private static void preprocessor_2() throws IOException {
 
+        //final String filename = "src/test/resources/preprocessor/define_square.pp";
         // final String filename = "src/test/resources/preprocessor/define.pp";
+        // final String filename = "src/test/resources/preprocessor/dgame.pp"; // TODO
+
+        final String filename = "src/test/resources/preprocessor/if_defined_nested.pp";
+        //final String filename = "src/test/resources/preprocessor/if_defined.pp";
 
         // final String filename = "src/test/resources/preprocessor/ifndef.pp";
-        // final String filename = "src/test/resources/preprocessor/if_defined.pp";
-        // final String filename =
-        // "src/test/resources/preprocessor/if_defined_nested.pp";
+
         // final String filename = "src/test/resources/preprocessor/ifdef_else.pp";
         // final String filename = "src/test/resources/preprocessor/include.pp";
         // final String filename = "src/test/resources/preprocessor/scratchpad.pp";
 
         // final String filename = "src/test/resources/preprocessor/funcs.h";
         // final String filename = "src/test/resources/preprocessor/vars.h";
-        // final String filename = "src/test/resources/preprocessor/dgame.pp";
+        //
 
         //final String filename = "src/test/resources/preprocessor/if.pp";
-        final String filename = "src/test/resources/preprocessor/ifdef.pp";
+        //final String filename = "src/test/resources/preprocessor/ifdef.pp";
 
         // final String filename = "src/test/resources/preprocessor/ifdef_2.pp";
 
@@ -891,7 +897,7 @@ public class Main {
         // final String filename = "src/test/resources/preprocessor/replace_2.pp";
 
         // TODO: next
-        // final String filename = "src/test/resources/preprocessor/define_square.pp";
+        //
         // final String filename = "src/test/resources/preprocessor/printf_test_1.pp";
 
         ASTNode dummyASTNode = new ASTNode();

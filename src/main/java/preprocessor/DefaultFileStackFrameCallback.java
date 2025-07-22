@@ -3,6 +3,10 @@ package preprocessor;
 import java.util.Map;
 import java.util.Stack;
 
+import org.antlr.runtime.tree.Tree;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
+
 import ast.ASTNode;
 
 public class DefaultFileStackFrameCallback implements FileStackFrameCallback {
@@ -31,9 +35,9 @@ public class DefaultFileStackFrameCallback implements FileStackFrameCallback {
 
             processDefine(isDefine(astNode));
 
-        } else if ((node = isIf(astNode)) != null) {
+        } else if ((node = isPreprocessorIf(astNode)) != null) {
 
-            processIf(node);
+            processPreprocessorIf(node);
 
         } else if ((node = isIfdef(astNode)) != null) {
 
@@ -57,17 +61,16 @@ public class DefaultFileStackFrameCallback implements FileStackFrameCallback {
 
         } else if (ifStack.isEmpty() || ifStack.peek().performOutput) {
 
-            // StringBuilder stringBuilder = new StringBuilder();
             outputASTNode(astNode, stringBuilder);
             stringBuilder.append("\n");
 
             // DEBUG
-            System.out.println(stringBuilder.toString());
+            // System.out.println(stringBuilder.toString());
 
         }
     }
 
-    private ASTNode isIf(ASTNode astNode) {
+    private ASTNode isPreprocessorIf(ASTNode astNode) {
         int i = 0;
         while ((i < astNode.children.size()) && astNode.children.get(i).value.isBlank()) {
             i++;
@@ -81,7 +84,7 @@ public class DefaultFileStackFrameCallback implements FileStackFrameCallback {
         return null;
     }
 
-    private void processIf(ASTNode astNode) {
+    private void processPreprocessorIf(ASTNode astNode) {
 
         IfStackFrame ifStackFrame = new IfStackFrame();
 
@@ -94,7 +97,8 @@ public class DefaultFileStackFrameCallback implements FileStackFrameCallback {
         ifStack.peek().performOutput = false;
 
         // evaluate expression and enable output content for the branch
-        boolean evaluationResult = evaluate(astNode.children.get(0));
+        ASTNode child0 = astNode.children.get(0);
+        boolean evaluationResult = evaluate(child0);
         ifStackFrame.processed = evaluationResult;
         if (evaluationResult) {
             ifStackFrame.performOutput = true;
@@ -289,8 +293,9 @@ public class DefaultFileStackFrameCallback implements FileStackFrameCallback {
             StringBuilder valueStringBuilder = new StringBuilder();
             outputASTNode(valueASTNode, valueStringBuilder);
 
-            //System.out.println("processDefine(): Defining Symbol: " + keyASTNode.value + " key: "
-            //        + keyStringBuilder.toString() + " value: " + valueStringBuilder.toString());
+            // System.out.println("processDefine(): Defining Symbol: " + keyASTNode.value +
+            // " key: "
+            // + keyStringBuilder.toString() + " value: " + valueStringBuilder.toString());
 
         } else {
 
@@ -305,30 +310,112 @@ public class DefaultFileStackFrameCallback implements FileStackFrameCallback {
             StringBuilder valueStringBuilder = new StringBuilder();
             outputASTNode(dummyASTNode, valueStringBuilder);
 
-            //System.out.println("processDefine(): Defining Symbol: " + keyASTNode.value + " key: "
-            //        + keyStringBuilder.toString() + " value: " + valueStringBuilder.toString());
+            // System.out.println("processDefine(): Defining Symbol: " + keyASTNode.value +
+            // " key: "
+            // + keyStringBuilder.toString() + " value: " + valueStringBuilder.toString());
 
         }
     }
 
     private boolean evaluate(ASTNode astNode) {
 
-        if ("||".equalsIgnoreCase(astNode.value)) {
+        if ("!".equalsIgnoreCase(astNode.value)) {
 
-            ASTNode lhs = astNode.children.get(0);
-            boolean lhsValue = evaluate(lhs);
+            boolean lhsValue = false;
 
-            ASTNode rhs = astNode.children.get(1);
-            boolean rhsValue = evaluate(rhs);
+            if (astNode instanceof TreeNode) {
+                TreeNode treeNode = (TreeNode) astNode;
+                lhsValue = evaluate(treeNode.lhs);
+            }
 
-            return lhsValue || rhsValue;
+            return !lhsValue;
+
+        } else if (("||".equalsIgnoreCase(astNode.value)) || ("&&".equalsIgnoreCase(astNode.value))) {
+
+            boolean lhsValue = false;
+            boolean rhsValue = false;
+
+            if (astNode instanceof TreeNode) {
+
+                TreeNode treeNode = (TreeNode) astNode;
+
+                lhsValue = evaluate(treeNode.lhs);
+                rhsValue = evaluate(treeNode.rhs);
+
+            } else {
+
+                ASTNode lhs = astNode.children.get(0);
+                lhsValue = evaluate(lhs);
+
+                ASTNode rhs = astNode.children.get(1);
+                rhsValue = evaluate(rhs);
+
+            }
+
+            if (("||".equalsIgnoreCase(astNode.value))) {
+                return lhsValue || rhsValue;
+            } else if (("&&".equalsIgnoreCase(astNode.value))) {
+                return lhsValue && rhsValue;
+            }
 
         } else if ("defined".equalsIgnoreCase(astNode.value)) {
 
-            ASTNode sub = astNode.children.get(0);
+            if (astNode instanceof TreeNode) {
 
-            ASTNode dataASTNode = sub.children.get(1);
-            return defineMap.containsKey(dataASTNode.value);
+                TreeNode treeNode = (TreeNode) astNode;
+
+                if (treeNode.lhs != null) {
+                    return defineMap.containsKey(treeNode.lhs.value);
+                }
+                if (treeNode.rhs != null) {
+                    return defineMap.containsKey(treeNode.rhs.value);
+                }
+
+            } else {
+
+                ASTNode sub = astNode.children.get(0);
+                ASTNode dataASTNode = sub.children.get(1);
+                return defineMap.containsKey(dataASTNode.value);
+
+            }
+
+        } else if (">=".equalsIgnoreCase(astNode.value)) {
+
+            if (astNode instanceof TreeNode) {
+
+                TreeNode treeNode = (TreeNode) astNode;
+
+                double lhsDouble = 0.0d;
+                double rhsDouble = 0.0d;
+
+                if (treeNode.lhs != null) {
+                    String key = treeNode.lhs.value;
+                    if (StringUtils.isNumeric(key)) {
+                        rhsDouble = Double.parseDouble(key);
+                    } else {
+                        if (!defineMap.containsKey(key)) {
+                            return false;
+                        }
+                        ASTNode valueASTNode = defineMap.get(key);
+                        lhsDouble = Double.parseDouble(valueASTNode.value);
+                    }
+                }
+                if (treeNode.rhs != null) {
+                    String key = treeNode.rhs.value;
+                    if (StringUtils.isNumeric(key)) {
+                        rhsDouble = Double.parseDouble(key);
+                    } else {
+                        if (!defineMap.containsKey(key)) {
+                            return false;
+                        }
+                        ASTNode valueASTNode = defineMap.get(key);
+                        lhsDouble = Double.parseDouble(valueASTNode.value);
+                    }
+                }
+
+                return lhsDouble >= rhsDouble;
+
+            }
 
         }
 
@@ -337,19 +424,19 @@ public class DefaultFileStackFrameCallback implements FileStackFrameCallback {
 
     // private void outputASTNode(ASTNode astNode, StringBuilder stringBuilder) {
 
-    //     // when inside a if-branch which is skipped (= blocked) because the
-    //     // expression did evaluate to false, then do not output the line
-    //     if (!ifStack.empty() && ifStack.peek().blocked) {
-    //         return;
-    //     }
+    // // when inside a if-branch which is skipped (= blocked) because the
+    // // expression did evaluate to false, then do not output the line
+    // if (!ifStack.empty() && ifStack.peek().blocked) {
+    // return;
+    // }
 
-    //     // add the parents value
-    //     stringBuilder.append(astNode.value);
+    // // add the parents value
+    // stringBuilder.append(astNode.value);
 
-    //     // finally output children
-    //     for (ASTNode childNode : astNode.getChildren()) {
-    //         outputASTNode(childNode, stringBuilder);
-    //     }
+    // // finally output children
+    // for (ASTNode childNode : astNode.getChildren()) {
+    // outputASTNode(childNode, stringBuilder);
+    // }
     // }
 
     private void outputASTNode(ASTNode astNode, StringBuilder stringBuilder) {
@@ -437,33 +524,33 @@ public class DefaultFileStackFrameCallback implements FileStackFrameCallback {
 
             }
 
-            // // finally output children
-            // for (ASTNode childNode : astNode.children) {
-
-            //     if (childNode.children.size() == 0) {
-            //         String val = childNode.value;
-            //         if (val != null) {
-            //             stringBuilder.append(val).append(" ");
-            //         }
-            //     } else {
-            //         outputASTNode(childNode, stringBuilder);
-            //     }
-
-            // }
-
             // finally output children
             for (ASTNode childNode : astNode.children) {
 
-                String val = childNode.value;
-                if (val != null) {
-                    stringBuilder.append(val).append(" ");
-                }
-
-                if (childNode.children.size() != 0) {
+                if (childNode.children.size() == 0) {
+                    String val = childNode.value;
+                    if (val != null) {
+                        stringBuilder.append(val).append(" ");
+                    }
+                } else {
                     outputASTNode(childNode, stringBuilder);
                 }
 
             }
+
+            // // finally output children
+            // for (ASTNode childNode : astNode.children) {
+
+            // String val = childNode.value;
+            // if (val != null) {
+            // stringBuilder.append(val).append(" ");
+            // }
+
+            // if (childNode.children.size() != 0) {
+            // outputASTNode(childNode, stringBuilder);
+            // }
+
+            // }
 
         } catch (IndexOutOfBoundsException e) {
             e.printStackTrace();

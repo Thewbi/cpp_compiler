@@ -139,12 +139,22 @@ public class TreeNode extends ASTNode {
     }
 
     public void linearAddInto(List<ASTNode> target) {
-        if (lhs != null) {
-            lhs.linearAddInto(target);
-        }
-        target.add(this);
-        if (rhs != null) {
-            rhs.linearAddInto(target);
+        if (functionCall) {
+            target.add(this);
+            if (lhs != null) {
+                lhs.linearAddInto(target);
+            }
+            if (rhs != null) {
+                rhs.linearAddInto(target);
+            }
+        } else {
+            if (lhs != null) {
+                lhs.linearAddInto(target);
+            }
+            target.add(this);
+            if (rhs != null) {
+                rhs.linearAddInto(target);
+            }
         }
     }
 

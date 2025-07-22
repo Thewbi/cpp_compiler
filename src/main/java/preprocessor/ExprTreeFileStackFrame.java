@@ -101,7 +101,7 @@ public class ExprTreeFileStackFrame extends AbstractFileStackFrame {
 
                 //processExpressionNode(text);
 
-                // skip bracket
+                // skip brace ('(')
                 token = lexer.nextToken();
 
                 token = lexer.nextToken();
@@ -245,7 +245,6 @@ public class ExprTreeFileStackFrame extends AbstractFileStackFrame {
                     // an if-statement is finished
                     if (expressionRootNode.balance == 0) {
 
-                        //currentNode.children.add(expressionRootNode);
                         expressionRootNode.linearAddInto(currentNode.children);
                         expressionRootNode = null;
 
@@ -253,16 +252,15 @@ public class ExprTreeFileStackFrame extends AbstractFileStackFrame {
                         node.value = token.getText();
                         currentNode.children.add(node);
 
-                        // ((DefaultFileStackFrameCallback) callback).stringBuilder = outputStringBuilder;
-                        // callback.execute(rootNode);
-
                         // go back to the root node
                         currentNode = currentNode.parent;
 
                         parserMode = ParserMode.NORMAL;
 
                     } else {
+
                         processExpressionNode(text);
+
                     }
 
                 } else {
@@ -279,12 +277,12 @@ public class ExprTreeFileStackFrame extends AbstractFileStackFrame {
                     }
 
                     if (ADD_SUB_NODE) {
-                        // ascend ( out of sub into parent )
+                        // ascend (out of sub into parent)
                         currentNode = currentNode.parent;
                     }
 
                     if (currentNode.value != null && currentNode.value.equalsIgnoreCase("defined")) {
-                        // ascend ( out of sub into parent )
+                        // ascend (out of sub into parent)
                         currentNode = currentNode.parent;
                     }
 
@@ -309,17 +307,21 @@ public class ExprTreeFileStackFrame extends AbstractFileStackFrame {
 
                 }
 
-            } else if (text.equalsIgnoreCase("defined")) {
-
-                node = new ASTNode();
-                node.value = "defined";
-                currentNode.children.add(node);
-                node.parent = currentNode;
-
-                // descend
-                currentNode = node;
-
             }
+
+
+            // else if (text.equalsIgnoreCase("defined")) {
+
+            //     node = new ASTNode();
+            //     node.value = "defined";
+            //     currentNode.children.add(node);
+            //     node.parent = currentNode;
+
+            //     // descend
+            //     currentNode = node;
+
+            // }
+
             // else if (isBinaryOperator(text)) {
 
             //     if (parserMode == ParserMode.EXPRESSION) {
@@ -354,6 +356,7 @@ public class ExprTreeFileStackFrame extends AbstractFileStackFrame {
             //     }
 
             // }
+
             else if (token.getType() == PreprocessorLexer2.Newline) {
 
                 // DEBUG
@@ -364,6 +367,14 @@ public class ExprTreeFileStackFrame extends AbstractFileStackFrame {
                 if (rootNode.children.size() == 0) {
                     token = lexer.nextToken();
                     continue;
+                }
+
+                if (parserMode == ParserMode.EXPRESSION) {
+                    //expressionRootNode.linearAddInto(currentNode.children);
+                    currentNode.children.add(expressionRootNode);
+                    expressionRootNode = null;
+
+                    parserMode = ParserMode.NORMAL;
                 }
 
                 ((DefaultFileStackFrameCallback) callback).stringBuilder = outputStringBuilder;
@@ -482,7 +493,10 @@ public class ExprTreeFileStackFrame extends AbstractFileStackFrame {
             expressionRootNode.balance++;
 
             if (identifier) {
-                System.out.println("function call detected: " + lastIdentifier);
+
+                // DEBUG
+                //System.out.println("function call detected: " + lastIdentifier);
+
                 expressionRootNode.functionCall = true;
             }
 
