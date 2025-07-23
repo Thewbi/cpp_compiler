@@ -945,6 +945,9 @@ public class Main {
 
         Files.writeString(Paths.get(filename + ".out"), result);
 
+
+        System.out.println("\n\n---------------- Define Map ------------------");
+
         for (Map.Entry<String, ASTNode> entry : defineMap.entrySet()) {
 
             StringBuilder stringBuilder = new StringBuilder();

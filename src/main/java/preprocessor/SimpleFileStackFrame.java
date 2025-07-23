@@ -89,7 +89,7 @@ public class SimpleFileStackFrame extends AbstractFileStackFrame {
                 currentNode = node;
 
                 // skip brace ('(')
-                token = lexer.nextToken();
+                //token = lexer.nextToken();
 
                 token = lexer.nextToken();
                 continue;
@@ -117,6 +117,10 @@ public class SimpleFileStackFrame extends AbstractFileStackFrame {
 
                 // descend
                 currentNode = node;
+
+            } else if (text.equalsIgnoreCase("#endif")) {
+
+                //throw new RuntimeException();
 
             } else if (text.equalsIgnoreCase("#ifdef")) {
 
@@ -227,25 +231,10 @@ public class SimpleFileStackFrame extends AbstractFileStackFrame {
 
                 } else {
 
-                    //throw new RuntimeException("null");
-                    //System.out.println(text);
-                    outputStringBuilder.append(text);
-
-                    // if (ADD_SUB_NODE) {
-                    //     node.value = "sub";
-
-                    //     currentNode.children.add(node);
-                    //     node.parent = currentNode;
-
-                    //     // descend
-                    //     currentNode = node;
-
-                    //     node = new ASTNode();
-                    // }
-
-                    // node.value = "(";
-                    // node.parent = currentNode;
-                    // currentNode.children.add(node);
+                    DefaultFileStackFrameCallback cb = (preprocessor.DefaultFileStackFrameCallback) callback;
+                    if (cb.ifStack.isEmpty() || cb.ifStack.peek().performOutput) {
+                        outputStringBuilder.append(text);
+                    }
 
                 }
 
@@ -347,12 +336,14 @@ public class SimpleFileStackFrame extends AbstractFileStackFrame {
                     // an if-statement is finished
                     if (expressionRootNode.balance == 0) {
 
-                        expressionRootNode.linearAddInto(currentNode.children);
+                        currentNode.children.add(expressionRootNode);
+
+                        //expressionRootNode.linearAddInto(currentNode.children);
                         expressionRootNode = null;
 
-                        node = new ASTNode();
-                        node.value = token.getText();
-                        currentNode.children.add(node);
+                        // node = new ASTNode();
+                        // node.value = token.getText();
+                        // currentNode.children.add(node);
 
                         // go back to the root node
                         currentNode = currentNode.parent;
@@ -367,9 +358,10 @@ public class SimpleFileStackFrame extends AbstractFileStackFrame {
 
                 } else {
 
-                    //throw new RuntimeException();
-                    //System.out.println(text);
-                    outputStringBuilder.append(text);
+                    DefaultFileStackFrameCallback cb = (preprocessor.DefaultFileStackFrameCallback) callback;
+                    if (cb.ifStack.isEmpty() || cb.ifStack.peek().performOutput) {
+                        outputStringBuilder.append(text);
+                    }
 
                 }
 
@@ -559,12 +551,15 @@ public class SimpleFileStackFrame extends AbstractFileStackFrame {
                 } else {
 
                     // throw new RuntimeException();
-                    System.out.println(text);
+                    //System.out.println(text);
 
-                    outputStringBuilder.append(text);
+                    DefaultFileStackFrameCallback cb = (preprocessor.DefaultFileStackFrameCallback) callback;
+                    if (cb.ifStack.isEmpty() || cb.ifStack.peek().performOutput) {
+                        outputStringBuilder.append(text);
+                    }
 
-                    // ((DefaultFileStackFrameCallback) callback).stringBuilder = outputStringBuilder;
-                    // callback.execute(text);
+                    //((DefaultFileStackFrameCallback) callback).stringBuilder = outputStringBuilder;
+                    //callback.execute(null);
 
                 }
 
@@ -597,7 +592,7 @@ public class SimpleFileStackFrame extends AbstractFileStackFrame {
 
     private void processExpressionNode(String currentToken) {
 
-        System.out.println(currentToken);
+        //System.out.println(currentToken);
 
         if (currentToken.equalsIgnoreCase("(")) {
 
