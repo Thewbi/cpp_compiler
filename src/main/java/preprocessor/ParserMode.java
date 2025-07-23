@@ -4,6 +4,8 @@ public enum ParserMode {
 
     NORMAL,
 
-    EXPRESSION
+    EXPRESSION,
+
+    PREPROCESSOR, DEFINE
 
 }

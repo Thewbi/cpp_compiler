@@ -1,4 +1,1 @@
-int main ( ) { 
-   printf ( "Square of 4: %d\n" , ( ( 4 ) * ( 4 ) ) ) ; 
-   return 0 ; 
-} 
+intmain(){  printf("Square of 4: %d\n",SQUARE(4));  return0;}

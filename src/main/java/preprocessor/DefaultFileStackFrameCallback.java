@@ -272,7 +272,7 @@ public class DefaultFileStackFrameCallback implements FileStackFrameCallback {
     private void processDefine(ASTNode astNode) {
 
         // this define might be contained inside an #ifdef statement.
-        // Check if the if-stack frame is disabled
+        // Check if the if-stack frame is disabled. If so, do not perform any operations
         if (!ifStack.isEmpty() && !ifStack.peek().performOutput) {
             return;
         }
@@ -523,6 +523,11 @@ public class DefaultFileStackFrameCallback implements FileStackFrameCallback {
                 index++;
 
             }
+
+            // // add the parents value
+            // if (astNode.parent != null) {
+            //     stringBuilder.append(astNode.value);
+            // }
 
             // finally output children
             for (ASTNode childNode : astNode.children) {

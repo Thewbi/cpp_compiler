@@ -1,9 +1,10 @@
+#if defined(_DEBUG)
 //#define _DEBUG
 //#undef _DEBUG
 //#define _UNIT_TEST
 
 //#define BUFSIZE 1
-#define BUFSIZE 2048
+//#define BUFSIZE 2048
 
 /*
 #if defined(_DEBUG)

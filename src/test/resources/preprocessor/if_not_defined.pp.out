@@ -1,0 +1,4 @@
+int main ( ) { 
+    printf ( "Here is the message: %s\n" , "You wish!" ) ; 
+    return 0 ; 
+} 

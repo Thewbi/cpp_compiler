@@ -1,7 +1,8 @@
 package preprocessor;
 
 import java.io.IOException;
-import java.util.Stack;
+
+import javax.management.RuntimeErrorException;
 
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.Token;
@@ -9,12 +10,11 @@ import org.antlr.v4.runtime.Token;
 import com.cpp.grammar.PreprocessorLexer2;
 
 import ast.ASTNode;
-import ast.ExpressionType;
 import common.StringUtil;
 
-public class ExprTreeFileStackFrame extends AbstractFileStackFrame {
+public class SimpleFileStackFrame extends AbstractFileStackFrame {
 
-    private static final boolean ADD_SUB_NODE = true;
+    // private static final boolean ADD_SUB_NODE = true;
 
     public boolean defineMode;
     public boolean defineModeKey;
@@ -22,13 +22,12 @@ public class ExprTreeFileStackFrame extends AbstractFileStackFrame {
 
     private ParserMode parserMode = ParserMode.NORMAL;
 
-    // public TreeNode rootTreeNode;
-    // public TreeNode currentTreeNode;
-
     private TreeNode expressionRootNode = null;
     private int customWeight = 0;
+    private int balance = 0;
+    private boolean functionCall = false;
     private boolean identifier = false;
-    private String lastIdentifier = null;
+    private boolean lookAheadUsed =false;
 
     @Override
     public void start() throws IOException {
@@ -42,41 +41,24 @@ public class ExprTreeFileStackFrame extends AbstractFileStackFrame {
 
         ASTNode currentNode = rootNode;
 
-        int line = 1;
-        // System.out.println("Line: " + line);
-
         Token token = lexer.nextToken();
         while ((token != null) && (token.getType() != Token.EOF)) {
 
-            if (line != token.getLine()) {
-                line = token.getLine();
-                // System.out.println("Line: " + line);
-            }
+            String text = token.getText();
 
-            // DEBUG
-            // System.out.println(
-            // " " + token.getChannel() + "[" + token.getTokenIndex() + "] : " +
-            // token.getText());
+            // skip whitespace
+            if (text.equalsIgnoreCase(" ")) {
+            //if (text.equalsIgnoreCase("\s+")) {
+            //if (text.isBlank()) {
+                token = lexer.nextToken();
+                continue;
+            }
 
             ASTNode node = new ASTNode();
 
-            String text = token.getText();
+            if (text.equalsIgnoreCase("#define")) {
 
-            // // DEBUG
-            // if (text.equalsIgnoreCase(")")) {
-            //     System.out.println("");
-            // }
-
-            if (text.equalsIgnoreCase(" ")) {
-
-                // what is this branch for?
-
-                if (currentNode.parent == null) {
-                    token = lexer.nextToken();
-                    continue;
-                }
-
-            } else if (text.equalsIgnoreCase("#define")) {
+                parserMode = ParserMode.DEFINE;
 
                 defineMode = true;
                 defineModeKey = true;
@@ -96,6 +78,8 @@ public class ExprTreeFileStackFrame extends AbstractFileStackFrame {
 
             } else if (text.equalsIgnoreCase("#if")) {
 
+                parserMode = ParserMode.EXPRESSION;
+
                 node = new ASTNode();
                 node.value = "#if";
                 currentNode.children.add(node);
@@ -104,10 +88,6 @@ public class ExprTreeFileStackFrame extends AbstractFileStackFrame {
                 // descend
                 currentNode = node;
 
-                parserMode = ParserMode.EXPRESSION;
-
-                //processExpressionNode(text);
-
                 // skip brace ('(')
                 token = lexer.nextToken();
 
@@ -115,6 +95,8 @@ public class ExprTreeFileStackFrame extends AbstractFileStackFrame {
                 continue;
 
             } else if (text.equalsIgnoreCase("#elif")) {
+
+                parserMode = ParserMode.EXPRESSION;
 
                 node = new ASTNode();
                 node.value = "#elif";
@@ -126,6 +108,8 @@ public class ExprTreeFileStackFrame extends AbstractFileStackFrame {
 
             } else if (text.equalsIgnoreCase("#else")) {
 
+                parserMode = ParserMode.PREPROCESSOR;
+
                 node = new ASTNode();
                 node.value = "#else";
                 currentNode.children.add(node);
@@ -135,6 +119,8 @@ public class ExprTreeFileStackFrame extends AbstractFileStackFrame {
                 currentNode = node;
 
             } else if (text.equalsIgnoreCase("#ifdef")) {
+
+                parserMode = ParserMode.EXPRESSION;
 
                 node = new ASTNode();
                 node.value = "#ifdef";
@@ -146,6 +132,8 @@ public class ExprTreeFileStackFrame extends AbstractFileStackFrame {
 
             } else if (text.equalsIgnoreCase("#ifndef")) {
 
+                parserMode = ParserMode.EXPRESSION;
+
                 node = new ASTNode();
                 node.value = "#ifndef";
                 currentNode.children.add(node);
@@ -155,6 +143,8 @@ public class ExprTreeFileStackFrame extends AbstractFileStackFrame {
                 currentNode = node;
 
             } else if (text.equalsIgnoreCase("#include")) {
+
+                parserMode = ParserMode.PREPROCESSOR;
 
                 String temp = "";
                 boolean useIncludePathResolution = false;
@@ -226,35 +216,133 @@ public class ExprTreeFileStackFrame extends AbstractFileStackFrame {
 
                     processExpressionNode(text);
 
+                } else if (parserMode == ParserMode.DEFINE) {
+
+                    processExpressionNode(text);
+
+                } else if (parserMode == ParserMode.PREPROCESSOR) {
+
+                    // ????
+                    throw new RuntimeException("");
+
                 } else {
 
-                    if (ADD_SUB_NODE) {
-                        node.value = "sub";
+                    //throw new RuntimeException("null");
+                    //System.out.println(text);
+                    outputStringBuilder.append(text);
 
-                        currentNode.children.add(node);
-                        node.parent = currentNode;
+                    // if (ADD_SUB_NODE) {
+                    //     node.value = "sub";
 
-                        // descend
-                        currentNode = node;
+                    //     currentNode.children.add(node);
+                    //     node.parent = currentNode;
 
-                        node = new ASTNode();
-                    }
+                    //     // descend
+                    //     currentNode = node;
 
+                    //     node = new ASTNode();
+                    // }
 
-                    node.value = "(";
-                    node.parent = currentNode;
-                    currentNode.children.add(node);
+                    // node.value = "(";
+                    // node.parent = currentNode;
+                    // currentNode.children.add(node);
 
                 }
 
             } else if (text.equalsIgnoreCase(")")) {
 
-                if (ADD_SUB_NODE) {
-                    // ascend (out of sub into parent)
-                    currentNode = currentNode.parent;
-                }
+                // if (ADD_SUB_NODE) {
+                //     // ascend (out of sub into parent)
+                //     currentNode = currentNode.parent;
+                // }
 
-                if (parserMode == ParserMode.EXPRESSION) {
+                if (parserMode == ParserMode.DEFINE) {
+
+                    // // an expression is finished
+                    // if (expressionRootNode.balance == 0) {
+
+                    //     // expressionRootNode.linearAddInto(currentNode.children);
+                    //     // expressionRootNode = null;
+
+                    //     // node = new ASTNode();
+                    //     // node.value = token.getText();
+                    //     // currentNode.children.add(node);
+
+                    //     // // go back to the root node
+                    //     // currentNode = currentNode.parent;
+
+                    //     // // parserMode = ParserMode.NORMAL;
+
+                    //     // if (ADD_SUB_NODE) {
+                    //     //     // ascend (out of sub into parent)
+                    //     //     currentNode = currentNode.parent;
+                    //     // }
+
+                    //     //node = new ASTNode();
+                    //     ///node.value = ")";
+
+                    //     // DEBUG
+                    //     // if (currentNode == null) {
+                    //     //     System.out.println("test");
+                    //     // }
+
+                    //     // currentNode.children.add(node);
+                    //     // node.parent = currentNode;
+
+                    //     // if (currentNode.parent == null) {
+
+                    //     //     token = lexer.nextToken();
+                    //     //     continue;
+                    //     // }
+
+                    //     // if (ADD_SUB_NODE) {
+                    //     //     // ascend (out of sub into parent)
+                    //     //     currentNode = currentNode.parent;
+                    //     // }
+
+                    //     // if (currentNode.value != null && currentNode.value.equalsIgnoreCase("defined")) {
+                    //     //     // ascend (out of sub into parent)
+                    //     //     currentNode = currentNode.parent;
+                    //     // }
+
+                    //     // if ("define_key___".equalsIgnoreCase(currentNode.type)) {
+
+                    //     //     currentNode = currentNode.parent;
+                    //     //     defineModeKey = false;
+                    //     //     defineModeValue = true;
+
+                    //     //     node = new ASTNode();
+
+                    //     //     currentNode.children.add(node);
+                    //     //     node.parent = currentNode;
+
+                    //     //     node.value = "define_value___";
+                    //     //     node.type = "define_value___";
+
+                    //     //     // descend into key
+                    //     //     currentNode = node;
+
+                    //     // }
+
+                    //     currentNode.children.add(expressionRootNode);
+                    //     expressionRootNode = null;
+
+                    // } else {
+
+                        processExpressionNode(text);
+
+                        // an expression is finished
+                        if (balance == 0) {
+                            currentNode.children.add(expressionRootNode);
+
+                            // start new expression
+                            expressionRootNode = null;
+                            identifier = false;
+                        }
+
+                    // }
+
+                } else if (parserMode == ParserMode.EXPRESSION) {
 
                     // an if-statement is finished
                     if (expressionRootNode.balance == 0) {
@@ -269,7 +357,7 @@ public class ExprTreeFileStackFrame extends AbstractFileStackFrame {
                         // go back to the root node
                         currentNode = currentNode.parent;
 
-                        parserMode = ParserMode.NORMAL;
+                        // parserMode = ParserMode.NORMAL;
 
                     } else {
 
@@ -279,107 +367,13 @@ public class ExprTreeFileStackFrame extends AbstractFileStackFrame {
 
                 } else {
 
-                    // if (ADD_SUB_NODE) {
-                    //     // ascend (out of sub into parent)
-                    //     currentNode = currentNode.parent;
-                    // }
-
-                    node = new ASTNode();
-                    node.value = ")";
-
-                    if (currentNode == null) {
-                        System.out.println("test");
-                    }
-
-                    currentNode.children.add(node);
-                    node.parent = currentNode;
-
-                    if (currentNode.parent == null) {
-
-                        token = lexer.nextToken();
-                        continue;
-                    }
-
-                    if (ADD_SUB_NODE) {
-                        // ascend (out of sub into parent)
-                        currentNode = currentNode.parent;
-                    }
-
-                    if (currentNode.value != null && currentNode.value.equalsIgnoreCase("defined")) {
-                        // ascend (out of sub into parent)
-                        currentNode = currentNode.parent;
-                    }
-
-                    if ("define_key___".equalsIgnoreCase(currentNode.type)) {
-
-                        currentNode = currentNode.parent;
-                        defineModeKey = false;
-                        defineModeValue = true;
-
-                        node = new ASTNode();
-
-                        currentNode.children.add(node);
-                        node.parent = currentNode;
-
-                        node.value = "define_value___";
-                        node.type = "define_value___";
-
-                        // descend into key
-                        currentNode = node;
-
-                    }
+                    //throw new RuntimeException();
+                    //System.out.println(text);
+                    outputStringBuilder.append(text);
 
                 }
 
             }
-
-
-            // else if (text.equalsIgnoreCase("defined")) {
-
-            //     node = new ASTNode();
-            //     node.value = "defined";
-            //     currentNode.children.add(node);
-            //     node.parent = currentNode;
-
-            //     // descend
-            //     currentNode = node;
-
-            // }
-
-            // else if (isBinaryOperator(text)) {
-
-            //     if (parserMode == ParserMode.EXPRESSION) {
-
-            //         TreeNode treeNode = new TreeNode();
-            //         treeNode.parent = null;
-            //         treeNode.value = text;
-
-            //         treeNode.addChild(rootTreeNode);
-
-            //         rootTreeNode = treeNode;
-
-            //     } else {
-
-            //         int size = currentNode.children.size();
-            //         ASTNode lhs = currentNode.children.get(size - 1);
-
-            //         currentNode.children.remove(lhs);
-
-            //         node = new ASTNode();
-            //         node.value = text;
-            //         currentNode.children.add(node);
-            //         node.parent = currentNode;
-
-            //         // reparent
-            //         node.children.add(lhs);
-            //         lhs.parent = node;
-
-            //         // descend
-            //         currentNode = node;
-
-            //     }
-
-            // }
 
             else if (token.getType() == PreprocessorLexer2.Newline) {
 
@@ -394,11 +388,21 @@ public class ExprTreeFileStackFrame extends AbstractFileStackFrame {
                 }
 
                 if (parserMode == ParserMode.EXPRESSION) {
-                    //expressionRootNode.linearAddInto(currentNode.children);
+
                     currentNode.children.add(expressionRootNode);
                     expressionRootNode = null;
 
                     parserMode = ParserMode.NORMAL;
+
+                } else if (parserMode == ParserMode.DEFINE) {
+
+                    if (expressionRootNode != null) {
+                        currentNode.children.add(expressionRootNode);
+                        expressionRootNode = null;
+                    }
+
+                    parserMode = ParserMode.NORMAL;
+
                 }
 
                 ((DefaultFileStackFrameCallback) callback).stringBuilder = outputStringBuilder;
@@ -461,11 +465,59 @@ public class ExprTreeFileStackFrame extends AbstractFileStackFrame {
                 }
                 */
 
-                if (parserMode == ParserMode.EXPRESSION) {
+                if (parserMode == ParserMode.DEFINE) {
+
+                    // if (expressionRootNode != null) {
+                    //     if (!text.equalsIgnoreCase("(") && !text.equalsIgnoreCase(")")) {
+
+
+                    //         System.out.println("new");
+
+                    //         currentNode.children.add(expressionRootNode);
+
+                    //         balance = 0;
+                    //         customWeight = 0;
+                    //         identifier = false;
+                    //         expressionRootNode = null;
+                    //     }
+                    // }
+
+
 
                     processExpressionNode(text);
 
-                } else {
+                    // perform lookahead
+                    lookAheadUsed = true;
+
+                    token = lexer.nextToken();
+                    String temp = token.getText();
+
+
+                    // skip whitespace
+                    while (temp.equalsIgnoreCase(" ")) {
+                    //if (text.equalsIgnoreCase("\s+")) {
+                    //if (text.isBlank()) {
+                        token = lexer.nextToken();
+                        //continue;
+                        temp = token.getText();
+                    }
+
+                    if (!temp.equalsIgnoreCase("(") && !temp.equalsIgnoreCase(")")) {
+
+                        currentNode.children.add(expressionRootNode);
+
+                            balance = 0;
+                            customWeight = 0;
+                            identifier = false;
+                            expressionRootNode = null;
+                    }
+
+
+                } else if (parserMode == ParserMode.EXPRESSION) {
+
+                    processExpressionNode(text);
+
+                } else if (parserMode == ParserMode.PREPROCESSOR) {
 
                     node.value = text;
 
@@ -497,18 +549,32 @@ public class ExprTreeFileStackFrame extends AbstractFileStackFrame {
 
                     }
 
-                    if (ADD_SUB_NODE) {
-                        if (currentNode.value.equalsIgnoreCase("defined")) {
-                            // ascend ( out of sub into parent )
-                            currentNode = currentNode.parent;
-                        }
-                    }
+                    // if (ADD_SUB_NODE) {
+                    //     if (currentNode.value.equalsIgnoreCase("defined")) {
+                    //         // ascend ( out of sub into parent )
+                    //         currentNode = currentNode.parent;
+                    //     }
+                    // }
+
+                } else {
+
+                    // throw new RuntimeException();
+                    System.out.println(text);
+
+                    outputStringBuilder.append(text);
+
+                    // ((DefaultFileStackFrameCallback) callback).stringBuilder = outputStringBuilder;
+                    // callback.execute(text);
 
                 }
 
             }
 
-            token = lexer.nextToken();
+            if (!lookAheadUsed) {
+                token = lexer.nextToken();
+            }
+
+            lookAheadUsed = false;
 
         }
 
@@ -531,16 +597,18 @@ public class ExprTreeFileStackFrame extends AbstractFileStackFrame {
 
     private void processExpressionNode(String currentToken) {
 
+        System.out.println(currentToken);
+
         if (currentToken.equalsIgnoreCase("(")) {
 
-            expressionRootNode.balance++;
+            balance++;
 
             if (identifier) {
 
                 // DEBUG
                 //System.out.println("function call detected: " + lastIdentifier);
 
-                expressionRootNode.functionCall = true;
+                functionCall = true;
             }
 
             customWeight += 1000;
@@ -549,14 +617,14 @@ public class ExprTreeFileStackFrame extends AbstractFileStackFrame {
         }
         if (currentToken.equalsIgnoreCase(")")) {
 
-            expressionRootNode.balance--;
+            balance--;
 
             customWeight -= 1000;
             return;
         }
 
         identifier = AbstractFileStackFrame.isIdentifier(currentToken);
-        lastIdentifier = currentToken;
+        // lastIdentifier = currentToken;
 
         expressionRootNode = insertTokenIntoTree(expressionRootNode, currentToken, customWeight,
                 expressionRootNode != null ? expressionRootNode.functionCall : false);
@@ -636,8 +704,13 @@ public class ExprTreeFileStackFrame extends AbstractFileStackFrame {
 
         } else {
 
-            priorityLHS = customWeight + AbstractFileStackFrame.getPriority(lhs);
+            priorityLHS = customWeight;
+            if (lhs != null) {
+                AbstractFileStackFrame.getPriority(lhs);
+            }
+            if (rhs != null) {
             priorityRHS = AbstractFileStackFrame.getPriority(rhs);
+            }
 
         }
 

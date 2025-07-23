@@ -8,4 +8,5 @@ int main() {
 
    printf("Here is the message: %s\n", MESSAGE);
    return 0;
+
 }

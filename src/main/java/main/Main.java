@@ -61,6 +61,7 @@ import riscv.RISCVInstructionDecoder;
 import riscv.RISCVInstructionEncoder;
 import riscv.RISCVProcessor;
 import preprocessor.IFileStackFrame;
+import preprocessor.SimpleFileStackFrame;
 import preprocessor.TreeNode;
 
 import com.cpp.grammar.RISCVLexer;
@@ -178,22 +179,22 @@ public class Main {
         // tokens.add("<=");
         // tokens.add("1");
 
-        // prsvec_1.prso == oindex_1.valua || prsvec_1.prso == oindex_1.every
-        tokens.add("prsvec_1");
-        tokens.add(".");
-        tokens.add("prso");
-        tokens.add("==");
-        tokens.add("oindex_1");
-        tokens.add(".");
-        tokens.add("valua");
-        tokens.add("||");
-        tokens.add("prsvec_1");
-        tokens.add(".");
-        tokens.add("prso");
-        tokens.add("==");
-        tokens.add("oindex_1");
-        tokens.add(".");
-        tokens.add("every");
+        // // prsvec_1.prso == oindex_1.valua || prsvec_1.prso == oindex_1.every
+        // tokens.add("prsvec_1");
+        // tokens.add(".");
+        // tokens.add("prso");
+        // tokens.add("==");
+        // tokens.add("oindex_1");
+        // tokens.add(".");
+        // tokens.add("valua");
+        // tokens.add("||");
+        // tokens.add("prsvec_1");
+        // tokens.add(".");
+        // tokens.add("prso");
+        // tokens.add("==");
+        // tokens.add("oindex_1");
+        // tokens.add(".");
+        // tokens.add("every");
 
         // // ! a
         // tokens.add("!");
@@ -301,6 +302,16 @@ public class Main {
         // tokens.add("(");
         // tokens.add("_UNIT_TEST");
         // tokens.add(")");
+
+        tokens.add("(");
+        tokens.add("(");
+        tokens.add("x");
+        tokens.add(")");
+        tokens.add("*");
+        tokens.add("(");
+        tokens.add("x");
+        tokens.add(")");
+        tokens.add(")");
 
         System.out.println("--------------------------------------");
 
@@ -872,15 +883,20 @@ public class Main {
     private static void preprocessor_2() throws IOException {
 
         //final String filename = "src/test/resources/preprocessor/define_square.pp";
-        // final String filename = "src/test/resources/preprocessor/define.pp";
+        //final String filename = "src/test/resources/preprocessor/define.pp";
         // final String filename = "src/test/resources/preprocessor/dgame.pp"; // TODO
 
-        final String filename = "src/test/resources/preprocessor/if_defined_nested.pp";
-        //final String filename = "src/test/resources/preprocessor/if_defined.pp";
+        //final String filename = "src/test/resources/preprocessor/if_defined_nested.pp";
+        final String filename = "src/test/resources/preprocessor/if_defined.pp";
 
-        // final String filename = "src/test/resources/preprocessor/ifndef.pp";
+        //final String filename = "src/test/resources/preprocessor/if_not_defined.pp";
+        //final String filename = "src/test/resources/preprocessor/if.pp";
+        // final String filename = "src/test/resources/preprocessor/ifdef_2.pp";
+        //final String filename = "src/test/resources/preprocessor/ifdef_else.pp";
 
-        // final String filename = "src/test/resources/preprocessor/ifdef_else.pp";
+        //final String filename = "src/test/resources/preprocessor/ifdef.pp";
+        //final String filename = "src/test/resources/preprocessor/ifndef.pp";
+
         // final String filename = "src/test/resources/preprocessor/include.pp";
         // final String filename = "src/test/resources/preprocessor/scratchpad.pp";
 
@@ -888,10 +904,8 @@ public class Main {
         // final String filename = "src/test/resources/preprocessor/vars.h";
         //
 
-        //final String filename = "src/test/resources/preprocessor/if.pp";
-        //final String filename = "src/test/resources/preprocessor/ifdef.pp";
 
-        // final String filename = "src/test/resources/preprocessor/ifdef_2.pp";
+
 
         // final String filename = "src/test/resources/preprocessor/replace_1.pp";
         // final String filename = "src/test/resources/preprocessor/replace_2.pp";
@@ -912,8 +926,9 @@ public class Main {
         defaultfileStackFrameCallback.defineKeyMap = defineKeyMap;
         defaultfileStackFrameCallback.dummyASTNode = dummyASTNode;
 
-        ExprTreeFileStackFrame fileStackFrame = new ExprTreeFileStackFrame();
+        //ExprTreeFileStackFrame fileStackFrame = new ExprTreeFileStackFrame();
         // DefaultFileStackFrame fileStackFrame = new DefaultFileStackFrame();
+        SimpleFileStackFrame fileStackFrame = new SimpleFileStackFrame();
         fileStackFrame.callback = defaultfileStackFrameCallback;
         fileStackFrame.filename = filename;
         fileStackFrame.outputStringBuilder = outputStringBuilder;
@@ -929,6 +944,14 @@ public class Main {
         System.out.println(result);
 
         Files.writeString(Paths.get(filename + ".out"), result);
+
+        for (Map.Entry<String, ASTNode> entry : defineMap.entrySet()) {
+
+            StringBuilder stringBuilder = new StringBuilder();
+            entry.getValue().printRecursive(stringBuilder, 0);
+            System.out.println(entry.getKey() + " - " + stringBuilder.toString());
+
+        }
 
     }
 

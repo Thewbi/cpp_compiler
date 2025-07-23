@@ -125,6 +125,10 @@ public abstract class AbstractFileStackFrame implements IFileStackFrame {
      */
     public static int getPriority(String operator) {
 
+        if (operator == null) {
+            System.out.println("null!");
+        }
+
         if (operator.equalsIgnoreCase("%")) {
             return 1000 - 3;
         }
@@ -173,10 +177,14 @@ public abstract class AbstractFileStackFrame implements IFileStackFrame {
 
     static Pattern isNumericPattern = Pattern.compile("-?\\d+(\\.\\d+)?");
     static Pattern isBracePattern = Pattern.compile("[\\[\\]\\{\\}\\()\\)]");
+    static Pattern isLetterPattern = Pattern.compile("[a-zA-Z]([a-zA-Z0-9])*");
 
     public static boolean isIdentifier(String token) {
 
         if (token.isBlank()) {
+            return false;
+        }
+        if (!isLetterPattern.matcher(token).matches()) {
             return false;
         }
         if (token.startsWith("\"")) {
