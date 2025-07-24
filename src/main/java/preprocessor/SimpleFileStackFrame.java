@@ -27,7 +27,7 @@ public class SimpleFileStackFrame extends AbstractFileStackFrame {
     private int balance = 0;
     private boolean functionCall = false;
     private boolean identifier = false;
-    private boolean lookAheadUsed =false;
+    private boolean lookAheadUsed = false;
 
     @Override
     public void start() throws IOException {
@@ -41,6 +41,10 @@ public class SimpleFileStackFrame extends AbstractFileStackFrame {
 
         ASTNode currentNode = rootNode;
 
+        // DEBUG
+        // int line = 1;
+        // System.out.println("Line: " + line);
+
         Token token = lexer.nextToken();
         while ((token != null) && (token.getType() != Token.EOF)) {
 
@@ -48,8 +52,8 @@ public class SimpleFileStackFrame extends AbstractFileStackFrame {
 
             // skip whitespace
             if (text.equalsIgnoreCase(" ")) {
-            //if (text.equalsIgnoreCase("\s+")) {
-            //if (text.isBlank()) {
+                // if (text.equalsIgnoreCase("\s+")) {
+                // if (text.isBlank()) {
                 token = lexer.nextToken();
                 continue;
             }
@@ -58,7 +62,7 @@ public class SimpleFileStackFrame extends AbstractFileStackFrame {
 
             if (text.equalsIgnoreCase("#define")) {
 
-                parserMode = ParserMode.DEFINE;
+                setParserMode(ParserMode.DEFINE);
 
                 defineMode = true;
                 defineModeKey = true;
@@ -78,10 +82,12 @@ public class SimpleFileStackFrame extends AbstractFileStackFrame {
 
             } else if (text.equalsIgnoreCase("#if")) {
 
-                parserMode = ParserMode.EXPRESSION;
+                setParserMode(ParserMode.EXPRESSION);
 
                 node = new ASTNode();
                 node.value = "#if";
+
+                // connect parent and child
                 currentNode.children.add(node);
                 node.parent = currentNode;
 
@@ -89,14 +95,14 @@ public class SimpleFileStackFrame extends AbstractFileStackFrame {
                 currentNode = node;
 
                 // skip brace ('(')
-                //token = lexer.nextToken();
+                // token = lexer.nextToken();
 
                 token = lexer.nextToken();
                 continue;
 
             } else if (text.equalsIgnoreCase("#elif")) {
 
-                parserMode = ParserMode.EXPRESSION;
+                setParserMode(ParserMode.EXPRESSION);
 
                 node = new ASTNode();
                 node.value = "#elif";
@@ -108,7 +114,7 @@ public class SimpleFileStackFrame extends AbstractFileStackFrame {
 
             } else if (text.equalsIgnoreCase("#else")) {
 
-                parserMode = ParserMode.PREPROCESSOR;
+                setParserMode(ParserMode.PREPROCESSOR);
 
                 node = new ASTNode();
                 node.value = "#else";
@@ -120,11 +126,11 @@ public class SimpleFileStackFrame extends AbstractFileStackFrame {
 
             } else if (text.equalsIgnoreCase("#endif")) {
 
-                //throw new RuntimeException();
+                // throw new RuntimeException();
 
             } else if (text.equalsIgnoreCase("#ifdef")) {
 
-                parserMode = ParserMode.EXPRESSION;
+                setParserMode(ParserMode.EXPRESSION);
 
                 node = new ASTNode();
                 node.value = "#ifdef";
@@ -136,7 +142,7 @@ public class SimpleFileStackFrame extends AbstractFileStackFrame {
 
             } else if (text.equalsIgnoreCase("#ifndef")) {
 
-                parserMode = ParserMode.EXPRESSION;
+                setParserMode(ParserMode.EXPRESSION);
 
                 node = new ASTNode();
                 node.value = "#ifndef";
@@ -148,7 +154,7 @@ public class SimpleFileStackFrame extends AbstractFileStackFrame {
 
             } else if (text.equalsIgnoreCase("#include")) {
 
-                parserMode = ParserMode.PREPROCESSOR;
+                setParserMode(ParserMode.PREPROCESSOR);
 
                 String temp = "";
                 boolean useIncludePathResolution = false;
@@ -241,8 +247,8 @@ public class SimpleFileStackFrame extends AbstractFileStackFrame {
             } else if (text.equalsIgnoreCase(")")) {
 
                 // if (ADD_SUB_NODE) {
-                //     // ascend (out of sub into parent)
-                //     currentNode = currentNode.parent;
+                // // ascend (out of sub into parent)
+                // currentNode = currentNode.parent;
                 // }
 
                 if (parserMode == ParserMode.DEFINE) {
@@ -250,95 +256,97 @@ public class SimpleFileStackFrame extends AbstractFileStackFrame {
                     // // an expression is finished
                     // if (expressionRootNode.balance == 0) {
 
-                    //     // expressionRootNode.linearAddInto(currentNode.children);
-                    //     // expressionRootNode = null;
+                    // // expressionRootNode.linearAddInto(currentNode.children);
+                    // // expressionRootNode = null;
 
-                    //     // node = new ASTNode();
-                    //     // node.value = token.getText();
-                    //     // currentNode.children.add(node);
+                    // // node = new ASTNode();
+                    // // node.value = token.getText();
+                    // // currentNode.children.add(node);
 
-                    //     // // go back to the root node
-                    //     // currentNode = currentNode.parent;
+                    // // // go back to the root node
+                    // // currentNode = currentNode.parent;
 
-                    //     // // parserMode = ParserMode.NORMAL;
+                    // // // parserMode = ParserMode.NORMAL;
 
-                    //     // if (ADD_SUB_NODE) {
-                    //     //     // ascend (out of sub into parent)
-                    //     //     currentNode = currentNode.parent;
-                    //     // }
+                    // // if (ADD_SUB_NODE) {
+                    // // // ascend (out of sub into parent)
+                    // // currentNode = currentNode.parent;
+                    // // }
 
-                    //     //node = new ASTNode();
-                    //     ///node.value = ")";
+                    // //node = new ASTNode();
+                    // ///node.value = ")";
 
-                    //     // DEBUG
-                    //     // if (currentNode == null) {
-                    //     //     System.out.println("test");
-                    //     // }
+                    // // DEBUG
+                    // // if (currentNode == null) {
+                    // // System.out.println("test");
+                    // // }
 
-                    //     // currentNode.children.add(node);
-                    //     // node.parent = currentNode;
+                    // // currentNode.children.add(node);
+                    // // node.parent = currentNode;
 
-                    //     // if (currentNode.parent == null) {
+                    // // if (currentNode.parent == null) {
 
-                    //     //     token = lexer.nextToken();
-                    //     //     continue;
-                    //     // }
+                    // // token = lexer.nextToken();
+                    // // continue;
+                    // // }
 
-                    //     // if (ADD_SUB_NODE) {
-                    //     //     // ascend (out of sub into parent)
-                    //     //     currentNode = currentNode.parent;
-                    //     // }
+                    // // if (ADD_SUB_NODE) {
+                    // // // ascend (out of sub into parent)
+                    // // currentNode = currentNode.parent;
+                    // // }
 
-                    //     // if (currentNode.value != null && currentNode.value.equalsIgnoreCase("defined")) {
-                    //     //     // ascend (out of sub into parent)
-                    //     //     currentNode = currentNode.parent;
-                    //     // }
+                    // // if (currentNode.value != null &&
+                    // currentNode.value.equalsIgnoreCase("defined")) {
+                    // // // ascend (out of sub into parent)
+                    // // currentNode = currentNode.parent;
+                    // // }
 
-                    //     // if ("define_key___".equalsIgnoreCase(currentNode.type)) {
+                    // // if ("define_key___".equalsIgnoreCase(currentNode.type)) {
 
-                    //     //     currentNode = currentNode.parent;
-                    //     //     defineModeKey = false;
-                    //     //     defineModeValue = true;
+                    // // currentNode = currentNode.parent;
+                    // // defineModeKey = false;
+                    // // defineModeValue = true;
 
-                    //     //     node = new ASTNode();
+                    // // node = new ASTNode();
 
-                    //     //     currentNode.children.add(node);
-                    //     //     node.parent = currentNode;
+                    // // currentNode.children.add(node);
+                    // // node.parent = currentNode;
 
-                    //     //     node.value = "define_value___";
-                    //     //     node.type = "define_value___";
+                    // // node.value = "define_value___";
+                    // // node.type = "define_value___";
 
-                    //     //     // descend into key
-                    //     //     currentNode = node;
+                    // // // descend into key
+                    // // currentNode = node;
 
-                    //     // }
+                    // // }
 
-                    //     currentNode.children.add(expressionRootNode);
-                    //     expressionRootNode = null;
+                    // currentNode.children.add(expressionRootNode);
+                    // expressionRootNode = null;
 
                     // } else {
 
-                        processExpressionNode(text);
+                    processExpressionNode(text);
 
-                        // an expression is finished
-                        if (balance == 0) {
-                            currentNode.children.add(expressionRootNode);
+                    // an expression is finished
+                    if (balance == 0) {
+                        currentNode.children.add(expressionRootNode);
 
-                            // start new expression
-                            expressionRootNode = null;
-                            identifier = false;
-                        }
+                        // start new expression
+                        expressionRootNode = null;
+                        identifier = false;
+                    }
 
                     // }
 
                 } else if (parserMode == ParserMode.EXPRESSION) {
 
                     // an if-statement is finished
-                    if (expressionRootNode.balance == 0) {
+                    // if (expressionRootNode.balance == 0) {
+                    if (balance == 0) {
 
                         currentNode.children.add(expressionRootNode);
 
-                        //expressionRootNode.linearAddInto(currentNode.children);
+                        // expressionRootNode.linearAddInto(currentNode.children);
                         expressionRootNode = null;
 
                         // node = new ASTNode();
@@ -347,8 +355,6 @@ public class SimpleFileStackFrame extends AbstractFileStackFrame {
 
                         // go back to the root node
                         currentNode = currentNode.parent;
-
-                        // parserMode = ParserMode.NORMAL;
 
                     } else {
 
@@ -365,12 +371,19 @@ public class SimpleFileStackFrame extends AbstractFileStackFrame {
 
                 }
 
-            }
+            } else if (token.getType() == PreprocessorLexer2.Newline) {
 
-            else if (token.getType() == PreprocessorLexer2.Newline) {
+                // // DEBUG
+                // line++;
+                // System.out.println("Line: " + line);
 
                 // DEBUG
-                //outputRootNode(rootNode);
+                // if (line == 12) {
+                // System.out.println("");
+                // }
+
+                // DEBUG
+                // outputRootNode(rootNode);
 
                 // deal with completely empty lines (the node is still the root node and it has
                 // no children)
@@ -384,7 +397,7 @@ public class SimpleFileStackFrame extends AbstractFileStackFrame {
                     currentNode.children.add(expressionRootNode);
                     expressionRootNode = null;
 
-                    parserMode = ParserMode.NORMAL;
+                    setParserMode(ParserMode.NORMAL);
 
                 } else if (parserMode == ParserMode.DEFINE) {
 
@@ -393,7 +406,7 @@ public class SimpleFileStackFrame extends AbstractFileStackFrame {
                         expressionRootNode = null;
                     }
 
-                    parserMode = ParserMode.NORMAL;
+                    setParserMode(ParserMode.NORMAL);
 
                 }
 
@@ -409,72 +422,69 @@ public class SimpleFileStackFrame extends AbstractFileStackFrame {
 
                 defineMode = false;
 
-                parserMode = ParserMode.NORMAL;
+                setParserMode(ParserMode.NORMAL);
 
             } else {
 
                 /*
-                if (text.equalsIgnoreCase("if")) {
-
-                    if (ADD_SUB_NODE) {
-                        node.value = "sub";
-
-                        currentNode.children.add(node);
-                        node.parent = currentNode;
-
-                        // descend
-                        currentNode = node;
-                    }
-
-                    TreeNode treeNode = new TreeNode();
-                    treeNode.value = text;
-
-                    // connect child and parent
-                    currentNode.children.add(treeNode);
-                    treeNode.parent = currentNode;
-
-                    // ascend
-                    currentNode = treeNode;
-
-                    parserMode = ParserMode.EXPRESSION;
-
-                    // skip whitespace up to bracket
-                    do {
-                        token = lexer.nextToken();
-                    } while (!token.getText().equalsIgnoreCase("("));
-
-                    node = new ASTNode();
-                    node.value = token.getText();
-
-                    currentNode.parent.children.add(node);
-                    node.parent = currentNode.parent;
-
-                    //currentNode.children.add(node);
-
-                    token = lexer.nextToken();
-
-                    continue;
-                }
-                */
+                 * if (text.equalsIgnoreCase("if")) {
+                 *
+                 * if (ADD_SUB_NODE) {
+                 * node.value = "sub";
+                 *
+                 * currentNode.children.add(node);
+                 * node.parent = currentNode;
+                 *
+                 * // descend
+                 * currentNode = node;
+                 * }
+                 *
+                 * TreeNode treeNode = new TreeNode();
+                 * treeNode.value = text;
+                 *
+                 * // connect child and parent
+                 * currentNode.children.add(treeNode);
+                 * treeNode.parent = currentNode;
+                 *
+                 * // ascend
+                 * currentNode = treeNode;
+                 *
+                 * parserMode = ParserMode.EXPRESSION;
+                 *
+                 * // skip whitespace up to bracket
+                 * do {
+                 * token = lexer.nextToken();
+                 * } while (!token.getText().equalsIgnoreCase("("));
+                 *
+                 * node = new ASTNode();
+                 * node.value = token.getText();
+                 *
+                 * currentNode.parent.children.add(node);
+                 * node.parent = currentNode.parent;
+                 *
+                 * //currentNode.children.add(node);
+                 *
+                 * token = lexer.nextToken();
+                 *
+                 * continue;
+                 * }
+                 */
 
                 if (parserMode == ParserMode.DEFINE) {
 
                     // if (expressionRootNode != null) {
-                    //     if (!text.equalsIgnoreCase("(") && !text.equalsIgnoreCase(")")) {
+                    // if (!text.equalsIgnoreCase("(") && !text.equalsIgnoreCase(")")) {
 
+                    // System.out.println("new");
 
-                    //         System.out.println("new");
+                    // currentNode.children.add(expressionRootNode);
 
-                    //         currentNode.children.add(expressionRootNode);
-
-                    //         balance = 0;
-                    //         customWeight = 0;
-                    //         identifier = false;
-                    //         expressionRootNode = null;
-                    //     }
+                    // balance = 0;
+                    // customWeight = 0;
+                    // identifier = false;
+                    // expressionRootNode = null;
                     // }
-
-
+                    // }
 
                     processExpressionNode(text);
 
@@ -484,13 +494,12 @@ public class SimpleFileStackFrame extends AbstractFileStackFrame {
                     token = lexer.nextToken();
                     String temp = token.getText();
 
-
                     // skip whitespace
                     while (temp.equalsIgnoreCase(" ")) {
-                    //if (text.equalsIgnoreCase("\s+")) {
-                    //if (text.isBlank()) {
+                        // if (text.equalsIgnoreCase("\s+")) {
+                        // if (text.isBlank()) {
                         token = lexer.nextToken();
-                        //continue;
+                        // continue;
                         temp = token.getText();
                     }
 
@@ -498,12 +507,11 @@ public class SimpleFileStackFrame extends AbstractFileStackFrame {
 
                         currentNode.children.add(expressionRootNode);
 
-                            balance = 0;
-                            customWeight = 0;
-                            identifier = false;
-                            expressionRootNode = null;
+                        balance = 0;
+                        customWeight = 0;
+                        identifier = false;
+                        expressionRootNode = null;
                     }
-
 
                 } else if (parserMode == ParserMode.EXPRESSION) {
 
@@ -542,24 +550,25 @@ public class SimpleFileStackFrame extends AbstractFileStackFrame {
                     }
 
                     // if (ADD_SUB_NODE) {
-                    //     if (currentNode.value.equalsIgnoreCase("defined")) {
-                    //         // ascend ( out of sub into parent )
-                    //         currentNode = currentNode.parent;
-                    //     }
+                    // if (currentNode.value.equalsIgnoreCase("defined")) {
+                    // // ascend ( out of sub into parent )
+                    // currentNode = currentNode.parent;
+                    // }
                     // }
 
                 } else {
 
                     // throw new RuntimeException();
-                    //System.out.println(text);
+                    // System.out.println(text);
 
                     DefaultFileStackFrameCallback cb = (preprocessor.DefaultFileStackFrameCallback) callback;
                     if (cb.ifStack.isEmpty() || cb.ifStack.peek().performOutput) {
                         outputStringBuilder.append(text);
                     }
 
-                    //((DefaultFileStackFrameCallback) callback).stringBuilder = outputStringBuilder;
-                    //callback.execute(null);
+                    // ((DefaultFileStackFrameCallback) callback).stringBuilder =
+                    // outputStringBuilder;
+                    // callback.execute(null);
 
                 }
 
@@ -576,7 +585,8 @@ public class SimpleFileStackFrame extends AbstractFileStackFrame {
         // output the very last node
         if (rootNode.children.size() != 0) {
 
-            // ((DefaultFileStackFrameCallback) callback).stringBuilder = outputStringBuilder;
+            // ((DefaultFileStackFrameCallback) callback).stringBuilder =
+            // outputStringBuilder;
             callback.execute(rootNode);
         }
 
@@ -584,15 +594,20 @@ public class SimpleFileStackFrame extends AbstractFileStackFrame {
 
     }
 
-    private void outputRootNode(ASTNode rootNode) {
-        StringBuilder debugStringBuilder = new StringBuilder();
-        rootNode.printRecursive(debugStringBuilder, 0);
-        System.out.println(debugStringBuilder.toString());
+    private void setParserMode(ParserMode parserMode) {
+        this.parserMode = parserMode;
     }
+
+    // private void outputRootNode(ASTNode rootNode) {
+    // StringBuilder debugStringBuilder = new StringBuilder();
+    // rootNode.printRecursive(debugStringBuilder, 0);
+    // System.out.println(debugStringBuilder.toString());
+    // }
 
     private void processExpressionNode(String currentToken) {
 
-        //System.out.println(currentToken);
+        // // DEBUG
+        // System.out.println(currentToken);
 
         if (currentToken.equalsIgnoreCase("(")) {
 
@@ -601,7 +616,7 @@ public class SimpleFileStackFrame extends AbstractFileStackFrame {
             if (identifier) {
 
                 // DEBUG
-                //System.out.println("function call detected: " + lastIdentifier);
+                // System.out.println("function call detected: " + lastIdentifier);
 
                 functionCall = true;
             }
@@ -628,7 +643,6 @@ public class SimpleFileStackFrame extends AbstractFileStackFrame {
         // StringBuilder stringBuilder = new StringBuilder();
         // expressionRootNode.printRecursive(stringBuilder, 0);
         // System.out.println(stringBuilder.toString());
-
         // System.out.println("--------------------------------------");
     }
 
@@ -657,7 +671,7 @@ public class SimpleFileStackFrame extends AbstractFileStackFrame {
 
         if (comparePriority(functionCall, node.customWeight, node.value, token) < 0) {
 
-            //System.out.println("existing node is heavier");
+            // System.out.println("existing node is heavier");
 
             TreeNode newNode = new TreeNode();
             newNode.value = token;
@@ -669,7 +683,7 @@ public class SimpleFileStackFrame extends AbstractFileStackFrame {
 
         } else {
 
-            //System.out.println("existing node is lighter");
+            // System.out.println("existing node is lighter");
 
             if ((node.lhs != null) && (node.rhs != null)) {
                 insertTokenIntoTree(node.rhs, token, customWeight, false);
@@ -701,10 +715,10 @@ public class SimpleFileStackFrame extends AbstractFileStackFrame {
 
             priorityLHS = customWeight;
             if (lhs != null) {
-                AbstractFileStackFrame.getPriority(lhs);
+                priorityLHS += AbstractFileStackFrame.getPriority(lhs);
             }
             if (rhs != null) {
-            priorityRHS = AbstractFileStackFrame.getPriority(rhs);
+                priorityRHS = AbstractFileStackFrame.getPriority(rhs);
             }
 
         }

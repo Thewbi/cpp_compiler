@@ -86,6 +86,11 @@ public class DefaultFileStackFrameCallback implements FileStackFrameCallback {
 
     private void processPreprocessorIf(ASTNode astNode) {
 
+        // // DEBUG
+        // StringBuilder debugStringBuilder = new StringBuilder();
+        // astNode.printRecursive(debugStringBuilder, 0);
+        // System.out.println(debugStringBuilder.toString());
+
         IfStackFrame ifStackFrame = new IfStackFrame();
 
         if (!ifStack.empty() && ifStack.peek().performOutput == false) {
