@@ -14,6 +14,7 @@ import java.io.Console;
 import java.io.File;
 
 import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.Vocabulary;
 import org.antlr.runtime.tree.Tree;
 import org.antlr.v4.parse.v4ParserException;
 import org.antlr.v4.runtime.CharStream;
@@ -86,7 +87,7 @@ public class Main {
         // preprocessor();
         // continue here:
 
-        preprocessor_2();
+        //preprocessor_2();
 
         // preprocessor_3();
         // translationUnit();
@@ -98,9 +99,104 @@ public class Main {
 
         //manualExpressionParsing2();
 
+        manualExpressionParsing3();
+
         // ide();
 
         System.out.println("End");
+    }
+
+    private static void manualExpressionParsing3() {
+
+        String data = "";
+        //data = "a + b * c";
+        data = "a + b + c";
+
+        final CharStream charStream = CharStreams
+                .fromString(data);
+
+        final CPP14Lexer lexer = new CPP14Lexer(charStream);
+
+        Vocabulary vocabulary = lexer.getVocabulary();
+        int maxTokenType = vocabulary.getMaxTokenType();
+
+        int ruleIndexOffset = 1;
+        ExpressionBuilderRule.exprType = maxTokenType + ruleIndexOffset++;
+        ExpressionBuilderRule.startSymbolType = maxTokenType + ruleIndexOffset++;
+
+        // create a buffer of tokens pulled from the lexer
+        final CommonTokenStream tokenStream = new CommonTokenStream(lexer);
+
+        ExpressionBuilderRule rule_4 = new ExpressionBuilderRule();
+        rule_4.name = "rule_4";
+        rule_4.priority = 4;
+        rule_4.elements.add(ExpressionBuilderRule.exprType);
+        rule_4.elements.add(CPP14Lexer.EOF);
+        rule_4.resultType = ExpressionBuilderRule.startSymbolType;
+
+        ExpressionBuilderRule rule_3 = new ExpressionBuilderRule();
+        rule_3.name = "rule_3";
+        rule_3.priority = 1;
+        rule_3.elements.add(ExpressionBuilderRule.exprType);
+        rule_3.elements.add(CPP14Lexer.Plus);
+        rule_3.elements.add(ExpressionBuilderRule.exprType);
+        rule_3.resultType = ExpressionBuilderRule.exprType;
+
+        ExpressionBuilderRule rule_2 = new ExpressionBuilderRule();
+        rule_2.name = "rule_2";
+        rule_2.priority = 2;
+        rule_2.elements.add(ExpressionBuilderRule.exprType);
+        rule_2.elements.add(CPP14Lexer.Star);
+        rule_2.elements.add(ExpressionBuilderRule.exprType);
+        rule_2.resultType = ExpressionBuilderRule.exprType;
+
+        ExpressionBuilderRule rule_1 = new ExpressionBuilderRule();
+        rule_1.name = "rule_1";
+        rule_1.priority = 3;
+        rule_1.elements.add(CPP14Lexer.Identifier);
+        rule_1.resultType = ExpressionBuilderRule.exprType;
+
+        DefaultExpressionBuilder expressionBuilder = new DefaultExpressionBuilder();
+        expressionBuilder.rules.add(rule_4);
+        expressionBuilder.rules.add(rule_3);
+        expressionBuilder.rules.add(rule_2);
+        expressionBuilder.rules.add(rule_1);
+
+        boolean done = false;
+        int tokenIndex = 0;
+        boolean readNextToken = true;
+        while (!done) {
+
+            if (readNextToken) {
+                tokenIndex++;
+            }
+
+            Token currentToken = tokenStream.LT(tokenIndex);
+            Token lookAheadToken = tokenStream.LT(tokenIndex + 1);
+            System.out.println(currentToken + " Type: " + vocabulary.getSymbolicName(currentToken.getType()));
+
+            readNextToken = expressionBuilder.addToken(currentToken, lookAheadToken);
+
+            // if (currentToken.getType() == Token.EOF) {
+            //     done = true;
+            // }
+
+            if (expressionBuilder.stack.peek().token.getType() == ExpressionBuilderRule.startSymbolType) {
+                done = true;
+                continue;
+            }
+
+        }
+
+        // DEBUG output ParserTree
+        ASTNode astNode = expressionBuilder.stack.peek();
+
+        StringBuilder stringBuilder = new StringBuilder();
+        astNode.printRecursive(stringBuilder, 0);
+        System.out.println(stringBuilder);
+
+
+        System.out.println("The End");
     }
 
     private static void manualExpressionParsing2() {

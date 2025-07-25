@@ -3,6 +3,7 @@ package ast;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.ParseTree;
 
 public class ASTNode {
@@ -16,6 +17,8 @@ public class ASTNode {
     public String type;
 
     public ParseTree ctx;
+
+    public Token token;
 
     public void printRecursive(final StringBuilder stringBuilder, final int indent) {
         printRecursive(stringBuilder, indent, true);
