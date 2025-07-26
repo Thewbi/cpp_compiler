@@ -110,6 +110,8 @@ public class Main {
 
         String data = "";
 
+        data = "\"identifier\"";
+
         //data = "a";
         //data = "a + b";
         //data = "a * b";
@@ -136,6 +138,23 @@ public class Main {
         //data = "1 + a";
         //data = "a * 1";
         //data = "SQUARE(a * (b + 1))";
+        //data = "printf("File: %s\n", __FILE__)"
+
+        //data = "a || b";
+        //data = "a || 1 + b";
+
+        //data = "a && b";
+        //data = "a && 1 + b";
+
+        //data = "!a";
+        //data = "!defined(_DEBUG) && defined(_UNIT_TEST)";
+        //data = "!defined _DEBUG && defined _UNIT_TEST";
+
+        //data = "a.b";
+
+        //data = "prsvec_1 == oindex_1";
+        //data = "(prsvec_1 == oindex_1 || prso == every)";
+        //data = "(prsvec_1.prso == oindex_1.valua || prsvec_1.prso == oindex_1.every)";
 
         if (data.isBlank()) {
             throw new RuntimeException("no data!");
@@ -182,6 +201,23 @@ public class Main {
         rule_parenthesis.elements.add(CPP14Lexer.RightParen);
         rule_parenthesis.resultType = ExpressionBuilderRule.exprType;
 
+        // dot_concat
+        ExpressionBuilderRule rule_dot_concat = new ExpressionBuilderRule();
+        rule_dot_concat.name = "rule_dot_concat";
+        rule_dot_concat.priority = 2;
+        rule_dot_concat.elements.add(ExpressionBuilderRule.exprType);
+        rule_dot_concat.elements.add(CPP14Lexer.Dot);
+        rule_dot_concat.elements.add(ExpressionBuilderRule.exprType);
+        rule_dot_concat.resultType = ExpressionBuilderRule.exprType;
+
+        // unary not
+        ExpressionBuilderRule rule_unary_not = new ExpressionBuilderRule();
+        rule_unary_not.name = "rule_unary_not";
+        rule_unary_not.priority = 3;
+        rule_unary_not.elements.add(CPP14Lexer.Not);
+        rule_unary_not.elements.add(ExpressionBuilderRule.exprType);
+        rule_unary_not.resultType = ExpressionBuilderRule.exprType;
+
         // expr ::= expr * expr
         ExpressionBuilderRule rule_bin_mult = new ExpressionBuilderRule();
         rule_bin_mult.name = "rule_bin_mult";
@@ -200,12 +236,46 @@ public class Main {
         rule_bin_plus.elements.add(ExpressionBuilderRule.exprType);
         rule_bin_plus.resultType = ExpressionBuilderRule.exprType;
 
+        // expr ::= expr == expr
+        ExpressionBuilderRule rule_bin_equal = new ExpressionBuilderRule();
+        rule_bin_equal.name = "rule_bin_equal";
+        rule_bin_equal.priority = 10;
+        rule_bin_equal.elements.add(ExpressionBuilderRule.exprType);
+        rule_bin_equal.elements.add(CPP14Lexer.Equal);
+        rule_bin_equal.elements.add(ExpressionBuilderRule.exprType);
+        rule_bin_equal.resultType = ExpressionBuilderRule.exprType;
+
+        // expr ::= expr && expr
+        ExpressionBuilderRule rule_bin_andand = new ExpressionBuilderRule();
+        rule_bin_andand.name = "rule_bin_andand";
+        rule_bin_andand.priority = 14;
+        rule_bin_andand.elements.add(ExpressionBuilderRule.exprType);
+        rule_bin_andand.elements.add(CPP14Lexer.AndAnd);
+        rule_bin_andand.elements.add(ExpressionBuilderRule.exprType);
+        rule_bin_andand.resultType = ExpressionBuilderRule.exprType;
+
+        // expr ::= expr || expr
+        ExpressionBuilderRule rule_bin_oror = new ExpressionBuilderRule();
+        rule_bin_oror.name = "rule_bin_oror";
+        rule_bin_oror.priority = 15;
+        rule_bin_oror.elements.add(ExpressionBuilderRule.exprType);
+        rule_bin_oror.elements.add(CPP14Lexer.OrOr);
+        rule_bin_oror.elements.add(ExpressionBuilderRule.exprType);
+        rule_bin_oror.resultType = ExpressionBuilderRule.exprType;
+
         // expr ::= identifier
         ExpressionBuilderRule rule_identifier_to_exp = new ExpressionBuilderRule();
         rule_identifier_to_exp.name = "rule_identifier_to_exp";
         rule_identifier_to_exp.priority = 50;
         rule_identifier_to_exp.elements.add(CPP14Lexer.Identifier);
         rule_identifier_to_exp.resultType = ExpressionBuilderRule.exprType;
+
+        // expr ::= string_literal
+        ExpressionBuilderRule rule_string_literal_to_exp = new ExpressionBuilderRule();
+        rule_string_literal_to_exp.name = "rule_string_literal_to_exp";
+        rule_string_literal_to_exp.priority = 50;
+        rule_string_literal_to_exp.elements.add(CPP14Lexer.StringLiteral);
+        rule_string_literal_to_exp.resultType = ExpressionBuilderRule.exprType;
 
         // expr ::= integer_literal
         ExpressionBuilderRule rule_int_literal_to_exp = new ExpressionBuilderRule();
@@ -234,13 +304,23 @@ public class Main {
         expressionBuilder.rules.add(rule_parenthesis);
         // 2
         expressionBuilder.rules.add(rule_function_call);
+        expressionBuilder.rules.add(rule_dot_concat);
+        // 3
+        expressionBuilder.rules.add(rule_unary_not);
         // 5
         expressionBuilder.rules.add(rule_bin_mult);
         // 6
         expressionBuilder.rules.add(rule_bin_plus);
+        // 10
+        expressionBuilder.rules.add(rule_bin_equal);
+        // 14
+        expressionBuilder.rules.add(rule_bin_andand);
+        // 15
+        expressionBuilder.rules.add(rule_bin_oror);
         // 50
         expressionBuilder.rules.add(rule_identifier_to_exp);
         expressionBuilder.rules.add(rule_int_literal_to_exp);
+        expressionBuilder.rules.add(rule_string_literal_to_exp);
         // 100
         expressionBuilder.rules.add(rule_start_symbol);
 
