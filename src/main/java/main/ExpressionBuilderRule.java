@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
+import com.cpp.grammar.CPP14Lexer;
+
 import ast.ASTNode;
 
 public class ExpressionBuilderRule {
@@ -13,6 +15,8 @@ public class ExpressionBuilderRule {
     public static int exprType;
 
     public static int cStyleCast;
+
+    public static int exprCommaListType;
 
     public List<Integer> elements = new ArrayList<>();
 
@@ -26,6 +30,11 @@ public class ExpressionBuilderRule {
 
         // System.out.println(name);
 
+        // DEBUG
+        if ((stack.size() == 1) && (tokenASTNode.token.getType() == CPP14Lexer.EOF) && name.equalsIgnoreCase("rule_start_symbol")) {
+            System.out.println("test");
+        }
+
         // start looking with the second element from the right.
         // any rule that has a single element only is excluded per definition
         if (elements.size() == 1) {
@@ -37,22 +46,14 @@ public class ExpressionBuilderRule {
 
         int startIndex = elements.size() - 2;
 
-        boolean result = true;
-
         if (startIndex == 0) {
             return false;
         }
 
-
-        // //if (startIndex >= stack.size() + 1) {
-        // if ((elements.size()-1) > stack.size() + 1) {
-        //     return false;
-        // }
+        boolean result = true;
 
         // outer loop
         while (startIndex > 0) {
-
-
 
             result = true;
             int stackIndex = stack.size() - 1;
@@ -82,9 +83,6 @@ public class ExpressionBuilderRule {
 
                 } else {
 
-
-
-                    //int stackElementType = stack.get(stack.size() + 1 - i).token.getType();
                     int stackElementType = stack.get(stackIndex--).token.getType();
                     if (ruleElementType != stackElementType) {
                         result = false;
@@ -106,34 +104,5 @@ public class ExpressionBuilderRule {
         return result;
 
     }
-
-    // public boolean isPrefix(Stack<ASTNode> stack, ASTNode tokenASTNode) {
-
-    //     if (elements.size() == 1) {
-    //         return false;
-    //     }
-
-    //     for (int i = 1; i < elements.size(); i++) {
-
-    //         int type = elements.get(elements.size() - 1 - i);
-
-    //         if (i == 1) {
-
-    //             if (type != tokenASTNode.token.getType()) {
-    //                 return false;
-    //             }
-
-    //         } else {
-
-    //             if (type != stack.get(stack.size() + 1 - i).token.getType()) {
-    //                 return false;
-    //             }
-
-    //         }
-
-    //     }
-
-    //     return true;
-    // }
 
 }

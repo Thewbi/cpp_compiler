@@ -659,45 +659,47 @@ public class SimpleFileStackFrame extends AbstractFileStackFrame {
      */
     private static TreeNode insertTokenIntoTree(TreeNode node, String token, int customWeight, boolean functionCall) {
 
-        if (node == null) {
+        throw new RuntimeException();
 
-            TreeNode newTreeNode = new TreeNode();
-            newTreeNode.value = token;
-            newTreeNode.unaryOperator = AbstractFileStackFrame.isUnaryOperator(token);
-            newTreeNode.customWeight = customWeight;
+        // if (node == null) {
 
-            return newTreeNode;
-        }
+        //     TreeNode newTreeNode = new TreeNode();
+        //     newTreeNode.value = token;
+        //     newTreeNode.unaryOperator = AbstractFileStackFrame.isUnaryOperator(token);
+        //     newTreeNode.customWeight = customWeight;
 
-        if (comparePriority(functionCall, node.customWeight, node.value, token) < 0) {
+        //     return newTreeNode;
+        // }
 
-            // System.out.println("existing node is heavier");
+        // if (comparePriority(functionCall, node.customWeight, node.value, token) < 0) {
 
-            TreeNode newNode = new TreeNode();
-            newNode.value = token;
-            newNode.customWeight = customWeight;
+        //     // System.out.println("existing node is heavier");
 
-            newNode.reparent(node);
+        //     TreeNode newNode = new TreeNode();
+        //     newNode.value = token;
+        //     newNode.customWeight = customWeight;
 
-            return newNode;
+        //     newNode.reparent(node);
 
-        } else {
+        //     return newNode;
 
-            // System.out.println("existing node is lighter");
+        // } else {
 
-            if ((node.lhs != null) && (node.rhs != null)) {
-                insertTokenIntoTree(node.rhs, token, customWeight, false);
-                return node;
-            }
+        //     // System.out.println("existing node is lighter");
 
-            TreeNode newNode = new TreeNode();
-            newNode.value = token;
-            newNode.customWeight = customWeight;
-            node.addChild(newNode);
+        //     if ((node.lhs != null) && (node.rhs != null)) {
+        //         insertTokenIntoTree(node.rhs, token, customWeight, false);
+        //         return node;
+        //     }
 
-            return node;
+        //     TreeNode newNode = new TreeNode();
+        //     newNode.value = token;
+        //     newNode.customWeight = customWeight;
+        //     node.addChild(newNode);
 
-        }
+        //     return node;
+
+        // }
 
     }
 

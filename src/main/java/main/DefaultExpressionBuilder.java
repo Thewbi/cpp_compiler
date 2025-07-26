@@ -1,6 +1,5 @@
 package main;
 
-import java.lang.foreign.Linker.Option;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -12,6 +11,8 @@ import java.util.Stack;
 
 import org.antlr.v4.runtime.CommonToken;
 import org.antlr.v4.runtime.Token;
+
+import com.cpp.grammar.CPP14Lexer;
 
 import ast.ASTNode;
 
@@ -83,6 +84,10 @@ public class DefaultExpressionBuilder implements ExpressionBuilder {
 
             System.out.println("No Rules are active!");
 
+            if ((token.getType() == CPP14Lexer.EOF) && (stack.peek().token.getType() == CPP14Lexer.EOF))  {
+                throw new RuntimeException("EOF detected a second time but start token has not been reduced yet!");
+            }
+
             System.out
                     .println(">> Choose SHIFT: [PUSH_CURRENT_TOKEN] place current token onto stack + [GET_NEXT_TOKEN]");
 
@@ -137,7 +142,6 @@ public class DefaultExpressionBuilder implements ExpressionBuilder {
         Arrays.sort(rules, new Comparator<ExpressionBuilderRule>() {
             @Override
             public int compare(ExpressionBuilderRule lhs, ExpressionBuilderRule rhs) {
-                //return rhs.priority - lhs.priority;
                 return lhs.priority - rhs.priority;
             }
         });
@@ -220,6 +224,7 @@ public class DefaultExpressionBuilder implements ExpressionBuilder {
         Set<ExpressionBuilderRule> set = new HashSet<>();
 
         for (ExpressionBuilderRule rule : rules) {
+
             // // DEBUG
             // System.out.println(rule.name);
 
