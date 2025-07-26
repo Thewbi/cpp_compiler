@@ -12,6 +12,8 @@ public class ExpressionBuilderRule {
 
     public static int exprType;
 
+    public static int cStyleCast;
+
     public List<Integer> elements = new ArrayList<>();
 
     public int priority;
@@ -41,8 +43,16 @@ public class ExpressionBuilderRule {
             return false;
         }
 
+
+        // //if (startIndex >= stack.size() + 1) {
+        // if ((elements.size()-1) > stack.size() + 1) {
+        //     return false;
+        // }
+
         // outer loop
         while (startIndex > 0) {
+
+
 
             result = true;
             int stackIndex = stack.size() - 1;
@@ -51,6 +61,13 @@ public class ExpressionBuilderRule {
 
             // search prefix in rule element starting from the startIndex back to zero
             for (int i = startIndex; i >= 0; i--) {
+
+                // no elements on stack left to fit the current rule!
+                // !the rule does not match
+                if (stackIndex < 0) {
+                    result = false;
+                    break;
+                }
 
                 int ruleElementType = elements.get(i);
 
@@ -65,6 +82,8 @@ public class ExpressionBuilderRule {
 
                 } else {
 
+
+
                     //int stackElementType = stack.get(stack.size() + 1 - i).token.getType();
                     int stackElementType = stack.get(stackIndex--).token.getType();
                     if (ruleElementType != stackElementType) {
@@ -73,6 +92,11 @@ public class ExpressionBuilderRule {
                     }
                 }
 
+            }
+
+            // the entire rule has matched correctly!
+            if (result == true) {
+                return true;
             }
 
             startIndex--;

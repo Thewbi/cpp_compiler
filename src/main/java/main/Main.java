@@ -110,7 +110,7 @@ public class Main {
 
         String data = "";
 
-        data = "\"identifier\"";
+        //data = "\"identifier\"";
 
         //data = "a";
         //data = "a + b";
@@ -129,6 +129,7 @@ public class Main {
         //data = "(x + y) * a";
 
         //data = "SQUARE(x)";
+        //data = "defined(_DEBUG)";
         //data = "SQUARE(a + b)";
         //data = "SQUARE(a * b + c)";
         //data = "SQUARE(a * (b + c))";
@@ -155,6 +156,10 @@ public class Main {
         //data = "prsvec_1 == oindex_1";
         //data = "(prsvec_1 == oindex_1 || prso == every)";
         //data = "(prsvec_1.prso == oindex_1.valua || prsvec_1.prso == oindex_1.every)";
+
+        //data = "&orphs_1";
+        //data = "(integer *)";
+        data = "((integer *)&orphs_1)"; // todo
 
         if (data.isBlank()) {
             throw new RuntimeException("no data!");
@@ -210,6 +215,16 @@ public class Main {
         rule_dot_concat.elements.add(ExpressionBuilderRule.exprType);
         rule_dot_concat.resultType = ExpressionBuilderRule.exprType;
 
+        // pointer_type_cast
+        ExpressionBuilderRule rule_pointer_type_cast = new ExpressionBuilderRule();
+        rule_pointer_type_cast.name = "rule_pointer_type_cast";
+        rule_pointer_type_cast.priority = 2;
+        rule_pointer_type_cast.elements.add(CPP14Lexer.LeftParen);
+        rule_pointer_type_cast.elements.add(CPP14Lexer.Identifier);
+        rule_pointer_type_cast.elements.add(CPP14Lexer.Star);
+        rule_pointer_type_cast.elements.add(CPP14Lexer.RightParen);
+        rule_pointer_type_cast.resultType = ExpressionBuilderRule.cStyleCast;
+
         // unary not
         ExpressionBuilderRule rule_unary_not = new ExpressionBuilderRule();
         rule_unary_not.name = "rule_unary_not";
@@ -217,6 +232,24 @@ public class Main {
         rule_unary_not.elements.add(CPP14Lexer.Not);
         rule_unary_not.elements.add(ExpressionBuilderRule.exprType);
         rule_unary_not.resultType = ExpressionBuilderRule.exprType;
+
+        // address_of
+        ExpressionBuilderRule rule_address_of = new ExpressionBuilderRule();
+        rule_address_of.name = "rule_address_of";
+        rule_address_of.priority = 3;
+        rule_address_of.elements.add(CPP14Lexer.And);
+        rule_address_of.elements.add(ExpressionBuilderRule.exprType);
+        rule_address_of.resultType = ExpressionBuilderRule.exprType;
+
+        // parenthesis
+        ExpressionBuilderRule rule_cast_applied = new ExpressionBuilderRule();
+        rule_cast_applied.name = "rule_cast_applied";
+        rule_cast_applied.priority = 3;
+        rule_cast_applied.elements.add(CPP14Lexer.LeftParen);
+        rule_cast_applied.elements.add(ExpressionBuilderRule.cStyleCast);
+        rule_cast_applied.elements.add(ExpressionBuilderRule.exprType);
+        rule_cast_applied.elements.add(CPP14Lexer.RightParen);
+        rule_cast_applied.resultType = ExpressionBuilderRule.exprType;
 
         // expr ::= expr * expr
         ExpressionBuilderRule rule_bin_mult = new ExpressionBuilderRule();
@@ -305,8 +338,11 @@ public class Main {
         // 2
         expressionBuilder.rules.add(rule_function_call);
         expressionBuilder.rules.add(rule_dot_concat);
+        expressionBuilder.rules.add(rule_pointer_type_cast);
         // 3
         expressionBuilder.rules.add(rule_unary_not);
+        expressionBuilder.rules.add(rule_address_of);
+        expressionBuilder.rules.add(rule_cast_applied);
         // 5
         expressionBuilder.rules.add(rule_bin_mult);
         // 6

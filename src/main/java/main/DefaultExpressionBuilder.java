@@ -97,11 +97,15 @@ public class DefaultExpressionBuilder implements ExpressionBuilder {
 
         } else if (reduce_rule_set.isPresent()) {
 
+            // DEBUG
             System.out.println(">> Choose REDUCE: Reduce Rules activated!");
 
             // sort by priority
             var set = reduce_rule_set.get();
             ExpressionBuilderRule selectedRule = findHighestPriorityRule(set);
+
+            // DEBUG
+            System.out.println(">> Choose REDUCE with rule: " + selectedRule.name);
 
             // [REDUCE]
             ASTNode resultASTNode = reduceRule(selectedRule);
@@ -216,9 +220,11 @@ public class DefaultExpressionBuilder implements ExpressionBuilder {
         Set<ExpressionBuilderRule> set = new HashSet<>();
 
         for (ExpressionBuilderRule rule : rules) {
+            // // DEBUG
+            // System.out.println(rule.name);
 
             // // DEBUG
-            // if (rule.name.equalsIgnoreCase("rule_function_call")) {
+            // if (rule.name.equalsIgnoreCase("rule_pointer_type_cast")) {
             //     System.out.println("test");
             // }
 
