@@ -167,8 +167,8 @@ public class Main {
         //data = "(prsvec_1.prso == oindex_1.valua || prsvec_1.prso == oindex_1.every)";
 
         //data = "&orphs_1";
-        //data = "(integer *)"; // TODO
-        data = "((integer *)&orphs_1)"; // TODO
+        //data = "(integer *)"; // this will not parse on it's own based on the grammar
+        data = "((integer *)&orphs_1)";
 
         if (data.isBlank()) {
             throw new RuntimeException("no data!");
@@ -295,7 +295,8 @@ public class Main {
         rule_pointer_type_cast.name = "rule_pointer_type_cast";
         rule_pointer_type_cast.priority = 60;
         rule_pointer_type_cast.elements.add(CPP14Lexer.LeftParen);
-        rule_pointer_type_cast.elements.add(CPP14Lexer.Identifier);
+        //rule_pointer_type_cast.elements.add(CPP14Lexer.Identifier);
+        rule_pointer_type_cast.elements.add(ExpressionBuilderRule.exprType);
         rule_pointer_type_cast.elements.add(CPP14Lexer.Star);
         rule_pointer_type_cast.elements.add(CPP14Lexer.RightParen);
         rule_pointer_type_cast.resultType = ExpressionBuilderRule.cStyleCast;
