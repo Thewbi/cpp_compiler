@@ -27,7 +27,8 @@ public class DefaultExpressionBuilder implements ExpressionBuilder {
         boolean readNextToken = false;
 
         Optional<Set<ExpressionBuilderRule>> reduce_rule_set = CHECK_ACTIVATED_RULES_USING_STACK_ONLY();
-        Optional<Set<ExpressionBuilderRule>> shift_rule_set = CHECK_ACTIVATED_RULES_USING_STACK_AND_CURR_TOKEN(token, lookAheadToken);
+        Optional<Set<ExpressionBuilderRule>> shift_rule_set = CHECK_ACTIVATED_RULES_USING_STACK_AND_CURR_TOKEN(token,
+                lookAheadToken);
 
         if (reduce_rule_set.isPresent() && shift_rule_set.isPresent()) {
 
@@ -39,14 +40,16 @@ public class DefaultExpressionBuilder implements ExpressionBuilder {
             ExpressionBuilderRule shiftRule = findHighestPriorityRule(shift_rule_set.get());
 
             // if (shiftRule.priority == reduceRule.priority) {
-            //     throw new RuntimeException("Priorities are set incorrectly! Two rules have the same priority!");
+            // throw new RuntimeException("Priorities are set incorrectly! Two rules have
+            // the same priority!");
             // }
 
             if (shiftRule.priority <= reduceRule.priority) {
 
                 System.out.println("SHIFT");
 
-                System.out.println(">> Choose SHIFT: [PUSH_CURRENT_TOKEN] place current token onto stack + [GET_NEXT_TOKEN]");
+                System.out.println(
+                        ">> Choose SHIFT: [PUSH_CURRENT_TOKEN] place current token onto stack + [GET_NEXT_TOKEN]");
 
                 // [PUSH_CURRENT_TOKEN]
                 ASTNode astNode = new ASTNode();
@@ -76,7 +79,8 @@ public class DefaultExpressionBuilder implements ExpressionBuilder {
 
             System.out.println("No Rules are active!");
 
-            System.out.println(">> Choose SHIFT: [PUSH_CURRENT_TOKEN] place current token onto stack + [GET_NEXT_TOKEN]");
+            System.out
+                    .println(">> Choose SHIFT: [PUSH_CURRENT_TOKEN] place current token onto stack + [GET_NEXT_TOKEN]");
 
             // [PUSH_CURRENT_TOKEN]
             ASTNode astNode = new ASTNode();
@@ -106,7 +110,8 @@ public class DefaultExpressionBuilder implements ExpressionBuilder {
 
         } else if (shift_rule_set.isPresent()) {
 
-            System.out.println(">> Choose SHIFT: [PUSH_CURRENT_TOKEN] place current token onto stack + [GET_NEXT_TOKEN]");
+            System.out
+                    .println(">> Choose SHIFT: [PUSH_CURRENT_TOKEN] place current token onto stack + [GET_NEXT_TOKEN]");
 
             // [PUSH_CURRENT_TOKEN]
             PUSH_CURRENT_TOKEN(token);
@@ -125,7 +130,7 @@ public class DefaultExpressionBuilder implements ExpressionBuilder {
             @Override
             public int compare(ExpressionBuilderRule lhs, ExpressionBuilderRule rhs) {
                 return rhs.priority - lhs.priority;
-                //return lhs.priority - rhs.priority;
+                // return lhs.priority - rhs.priority;
             }
         });
 
@@ -140,13 +145,14 @@ public class DefaultExpressionBuilder implements ExpressionBuilder {
         newASTNode.token = new CommonToken(rule.resultType);
         newASTNode.value = rule.name;
 
-        if (rule.elements.size() == 3) {
-            System.out.println("test");
-        }
-        System.out.println(rule.name);
-        if (rule.name.equalsIgnoreCase("rule_4")) {
-            System.out.println("test");
-        }
+        // // DEBUG
+        // if (rule.elements.size() == 3) {
+        // System.out.println("test");
+        // }
+        // System.out.println(rule.name);
+        // if (rule.name.equalsIgnoreCase("rule_4")) {
+        // System.out.println("test");
+        // }
 
         for (int index = 0; index < rule.elements.size(); index++) {
 
@@ -161,13 +167,22 @@ public class DefaultExpressionBuilder implements ExpressionBuilder {
                 throw new RuntimeException();
             }
 
-            // ASTNode oldASTNode = stack.peek();
-            // newASTNode.children.add(oldASTNode);
-
         }
 
-        for (int i = 0; i < rule.elements.size(); i++) {
-            newASTNode.children.add(stack.pop());
+        boolean in_reverse_order = false;
+        if (in_reverse_order) {
+            // add children in reverse order
+            for (int i = 0; i < rule.elements.size(); i++) {
+                newASTNode.children.add(stack.pop());
+            }
+        } else {
+            // consume children in human readable order
+            for (int i = rule.elements.size(); i > 0; i--) {
+                newASTNode.children.add(stack.get(stack.size() - i));
+            }
+            for (int i = 0; i < rule.elements.size(); i++) {
+                stack.pop();
+            }
         }
 
         return newASTNode;
@@ -181,16 +196,18 @@ public class DefaultExpressionBuilder implements ExpressionBuilder {
         stack.push(astNode);
     }
 
-    private Optional<Set<ExpressionBuilderRule>> CHECK_ACTIVATED_RULES_USING_STACK_AND_CURR_TOKEN(Token token, Token lookAheadToken) {
+    private Optional<Set<ExpressionBuilderRule>> CHECK_ACTIVATED_RULES_USING_STACK_AND_CURR_TOKEN(Token token,
+            Token lookAheadToken) {
 
         ASTNode tokenASTNode = new ASTNode();
         tokenASTNode.token = token;
 
         // ASTNode lookAheadTokenASTNode = new ASTNode();
         // lookAheadTokenASTNode.token = lookAheadToken;
-        //stack.push(tokenASTNode);
-        //Optional<Set<ExpressionBuilderRule>> set = CHECK_ACTIVATED_RULES_USING_STACK_ONLY();
-        //stack.pop();
+        // stack.push(tokenASTNode);
+        // Optional<Set<ExpressionBuilderRule>> set =
+        // CHECK_ACTIVATED_RULES_USING_STACK_ONLY();
+        // stack.pop();
 
         Set<ExpressionBuilderRule> set = new HashSet<>();
 
@@ -238,7 +255,8 @@ public class DefaultExpressionBuilder implements ExpressionBuilder {
             index++;
         }
 
-        // remove all rules that have not been fully checked because there are not enough elements on the stack
+        // remove all rules that have not been fully checked because there are not
+        // enough elements on the stack
         List<ExpressionBuilderRule> removeList = new ArrayList<>();
         for (ExpressionBuilderRule rule : set) {
             if (index < rule.elements.size()) {
