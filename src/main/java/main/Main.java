@@ -133,6 +133,10 @@ public class Main {
         //data = "SQUARE(a + b)";
         //data = "SQUARE(a * b + c)";
         //data = "SQUARE(a * (b + c))";
+        data = "P()"; // TODO
+        //data = "P(x)";
+        //data = "P(void)";
+        //data = "P((void))";
 
         //data = "1";
         //data = "1 + 2";
@@ -159,7 +163,7 @@ public class Main {
 
         //data = "&orphs_1";
         //data = "(integer *)";
-        data = "((integer *)&orphs_1)"; // todo
+        //data = "((integer *)&orphs_1)"; // todo
 
         if (data.isBlank()) {
             throw new RuntimeException("no data!");
@@ -303,6 +307,12 @@ public class Main {
         rule_identifier_to_exp.elements.add(CPP14Lexer.Identifier);
         rule_identifier_to_exp.resultType = ExpressionBuilderRule.exprType;
 
+        ExpressionBuilderRule rule_void_to_exp = new ExpressionBuilderRule();
+        rule_void_to_exp.name = "rule_void_to_exp";
+        rule_void_to_exp.priority = 50;
+        rule_void_to_exp.elements.add(CPP14Lexer.Void);
+        rule_void_to_exp.resultType = ExpressionBuilderRule.exprType;
+
         // expr ::= string_literal
         ExpressionBuilderRule rule_string_literal_to_exp = new ExpressionBuilderRule();
         rule_string_literal_to_exp.name = "rule_string_literal_to_exp";
@@ -355,6 +365,7 @@ public class Main {
         expressionBuilder.rules.add(rule_bin_oror);
         // 50
         expressionBuilder.rules.add(rule_identifier_to_exp);
+        expressionBuilder.rules.add(rule_void_to_exp);
         expressionBuilder.rules.add(rule_int_literal_to_exp);
         expressionBuilder.rules.add(rule_string_literal_to_exp);
         // 100
