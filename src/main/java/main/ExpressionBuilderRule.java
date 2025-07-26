@@ -22,31 +22,94 @@ public class ExpressionBuilderRule {
 
     public boolean isPrefix(Stack<ASTNode> stack, ASTNode tokenASTNode) {
 
+        // System.out.println(name);
+
+        // start looking with the second element from the right.
+        // any rule that has a single element only is excluded per definition
         if (elements.size() == 1) {
             return false;
         }
+        if (stack.size() == 0) {
+            return false;
+        }
 
-        for (int i = 1; i < elements.size(); i++) {
+        int startIndex = elements.size() - 2;
 
-            int type = elements.get(elements.size() - 1 - i);
+        boolean result = true;
 
-            if (i == 1) {
+        if (startIndex == 0) {
+            return false;
+        }
 
-                if (type != tokenASTNode.token.getType()) {
-                    return false;
-                }
+        // outer loop
+        while (startIndex > 0) {
 
-            } else {
+            result = true;
+            int stackIndex = stack.size() - 1;
 
-                if (type != stack.get(stack.size() + 1 - i).token.getType()) {
-                    return false;
+            ASTNode preToken = tokenASTNode;
+
+            // search prefix in rule element starting from the startIndex back to zero
+            for (int i = startIndex; i >= 0; i--) {
+
+                int ruleElementType = elements.get(i);
+
+                if (preToken != null) {
+
+                    if (ruleElementType != preToken.token.getType()) {
+                        result = false;
+                        break;
+                    }
+
+                    preToken = null;
+
+                } else {
+
+                    //int stackElementType = stack.get(stack.size() + 1 - i).token.getType();
+                    int stackElementType = stack.get(stackIndex--).token.getType();
+                    if (ruleElementType != stackElementType) {
+                        result = false;
+                        break;
+                    }
                 }
 
             }
 
+            startIndex--;
+
         }
 
-        return true;
+        return result;
+
     }
+
+    // public boolean isPrefix(Stack<ASTNode> stack, ASTNode tokenASTNode) {
+
+    //     if (elements.size() == 1) {
+    //         return false;
+    //     }
+
+    //     for (int i = 1; i < elements.size(); i++) {
+
+    //         int type = elements.get(elements.size() - 1 - i);
+
+    //         if (i == 1) {
+
+    //             if (type != tokenASTNode.token.getType()) {
+    //                 return false;
+    //             }
+
+    //         } else {
+
+    //             if (type != stack.get(stack.size() + 1 - i).token.getType()) {
+    //                 return false;
+    //             }
+
+    //         }
+
+    //     }
+
+    //     return true;
+    // }
 
 }

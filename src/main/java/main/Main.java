@@ -109,6 +109,7 @@ public class Main {
     private static void manualExpressionParsing3() {
 
         String data = "";
+
         //data = "a";
         //data = "a + b";
         //data = "a * b";
@@ -116,12 +117,19 @@ public class Main {
         //data = "a + b * c";
         //data = "a + b + c";
         //data = "a * b * c";
+
         //data = "(x)";
         //data = "a + (x)";
         //data = "(x) + a";
         //data = "(x) + (y)";
         //data = "((x) + (y))";
-        data = "a * (x + y)";
+        //data = "a * (x + y)";
+        //data = "(x + y) * a";
+
+        //data = "SQUARE(x)";
+        //data = "SQUARE(a + b)";
+        //data = "SQUARE(a * b + c)";
+        //data = "SQUARE(a * (b + c))";
 
         if (data.isBlank()) {
             throw new RuntimeException("no data!");
@@ -142,6 +150,58 @@ public class Main {
         // create a buffer of tokens pulled from the lexer
         final CommonTokenStream tokenStream = new CommonTokenStream(lexer);
 
+        // Precedences: https://en.cppreference.com/w/cpp/language/operator_precedence.html
+
+
+
+
+
+
+
+        // expr ::= identifier
+        ExpressionBuilderRule rule_identifier_to_exp = new ExpressionBuilderRule();
+        rule_identifier_to_exp.name = "rule_identifier_to_exp";
+        rule_identifier_to_exp.priority = 50;
+        rule_identifier_to_exp.elements.add(CPP14Lexer.Identifier);
+        rule_identifier_to_exp.resultType = ExpressionBuilderRule.exprType;
+
+        // parenthesis
+        ExpressionBuilderRule rule_parenthesis = new ExpressionBuilderRule();
+        rule_parenthesis.name = "rule_parenthesis";
+        rule_parenthesis.priority = 2;
+        rule_parenthesis.elements.add(CPP14Lexer.LeftParen);
+        rule_parenthesis.elements.add(ExpressionBuilderRule.exprType);
+        rule_parenthesis.elements.add(CPP14Lexer.RightParen);
+        rule_parenthesis.resultType = ExpressionBuilderRule.exprType;
+
+        // function_call
+        ExpressionBuilderRule rule_function_call = new ExpressionBuilderRule();
+        rule_function_call.name = "rule_function_call";
+        rule_function_call.priority = 1;
+        rule_function_call.elements.add(CPP14Lexer.Identifier);
+        rule_function_call.elements.add(CPP14Lexer.LeftParen);
+        rule_function_call.elements.add(ExpressionBuilderRule.exprType);
+        rule_function_call.elements.add(CPP14Lexer.RightParen);
+        rule_function_call.resultType = ExpressionBuilderRule.exprType;
+
+        // expr ::= expr * expr
+        ExpressionBuilderRule rule_bin_mult = new ExpressionBuilderRule();
+        rule_bin_mult.name = "rule_bin_mult";
+        rule_bin_mult.priority = 5;
+        rule_bin_mult.elements.add(ExpressionBuilderRule.exprType);
+        rule_bin_mult.elements.add(CPP14Lexer.Star);
+        rule_bin_mult.elements.add(ExpressionBuilderRule.exprType);
+        rule_bin_mult.resultType = ExpressionBuilderRule.exprType;
+
+        // expr ::= expr + expr
+        ExpressionBuilderRule rule_bin_plus = new ExpressionBuilderRule();
+        rule_bin_plus.name = "rule_bin_plus";
+        rule_bin_plus.priority = 6;
+        rule_bin_plus.elements.add(ExpressionBuilderRule.exprType);
+        rule_bin_plus.elements.add(CPP14Lexer.Plus);
+        rule_bin_plus.elements.add(ExpressionBuilderRule.exprType);
+        rule_bin_plus.resultType = ExpressionBuilderRule.exprType;
+
         // start_symbol ::= expr <EOF>
         ExpressionBuilderRule rule_start_symbol = new ExpressionBuilderRule();
         rule_start_symbol.name = "rule_start_symbol";
@@ -150,46 +210,28 @@ public class Main {
         rule_start_symbol.elements.add(CPP14Lexer.EOF);
         rule_start_symbol.resultType = ExpressionBuilderRule.startSymbolType;
 
-        // expr ::= expr + expr
-        ExpressionBuilderRule rule_bin_plus = new ExpressionBuilderRule();
-        rule_bin_plus.name = "rule_3";
-        rule_bin_plus.priority = 6;
-        rule_bin_plus.elements.add(ExpressionBuilderRule.exprType);
-        rule_bin_plus.elements.add(CPP14Lexer.Plus);
-        rule_bin_plus.elements.add(ExpressionBuilderRule.exprType);
-        rule_bin_plus.resultType = ExpressionBuilderRule.exprType;
 
-        // expr ::= expr * expr
-        ExpressionBuilderRule rule_bin_mult = new ExpressionBuilderRule();
-        rule_bin_mult.name = "rule_2";
-        rule_bin_mult.priority = 5;
-        rule_bin_mult.elements.add(ExpressionBuilderRule.exprType);
-        rule_bin_mult.elements.add(CPP14Lexer.Star);
-        rule_bin_mult.elements.add(ExpressionBuilderRule.exprType);
-        rule_bin_mult.resultType = ExpressionBuilderRule.exprType;
 
-        // expr ::= identifier
-        ExpressionBuilderRule rule_identifier_to_exp = new ExpressionBuilderRule();
-        rule_identifier_to_exp.name = "rule_identifier_to_exp";
-        rule_identifier_to_exp.priority = 1;
-        rule_identifier_to_exp.elements.add(CPP14Lexer.Identifier);
-        rule_identifier_to_exp.resultType = ExpressionBuilderRule.exprType;
 
-        // parenthesis
-        ExpressionBuilderRule rule_parenthesis = new ExpressionBuilderRule();
-        rule_parenthesis.name = "rule_parenthesis";
-        rule_parenthesis.priority = 1;
-        rule_parenthesis.elements.add(CPP14Lexer.LeftParen);
-        rule_parenthesis.elements.add(ExpressionBuilderRule.exprType);
-        rule_parenthesis.elements.add(CPP14Lexer.RightParen);
-        rule_parenthesis.resultType = ExpressionBuilderRule.exprType;
+
+
+
 
         DefaultExpressionBuilder expressionBuilder = new DefaultExpressionBuilder();
-        expressionBuilder.rules.add(rule_start_symbol);
-        expressionBuilder.rules.add(rule_bin_plus);
-        expressionBuilder.rules.add(rule_bin_mult);
+        // 1
         expressionBuilder.rules.add(rule_identifier_to_exp);
         expressionBuilder.rules.add(rule_parenthesis);
+        // 2
+        expressionBuilder.rules.add(rule_function_call);
+        // 5
+        expressionBuilder.rules.add(rule_bin_mult);
+        // 6
+        expressionBuilder.rules.add(rule_bin_plus);
+        // 100
+        expressionBuilder.rules.add(rule_start_symbol);
+
+
+
 
         boolean done = false;
         int tokenIndex = 0;
@@ -202,7 +244,7 @@ public class Main {
 
             Token currentToken = tokenStream.LT(tokenIndex);
             Token lookAheadToken = tokenStream.LT(tokenIndex + 1);
-            System.out.println(currentToken + " Type: " + vocabulary.getSymbolicName(currentToken.getType()));
+            //System.out.println(currentToken + " Type: " + vocabulary.getSymbolicName(currentToken.getType()));
 
             readNextToken = expressionBuilder.addToken(currentToken, lookAheadToken);
 

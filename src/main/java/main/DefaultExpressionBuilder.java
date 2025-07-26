@@ -24,6 +24,10 @@ public class DefaultExpressionBuilder implements ExpressionBuilder {
     @Override
     public boolean addToken(Token token, Token lookAheadToken) {
 
+        // DEBUG
+        //System.out.println(token + " Type: " + vocabulary.getSymbolicName(token.getType()));
+        System.out.println(token);
+
         boolean readNextToken = false;
 
         Optional<Set<ExpressionBuilderRule>> reduce_rule_set = CHECK_ACTIVATED_RULES_USING_STACK_ONLY();
@@ -129,8 +133,8 @@ public class DefaultExpressionBuilder implements ExpressionBuilder {
         Arrays.sort(rules, new Comparator<ExpressionBuilderRule>() {
             @Override
             public int compare(ExpressionBuilderRule lhs, ExpressionBuilderRule rhs) {
-                return rhs.priority - lhs.priority;
-                // return lhs.priority - rhs.priority;
+                //return rhs.priority - lhs.priority;
+                return lhs.priority - rhs.priority;
             }
         });
 
@@ -212,6 +216,12 @@ public class DefaultExpressionBuilder implements ExpressionBuilder {
         Set<ExpressionBuilderRule> set = new HashSet<>();
 
         for (ExpressionBuilderRule rule : rules) {
+
+            // // DEBUG
+            // if (rule.name.equalsIgnoreCase("rule_function_call")) {
+            //     System.out.println("test");
+            // }
+
             if (rule.isPrefix(stack, tokenASTNode)) {
                 set.add(rule);
             }
