@@ -130,23 +130,25 @@ public class Main {
 
         //data = "SQUARE(x)";
         //data = "defined(_DEBUG)";
-        //data = "SQUARE(a + b)";
+        //data = "SQUARE(a + b)"; // OK
+        //data = "SQUARE(a * b)"; // OK
         //data = "SQUARE(a * b + c)";
         //data = "SQUARE(a * (b + c))";
         //data = "P()";
-        //data = "P(x)"; // TODO
+        //data = "P(x)";
         //data = "P(a, b)";
         //data = "P(a, b, c)";
         //data = "P(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)";
-        //data = "P(void)"; // TODO
-        //data = "P((void))"; // TODO
+        //data = "P(void)";
+        //data = "P((void))";
 
         //data = "1";
         //data = "1 + 2";
         //data = "1 + a";
         //data = "a * 1";
         //data = "SQUARE(a * (b + 1))";
-        //data = "printf("File: %s\n", __FILE__)"
+
+        //data = "printf(\"File: %s\n\", __FILE__)"; // TODO
 
         //data = "a || b";
         //data = "a || 1 + b";
@@ -156,7 +158,7 @@ public class Main {
 
         //data = "!a";
         //data = "!defined(_DEBUG) && defined(_UNIT_TEST)";
-        //data = "!defined _DEBUG && defined _UNIT_TEST";
+        //data = "!defined _DEBUG && defined _UNIT_TEST"; // does not work with the grammar!
 
         //data = "a.b";
 
@@ -165,8 +167,8 @@ public class Main {
         //data = "(prsvec_1.prso == oindex_1.valua || prsvec_1.prso == oindex_1.every)";
 
         //data = "&orphs_1";
-        //data = "(integer *)";
-        //data = "((integer *)&orphs_1)"; // todo
+        //data = "(integer *)"; // TODO
+        data = "((integer *)&orphs_1)"; // TODO
 
         if (data.isBlank()) {
             throw new RuntimeException("no data!");
@@ -249,6 +251,17 @@ public class Main {
         rule_function_call.elements.add(CPP14Lexer.RightParen);
         rule_function_call.resultType = ExpressionBuilderRule.exprType;
 
+
+        // function_call
+        ExpressionBuilderRule rule_function_call_with_single_param = new ExpressionBuilderRule();
+        rule_function_call_with_single_param.name = "rule_function_call_with_single_param";
+        rule_function_call_with_single_param.priority = 2;
+        rule_function_call_with_single_param.elements.add(CPP14Lexer.Identifier);
+        rule_function_call_with_single_param.elements.add(CPP14Lexer.LeftParen);
+        rule_function_call_with_single_param.elements.add(ExpressionBuilderRule.exprType);
+        rule_function_call_with_single_param.elements.add(CPP14Lexer.RightParen);
+        rule_function_call_with_single_param.resultType = ExpressionBuilderRule.exprType;
+
         // function_call
         ExpressionBuilderRule rule_function_call_with_paramlist = new ExpressionBuilderRule();
         rule_function_call_with_paramlist.name = "rule_function_call";
@@ -280,7 +293,7 @@ public class Main {
         // pointer_type_cast
         ExpressionBuilderRule rule_pointer_type_cast = new ExpressionBuilderRule();
         rule_pointer_type_cast.name = "rule_pointer_type_cast";
-        rule_pointer_type_cast.priority = 3;
+        rule_pointer_type_cast.priority = 60;
         rule_pointer_type_cast.elements.add(CPP14Lexer.LeftParen);
         rule_pointer_type_cast.elements.add(CPP14Lexer.Identifier);
         rule_pointer_type_cast.elements.add(CPP14Lexer.Star);
@@ -411,6 +424,7 @@ public class Main {
         // 2
         expressionBuilder.rules.add(rule_function_call);
         expressionBuilder.rules.add(rule_function_call_with_paramlist);
+        expressionBuilder.rules.add(rule_function_call_with_single_param);
         expressionBuilder.rules.add(rule_dot_concat);
         expressionBuilder.rules.add(rule_pointer_type_cast);
         // 3

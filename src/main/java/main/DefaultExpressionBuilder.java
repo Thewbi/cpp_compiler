@@ -29,6 +29,11 @@ public class DefaultExpressionBuilder implements ExpressionBuilder {
         //System.out.println(token + " Type: " + vocabulary.getSymbolicName(token.getType()));
         System.out.println(token);
 
+        // // DEBUG
+        // if (token.getText().equalsIgnoreCase("*")) {
+        //     System.out.println("test");
+        // }
+
         boolean readNextToken = false;
 
         Optional<Set<ExpressionBuilderRule>> reduce_rule_set = CHECK_ACTIVATED_RULES_USING_STACK_ONLY();
@@ -44,10 +49,9 @@ public class DefaultExpressionBuilder implements ExpressionBuilder {
             ExpressionBuilderRule reduceRule = findHighestPriorityRule(reduce_rule_set.get());
             ExpressionBuilderRule shiftRule = findHighestPriorityRule(shift_rule_set.get());
 
-            // if (shiftRule.priority == reduceRule.priority) {
-            // throw new RuntimeException("Priorities are set incorrectly! Two rules have
-            // the same priority!");
-            // }
+            // DEBUG
+            System.out.println((reduceRule != null) ? ("REDUCE_RULE: " + reduceRule.name + " (Prio: " + reduceRule.priority +")") : "");
+            System.out.println((shiftRule != null) ? ("SHIFT_RULE: " + shiftRule.name + " (Prio: " + shiftRule.priority +")") : "");
 
             if (shiftRule.priority <= reduceRule.priority) {
 
@@ -111,6 +115,11 @@ public class DefaultExpressionBuilder implements ExpressionBuilder {
 
             // DEBUG
             System.out.println(">> Choose REDUCE with rule: " + selectedRule.name);
+
+            // // DEBUG
+            // if (selectedRule.name.equalsIgnoreCase("rule_identifier_to_exp")) {
+            //     System.out.println("test");
+            // }
 
             // [REDUCE]
             ASTNode resultASTNode = reduceRule(selectedRule);
