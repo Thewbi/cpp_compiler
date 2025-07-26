@@ -34,36 +34,15 @@ public class DefaultExpressionBuilder implements ExpressionBuilder {
             // System.out.println("Two or more Rules activated!");
             // throw new RuntimeException("Not implemented yet!");
 
-            // sort by priority
-            var set = reduce_rule_set.get();
-            ExpressionBuilderRule[] reduceRules = set.toArray(ExpressionBuilderRule[]::new);
-            Arrays.sort(reduceRules, new Comparator<ExpressionBuilderRule>() {
-                @Override
-                public int compare(ExpressionBuilderRule lhs, ExpressionBuilderRule rhs) {
-                    return rhs.priority - lhs.priority;
-                }
-            });
-
             // select highest priority rule
-            ExpressionBuilderRule reduceRule = reduceRules[0];
-
-            set = shift_rule_set.get();
-            ExpressionBuilderRule[] shiftRules = set.toArray(ExpressionBuilderRule[]::new);
-            Arrays.sort(shiftRules, new Comparator<ExpressionBuilderRule>() {
-                @Override
-                public int compare(ExpressionBuilderRule lhs, ExpressionBuilderRule rhs) {
-                    return rhs.priority - lhs.priority;
-                }
-            });
-
-            // select highest priority rule
-            ExpressionBuilderRule shiftRule = shiftRules[0];
+            ExpressionBuilderRule reduceRule = findHighestPriorityRule(reduce_rule_set.get());
+            ExpressionBuilderRule shiftRule = findHighestPriorityRule(shift_rule_set.get());
 
             // if (shiftRule.priority == reduceRule.priority) {
             //     throw new RuntimeException("Priorities are set incorrectly! Two rules have the same priority!");
             // }
 
-            if (shiftRule.priority >= reduceRule.priority) {
+            if (shiftRule.priority <= reduceRule.priority) {
 
                 System.out.println("SHIFT");
 
@@ -114,17 +93,7 @@ public class DefaultExpressionBuilder implements ExpressionBuilder {
 
             // sort by priority
             var set = reduce_rule_set.get();
-            ExpressionBuilderRule[] rules = set.toArray(ExpressionBuilderRule[]::new);
-            Arrays.sort(rules, new Comparator<ExpressionBuilderRule>() {
-                @Override
-                public int compare(ExpressionBuilderRule lhs, ExpressionBuilderRule rhs) {
-                    return rhs.priority - lhs.priority;
-                }
-            });
-
-            // select highest priority rule
-            ExpressionBuilderRule selectedRule = rules[0];
-            //System.out.println(selectedRule);
+            ExpressionBuilderRule selectedRule = findHighestPriorityRule(set);
 
             // [REDUCE]
             ASTNode resultASTNode = reduceRule(selectedRule);
@@ -148,6 +117,21 @@ public class DefaultExpressionBuilder implements ExpressionBuilder {
         }
 
         return readNextToken;
+    }
+
+    private ExpressionBuilderRule findHighestPriorityRule(Set<ExpressionBuilderRule> set) {
+        ExpressionBuilderRule[] rules = set.toArray(ExpressionBuilderRule[]::new);
+        Arrays.sort(rules, new Comparator<ExpressionBuilderRule>() {
+            @Override
+            public int compare(ExpressionBuilderRule lhs, ExpressionBuilderRule rhs) {
+                return rhs.priority - lhs.priority;
+                //return lhs.priority - rhs.priority;
+            }
+        });
+
+        // select highest priority rule
+        ExpressionBuilderRule selectedRule = rules[0];
+        return selectedRule;
     }
 
     private ASTNode reduceRule(ExpressionBuilderRule rule) {

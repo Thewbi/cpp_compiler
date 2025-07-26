@@ -109,8 +109,18 @@ public class Main {
     private static void manualExpressionParsing3() {
 
         String data = "";
+        //data = "a";
+        //data = "a + b";
+        //data = "a * b";
+        //data = "a * b + c";
         //data = "a + b * c";
-        data = "a + b + c";
+        //data = "a + b + c";
+        //data = "a * b * c";
+        //data = "((x) * (x))";
+
+        if (data.isBlank()) {
+            throw new RuntimeException("no data!");
+        }
 
         final CharStream charStream = CharStreams
                 .fromString(data);
@@ -127,32 +137,36 @@ public class Main {
         // create a buffer of tokens pulled from the lexer
         final CommonTokenStream tokenStream = new CommonTokenStream(lexer);
 
+        // start_symbol ::= expr <EOF>
         ExpressionBuilderRule rule_4 = new ExpressionBuilderRule();
         rule_4.name = "rule_4";
-        rule_4.priority = 4;
+        rule_4.priority = 100;
         rule_4.elements.add(ExpressionBuilderRule.exprType);
         rule_4.elements.add(CPP14Lexer.EOF);
         rule_4.resultType = ExpressionBuilderRule.startSymbolType;
 
+        // expr ::= expr + expr
         ExpressionBuilderRule rule_3 = new ExpressionBuilderRule();
         rule_3.name = "rule_3";
-        rule_3.priority = 1;
+        rule_3.priority = 6;
         rule_3.elements.add(ExpressionBuilderRule.exprType);
         rule_3.elements.add(CPP14Lexer.Plus);
         rule_3.elements.add(ExpressionBuilderRule.exprType);
         rule_3.resultType = ExpressionBuilderRule.exprType;
 
+        // expr ::= expr * expr
         ExpressionBuilderRule rule_2 = new ExpressionBuilderRule();
         rule_2.name = "rule_2";
-        rule_2.priority = 2;
+        rule_2.priority = 5;
         rule_2.elements.add(ExpressionBuilderRule.exprType);
         rule_2.elements.add(CPP14Lexer.Star);
         rule_2.elements.add(ExpressionBuilderRule.exprType);
         rule_2.resultType = ExpressionBuilderRule.exprType;
 
+        // expr ::= identifier
         ExpressionBuilderRule rule_1 = new ExpressionBuilderRule();
         rule_1.name = "rule_1";
-        rule_1.priority = 3;
+        rule_1.priority = 1;
         rule_1.elements.add(CPP14Lexer.Identifier);
         rule_1.resultType = ExpressionBuilderRule.exprType;
 
@@ -194,7 +208,6 @@ public class Main {
         StringBuilder stringBuilder = new StringBuilder();
         astNode.printRecursive(stringBuilder, 0);
         System.out.println(stringBuilder);
-
 
         System.out.println("The End");
     }
