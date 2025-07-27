@@ -8,15 +8,9 @@ import java.util.Stack;
 
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.io.Console;
 import java.io.File;
 
-import org.antlr.v4.runtime.Token;
-import org.antlr.v4.runtime.Vocabulary;
-import org.antlr.runtime.tree.Tree;
-import org.antlr.v4.parse.v4ParserException;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -27,11 +21,9 @@ import com.cpp.grammar.CPP14Lexer;
 import com.cpp.grammar.CPP14Parser;
 import com.cpp.grammar.CPP14ParserListener;
 import com.cpp.grammar.CPreprocessorLexer;
-import com.cpp.grammar.CPreprocessorLexerRule;
 import com.cpp.grammar.CPreprocessorParser;
 import com.cpp.grammar.CPreprocessorParser.ProgramContext;
 import com.cpp.grammar.PreprocessorLexer;
-import com.cpp.grammar.PreprocessorLexer2;
 import com.cpp.grammar.PreprocessorParser;
 import com.cpp.grammar.CPP14Parser.TranslationUnitContext;
 import com.cpp.grammar.PreprocessorParser.Code_fileContext;
@@ -54,9 +46,7 @@ import grammar.StructureCPP14ParserListener;
 import grammar.StructureTACKYParserListener;
 import grammar.SyntaxErrorListener;
 import preprocessor.AbstractFileStackFrame;
-import preprocessor.DefaultFileStackFrame;
 import preprocessor.DefaultFileStackFrameCallback;
-import preprocessor.ExprTreeFileStackFrame;
 import riscv.ExplicitRISCVProcessor;
 import riscv.RISCVInstructionDecoder;
 import riscv.RISCVInstructionEncoder;
@@ -87,7 +77,7 @@ public class Main {
         // preprocessor();
         // continue here:
 
-        //preprocessor_2();
+        // preprocessor_2();
 
         // preprocessor_3();
         // translationUnit();
@@ -97,7 +87,7 @@ public class Main {
         // tacky();
         // manualExpressionParsing();
 
-        //manualExpressionParsing2();
+        // manualExpressionParsing2();
 
         manualExpressionParsing3();
 
@@ -112,377 +102,71 @@ public class Main {
 
         //data = "\"identifier\"";
 
-        //data = "a";
-        //data = "a + b";
-        //data = "a * b";
-        //data = "a * b + c";
-        //data = "a + b * c";
-        //data = "a + b + c";
-        //data = "a * b * c";
+        data = "a";
+        // data = "a + b";
+        // data = "a * b";
+        // data = "a * b + c";
+        // data = "a + b * c";
+        // data = "a + b + c";
+        // data = "a * b * c";
 
-        //data = "(x)";
-        //data = "a + (x)";
-        //data = "(x) + a";
-        //data = "(x) + (y)";
-        //data = "((x) + (y))";
-        //data = "a * (x + y)";
-        //data = "(x + y) * a";
+        // data = "(x)";
+        // data = "a + (x)";
+        // data = "(x) + a";
+        // data = "(x) + (y)";
+        // data = "((x) + (y))";
+        // data = "a * (x + y)";
+        // data = "(x + y) * a";
 
-        //data = "SQUARE(x)";
-        //data = "defined(_DEBUG)";
-        //data = "SQUARE(a + b)"; // OK
-        //data = "SQUARE(a * b)"; // OK
-        //data = "SQUARE(a * b + c)";
-        //data = "SQUARE(a * (b + c))";
-        //data = "P()";
-        //data = "P(x)";
-        //data = "P(a, b)";
-        //data = "P(a, b, c)";
-        //data = "P(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)";
-        //data = "P(void)";
-        //data = "P((void))";
+        // data = "SQUARE(x)";
+        // data = "defined(_DEBUG)";
+        // data = "SQUARE(a + b)"; // OK
+        // data = "SQUARE(a * b)"; // OK
+        // data = "SQUARE(a * b + c)";
+        // data = "SQUARE(a * (b + c))";
+        // data = "P()";
+        // data = "P(x)";
+        // data = "P(a, b)";
+        // data = "P(a, b, c)";
+        // data = "P(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v,
+        // w, x, y, z)";
+        // data = "P(void)";
+        // data = "P((void))";
 
-        //data = "1";
-        //data = "1 + 2";
-        //data = "1 + a";
-        //data = "a * 1";
-        //data = "SQUARE(a * (b + 1))";
+        // data = "1";
+        // data = "1 + 2";
+        // data = "1 + a";
+        // data = "a * 1";
+        // data = "SQUARE(a * (b + 1))";
 
-        //data = "printf(\"File: %s\n\", __FILE__)"; // TODO
+        // data = "printf(\"File: %s\n\", __FILE__)"; // TODO
 
-        //data = "a || b";
-        //data = "a || 1 + b";
+        // data = "a || b";
+        // data = "a || 1 + b";
 
-        //data = "a && b";
-        //data = "a && 1 + b";
+        // data = "a && b";
+        // data = "a && 1 + b";
 
-        //data = "!a";
-        //data = "!defined(_DEBUG) && defined(_UNIT_TEST)";
-        //data = "!defined _DEBUG && defined _UNIT_TEST"; // does not work with the grammar!
+        // data = "!a";
+        // data = "!defined(_DEBUG) && defined(_UNIT_TEST)";
+        // data = "!defined _DEBUG && defined _UNIT_TEST"; // does not work with the
+        // grammar!
 
-        //data = "a.b";
+        // data = "a.b";
 
-        //data = "prsvec_1 == oindex_1";
-        //data = "(prsvec_1 == oindex_1 || prso == every)";
-        //data = "(prsvec_1.prso == oindex_1.valua || prsvec_1.prso == oindex_1.every)";
+        // data = "prsvec_1 == oindex_1";
+        // data = "(prsvec_1 == oindex_1 || prso == every)";
+        // data = "(prsvec_1.prso == oindex_1.valua || prsvec_1.prso ==
+        // oindex_1.every)";
 
-        //data = "&orphs_1";
-        //data = "(integer *)"; // this will not parse on it's own based on the grammar
-        data = "((integer *)&orphs_1)";
+        // data = "&orphs_1";
+        // data = "(integer *)"; // this will not parse on it's own based on the grammar
+        // data = "((integer *)&orphs_1)";
 
-        if (data.isBlank()) {
-            throw new RuntimeException("no data!");
-        }
-
-        final CharStream charStream = CharStreams
-                .fromString(data);
-
-        final CPP14Lexer lexer = new CPP14Lexer(charStream);
-
-        Vocabulary vocabulary = lexer.getVocabulary();
-        int maxTokenType = vocabulary.getMaxTokenType();
-
-        // maxTokenType is 144 for reference
-        int ruleIndexOffset = 1;
-        ExpressionBuilderRule.exprType = maxTokenType + ruleIndexOffset++;
-        ExpressionBuilderRule.startSymbolType = maxTokenType + ruleIndexOffset++;
-        ExpressionBuilderRule.cStyleCast = maxTokenType + ruleIndexOffset++;
-        ExpressionBuilderRule.exprCommaListType = maxTokenType + ruleIndexOffset++;
-
-        // create a buffer of tokens pulled from the lexer
-        final CommonTokenStream tokenStream = new CommonTokenStream(lexer);
-
-        // Precedences: https://en.cppreference.com/w/cpp/language/operator_precedence.html
-
-        // expression comma list
-        ExpressionBuilderRule rule_expression_comma_list = new ExpressionBuilderRule();
-        rule_expression_comma_list.name = "rule_expression_comma_list";
-        rule_expression_comma_list.priority = 90;
-        //rule_expression_comma_list.elements.add(CPP14Lexer.Identifier);
-        //rule_expression_comma_list.elements.add(CPP14Lexer.LeftParen);
-        // rule_expression_comma_list.elements.add(ExpressionBuilderRule.exprType);
-        rule_expression_comma_list.elements.add(ExpressionBuilderRule.exprType);
-        rule_expression_comma_list.elements.add(CPP14Lexer.Comma);
-        rule_expression_comma_list.elements.add(ExpressionBuilderRule.exprType);
-        //rule_expression_comma_list.elements.add(ExpressionBuilderRule.exprCommaListType);
-        //rule_expression_comma_list.elements.add(CPP14Lexer.RightParen);
-        rule_expression_comma_list.resultType = ExpressionBuilderRule.exprCommaListType;
-
-        ExpressionBuilderRule rule_expression_comma_list_middle = new ExpressionBuilderRule();
-        rule_expression_comma_list_middle.name = "rule_expression_comma_list_middle";
-        rule_expression_comma_list_middle.priority = 89;
-        //rule_expression_comma_list_middle.elements.add(CPP14Lexer.Identifier);
-        //rule_expression_comma_list_middle.elements.add(CPP14Lexer.LeftParen);
-        rule_expression_comma_list_middle.elements.add(ExpressionBuilderRule.exprType);
-        rule_expression_comma_list_middle.elements.add(CPP14Lexer.Comma);
-        rule_expression_comma_list_middle.elements.add(ExpressionBuilderRule.exprCommaListType);
-        // rule_expression_comma_list_middle.elements.add(CPP14Lexer.Comma);
-        //rule_expression_comma_list_middle.elements.add(ExpressionBuilderRule.exprCommaListType);
-        //rule_expression_comma_list_middle.elements.add(CPP14Lexer.RightParen);
-        rule_expression_comma_list_middle.resultType = ExpressionBuilderRule.exprCommaListType;
-
-        // ExpressionBuilderRule rule_expression_comma_list_end = new ExpressionBuilderRule();
-        // rule_expression_comma_list_end.name = "rule_expression_comma_list_end";
-        // rule_expression_comma_list_end.priority = 89;
-        // //rule_expression_comma_list_end.elements.add(CPP14Lexer.Identifier);
-        // //rule_expression_comma_list_end.elements.add(CPP14Lexer.LeftParen);
-        // rule_expression_comma_list_end.elements.add(ExpressionBuilderRule.exprCommaListType);
-        // // rule_expression_comma_list_end.elements.add(CPP14Lexer.Comma);
-        // rule_expression_comma_list_end.elements.add(ExpressionBuilderRule.exprType);
-        // //rule_expression_comma_list_end.elements.add(ExpressionBuilderRule.exprCommaListType);
-        // //rule_expression_comma_list_end.elements.add(CPP14Lexer.RightParen);
-        // rule_expression_comma_list_end.resultType = ExpressionBuilderRule.exprCommaListType;
-
-        // exprCommaListType ::= expr
-        ExpressionBuilderRule rule_exp_to_exp_comma_list = new ExpressionBuilderRule();
-        rule_exp_to_exp_comma_list.name = "rule_exp_to_exp_comma_list";
-        rule_exp_to_exp_comma_list.priority = 90;
-        rule_exp_to_exp_comma_list.elements.add(ExpressionBuilderRule.exprType);
-        rule_exp_to_exp_comma_list.resultType = ExpressionBuilderRule.exprCommaListType;
-
-
-        // function_call
-        ExpressionBuilderRule rule_function_call = new ExpressionBuilderRule();
-        rule_function_call.name = "rule_function_call";
-        rule_function_call.priority = 2;
-        rule_function_call.elements.add(CPP14Lexer.Identifier);
-        rule_function_call.elements.add(CPP14Lexer.LeftParen);
-        // rule_function_call.elements.add(ExpressionBuilderRule.exprType);
-        rule_function_call.elements.add(CPP14Lexer.RightParen);
-        rule_function_call.resultType = ExpressionBuilderRule.exprType;
-
-
-        // function_call
-        ExpressionBuilderRule rule_function_call_with_single_param = new ExpressionBuilderRule();
-        rule_function_call_with_single_param.name = "rule_function_call_with_single_param";
-        rule_function_call_with_single_param.priority = 2;
-        rule_function_call_with_single_param.elements.add(CPP14Lexer.Identifier);
-        rule_function_call_with_single_param.elements.add(CPP14Lexer.LeftParen);
-        rule_function_call_with_single_param.elements.add(ExpressionBuilderRule.exprType);
-        rule_function_call_with_single_param.elements.add(CPP14Lexer.RightParen);
-        rule_function_call_with_single_param.resultType = ExpressionBuilderRule.exprType;
-
-        // function_call
-        ExpressionBuilderRule rule_function_call_with_paramlist = new ExpressionBuilderRule();
-        rule_function_call_with_paramlist.name = "rule_function_call";
-        rule_function_call_with_paramlist.priority = 2;
-        rule_function_call_with_paramlist.elements.add(CPP14Lexer.Identifier);
-        rule_function_call_with_paramlist.elements.add(CPP14Lexer.LeftParen);
-        rule_function_call_with_paramlist.elements.add(ExpressionBuilderRule.exprCommaListType);
-        rule_function_call_with_paramlist.elements.add(CPP14Lexer.RightParen);
-        rule_function_call_with_paramlist.resultType = ExpressionBuilderRule.exprType;
-
-        // parenthesis
-        ExpressionBuilderRule rule_parenthesis = new ExpressionBuilderRule();
-        rule_parenthesis.name = "rule_parenthesis";
-        rule_parenthesis.priority = 3;
-        rule_parenthesis.elements.add(CPP14Lexer.LeftParen);
-        rule_parenthesis.elements.add(ExpressionBuilderRule.exprType);
-        rule_parenthesis.elements.add(CPP14Lexer.RightParen);
-        rule_parenthesis.resultType = ExpressionBuilderRule.exprType;
-
-        // dot_concat
-        ExpressionBuilderRule rule_dot_concat = new ExpressionBuilderRule();
-        rule_dot_concat.name = "rule_dot_concat";
-        rule_dot_concat.priority = 3;
-        rule_dot_concat.elements.add(ExpressionBuilderRule.exprType);
-        rule_dot_concat.elements.add(CPP14Lexer.Dot);
-        rule_dot_concat.elements.add(ExpressionBuilderRule.exprType);
-        rule_dot_concat.resultType = ExpressionBuilderRule.exprType;
-
-        // pointer_type_cast
-        ExpressionBuilderRule rule_pointer_type_cast = new ExpressionBuilderRule();
-        rule_pointer_type_cast.name = "rule_pointer_type_cast";
-        rule_pointer_type_cast.priority = 60;
-        rule_pointer_type_cast.elements.add(CPP14Lexer.LeftParen);
-        //rule_pointer_type_cast.elements.add(CPP14Lexer.Identifier);
-        rule_pointer_type_cast.elements.add(ExpressionBuilderRule.exprType);
-        rule_pointer_type_cast.elements.add(CPP14Lexer.Star);
-        rule_pointer_type_cast.elements.add(CPP14Lexer.RightParen);
-        rule_pointer_type_cast.resultType = ExpressionBuilderRule.cStyleCast;
-
-        // unary not
-        ExpressionBuilderRule rule_unary_not = new ExpressionBuilderRule();
-        rule_unary_not.name = "rule_unary_not";
-        rule_unary_not.priority = 4;
-        rule_unary_not.elements.add(CPP14Lexer.Not);
-        rule_unary_not.elements.add(ExpressionBuilderRule.exprType);
-        rule_unary_not.resultType = ExpressionBuilderRule.exprType;
-
-        // address_of
-        ExpressionBuilderRule rule_address_of = new ExpressionBuilderRule();
-        rule_address_of.name = "rule_address_of";
-        rule_address_of.priority = 4;
-        rule_address_of.elements.add(CPP14Lexer.And);
-        rule_address_of.elements.add(ExpressionBuilderRule.exprType);
-        rule_address_of.resultType = ExpressionBuilderRule.exprType;
-
-        // parenthesis
-        ExpressionBuilderRule rule_cast_applied = new ExpressionBuilderRule();
-        rule_cast_applied.name = "rule_cast_applied";
-        rule_cast_applied.priority = 4;
-        rule_cast_applied.elements.add(CPP14Lexer.LeftParen);
-        rule_cast_applied.elements.add(ExpressionBuilderRule.cStyleCast);
-        rule_cast_applied.elements.add(ExpressionBuilderRule.exprType);
-        rule_cast_applied.elements.add(CPP14Lexer.RightParen);
-        rule_cast_applied.resultType = ExpressionBuilderRule.exprType;
-
-        // expr ::= expr * expr
-        ExpressionBuilderRule rule_bin_mult = new ExpressionBuilderRule();
-        rule_bin_mult.name = "rule_bin_mult";
-        rule_bin_mult.priority = 6;
-        rule_bin_mult.elements.add(ExpressionBuilderRule.exprType);
-        rule_bin_mult.elements.add(CPP14Lexer.Star);
-        rule_bin_mult.elements.add(ExpressionBuilderRule.exprType);
-        rule_bin_mult.resultType = ExpressionBuilderRule.exprType;
-
-        // expr ::= expr + expr
-        ExpressionBuilderRule rule_bin_plus = new ExpressionBuilderRule();
-        rule_bin_plus.name = "rule_bin_plus";
-        rule_bin_plus.priority = 7;
-        rule_bin_plus.elements.add(ExpressionBuilderRule.exprType);
-        rule_bin_plus.elements.add(CPP14Lexer.Plus);
-        rule_bin_plus.elements.add(ExpressionBuilderRule.exprType);
-        rule_bin_plus.resultType = ExpressionBuilderRule.exprType;
-
-        // expr ::= expr == expr
-        ExpressionBuilderRule rule_bin_equal = new ExpressionBuilderRule();
-        rule_bin_equal.name = "rule_bin_equal";
-        rule_bin_equal.priority = 11;
-        rule_bin_equal.elements.add(ExpressionBuilderRule.exprType);
-        rule_bin_equal.elements.add(CPP14Lexer.Equal);
-        rule_bin_equal.elements.add(ExpressionBuilderRule.exprType);
-        rule_bin_equal.resultType = ExpressionBuilderRule.exprType;
-
-        // expr ::= expr && expr
-        ExpressionBuilderRule rule_bin_andand = new ExpressionBuilderRule();
-        rule_bin_andand.name = "rule_bin_andand";
-        rule_bin_andand.priority = 15;
-        rule_bin_andand.elements.add(ExpressionBuilderRule.exprType);
-        rule_bin_andand.elements.add(CPP14Lexer.AndAnd);
-        rule_bin_andand.elements.add(ExpressionBuilderRule.exprType);
-        rule_bin_andand.resultType = ExpressionBuilderRule.exprType;
-
-        // expr ::= expr || expr
-        ExpressionBuilderRule rule_bin_oror = new ExpressionBuilderRule();
-        rule_bin_oror.name = "rule_bin_oror";
-        rule_bin_oror.priority = 16;
-        rule_bin_oror.elements.add(ExpressionBuilderRule.exprType);
-        rule_bin_oror.elements.add(CPP14Lexer.OrOr);
-        rule_bin_oror.elements.add(ExpressionBuilderRule.exprType);
-        rule_bin_oror.resultType = ExpressionBuilderRule.exprType;
-
-        // expr ::= identifier
-        ExpressionBuilderRule rule_identifier_to_exp = new ExpressionBuilderRule();
-        rule_identifier_to_exp.name = "rule_identifier_to_exp";
-        rule_identifier_to_exp.priority = 51;
-        rule_identifier_to_exp.elements.add(CPP14Lexer.Identifier);
-        rule_identifier_to_exp.resultType = ExpressionBuilderRule.exprType;
-
-        ExpressionBuilderRule rule_void_to_exp = new ExpressionBuilderRule();
-        rule_void_to_exp.name = "rule_void_to_exp";
-        rule_void_to_exp.priority = 51;
-        rule_void_to_exp.elements.add(CPP14Lexer.Void);
-        rule_void_to_exp.resultType = ExpressionBuilderRule.exprType;
-
-        // expr ::= string_literal
-        ExpressionBuilderRule rule_string_literal_to_exp = new ExpressionBuilderRule();
-        rule_string_literal_to_exp.name = "rule_string_literal_to_exp";
-        rule_string_literal_to_exp.priority = 51;
-        rule_string_literal_to_exp.elements.add(CPP14Lexer.StringLiteral);
-        rule_string_literal_to_exp.resultType = ExpressionBuilderRule.exprType;
-
-        // expr ::= integer_literal
-        ExpressionBuilderRule rule_int_literal_to_exp = new ExpressionBuilderRule();
-        rule_int_literal_to_exp.name = "rule_int_literal_to_exp";
-        rule_int_literal_to_exp.priority = 51;
-        rule_int_literal_to_exp.elements.add(CPP14Lexer.IntegerLiteral);
-        rule_int_literal_to_exp.resultType = ExpressionBuilderRule.exprType;
-
-        // start_symbol ::= expr <EOF>
-        ExpressionBuilderRule rule_start_symbol = new ExpressionBuilderRule();
-        rule_start_symbol.name = "rule_start_symbol";
-         rule_start_symbol.priority = 100;
-        //rule_start_symbol.priority = 1;
-        rule_start_symbol.elements.add(ExpressionBuilderRule.exprType);
-        rule_start_symbol.elements.add(CPP14Lexer.EOF);
-        rule_start_symbol.resultType = ExpressionBuilderRule.startSymbolType;
-
-
-
-
-
-
-
-
-        DefaultExpressionBuilder expressionBuilder = new DefaultExpressionBuilder();
-        // 1
-        expressionBuilder.rules.add(rule_parenthesis);
-        expressionBuilder.rules.add(rule_expression_comma_list);
-        expressionBuilder.rules.add(rule_expression_comma_list_middle);
-        // expressionBuilder.rules.add(rule_expression_comma_list_end);
-        //expressionBuilder.rules.add(rule_exp_to_exp_comma_list);
-        // 2
-        expressionBuilder.rules.add(rule_function_call);
-        expressionBuilder.rules.add(rule_function_call_with_paramlist);
-        expressionBuilder.rules.add(rule_function_call_with_single_param);
-        expressionBuilder.rules.add(rule_dot_concat);
-        expressionBuilder.rules.add(rule_pointer_type_cast);
-        // 3
-        expressionBuilder.rules.add(rule_unary_not);
-        expressionBuilder.rules.add(rule_address_of);
-        expressionBuilder.rules.add(rule_cast_applied);
-        // 5
-        expressionBuilder.rules.add(rule_bin_mult);
-        // 6
-        expressionBuilder.rules.add(rule_bin_plus);
-        // 10
-        expressionBuilder.rules.add(rule_bin_equal);
-        // 14
-        expressionBuilder.rules.add(rule_bin_andand);
-        // 15
-        expressionBuilder.rules.add(rule_bin_oror);
-        // 50
-        expressionBuilder.rules.add(rule_identifier_to_exp);
-        expressionBuilder.rules.add(rule_void_to_exp);
-        expressionBuilder.rules.add(rule_int_literal_to_exp);
-        expressionBuilder.rules.add(rule_string_literal_to_exp);
-        // 100
-        expressionBuilder.rules.add(rule_start_symbol);
-
-
-
-
-        boolean done = false;
-        int tokenIndex = 0;
-        boolean readNextToken = true;
-        while (!done) {
-
-            if (readNextToken) {
-                tokenIndex++;
-            }
-
-            Token currentToken = tokenStream.LT(tokenIndex);
-            Token lookAheadToken = tokenStream.LT(tokenIndex + 1);
-
-            System.out.println(currentToken + " Type: " + vocabulary.getSymbolicName(currentToken.getType()));
-
-            readNextToken = expressionBuilder.addToken(currentToken, lookAheadToken);
-
-            // if (currentToken.getType() == Token.EOF) {
-            //     done = true;
-            // }
-
-            if (expressionBuilder.stack.peek().token.getType() == ExpressionBuilderRule.startSymbolType) {
-                done = true;
-                continue;
-            }
-
-        }
+        ExpressionBuilderExecutor expressionBuilderExecutor = new ExpressionBuilderExecutor();
+        ASTNode astNode = expressionBuilderExecutor.execute(data);
 
         // DEBUG output ParserTree
-        ASTNode astNode = expressionBuilder.stack.peek();
-
         StringBuilder stringBuilder = new StringBuilder();
         astNode.printRecursive(stringBuilder, 0);
         System.out.println(stringBuilder);
@@ -718,7 +402,7 @@ public class Main {
                 if (identifier) {
 
                     // DEBUG
-                    //System.out.println("function call detected: " + lastIdentifier);
+                    // System.out.println("function call detected: " + lastIdentifier);
 
                     rootNode.functionCall = true;
                 }
@@ -1269,20 +953,21 @@ public class Main {
 
     private static void preprocessor_2() throws IOException {
 
-        //final String filename = "src/test/resources/preprocessor/define_square.pp";
-        //final String filename = "src/test/resources/preprocessor/define.pp";
+        // final String filename = "src/test/resources/preprocessor/define_square.pp";
+        // final String filename = "src/test/resources/preprocessor/define.pp";
         // final String filename = "src/test/resources/preprocessor/dgame.pp"; // TODO
 
-        //final String filename = "src/test/resources/preprocessor/if_defined_nested.pp";
+        // final String filename =
+        // "src/test/resources/preprocessor/if_defined_nested.pp";
         final String filename = "src/test/resources/preprocessor/if_defined.pp";
 
-        //final String filename = "src/test/resources/preprocessor/if_not_defined.pp";
-        //final String filename = "src/test/resources/preprocessor/if.pp";
+        // final String filename = "src/test/resources/preprocessor/if_not_defined.pp";
+        // final String filename = "src/test/resources/preprocessor/if.pp";
         // final String filename = "src/test/resources/preprocessor/ifdef_2.pp";
-        //final String filename = "src/test/resources/preprocessor/ifdef_else.pp";
+        // final String filename = "src/test/resources/preprocessor/ifdef_else.pp";
 
-        //final String filename = "src/test/resources/preprocessor/ifdef.pp";
-        //final String filename = "src/test/resources/preprocessor/ifndef.pp";
+        // final String filename = "src/test/resources/preprocessor/ifdef.pp";
+        // final String filename = "src/test/resources/preprocessor/ifndef.pp";
 
         // final String filename = "src/test/resources/preprocessor/include.pp";
         // final String filename = "src/test/resources/preprocessor/scratchpad.pp";
@@ -1290,9 +975,6 @@ public class Main {
         // final String filename = "src/test/resources/preprocessor/funcs.h";
         // final String filename = "src/test/resources/preprocessor/vars.h";
         //
-
-
-
 
         // final String filename = "src/test/resources/preprocessor/replace_1.pp";
         // final String filename = "src/test/resources/preprocessor/replace_2.pp";
@@ -1313,7 +995,7 @@ public class Main {
         defaultfileStackFrameCallback.defineKeyMap = defineKeyMap;
         defaultfileStackFrameCallback.dummyASTNode = dummyASTNode;
 
-        //ExprTreeFileStackFrame fileStackFrame = new ExprTreeFileStackFrame();
+        // ExprTreeFileStackFrame fileStackFrame = new ExprTreeFileStackFrame();
         // DefaultFileStackFrame fileStackFrame = new DefaultFileStackFrame();
         SimpleFileStackFrame fileStackFrame = new SimpleFileStackFrame();
         fileStackFrame.callback = defaultfileStackFrameCallback;
@@ -1331,7 +1013,6 @@ public class Main {
         System.out.println(result);
 
         Files.writeString(Paths.get(filename + ".out"), result);
-
 
         System.out.println("\n\n---------------- Define Map ------------------");
 

@@ -263,7 +263,7 @@ public class DefaultExpressionBuilder implements ExpressionBuilder {
         set.addAll(rules);
 
         int index = 0;
-        for (ASTNode astNode : stack) {
+        for (@SuppressWarnings("unused") ASTNode astNode : stack) {
 
             List<ExpressionBuilderRule> removeList = new ArrayList<>();
             for (ExpressionBuilderRule rule : set) {
@@ -302,4 +302,8 @@ public class DefaultExpressionBuilder implements ExpressionBuilder {
         return Optional.of(set);
     }
 
+    public Stack<ASTNode> getStack() {
+        return stack;
+    }
+    
 }
