@@ -14,40 +14,18 @@ public class ExpressionBuilderFactory {
         ExpressionBuilderRule rule_expression_comma_list = new ExpressionBuilderRule();
         rule_expression_comma_list.name = "rule_expression_comma_list";
         rule_expression_comma_list.priority = 90;
-        //rule_expression_comma_list.elements.add(CPP14Lexer.Identifier);
-        //rule_expression_comma_list.elements.add(CPP14Lexer.LeftParen);
-        // rule_expression_comma_list.elements.add(ExpressionBuilderRule.exprType);
         rule_expression_comma_list.elements.add(ExpressionBuilderRule.exprType);
         rule_expression_comma_list.elements.add(CPP14Lexer.Comma);
         rule_expression_comma_list.elements.add(ExpressionBuilderRule.exprType);
-        //rule_expression_comma_list.elements.add(ExpressionBuilderRule.exprCommaListType);
-        //rule_expression_comma_list.elements.add(CPP14Lexer.RightParen);
         rule_expression_comma_list.resultType = ExpressionBuilderRule.exprCommaListType;
 
         ExpressionBuilderRule rule_expression_comma_list_middle = new ExpressionBuilderRule();
         rule_expression_comma_list_middle.name = "rule_expression_comma_list_middle";
         rule_expression_comma_list_middle.priority = 89;
-        //rule_expression_comma_list_middle.elements.add(CPP14Lexer.Identifier);
-        //rule_expression_comma_list_middle.elements.add(CPP14Lexer.LeftParen);
         rule_expression_comma_list_middle.elements.add(ExpressionBuilderRule.exprType);
         rule_expression_comma_list_middle.elements.add(CPP14Lexer.Comma);
         rule_expression_comma_list_middle.elements.add(ExpressionBuilderRule.exprCommaListType);
-        // rule_expression_comma_list_middle.elements.add(CPP14Lexer.Comma);
-        //rule_expression_comma_list_middle.elements.add(ExpressionBuilderRule.exprCommaListType);
-        //rule_expression_comma_list_middle.elements.add(CPP14Lexer.RightParen);
         rule_expression_comma_list_middle.resultType = ExpressionBuilderRule.exprCommaListType;
-
-        // ExpressionBuilderRule rule_expression_comma_list_end = new ExpressionBuilderRule();
-        // rule_expression_comma_list_end.name = "rule_expression_comma_list_end";
-        // rule_expression_comma_list_end.priority = 89;
-        // //rule_expression_comma_list_end.elements.add(CPP14Lexer.Identifier);
-        // //rule_expression_comma_list_end.elements.add(CPP14Lexer.LeftParen);
-        // rule_expression_comma_list_end.elements.add(ExpressionBuilderRule.exprCommaListType);
-        // // rule_expression_comma_list_end.elements.add(CPP14Lexer.Comma);
-        // rule_expression_comma_list_end.elements.add(ExpressionBuilderRule.exprType);
-        // //rule_expression_comma_list_end.elements.add(ExpressionBuilderRule.exprCommaListType);
-        // //rule_expression_comma_list_end.elements.add(CPP14Lexer.RightParen);
-        // rule_expression_comma_list_end.resultType = ExpressionBuilderRule.exprCommaListType;
 
         // exprCommaListType ::= expr
         ExpressionBuilderRule rule_exp_to_exp_comma_list = new ExpressionBuilderRule();
@@ -56,17 +34,14 @@ public class ExpressionBuilderFactory {
         rule_exp_to_exp_comma_list.elements.add(ExpressionBuilderRule.exprType);
         rule_exp_to_exp_comma_list.resultType = ExpressionBuilderRule.exprCommaListType;
 
-
         // function_call
         ExpressionBuilderRule rule_function_call = new ExpressionBuilderRule();
         rule_function_call.name = "rule_function_call";
         rule_function_call.priority = 2;
         rule_function_call.elements.add(CPP14Lexer.Identifier);
         rule_function_call.elements.add(CPP14Lexer.LeftParen);
-        // rule_function_call.elements.add(ExpressionBuilderRule.exprType);
         rule_function_call.elements.add(CPP14Lexer.RightParen);
         rule_function_call.resultType = ExpressionBuilderRule.exprType;
-
 
         // function_call
         ExpressionBuilderRule rule_function_call_with_single_param = new ExpressionBuilderRule();
@@ -111,7 +86,6 @@ public class ExpressionBuilderFactory {
         rule_pointer_type_cast.name = "rule_pointer_type_cast";
         rule_pointer_type_cast.priority = 60;
         rule_pointer_type_cast.elements.add(CPP14Lexer.LeftParen);
-        //rule_pointer_type_cast.elements.add(CPP14Lexer.Identifier);
         rule_pointer_type_cast.elements.add(ExpressionBuilderRule.exprType);
         rule_pointer_type_cast.elements.add(CPP14Lexer.Star);
         rule_pointer_type_cast.elements.add(CPP14Lexer.RightParen);
@@ -219,7 +193,6 @@ public class ExpressionBuilderFactory {
         ExpressionBuilderRule rule_start_symbol = new ExpressionBuilderRule();
         rule_start_symbol.name = "rule_start_symbol";
          rule_start_symbol.priority = 100;
-        //rule_start_symbol.priority = 1;
         rule_start_symbol.elements.add(ExpressionBuilderRule.exprType);
         rule_start_symbol.elements.add(CPP14Lexer.EOF);
         rule_start_symbol.resultType = ExpressionBuilderRule.startSymbolType;

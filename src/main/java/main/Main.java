@@ -103,23 +103,23 @@ public class Main {
 
         //data = "\"identifier\"";
 
-        data = "a";
+        //data = "a";
         // data = "a + b";
         // data = "a * b";
         // data = "a * b + c";
         // data = "a + b * c";
         // data = "a + b + c";
-        // data = "a * b * c";
+        //data = "a * b * c";
 
         // data = "(x)";
         // data = "a + (x)";
         // data = "(x) + a";
         // data = "(x) + (y)";
         // data = "((x) + (y))";
-        // data = "a * (x + y)";
+        //data = "a * (x + y)";
         // data = "(x + y) * a";
 
-        // data = "SQUARE(x)";
+        //data = "SQUARE(x)";
         // data = "defined(_DEBUG)";
         // data = "SQUARE(a + b)"; // OK
         // data = "SQUARE(a * b)"; // OK
@@ -153,7 +153,8 @@ public class Main {
         // data = "!defined _DEBUG && defined _UNIT_TEST"; // does not work with the
         // grammar!
 
-        // data = "a.b";
+        //data = "a.b";
+        //data = "a.b.c";
 
         // data = "prsvec_1 == oindex_1";
         // data = "(prsvec_1 == oindex_1 || prso == every)";
@@ -171,6 +172,30 @@ public class Main {
         StringBuilder stringBuilder = new StringBuilder();
         astNode.printRecursive(stringBuilder, 0);
         System.out.println(stringBuilder);
+
+        // rebuild parse tree into expression tree
+        //
+        // the process starts at the leaves
+        // every child that is not a grammar node is move up one level
+        //
+        // For the rule_start_symbol, drop the <EOF> node
+        //
+        // For rule_parenthesis, add opening, central node and closing braces
+        // into parent
+        //
+        // depth first search, while decending up again
+        //
+        // On the way down into the children.
+        // - if a bracket ( or ) is discovered, create a new ASTNode with value "()"
+        // and insert it in places of the "(" node, delete the ")" Node
+        //
+        // arriving at a node:
+        // - is the node a grammar node AND does the node have only 
+        // leaves (NON-Grammar nodes) as children?
+        // if yes, remove the node from the parent
+        // reparent children to remaining child of parent
+        //
+        // - if the node is NOT a grammar node, do nothing
 
         System.out.println("The End");
     }
