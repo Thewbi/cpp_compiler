@@ -1,4 +1,4 @@
-package main;
+package expressionbuilder;
 
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
@@ -12,7 +12,7 @@ import ast.ASTNode;
 
 public class ExpressionBuilderExecutor {
 
-    ASTNode execute(String data) {
+    public ASTNode execute(String data) {
 
         if (data.isBlank()) {
             throw new RuntimeException("no data!");
