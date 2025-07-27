@@ -18,6 +18,8 @@ import ast.ASTNode;
 
 public class DefaultExpressionBuilder implements ExpressionBuilder {
 
+    private static final boolean PUT_BRACKETS_INTO_THEIR_OWN_NODE = true;
+
     public List<ExpressionBuilderRule> rules = new ArrayList<>();
 
     public Stack<ASTNode> stack = new Stack<>();
@@ -197,9 +199,42 @@ public class DefaultExpressionBuilder implements ExpressionBuilder {
                 newASTNode.children.add(stack.pop());
             }
         } else {
+            ASTNode tempParent = null;
+
             // consume children in human readable order
             for (int i = rule.elements.size(); i > 0; i--) {
-                newASTNode.children.add(stack.get(stack.size() - i));
+
+                int stackIndex = stack.size() - i;
+                ASTNode stackASTNode = stack.get(stackIndex);
+
+                if (PUT_BRACKETS_INTO_THEIR_OWN_NODE) {
+
+                    // detect brackets and ignore them instead of inserting them into the parent
+                    // Instead add a new hierachy and insert a single "bracket" node
+                    if (stackASTNode.value.equalsIgnoreCase("(")) {
+                        tempParent = new ASTNode();
+                        tempParent.value = "()";
+                        continue;
+                    }
+                    if (stackASTNode.value.equalsIgnoreCase(")")) {
+                        continue;
+                    }
+
+                    if (tempParent == null) {
+                        newASTNode.children.add(stackASTNode);
+                    } else {
+                        tempParent.children.add(stackASTNode);
+                    }
+                    
+                } else {
+
+                    // inserting them into the parent as is
+                    newASTNode.children.add(stack.get(stack.size() - i));
+
+                }
+            }
+            if (tempParent != null) {
+                newASTNode.children.add(tempParent);
             }
             for (int i = 0; i < rule.elements.size(); i++) {
                 stack.pop();

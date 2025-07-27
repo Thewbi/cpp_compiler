@@ -114,8 +114,8 @@ public class Main {
         // data = "(x)";
         // data = "a + (x)";
         // data = "(x) + a";
-        // data = "(x) + (y)";
-        // data = "((x) + (y))";
+        //data = "(x) + (y)";
+        //data = "((x) + (y))";
         //data = "a * (x + y)";
         // data = "(x + y) * a";
 
@@ -125,12 +125,11 @@ public class Main {
         // data = "SQUARE(a * b)"; // OK
         // data = "SQUARE(a * b + c)";
         // data = "SQUARE(a * (b + c))";
-        // data = "P()";
+        //data = "P()";
         // data = "P(x)";
         // data = "P(a, b)";
         // data = "P(a, b, c)";
-        // data = "P(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v,
-        // w, x, y, z)";
+        //data = "P(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)";
         // data = "P(void)";
         // data = "P((void))";
 
@@ -138,12 +137,12 @@ public class Main {
         // data = "1 + 2";
         // data = "1 + a";
         // data = "a * 1";
-        // data = "SQUARE(a * (b + 1))";
+        //data = "SQUARE(a * (b + 1))";
 
         // data = "printf(\"File: %s\n\", __FILE__)"; // TODO
 
         // data = "a || b";
-        // data = "a || 1 + b";
+        //data = "a || 1 + b";
 
         // data = "a && b";
         // data = "a && 1 + b";
@@ -163,7 +162,7 @@ public class Main {
 
         // data = "&orphs_1";
         // data = "(integer *)"; // this will not parse on it's own based on the grammar
-        // data = "((integer *)&orphs_1)";
+        //data = "((integer *)&orphs_1)";
 
         ExpressionBuilderExecutor expressionBuilderExecutor = new ExpressionBuilderExecutor();
         ASTNode astNode = expressionBuilderExecutor.execute(data);
