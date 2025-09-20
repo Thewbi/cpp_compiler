@@ -92,6 +92,9 @@ public class DefaultFileStackFrameCallback implements FileStackFrameCallback {
         // System.out.println(debugStringBuilder.toString());
 
         IfStackFrame ifStackFrame = new IfStackFrame();
+        if (!ifStack.empty()) {
+            ifStackFrame.parent = ifStack.peek();
+        }
 
         if (!ifStack.empty() && ifStack.peek().performOutput == false) {
             ifStackFrame.blocked = true;
@@ -131,6 +134,9 @@ public class DefaultFileStackFrameCallback implements FileStackFrameCallback {
         boolean isDefined = defineMap.containsKey(dataASTNode.value);
 
         IfStackFrame ifStackFrame = new IfStackFrame();
+        if (!ifStack.empty()) {
+            ifStackFrame.parent = ifStack.peek();
+        }
 
         if (!ifStack.empty() && ifStack.peek().performOutput == false) {
             ifStackFrame.blocked = true;
@@ -164,6 +170,9 @@ public class DefaultFileStackFrameCallback implements FileStackFrameCallback {
         boolean isDefined = defineMap.containsKey(dataASTNode.value);
 
         IfStackFrame ifStackFrame = new IfStackFrame();
+        if (!ifStack.empty()) {
+            ifStackFrame.parent = ifStack.peek();
+        }
 
         if (!ifStack.empty() && ifStack.peek().performOutput == false) {
             ifStackFrame.blocked = true;
@@ -222,14 +231,30 @@ public class DefaultFileStackFrameCallback implements FileStackFrameCallback {
 
     private void processElse(ASTNode astNode) {
 
-        ifStack.peek().performOutput = false;
+        IfStackFrame currenIfStackFrame = ifStack.peek();
 
-        if (ifStack.peek().processed) {
+        currenIfStackFrame.performOutput = false;
+
+        // if one of the branches has been taken already, do not use the else branch
+        if (currenIfStackFrame.processed) {
             return;
         }
 
+        boolean performOutput = true;
+
+        if (currenIfStackFrame.parent != null) {
+            performOutput = currenIfStackFrame.parent.performOutput;
+        }
+
+        // if (ifStack.size() > 1) {
+        //     outputEnabled = ifStack.elementAt(ifStack.size()-1).performOutput;
+        // }
+
+        // check if output is enabled in any of the lower stack if-stack entries
+        //boolean outputEnabled = !ifStack.stream().filter(frame -> (frame.performOutput == false)).findFirst().isPresent();
+
         // enable output content for the branch
-        ifStack.peek().performOutput = true;
+        ifStack.peek().performOutput = performOutput;
     }
 
     private ASTNode isEndif(ASTNode astNode) {
@@ -247,14 +272,6 @@ public class DefaultFileStackFrameCallback implements FileStackFrameCallback {
     }
 
     private void processEndif(ASTNode astNode) {
-
-        // enable output content for the branch
-        ifStack.peek().performOutput = false;
-
-        // if (ifStack.peek().processed) {
-        // return;
-        // }
-
         ifStack.pop();
     }
 
@@ -427,23 +444,6 @@ public class DefaultFileStackFrameCallback implements FileStackFrameCallback {
         throw new RuntimeException("Not implemented yet! " + astNode.value);
     }
 
-    // private void outputASTNode(ASTNode astNode, StringBuilder stringBuilder) {
-
-    // // when inside a if-branch which is skipped (= blocked) because the
-    // // expression did evaluate to false, then do not output the line
-    // if (!ifStack.empty() && ifStack.peek().blocked) {
-    // return;
-    // }
-
-    // // add the parents value
-    // stringBuilder.append(astNode.value);
-
-    // // finally output children
-    // for (ASTNode childNode : astNode.getChildren()) {
-    // outputASTNode(childNode, stringBuilder);
-    // }
-    // }
-
     private void outputASTNode(ASTNode astNode, StringBuilder stringBuilder) {
 
         // // DEBUG
@@ -576,5 +576,25 @@ public class DefaultFileStackFrameCallback implements FileStackFrameCallback {
             replaceActualParameterByValue(childASTNode, formalParameterIdentifier, newValue);
         }
     }
+
+
+
+
+    // private void outputASTNode(ASTNode astNode, StringBuilder stringBuilder) {
+
+    // // when inside a if-branch which is skipped (= blocked) because the
+    // // expression did evaluate to false, then do not output the line
+    // if (!ifStack.empty() && ifStack.peek().blocked) {
+    // return;
+    // }
+
+    // // add the parents value
+    // stringBuilder.append(astNode.value);
+
+    // // finally output children
+    // for (ASTNode childNode : astNode.getChildren()) {
+    // outputASTNode(childNode, stringBuilder);
+    // }
+    // }
 
 }

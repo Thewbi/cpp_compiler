@@ -1,11 +1,12 @@
-#define _DEBUG 1
+//#define _DEBUG 1
 #define _UNIT_TEST
 
-#define _DEBUG_INNER
-#define _UNIT_TEST_INNER
+//#define _DEBUG_INNER
+//#define _UNIT_TEST_INNER
 
 #define _DEBUG_INNER_2
-#define _UNIT_TEST_INNER_2
+//#define _UNIT_TEST_INNER_2
+
 
 #if defined(_DEBUG) || defined(_UNIT_TEST)
   printf("a");

@@ -43,7 +43,7 @@ public class SimpleFileStackFrame extends AbstractFileStackFrame {
 
         // DEBUG
         // int line = 1;
-        // System.out.println("Line: " + line);
+        //System.out.println("Line: " + line);
 
         Token token = lexer.nextToken();
         while ((token != null) && (token.getType() != Token.EOF)) {
@@ -126,7 +126,15 @@ public class SimpleFileStackFrame extends AbstractFileStackFrame {
 
             } else if (text.equalsIgnoreCase("#endif")) {
 
-                // throw new RuntimeException();
+                setParserMode(ParserMode.EXPRESSION);
+
+                node = new ASTNode();
+                node.value = "#endif";
+                currentNode.children.add(node);
+                node.parent = currentNode;
+
+                // descend
+                currentNode = node;
 
             } else if (text.equalsIgnoreCase("#ifdef")) {
 
@@ -648,9 +656,9 @@ public class SimpleFileStackFrame extends AbstractFileStackFrame {
 
     /**
      * This function contains the basic idea of the algorithm. The purpose of the
-     * algorithm is to parse expressions without a parse, using a lexer and token
+     * algorithm is to parse expressions without a parser, using a lexer and token
      * only.
-     * The expression is expressed using a binary tree.
+     * The expression is represented using a binary tree.
      * To build the tree, all token types are identified and if the token is a C/C++
      * operator, the precedence of that operator is used as a weight. The heavier
      * the node (higher precedence) the deeper the token will sink into the tree.
@@ -659,47 +667,47 @@ public class SimpleFileStackFrame extends AbstractFileStackFrame {
      */
     private static TreeNode insertTokenIntoTree(TreeNode node, String token, int customWeight, boolean functionCall) {
 
-        throw new RuntimeException();
+        
 
-        // if (node == null) {
+        if (node == null) {
 
-        //     TreeNode newTreeNode = new TreeNode();
-        //     newTreeNode.value = token;
-        //     newTreeNode.unaryOperator = AbstractFileStackFrame.isUnaryOperator(token);
-        //     newTreeNode.customWeight = customWeight;
+            TreeNode newTreeNode = new TreeNode();
+            newTreeNode.value = token;
+            newTreeNode.unaryOperator = AbstractFileStackFrame.isUnaryOperator(token);
+            newTreeNode.customWeight = customWeight;
 
-        //     return newTreeNode;
-        // }
+            return newTreeNode;
+        }
 
-        // if (comparePriority(functionCall, node.customWeight, node.value, token) < 0) {
+        if (comparePriority(functionCall, node.customWeight, node.value, token) < 0) {
 
-        //     // System.out.println("existing node is heavier");
+            // System.out.println("existing node is heavier");
 
-        //     TreeNode newNode = new TreeNode();
-        //     newNode.value = token;
-        //     newNode.customWeight = customWeight;
+            TreeNode newNode = new TreeNode();
+            newNode.value = token;
+            newNode.customWeight = customWeight;
 
-        //     newNode.reparent(node);
+            newNode.reparent(node);
 
-        //     return newNode;
+            return newNode;
 
-        // } else {
+        } else {
 
-        //     // System.out.println("existing node is lighter");
+            // System.out.println("existing node is lighter");
 
-        //     if ((node.lhs != null) && (node.rhs != null)) {
-        //         insertTokenIntoTree(node.rhs, token, customWeight, false);
-        //         return node;
-        //     }
+            if ((node.lhs != null) && (node.rhs != null)) {
+                insertTokenIntoTree(node.rhs, token, customWeight, false);
+                return node;
+            }
 
-        //     TreeNode newNode = new TreeNode();
-        //     newNode.value = token;
-        //     newNode.customWeight = customWeight;
-        //     node.addChild(newNode);
+            TreeNode newNode = new TreeNode();
+            newNode.value = token;
+            newNode.customWeight = customWeight;
+            node.addChild(newNode);
 
-        //     return node;
+            return node;
 
-        // }
+        }
 
     }
 

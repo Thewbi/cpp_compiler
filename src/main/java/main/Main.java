@@ -78,7 +78,7 @@ public class Main {
         // preprocessor();
         // continue here:
 
-        // preprocessor_2();
+        preprocessor_2();
 
         // preprocessor_3();
         // translationUnit();
@@ -90,7 +90,7 @@ public class Main {
 
         // manualExpressionParsing2();
 
-        manualExpressionParsing3();
+        //manualExpressionParsing3(); // TODO: transform parse tree into expression tree by deleting all grammar nodes
 
         // ide();
 
@@ -978,13 +978,22 @@ public class Main {
 
     private static void preprocessor_2() throws IOException {
 
-        // final String filename = "src/test/resources/preprocessor/define_square.pp";
-        // final String filename = "src/test/resources/preprocessor/define.pp";
-        // final String filename = "src/test/resources/preprocessor/dgame.pp"; // TODO
+        // TODO:
+        // STATUS: SQUARE macro is parsed correctly, but not resolved when encountered!
+        //final String filename = "src/test/resources/preprocessor/define_square.pp";
 
-        // final String filename =
-        // "src/test/resources/preprocessor/if_defined_nested.pp";
-        final String filename = "src/test/resources/preprocessor/if_defined.pp";
+        // OK:
+        // STATUS: SQUARE macro is parsed correctly
+        //final String filename = "src/test/resources/preprocessor/define.pp";
+
+        // TODO:
+        // STATUS: goes into PREPROCESSOR parse mode and this is throwing a RuntimeException!
+        //final String filename = "src/test/resources/preprocessor/dgame.pp"; // TODO
+
+        // STATUS: OK
+        final String filename = "src/test/resources/preprocessor/if_defined_nested.pp";
+
+        //final String filename = "src/test/resources/preprocessor/if_defined.pp";
 
         // final String filename = "src/test/resources/preprocessor/if_not_defined.pp";
         // final String filename = "src/test/resources/preprocessor/if.pp";
@@ -1032,6 +1041,7 @@ public class Main {
 
         fileStackFrame.fileStack = fileStack;
 
+        // here, the stackframe parses the input file
         fileStackFrame.start();
 
         String result = outputStringBuilder.toString();
