@@ -6,6 +6,8 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.Stack;
 
+import javax.management.RuntimeErrorException;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -78,19 +80,20 @@ public class Main {
         // preprocessor();
         // continue here:
 
-        preprocessor_2();
+        // preprocessor_2(); <----------------- Continue here
 
         // preprocessor_3();
         // translationUnit();
         // riscvassembler();
         // riscvdecoder();
         // riscvencoder();
-        // tacky();
+        tacky();
         // manualExpressionParsing();
 
         // manualExpressionParsing2();
 
-        //manualExpressionParsing3(); // TODO: transform parse tree into expression tree by deleting all grammar nodes
+        // manualExpressionParsing3(); // TODO: transform parse tree into expression
+        // tree by deleting all grammar nodes
 
         // ide();
 
@@ -101,35 +104,36 @@ public class Main {
 
         String data = "";
 
-        //data = "\"identifier\"";
+        // data = "\"identifier\"";
 
-        //data = "a";
+        // data = "a";
         // data = "a + b";
         // data = "a * b";
         // data = "a * b + c";
         // data = "a + b * c";
         // data = "a + b + c";
-        //data = "a * b * c";
+        // data = "a * b * c";
 
         // data = "(x)";
         // data = "a + (x)";
         // data = "(x) + a";
-        //data = "(x) + (y)";
-        //data = "((x) + (y))";
-        //data = "a * (x + y)";
+        // data = "(x) + (y)";
+        // data = "((x) + (y))";
+        // data = "a * (x + y)";
         // data = "(x + y) * a";
 
-        //data = "SQUARE(x)";
+        // data = "SQUARE(x)";
         // data = "defined(_DEBUG)";
         // data = "SQUARE(a + b)"; // OK
         // data = "SQUARE(a * b)"; // OK
         // data = "SQUARE(a * b + c)";
         // data = "SQUARE(a * (b + c))";
-        //data = "P()";
+        // data = "P()";
         // data = "P(x)";
         // data = "P(a, b)";
         // data = "P(a, b, c)";
-        //data = "P(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)";
+        // data = "P(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v,
+        // w, x, y, z)";
         // data = "P(void)";
         // data = "P((void))";
 
@@ -137,12 +141,12 @@ public class Main {
         // data = "1 + 2";
         // data = "1 + a";
         // data = "a * 1";
-        //data = "SQUARE(a * (b + 1))";
+        // data = "SQUARE(a * (b + 1))";
 
         // data = "printf(\"File: %s\n\", __FILE__)"; // TODO
 
         // data = "a || b";
-        //data = "a || 1 + b";
+        // data = "a || 1 + b";
 
         // data = "a && b";
         // data = "a && 1 + b";
@@ -152,8 +156,8 @@ public class Main {
         // data = "!defined _DEBUG && defined _UNIT_TEST"; // does not work with the
         // grammar!
 
-        //data = "a.b";
-        //data = "a.b.c";
+        // data = "a.b";
+        // data = "a.b.c";
 
         // data = "prsvec_1 == oindex_1";
         // data = "(prsvec_1 == oindex_1 || prso == every)";
@@ -162,7 +166,7 @@ public class Main {
 
         // data = "&orphs_1";
         // data = "(integer *)"; // this will not parse on it's own based on the grammar
-        //data = "((integer *)&orphs_1)";
+        // data = "((integer *)&orphs_1)";
 
         ExpressionBuilderExecutor expressionBuilderExecutor = new ExpressionBuilderExecutor();
         ASTNode astNode = expressionBuilderExecutor.execute(data);
@@ -189,7 +193,7 @@ public class Main {
         // and insert it in places of the "(" node, delete the ")" Node
         //
         // arriving at a node:
-        // - is the node a grammar node AND does the node have only 
+        // - is the node a grammar node AND does the node have only
         // leaves (NON-Grammar nodes) as children?
         // if yes, remove the node from the parent
         // reparent children to remaining child of parent
@@ -659,10 +663,23 @@ public class Main {
 
     private static void tacky() throws IOException {
 
-        // final String filename = "src/test/resources/TACKY/for_loop.tky";
+        //
+        // for verification ordered by amount of dependencies used
+        // from essential to higher level
+        //
+        // All scripts should return the value 0. Otherwise validation
+        // throws an error
+        //
+        //final String filename = "src/test/resources/TACKY/main_function_return_value.tky";
+        // final String filename = "src/test/resources/TACKY/jump.tky";
+        // final String filename = "src/test/resources/TACKY/assignment.tky";
+        // final String filename = "src/test/resources/TACKY/expression_add.tky";
+        // final String filename = "src/test/resources/TACKY/expression_less_than_constants.tky";
+        // final String filename = "src/test/resources/TACKY/expression_less_than_var_constant.tky";
+        final String filename = "src/test/resources/TACKY/for_loop.tky";
         // final String filename = "src/test/resources/TACKY/pointer_creation.tky";
         // final String filename = "src/test/resources/TACKY/array_int.tky";
-        final String filename = "src/test/resources/TACKY/function_call.tky";
+        // final String filename = "src/test/resources/TACKY/function_call.tky";
 
         final CharStream charStream = CharStreams
                 .fromFileName(filename);
@@ -677,16 +694,23 @@ public class Main {
         // parse
         Tacky_fileContext root = parser.tacky_file();
 
-        // Create a generic parse tree walker that can trigger callbacks
+        // create a generic parse tree walker that can trigger callbacks
         final ParseTreeWalker walker = new ParseTreeWalker();
 
-        // DEBUG output parse tree
+        System.out.println("-- 1 - Parsing Input ------------------------------------");
+
+        // DEBUG output parse tree while parsing
         boolean printParseTree = true;
         // boolean printParseTree = false;
+
         if (printParseTree) {
             ConsoleTACKYParserListener printListener = new ConsoleTACKYParserListener();
             walker.walk(printListener, root);
         }
+
+        System.out.println("----------------------------------------------------------\n");
+
+        System.out.println("-- 2 - Parsing Tree ---> Abstract Syntax Tree ------------");
 
         ASTNode rootNode = new ASTNode();
         rootNode.value = "[tacky_file] root";
@@ -696,17 +720,14 @@ public class Main {
 
         TACKYParserListener listener = structureTACKYParserListener;
 
-        // start the base scope
-        // structureCallback.startScope();
-
         // Walk the tree created during the parse, trigger callbacks
         walker.walk(listener, root);
 
-        // end the base scope
-        // structureCallback.endScope();
+        System.out.println("----------------------------------------------------------\n");
 
-        // System.out.println(typeMap);
+        System.out.println("-- 3 - DEBUG OUTPUT Abstract Syntax Tree -------------------");
 
+        // DEBUG print AST
         boolean printAST = true;
         // boolean printAST = false;
         if (printAST) {
@@ -715,7 +736,13 @@ public class Main {
             System.out.print(stringBuilder.toString());
         }
 
+        System.out.println("----------------------------------------------------------\n");
+
+        System.out.println("-- 4 - Run the TACKY code ----------------------------------");
+
+        //
         // run the TACKY code
+        //
 
         // find the 'program' statement
         ProgramASTNode program = (ProgramASTNode) rootNode.children.stream().filter(e -> e instanceof ProgramASTNode)
@@ -723,14 +750,26 @@ public class Main {
         String mainEntryPointName = program.value;
 
         System.out.println("MainEntryPoint is \"" + mainEntryPointName + "\"");
-        FunctionDefinitionASTNode mainFunction = (FunctionDefinitionASTNode) rootNode.children.stream().filter(
-                e -> ((e instanceof FunctionDefinitionASTNode) && (e.value.equalsIgnoreCase(mainEntryPointName))))
-                .findFirst().get();
+        FunctionDefinitionASTNode mainFunction = structureTACKYParserListener.functionDefinitionMap
+                .get(mainEntryPointName);
 
         System.out.println("mainFunction found is \"" + mainFunction.value + "\"");
 
         DefaultTACKYExecutor tackyExecutor = new DefaultTACKYExecutor();
-        tackyExecutor.executeFunction(rootNode, 0, mainFunction);
+        tackyExecutor.functionDefinitionMap = structureTACKYParserListener.functionDefinitionMap;
+        int returnValue = tackyExecutor.executeFunction(rootNode, 0, mainFunction);
+
+        if (returnValue == 0) {
+            System.out.println("[OK]");
+            System.out.println("[OK]");
+            System.out.println("[OK]");
+        } else {
+            throw new RuntimeException("\n[ERROR]\n[ERROR] Script did not return zero but " + returnValue + "! Unit Test failed!\n[ERROR]");
+        }
+
+        System.out.println("----------------------------------------------------------\n");
+
+        System.out.println("Application is done!");
     }
 
     /**
@@ -980,24 +1019,38 @@ public class Main {
 
         // TODO:
         // STATUS: SQUARE macro is parsed correctly, but not resolved when encountered!
-        //final String filename = "src/test/resources/preprocessor/define_square.pp";
-
-        // OK:
-        // STATUS: SQUARE macro is parsed correctly
-        //final String filename = "src/test/resources/preprocessor/define.pp";
-
-        // TODO:
-        // STATUS: goes into PREPROCESSOR parse mode and this is throwing a RuntimeException!
-        //final String filename = "src/test/resources/preprocessor/dgame.pp"; // TODO
+        // final String filename = "src/test/resources/preprocessor/define_square.pp";
 
         // STATUS: OK
-        final String filename = "src/test/resources/preprocessor/if_defined_nested.pp";
+        // SQUARE macro is parsed correctly! The define key map contains the
+        // function call including the formal parameter and the define map contains
+        // the macro body
+        // final String filename = "src/test/resources/preprocessor/define.pp";
 
-        //final String filename = "src/test/resources/preprocessor/if_defined.pp";
+        // TODO:
+        // STATUS: goes into PREPROCESSOR parse mode and this is throwing a
+        // RuntimeException!
+        // final String filename = "src/test/resources/preprocessor/dgame.pp"; // TODO
 
+        // STATUS: OK
+        // final String filename =
+        // "src/test/resources/preprocessor/if_defined_nested.pp";
+
+        // STATUS: OK
+        // final String filename = "src/test/resources/preprocessor/if_defined.pp";
+
+        // STATUS: Macro is defined correctly, but not resolved when encountered!
         // final String filename = "src/test/resources/preprocessor/if_not_defined.pp";
+
+        // STATUS: OK
         // final String filename = "src/test/resources/preprocessor/if.pp";
+
+        // STATUS: OK
+        // macro is parsed correctly! The define key map contains the
+        // function call including the formal parameter and the define map contains
+        // the macro body
         // final String filename = "src/test/resources/preprocessor/ifdef_2.pp";
+
         // final String filename = "src/test/resources/preprocessor/ifdef_else.pp";
 
         // final String filename = "src/test/resources/preprocessor/ifdef.pp";
@@ -1015,7 +1068,7 @@ public class Main {
 
         // TODO: next
         //
-        // final String filename = "src/test/resources/preprocessor/printf_test_1.pp";
+        final String filename = "src/test/resources/preprocessor/printf_test_1.pp";
 
         ASTNode dummyASTNode = new ASTNode();
         dummyASTNode.value = "__DUMMY___11223344__";
@@ -1024,15 +1077,15 @@ public class Main {
         Map<String, ASTNode> defineMap = new HashMap<>();
         Map<String, ASTNode> defineKeyMap = new HashMap<>();
 
-        DefaultFileStackFrameCallback defaultfileStackFrameCallback = new DefaultFileStackFrameCallback();
-        defaultfileStackFrameCallback.defineMap = defineMap;
-        defaultfileStackFrameCallback.defineKeyMap = defineKeyMap;
-        defaultfileStackFrameCallback.dummyASTNode = dummyASTNode;
+        DefaultFileStackFrameCallback defaultFileStackFrameCallback = new DefaultFileStackFrameCallback();
+        defaultFileStackFrameCallback.defineMap = defineMap;
+        defaultFileStackFrameCallback.defineKeyMap = defineKeyMap;
+        defaultFileStackFrameCallback.dummyASTNode = dummyASTNode;
 
         // ExprTreeFileStackFrame fileStackFrame = new ExprTreeFileStackFrame();
         // DefaultFileStackFrame fileStackFrame = new DefaultFileStackFrame();
         SimpleFileStackFrame fileStackFrame = new SimpleFileStackFrame();
-        fileStackFrame.callback = defaultfileStackFrameCallback;
+        fileStackFrame.callback = defaultFileStackFrameCallback;
         fileStackFrame.filename = filename;
         fileStackFrame.outputStringBuilder = outputStringBuilder;
 
@@ -1049,14 +1102,30 @@ public class Main {
 
         Files.writeString(Paths.get(filename + ".out"), result);
 
-        System.out.println("\n\n---------------- Define Map ------------------");
+        System.out.println("\n\n---------------- Define Key Map ------------------");
+
+        for (Map.Entry<String, ASTNode> entry : defineKeyMap.entrySet()) {
+
+            String entryKey = entry.getKey();
+            TreeNode entryValue = (TreeNode) entry.getValue();
+
+            System.out.println("functionCall: " + entryValue.functionCall);
+
+            StringBuilder stringBuilder = new StringBuilder();
+            entryValue.printRecursive(stringBuilder, 0);
+            System.out.println(entryKey + " - " + stringBuilder.toString());
+        }
+
+        System.out.println("\n\n---------------- Define Value Map ------------------");
 
         for (Map.Entry<String, ASTNode> entry : defineMap.entrySet()) {
 
-            StringBuilder stringBuilder = new StringBuilder();
-            entry.getValue().printRecursive(stringBuilder, 0);
-            System.out.println(entry.getKey() + " - " + stringBuilder.toString());
+            String entryKey = entry.getKey();
+            ASTNode entryValue = entry.getValue();
 
+            StringBuilder stringBuilder = new StringBuilder();
+            entryValue.printRecursive(stringBuilder, 0);
+            System.out.println(entryKey + " - " + stringBuilder.toString());
         }
 
     }
@@ -1093,7 +1162,7 @@ public class Main {
     }
 
     private static void ide() {
-        // TODO Auto-generated method stub
+        // Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'ide'");
     }
 

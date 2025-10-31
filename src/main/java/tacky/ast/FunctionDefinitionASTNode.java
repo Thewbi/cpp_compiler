@@ -21,13 +21,13 @@ public class FunctionDefinitionASTNode extends TACKYASTNode {
         for (int i = 0; i < indent; i++) {
             stringBuilder.append("  ");
         }
-        stringBuilder.append("[function_definition] ").append(value).append(" global: ").append(global);
+        stringBuilder.append("[function_definition] name: \"").append(value).append("\" global: ").append(global);
 
         if (addLineBreak) {
             stringBuilder.append("\n");
         }
 
-        // // all local variables
+        // // DEBUG: print all local variables
         // for (ASTNode localVariable : localVariables) {
         //     localVariable.printRecursive(stringBuilder, indent + 1);
         // }

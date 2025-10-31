@@ -268,6 +268,7 @@ expr
 //    | expr '(' exprList? ')'
     | Identifier
     | IntegerLiteral
+    | constant_decl
     ;
 
 // page 479

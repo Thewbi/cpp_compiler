@@ -1,0 +1,15 @@
+Program("main")
+
+// Function
+// Name: "main"
+// Global: true
+// Parameters: None
+// Statements: [ ... ]
+Function("main", true, [
+
+    tmp.0 = Var("tmp.0")
+    tmp.0 = Constant(ConstInt(20)) < Constant(ConstInt(30))
+
+    return(Constant(ConstInt(0)))
+
+])

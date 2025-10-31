@@ -2,8 +2,6 @@ package preprocessor;
 
 import java.io.IOException;
 
-import javax.management.RuntimeErrorException;
-
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.Token;
 
@@ -14,8 +12,6 @@ import common.StringUtil;
 
 public class SimpleFileStackFrame extends AbstractFileStackFrame {
 
-    // private static final boolean ADD_SUB_NODE = true;
-
     public boolean defineMode;
     public boolean defineModeKey;
     public boolean defineModeValue;
@@ -25,7 +21,7 @@ public class SimpleFileStackFrame extends AbstractFileStackFrame {
     private TreeNode expressionRootNode = null;
     private int customWeight = 0;
     private int balance = 0;
-    private boolean functionCall = false;
+    // private boolean functionCall = false;
     private boolean identifier = false;
     private boolean lookAheadUsed = false;
 
@@ -50,10 +46,13 @@ public class SimpleFileStackFrame extends AbstractFileStackFrame {
 
             String text = token.getText();
 
-            // skip whitespace
+            // add a newline
+            if (token.getType() == PreprocessorLexer2.Newline) {
+                outputStringBuilder.append("\n");
+            }
+
+            // skip space
             if (text.equalsIgnoreCase(" ")) {
-                // if (text.equalsIgnoreCase("\s+")) {
-                // if (text.isBlank()) {
                 token = lexer.nextToken();
                 continue;
             }
@@ -93,9 +92,6 @@ public class SimpleFileStackFrame extends AbstractFileStackFrame {
 
                 // descend
                 currentNode = node;
-
-                // skip brace ('(')
-                // token = lexer.nextToken();
 
                 token = lexer.nextToken();
                 continue;
@@ -198,9 +194,6 @@ public class SimpleFileStackFrame extends AbstractFileStackFrame {
                     } else {
 
                         includeFilePreprocessorCommand.append(temp);
-
-                        // throw new RuntimeException("Cannot parse include-file preprocessor
-                        // command!");
 
                     }
 
@@ -504,8 +497,6 @@ public class SimpleFileStackFrame extends AbstractFileStackFrame {
 
                     // skip whitespace
                     while (temp.equalsIgnoreCase(" ")) {
-                        // if (text.equalsIgnoreCase("\s+")) {
-                        // if (text.isBlank()) {
                         token = lexer.nextToken();
                         // continue;
                         temp = token.getText();
@@ -593,8 +584,6 @@ public class SimpleFileStackFrame extends AbstractFileStackFrame {
         // output the very last node
         if (rootNode.children.size() != 0) {
 
-            // ((DefaultFileStackFrameCallback) callback).stringBuilder =
-            // outputStringBuilder;
             callback.execute(rootNode);
         }
 
@@ -612,12 +601,12 @@ public class SimpleFileStackFrame extends AbstractFileStackFrame {
     // System.out.println(debugStringBuilder.toString());
     // }
 
-    private void processExpressionNode(String currentToken) {
+    private void processExpressionNode(String currentTokenAsString) {
 
         // // DEBUG
         // System.out.println(currentToken);
 
-        if (currentToken.equalsIgnoreCase("(")) {
+        if (currentTokenAsString.equalsIgnoreCase("(")) {
 
             balance++;
 
@@ -626,14 +615,15 @@ public class SimpleFileStackFrame extends AbstractFileStackFrame {
                 // DEBUG
                 // System.out.println("function call detected: " + lastIdentifier);
 
-                functionCall = true;
+                //functionCall = true;
+                expressionRootNode.functionCall = true;
             }
 
             customWeight += 1000;
             return;
 
         }
-        if (currentToken.equalsIgnoreCase(")")) {
+        if (currentTokenAsString.equalsIgnoreCase(")")) {
 
             balance--;
 
@@ -641,11 +631,11 @@ public class SimpleFileStackFrame extends AbstractFileStackFrame {
             return;
         }
 
-        identifier = AbstractFileStackFrame.isIdentifier(currentToken);
-        // lastIdentifier = currentToken;
+        identifier = AbstractFileStackFrame.isIdentifier(currentTokenAsString);
 
-        expressionRootNode = insertTokenIntoTree(expressionRootNode, currentToken, customWeight,
+        expressionRootNode = insertTokenIntoTree(expressionRootNode, currentTokenAsString, customWeight,
                 expressionRootNode != null ? expressionRootNode.functionCall : false);
+        
 
         // // DEBUG
         // StringBuilder stringBuilder = new StringBuilder();
@@ -666,8 +656,6 @@ public class SimpleFileStackFrame extends AbstractFileStackFrame {
      * the tree (Leaf == no children).
      */
     private static TreeNode insertTokenIntoTree(TreeNode node, String token, int customWeight, boolean functionCall) {
-
-        
 
         if (node == null) {
 

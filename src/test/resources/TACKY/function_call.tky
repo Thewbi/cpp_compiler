@@ -1,19 +1,20 @@
-Program("test")
+Program("main")
 
 // Function
-// Name: "test"
+// Name: "main"
 // Global: true
 // Parameters: None
-Function("test", true, [
+// Statements: [ ... ]
+Function("main", true, [
 
-        tmp.0 = Var("tmp.0")
+    tmp.0 = Var("tmp.0")
 
-        // Function Call
-        // provide actual parameters for both arguments
-        // provide a parameter for the return value
-        funccall(test_function, false, Constant(ConstInt(2)), Constant(ConstInt(3)), tmp.0)
+    // Function Call
+    // provide actual parameters for both arguments
+    // provide a parameter for the return value
+    funccall(test_function, false, Constant(ConstInt(2)), Constant(ConstInt(3)), tmp.0)
 
-        return(Constant(ConstInt(0)))
+    return(Constant(ConstInt(0)))
 
 ])
 
@@ -21,6 +22,12 @@ Function("test", true, [
 // Name: "test_function"
 // Global: true
 // Parameters: param_a, param_b
+// Statements: [ ... ]
 Function("test_function", true, param_a, param_b, [
+
+    tmp.0 = Var("tmp.0")
+    tmp.0 = Constant(ConstInt(20)) + Constant(ConstInt(30))
+
     return(Constant(ConstInt(0)))
+    
 ])

@@ -14,7 +14,7 @@ public class LabelASTNode extends TACKYASTNode {
         for (int i = 0; i < indent; i++) {
             stringBuilder.append("  ");
         }
-        stringBuilder.append("[label] ").append(value);
+        stringBuilder.append("[label] \"").append(value).append("\"");
 
         if (addLineBreak) {
             stringBuilder.append("\n");

@@ -5,6 +5,6 @@ import tacky.ast.FunctionDefinitionASTNode;
 
 public interface TACKYExecutor {
 
-    void executeFunction(ASTNode rootNode, int currentIndex, FunctionDefinitionASTNode functionDefinition);
+    int executeFunction(ASTNode rootNode, int currentIndex, FunctionDefinitionASTNode functionDefinition);
 
 }

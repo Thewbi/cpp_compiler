@@ -1,13 +1,15 @@
-//#define __STDC__
+#define __STDC__
 
 #ifdef __STDC__
 
+//#define TEST_1
 #define P(x) x
 
 #else
 
-#define P(x) ()
-#define void int
-#define const
+#define TEST_2
+//#define P(x) ()
+//#define void int
+//#define const
 
 #endif

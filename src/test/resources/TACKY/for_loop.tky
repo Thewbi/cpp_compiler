@@ -1,27 +1,36 @@
-Program("for_loop_test")
-Function("for_loop_test", true, [
+// This for loop structure is used
+//
+// start:
+//    for (<instructions for init> ; continue_label: <instructions for condition> ; continue_label: <instructions for post>)
+//    {
+//        <instructions for body>
+//    }
+// break_label:
+//
+//
+// This for loop is implemented
+//
+// for (int i = 0; i < 10; i++) {
+//     printf("test");
+// }
+// return 0;
+//
 
-//start:
-//        for (<instructions for init> ; continue_label: <instructions for condition> ; continue_label: <instructions for post>)
-//        {
-//            <instructions for body>
-//        }
-//break_label:
+Program("for_loop_test")
+
+Function("for_loop_test", true, [
 
     // <instructions for init>
     i = Var("i")
-    i = 0
+    i = Constant(ConstInt(0))
 
     tmp.0 = Var("tmp.0")
     tmp.1 = Var("tmp.1")
 
 Label(start)
     // <instructions for condition>
-    //    v = <result of condition>
-//    tmp.0 = Var("tmp.0")
-    tmp.0 = i < 10
+    tmp.0 = i < Constant(ConstInt(10))
 
-    // JumpIfZero(v, break_label)
     JumpIfZero(tmp.0, break_label)
 
     // <instructions for body>
@@ -29,8 +38,7 @@ Label(start)
 
 Label(continue_label)
     // <instructions for post>
-//    tmp.1 = Var("tmp.1")
-    tmp.1 = i + 1
+    tmp.1 = i + Constant(ConstInt(1))
     i = tmp.1
 
     Jump(start)

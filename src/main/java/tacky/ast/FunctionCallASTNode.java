@@ -1,12 +1,10 @@
 package tacky.ast;
 
-import ast.ExpressionASTNode;
+import ast.ASTNode;
 
-public class AssignmentASTNode extends TACKYASTNode {
+public class FunctionCallASTNode extends TACKYASTNode {
 
-    public String lhs;
-
-    public ExpressionASTNode expression;
+    public String returnVariable;
 
     public void printRecursive(final StringBuilder stringBuilder, final int indent) {
         printRecursive(stringBuilder, indent, true);
@@ -18,7 +16,7 @@ public class AssignmentASTNode extends TACKYASTNode {
         for (int i = 0; i < indent; i++) {
             stringBuilder.append("  ");
         }
-        stringBuilder.append("[assignment_stmt]");
+        stringBuilder.append("[function_call] name: \"").append(value).append("\"");
 
         if (addLineBreak) {
             stringBuilder.append("\n");
@@ -28,19 +26,14 @@ public class AssignmentASTNode extends TACKYASTNode {
         for (int i = 0; i < indent + 1; i++) {
             stringBuilder.append("  ");
         }
-        stringBuilder.append("lhs = \"").append(lhs).append("\"\n");
+        stringBuilder.append("returnVariable = \"").append(returnVariable).append("\"\n");
 
-        // indent
-        for (int i = 0; i < indent + 1; i++) {
-            stringBuilder.append("  ");
+        // expression.printRecursive(stringBuilder, indent + 1);
+
+        // all children
+        for (ASTNode child : children) {
+            child.printRecursive(stringBuilder, indent + 1);
         }
-        stringBuilder.append("rhs = \n");
-        expression.printRecursive(stringBuilder, indent + 2);
-
-        // // all children
-        // for (ASTNode child : children) {
-        //     child.printRecursive(stringBuilder, indent + 1);
-        // }
     }
-
+    
 }

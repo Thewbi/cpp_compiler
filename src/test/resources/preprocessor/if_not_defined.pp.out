@@ -1,4 +1,1 @@
-int main ( ) { 
-    printf ( "Here is the message: %s\n" , "You wish!" ) ; 
-    return 0 ; 
-} 
+   intmain(){   printf("Here is the message: %s\n",MESSAGE);   return0;}

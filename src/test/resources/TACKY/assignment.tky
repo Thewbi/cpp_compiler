@@ -1,14 +1,24 @@
 Program("test")
+
 Function("test", true, [
 
-    result = 1
+    result = Var("result")
+    result = Constant(ConstInt(1))
 
+    tmp.2 = Var("tmp.2")
     tmp.2 = 10 + 1
-    a.1 = tmp.2
-    tmp.3 = a.1 * 2
-    b.0 = tmp.3
-    Return(b.0)
 
-    Return(Var(b.0))
+    a.1 = Var("a.1")
+    a.1 = tmp.2
+    
+    tmp.3 = Var("tmp.3")
+    tmp.3 = a.1 * 2
+    
+    b.0 = Var("b.0")
+    b.0 = tmp.3
+    
+    //return(b.0)
+
+    return(Var(b.0))
 
 ])

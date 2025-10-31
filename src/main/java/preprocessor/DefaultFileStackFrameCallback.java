@@ -3,9 +3,7 @@ package preprocessor;
 import java.util.Map;
 import java.util.Stack;
 
-import org.antlr.runtime.tree.Tree;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.math.NumberUtils;
 
 import ast.ASTNode;
 
@@ -446,6 +444,10 @@ public class DefaultFileStackFrameCallback implements FileStackFrameCallback {
 
     private void outputASTNode(ASTNode astNode, StringBuilder stringBuilder) {
 
+        if (astNode == null) {
+            System.out.println("test");
+        }
+
         // // DEBUG
         // StringBuilder debugStringBuilder = new StringBuilder();
         // astNode.printRecursive(debugStringBuilder, 0);
@@ -576,9 +578,6 @@ public class DefaultFileStackFrameCallback implements FileStackFrameCallback {
             replaceActualParameterByValue(childASTNode, formalParameterIdentifier, newValue);
         }
     }
-
-
-
 
     // private void outputASTNode(ASTNode astNode, StringBuilder stringBuilder) {
 

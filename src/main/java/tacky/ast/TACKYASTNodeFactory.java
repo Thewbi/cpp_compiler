@@ -1,5 +1,6 @@
 package tacky.ast;
 
+
 public class TACKYASTNodeFactory {
 
     public ProgramASTNode createProgramASTNode() {
@@ -65,6 +66,18 @@ public class TACKYASTNodeFactory {
     public LoadFromAddressASTNode createLoadFromAddressASTNode() {
         LoadFromAddressASTNode node = new LoadFromAddressASTNode();
         node.nodeType = NodeType.LoadFromAddress;
+        return node;
+    }
+
+    public FunctionCallASTNode createFunctionCallASTNode() {
+        FunctionCallASTNode node = new FunctionCallASTNode();
+        node.nodeType = NodeType.FunctionCall;
+        return node;
+    }
+
+    public ValueASTNode createValueASTNode() {
+        ValueASTNode node = new ValueASTNode();
+        node.nodeType = NodeType.Value;
         return node;
     }
 
