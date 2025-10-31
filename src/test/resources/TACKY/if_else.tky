@@ -1,3 +1,51 @@
+//
+// if (a == 1) {
+//   printf("a == 1\n");
+// } else if (a == 2) {
+//   printf("a == 2\n");
+// } else {
+//   printf("a == other_value\n");
+// }
+//
+
+Program("main")
+
+Function("main", true, [
+
+    i = Var("i")
+    i = Constant(ConstInt(32))
+
+    //
+    // if-statement
+    //
+
+    tmp.0 = Var("tmp.0")
+
+    // if (a == 1) {
+    tmp.0 = i == Constant(ConstInt(1))
+    JumpIfZero(tmp.0, if_2)
+    printf("a == 1")
+    Jump(end_if)
+
+Label(if_2)
+
+    // } else if (a == 2) {
+    tmp.0 = i == Constant(ConstInt(2))
+    JumpIfZero(tmp.0, if_3)
+    printf("a == 2")
+    Jump(end_if)
+
+Label(if_3)
+
+    // } else {
+    printf("a == other_value");
+
+Label(end_if)
+
+    return(Constant(ConstInt(0)))
+
+])
+
 /*
 unsigned int one_hundred = 100u;
 unsigned int large_uint = 4294967294u;
@@ -39,7 +87,7 @@ int main(void) {
     return 0;
 }
 */
-
+/*
 global function main() {
 
     tmp.0 = large_uint < one_hundred
@@ -137,3 +185,5 @@ static global large_uint: Unsigned Int = 4294967294U
 static global large_ulong: Unsigned Long = 4294967294UL
 static global one_hundred: Unsigned Int = 100U
 static global one_hundred_ulong: Unsigned Long = 100UL
+
+*/

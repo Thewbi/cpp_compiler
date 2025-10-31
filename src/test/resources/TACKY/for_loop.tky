@@ -11,7 +11,7 @@
 // This for loop is implemented
 //
 // for (int i = 0; i < 10; i++) {
-//     printf("test");
+//     printf("test\n");
 // }
 // return 0;
 //

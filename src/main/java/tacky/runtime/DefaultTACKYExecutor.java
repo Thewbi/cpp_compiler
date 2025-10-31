@@ -243,6 +243,11 @@ public class DefaultTACKYExecutor implements TACKYExecutor {
                 rhsValue = evaluateExpression(tackyStackFrame, expression.rhs);
                 return lhsValue + rhsValue;
 
+            case Subtract:
+                lhsValue = evaluateExpression(tackyStackFrame, expression.lhs);
+                rhsValue = evaluateExpression(tackyStackFrame, expression.rhs);
+                return lhsValue - rhsValue;
+
             case Constant:
                 return retrieveConstantValue(expression);
 
@@ -256,13 +261,33 @@ public class DefaultTACKYExecutor implements TACKYExecutor {
                 TACKYStackFrameVariableDescriptor varDesc = tackyStackFrame.variables.get(expression.value);
                 return memory[varDesc.address / 4];
 
+            case Equality:
+                lhsValue = evaluateExpression(tackyStackFrame, expression.lhs);
+                rhsValue = evaluateExpression(tackyStackFrame, expression.rhs);
+                return lhsValue == rhsValue ? 1 : 0;
+
             case LessThen:
                 lhsValue = evaluateExpression(tackyStackFrame, expression.lhs);
                 rhsValue = evaluateExpression(tackyStackFrame, expression.rhs);
                 return lhsValue < rhsValue ? 1 : 0;
 
+            case LessThenOrEqual:
+                lhsValue = evaluateExpression(tackyStackFrame, expression.lhs);
+                rhsValue = evaluateExpression(tackyStackFrame, expression.rhs);
+                return lhsValue <= rhsValue ? 1 : 0;
+
+            case GreaterThen:
+                lhsValue = evaluateExpression(tackyStackFrame, expression.lhs);
+                rhsValue = evaluateExpression(tackyStackFrame, expression.rhs);
+                return lhsValue > rhsValue ? 1 : 0;
+
+            case GreaterThenOrEqual:
+                lhsValue = evaluateExpression(tackyStackFrame, expression.lhs);
+                rhsValue = evaluateExpression(tackyStackFrame, expression.rhs);
+                return lhsValue >= rhsValue ? 1 : 0;
+
             default:
-                throw new RuntimeException("null");
+                throw new RuntimeException("Unknown expression type: " + expression.expressionType);
 
         }
     }

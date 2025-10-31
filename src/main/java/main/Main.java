@@ -676,7 +676,9 @@ public class Main {
         // final String filename = "src/test/resources/TACKY/expression_add.tky";
         // final String filename = "src/test/resources/TACKY/expression_less_than_constants.tky";
         // final String filename = "src/test/resources/TACKY/expression_less_than_var_constant.tky";
-        final String filename = "src/test/resources/TACKY/for_loop.tky";
+        // final String filename = "src/test/resources/TACKY/if_else.tky";
+        // final String filename = "src/test/resources/TACKY/for_loop.tky";
+        final String filename = "src/test/resources/TACKY/while_loop.tky";
         // final String filename = "src/test/resources/TACKY/pointer_creation.tky";
         // final String filename = "src/test/resources/TACKY/array_int.tky";
         // final String filename = "src/test/resources/TACKY/function_call.tky";

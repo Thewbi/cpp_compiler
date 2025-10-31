@@ -2,7 +2,6 @@ package grammar;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Stack;
 
 import com.cpp.grammar.TACKYParser;
 import com.cpp.grammar.TACKYParser.Arg_listContext;
@@ -34,8 +33,6 @@ public class StructureTACKYParserListener extends TACKYParserBaseListener {
     public ASTNode currentNode;
 
     public ASTNode constVal;
-
-    // public Stack<ExpressionASTNode> expressionStack = new Stack<>();
 
     public TACKYASTNodeFactory tackyASTNodeFactory = new TACKYASTNodeFactory();
 
@@ -177,7 +174,7 @@ public class StructureTACKYParserListener extends TACKYParserBaseListener {
 
     @Override
     public void enterConstant_decl(TACKYParser.Constant_declContext ctx) {
-        System.out.println("[" + ctx.hashCode() + "] " + ctx.getText());
+        // System.out.println("[" + ctx.hashCode() + "] " + ctx.getText());
 
         // create a VariableDeclarationASTNode
         ConstantDeclarationASTNode constantDeclarationASTNode = tackyASTNodeFactory.createConstantDeclarationASTNode();
@@ -376,8 +373,7 @@ public class StructureTACKYParserListener extends TACKYParserBaseListener {
 
     @Override
     public void enterExpr(TACKYParser.ExprContext ctx) {
-
-        System.out.println("ENTER [" + ctx.hashCode() + "] " + ctx.getText());
+        // System.out.println("ENTER [" + ctx.hashCode() + "] " + ctx.getText());
 
         ExpressionASTNode expressionASTNode = new ExpressionASTNode();
         expressionASTNode.ctx = ctx;
@@ -385,7 +381,8 @@ public class StructureTACKYParserListener extends TACKYParserBaseListener {
         if (ctx.children.size() == 1) {
             expressionASTNode.expressionType = ExpressionType.Primary;
         } else if (ctx.children.size() == 3) {
-            expressionASTNode.expressionType = ExpressionType.fromString(ctx.getChild(1).getText());
+            String expressionAsText = ctx.getChild(1).getText();
+            expressionASTNode.expressionType = ExpressionType.fromString(expressionAsText);
         } else {
             throw new RuntimeException("Unhandled case!");
         }
@@ -396,7 +393,7 @@ public class StructureTACKYParserListener extends TACKYParserBaseListener {
 
     @Override
     public void exitExpr(TACKYParser.ExprContext ctx) {
-        System.out.println("EXIT [" + ctx.hashCode() + "] " + ctx.getText());
+        // System.out.println("EXIT [" + ctx.hashCode() + "] " + ctx.getText());
 
         ExpressionASTNode expressionASTNode = (ExpressionASTNode) currentNode;
         if (ctx.children.size() == 1) {
@@ -407,39 +404,6 @@ public class StructureTACKYParserListener extends TACKYParserBaseListener {
         }
 
         ascend();
-        
-        // if (ctx.children.size() == 1) {
-        //     ascend();
-        // } else if (ctx.children.size() == 3) {
-        //     ascend();
-        // } else {
-        //     throw new RuntimeException("Unhandled case!");
-        // }
-
-        // if (ctx.children.size() == 1) {
-        //     ExpressionASTNode expressionASTNode = new ExpressionASTNode();
-        //     expressionASTNode.ctx = ctx;
-        //     expressionASTNode.value = ctx.getText();
-        //     expressionASTNode.expressionType = ExpressionType.Primary;
-        //     expressionStackPush(expressionASTNode);
-
-        //     return;
-        // }
-
-        // if (ctx.children.size() == 3) {
-
-        //     ExpressionASTNode expressionASTNode = new ExpressionASTNode();
-        //     expressionASTNode.ctx = ctx;
-        //     expressionASTNode.value = ctx.getText();
-        //     expressionASTNode.expressionType = ExpressionType.fromString(ctx.getChild(1).getText());
-        //     expressionASTNode.rhs = expressionStackPop();
-        //     expressionASTNode.lhs = expressionStackPop();
-        //     expressionStackPush(expressionASTNode);
-
-        //     return;
-        // }
-
-        // throw new RuntimeException("Unhandled case!");
     }
 
     //
@@ -451,14 +415,6 @@ public class StructureTACKYParserListener extends TACKYParserBaseListener {
         parent.children.add(child);
         child.parent = parent;
     }
-
-    // private ExpressionASTNode expressionStackPop() {
-    //     return expressionStack.pop();
-    // }
-
-    // private void expressionStackPush(ExpressionASTNode expressionASTNode) {
-    //     expressionStack.push(expressionASTNode);
-    // }
 
     private void ascend() {
         currentNode = currentNode.parent;

@@ -8,6 +8,12 @@ public enum ExpressionType {
     /** ++ */
     UnaryIncrement,
 
+    /** Subtract: - */
+    Subtract,
+
+    /** -- */
+    UnaryDecrement,
+
     /** Multiplication: * */
     Mul,
 
@@ -24,7 +30,13 @@ public enum ExpressionType {
     LessThen,
 
     /** <= */
-    LessThenOrEquals,
+    LessThenOrEqual,
+
+    /** > */
+    GreaterThen,
+
+    /** >= */
+    GreaterThenOrEqual,
 
     /** & */
     AddressOperator,
@@ -49,6 +61,10 @@ public enum ExpressionType {
             return Add;
         } else if (tempData.equalsIgnoreCase("++")) {
             return UnaryIncrement;
+        } else if (tempData.equalsIgnoreCase("-")) {
+            return Subtract;
+        } else if (tempData.equalsIgnoreCase("--")) {
+            return UnaryDecrement;
         } else if (tempData.equalsIgnoreCase("*")) {
             return Mul;
         } else if (tempData.equalsIgnoreCase("/=")) {
@@ -60,7 +76,11 @@ public enum ExpressionType {
         } else if (tempData.equalsIgnoreCase("<")) {
             return LessThen;
         } else if (tempData.equalsIgnoreCase("<=")) {
-            return LessThenOrEquals;
+            return LessThenOrEqual;
+        } else if (tempData.equalsIgnoreCase(">")) {
+            return GreaterThen;
+        } else if (tempData.equalsIgnoreCase(">=")) {
+            return GreaterThenOrEqual;
         } else if (tempData.equalsIgnoreCase("*")) {
             return Mul;
         } else if (tempData.equalsIgnoreCase("&")) {
@@ -71,5 +91,9 @@ public enum ExpressionType {
             throw new RuntimeException("Unknown type: " + data);
         }
     }
+
+    // public String toString() {
+    //     return "";
+    // }
 
 }
