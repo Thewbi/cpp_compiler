@@ -6,7 +6,7 @@ public class JumpASTNode extends TACKYASTNode {
 
     public JumpType jumpType;
 
-    public String variable;
+    // public String variable;
 
     public void printRecursive(final StringBuilder stringBuilder, final int indent) {
         printRecursive(stringBuilder, indent, true);
@@ -20,9 +20,9 @@ public class JumpASTNode extends TACKYASTNode {
         }
 
         stringBuilder.append("[jump] type=\"").append(jumpType);
-        if (jumpType == JumpType.JumpIfZero || jumpType == JumpType.JumpIfNotZero) {
-            stringBuilder.append("\" variable=\"").append(variable);
-        }
+        // if (jumpType == JumpType.JumpIfZero || jumpType == JumpType.JumpIfNotZero) {
+        //     stringBuilder.append("\" variable=\"").append(variable);
+        // }
         stringBuilder.append("\" target=\"").append(value).append("\"");
 
         if (addLineBreak) {

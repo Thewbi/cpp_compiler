@@ -1,7 +1,7 @@
 Program("test")
 Function("test", true, [
 
-    Copy(Var(tmp.0), Var(abc))
+    Copy(Var("tmp.0"), Var("abc"))
 
     return(Constant(ConstInt(0)))
 

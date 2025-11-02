@@ -5,6 +5,6 @@ StaticConstant("string.1", ASCIIZ, STRINGINIT("A profound statement.", true))
 
 Function("test", true,
 
-    return(Constant(0))
+    return(Constant(ConstInt(0)))
 
 )

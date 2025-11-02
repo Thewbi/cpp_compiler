@@ -1,9 +1,9 @@
 Program("test")
-Function("test", true,
+Function("test", true, [
 
-    tmp.0 = Var(tmp.0)
-    abc = Var(abc)
+    tmp.0 = Var("tmp.0")
+    abc = Var("abc")
 
-    Return(Var(b.0))
+    Return(Var("b.0"))
 
-)
+])

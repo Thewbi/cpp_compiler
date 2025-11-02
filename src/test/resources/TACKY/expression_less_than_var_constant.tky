@@ -7,14 +7,22 @@ Program("main")
 // Statements: [ ... ]
 Function("main", true, [
 
+    compare = Var("compare")
+
     i = Var("i")
     i = Constant(ConstInt(0))
 
     tmp.0 = Var("tmp.0")
     tmp.0 = i < Constant(ConstInt(30))
 
-    
+    // check if tmp.0 stores a non-zero value
+    compare = tmp.0 == 1
+    jumpIfNotZero(compare, end)
+    printf("Should contain non-zero (true)")
+    return(Constant(ConstInt(1))) // non-zero return value equals error
 
+Label(end)
+    printf("done")
     return(Constant(ConstInt(0)))
 
 ])

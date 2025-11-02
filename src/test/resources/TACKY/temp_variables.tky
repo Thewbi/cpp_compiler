@@ -6,6 +6,6 @@ Function("test", true,
     tmp.3 = a.1 * 2
     b.0 = tmp.3
 
-    Return(b.0)
+    Return(Var("b.0"))
 
 )

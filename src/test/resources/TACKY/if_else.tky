@@ -13,7 +13,7 @@ Program("main")
 Function("main", true, [
 
     i = Var("i")
-    i = Constant(ConstInt(32))
+    i = Constant(ConstInt(1))
 
     //
     // if-statement

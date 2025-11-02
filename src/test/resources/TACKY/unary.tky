@@ -1,15 +1,15 @@
 Program("test")
-Function("test", true,
+Function("test", true, [
 
-    Unary(Negate, Constant(8), Var("tmp.0"))
-    Unary(Complement, Var("tmp.0"), Var("tmp.1"))
+    //Unary(Negate, Constant(8), Var("tmp.0"))
+    //Unary(Complement, Var("tmp.0"), Var("tmp.1"))
 
-    return(Constant(0))
+    return(Constant(ConstInt(0)))
     Return(Var("tmp.2"))
 
 
-    Unary(Complement, Constant(2), Var("main.0"))
-    Unary(Negate, Var("main.0"), Var("main.1"))
+    //Unary(Complement, Constant(2), Var("main.0"))
+    //Unary(Negate, Var("main.0"), Var("main.1"))
     Return(Var("main.1"))
 
-)
+])

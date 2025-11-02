@@ -5,6 +5,6 @@ StaticVariable(testBoolStaticVar, true, bool, INTINIT(0))
 
 Function("test", true,
 
-    return(Constant(0))
+    return(Constant(ConstInt(0)))
 
 )

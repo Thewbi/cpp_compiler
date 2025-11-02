@@ -3,7 +3,7 @@ Function("test", true, [
 
     Label(identifier)
 
-    Return(b.0)
+    //Return(Var("b.0"))
     return(Constant(ConstInt(0)))
 
 ])

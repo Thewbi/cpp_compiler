@@ -1,9 +1,9 @@
 //
 // int a = 5;
-// while (a > 0) {
+// do {
 //    printf("test");
 //    a = a - 1;
-// }
+// } while (a > 0)
 // return 0;
 //
 
@@ -18,12 +18,12 @@ Function("main", true, [
 
 Label(start_while_loop)
 
-    tmp.0 = a > Constant(ConstInt(0))
-    JumpIfZero(tmp.0, end_while_loop)
-
     printf("test %d", a);
 
     a = a - Constant(ConstInt(1))
+
+    tmp.0 = a > Constant(ConstInt(0))
+    JumpIfZero(tmp.0, end_while_loop)
 
     Jump(start_while_loop)
 

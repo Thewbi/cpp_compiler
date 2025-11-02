@@ -1,0 +1,20 @@
+Program("main")
+
+// Function
+// Name: "main"
+// Global: true
+// Parameters: None
+// Statements: [ ... ]
+Function("main", true, [
+
+    // OK
+    // printf("test_printf")
+
+    b = Var("b")
+    b = Constant(ConstInt(5))
+
+    printf("test_printf %s %d %d", "a", b, 6)
+
+    return(Constant(ConstInt(0)))
+
+])

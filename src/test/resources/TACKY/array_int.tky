@@ -8,39 +8,49 @@ Function("test", true, [
     // Q: How does the tacky runtime know, that the next variable needs to be placed so far away
     // that there is enough space for all the arrays elements?
     //
-    // A: The memory module has already processed the array size and has allocated enough memory for the array
+    // A: The memory module has already processed the array size and has allocated enough 
+    //    memory for the array
     //
-    // Q: What if I want to execute a tacky file and I have no access to the result of the memory module's layout?
+    // Q: What if I want to execute a tacky file and I have no access to the result of the 
+    //    memory module's layout?
     //
     // A: OPTION 1: Then arrays are always spilled (not placed into registers any more but into memory)
-    //    The implementation inside the tacky vm then needs to be a list of elements somehow!?!?
-    //    Then executing assembly code and executing the TACKY on the TACKY vm will show different behaviour!
+    //    The implementation inside the tacky VM then needs to be a list of elements somehow!?!?
+    //    Then executing assembly code and executing the TACKY on the TACKY VM will show different 
+    //    behaviour!
     //
-    // A: OPTION 2: Force the user to encode the length of the array into the TACKY code. For example if there
-    //    is an array of six elements, define six int variables in TACKY code in a consecutive manner!
-    //    Then the array will point to the first of these six int variables. And the assumption has to hold which
-    //    says that consecutively defined scalar values are also managed in a consecutive manner by the TACKY VM,
-    //    in order to make pointer arithmetic work. a ptr++ then just jumps to the next integer just like A
-    //    real array is implemented in assembly.
+    // A: OPTION 2: Force the user to encode the length of the array into the TACKY code. For example 
+    //    if there is an array of six elements, define six int variables in TACKY code in a consecutive
+    //    manner! Then the array will point to the first of these six int variables. And the assumption 
+    //    has to hold which says that consecutively defined scalar values are also managed in a 
+    //    consecutive manner by the TACKY VM, in order to make pointer arithmetic work. a ptr++ then 
+    //    just jumps to the next integer just like a real array is implemented in assembly.
+    //    This means when the TACKY VM sees several consecutive variables with the same prefix
+    //    and differing only by a digit following the prefix,
+    //    the TACKY VM spills them into memory automatically to treat them as an array.
 
     // If the TACKY VM does not get type information from the lexical analysis stage, it does not know
     // what types the variables are because there are no types in the TACKY grammar!
 
-    // To force the creation of an array in TACKY VM without type information from lexical analysis stage,
-    // use the special naming convention <ARRAY_NAME>_array_element_<IDX>, where <ARRAY_NAME> is the common
-    // identifier for all elements of that array and <IDX> is the index of the element.
+    // To force the creation of an array in TACKY VM without type information from lexical analysis 
+    // stage, use the special naming convention <ARRAY_NAME>_array_element_<IDX>, where <ARRAY_NAME> 
+    // is the common identifier for all elements of that array and <IDX> is the index of the element.
 
     // TACKY VM will automatically:
-    // 1. spill all elements into memeory so that they do have an address and pointer arithmetic works on them
-    // 2. place them in a packed, consecutive fashion into memory so that again, pointer arithmetic works on the array
+    // 1. spill all elements into memeory so that they do have an address and pointer arithmetic
+    //    works on them
+    // 2. place them in a packed, consecutive fashion into memory so that again, pointer arithmetic
+    //    works on the array
 
     // create the array "test" with four int32_t elements
-    test_array_element_1 = Var("test_array_element_1") // without variable definition table from semantic analysis stage, the TACKY VM assumes a single int32_t variable in a register
+    //
+    // without variable definition table from semantic analysis stage, 
+    // the TACKY VM assumes a single int32_t variable in a register
+    //
+    test_array_element_1 = Var("test_array_element_1") 
     test_array_element_2 = Var("test_array_element_2")
     test_array_element_3 = Var("test_array_element_3")
     test_array_element_4 = Var("test_array_element_4")
-
-
 
     return(Constant(ConstInt(0)))
 

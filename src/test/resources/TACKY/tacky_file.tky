@@ -1,6 +1,6 @@
 Program("test")
 Function("test", true,
 
-    return(Constant(0))
+    return(Constant(ConstInt(0)))
 
 )

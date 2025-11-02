@@ -1,0 +1,18 @@
+Program("main")
+
+// Function
+// Name: "main"
+// Global: true
+// Parameters: None
+// Statements: [ ... ]
+Function("main", true, [
+
+    // OK - can return variable
+    tmp.0 = Var("tmp.0")
+    tmp.0 = 0
+    return(Var("tmp.0"))
+
+    // OK - can return constant
+    //return(Constant(ConstInt(0)))
+
+])

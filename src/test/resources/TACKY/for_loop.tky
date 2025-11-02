@@ -34,7 +34,7 @@ Label(start)
     JumpIfZero(tmp.0, break_label)
 
     // <instructions for body>
-    printf("test")
+    printf("test %d", i)
 
 Label(continue_label)
     // <instructions for post>

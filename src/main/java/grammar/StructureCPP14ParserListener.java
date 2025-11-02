@@ -101,9 +101,11 @@ public class StructureCPP14ParserListener extends CPP14ParserBaseListener {
 
     @Override
     public void enterFunctionDefinition(CPP14Parser.FunctionDefinitionContext ctx) {
+
         FunctionDeclarationASTNode functionDeclarationASTNode = new FunctionDeclarationASTNode();
         functionDeclarationASTNode.returnType = ctx.getChild(0).getText();
         functionDeclarationASTNode.ctx = ctx;
+        
         connectToParent(currentNode, functionDeclarationASTNode);
 
         // descend
@@ -297,6 +299,7 @@ public class StructureCPP14ParserListener extends CPP14ParserBaseListener {
         expressionASTNode.ctx = ctx;
         expressionASTNode.value = ctx.getText();
         expressionASTNode.expressionType = ExpressionType.Primary;
+
         expressionStackPush(expressionASTNode);
     }
 

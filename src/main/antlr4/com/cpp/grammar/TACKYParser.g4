@@ -80,8 +80,6 @@ identifier_attrs
 // In TACKY, the function definition does not contain a parameter for the return value.
 // Only the function call will contain a parameter for a function return value!
 function_definition
-//    : FUNCTION LEFT_PAREN StringLiteral COMMA ( TRUE | FALSE ) ( COMMA param_list )? COMMA statement_list RIGHT_PAREN
-//    : FUNCTION LEFT_PAREN StringLiteral COMMA ( TRUE | FALSE ) COMMA statement_list RIGHT_PAREN
     : FUNCTION LEFT_PAREN StringLiteral COMMA ( TRUE | FALSE ) ( param_list )? COMMA LEFT_BRACKET statement_list RIGHT_BRACKET RIGHT_PAREN
     ;
 
@@ -129,7 +127,7 @@ statement
     | label
     | var_declaration_statement
     | assignment_statement
-    | func_call
+    | function_call
     | printf_call
     ;
 
@@ -265,19 +263,24 @@ expr
     | expr ( PLUS | MINUS ) expr
     | expr ( LESS_THAN | LESS_THAN_OR_EQUAL | GREATER_THAN_OR_EQUAL | GREATER_THAN | EQUAL_OPERATOR ) expr
     | expr ( AMPERSAND_DOUBLE | BAR_DOUBLE ) expr
-//    | expr '(' exprList? ')'
     | Identifier
     | IntegerLiteral
+    | StringLiteral
     | constant_decl
     ;
 
+exprList :
+    expr
+    | expr COMMA exprList
+    ;
+
 // page 479
-func_call
+function_call
     : FUNCCALL LEFT_PAREN Identifier COMMA ( TRUE | FALSE ) ( COMMA arg_list )? ( COMMA val )? RIGHT_PAREN
     ;
 
 printf_call
-    : PRINTF LEFT_PAREN StringLiteral RIGHT_PAREN
+    : PRINTF LEFT_PAREN StringLiteral (COMMA exprList)? RIGHT_PAREN
     ;
 
 arg_list
@@ -285,30 +288,23 @@ arg_list
     | val
     ;
 
-/*
 // VAR are either created using StringLiterals (page 37, e.g. Var("tmp.1")) or via identifiers (page )
-val
-    : CONSTANT LEFT_PAREN IntegerLiteral RIGHT_PAREN
-    | VAR LEFT_PAREN ( Identifier | StringLiteral ) RIGHT_PAREN
-    | Identifier
-    ;
-*/
-
-// VAR are either created using StringLiterals (page 37, e.g. Var("tmp.1")) or via identifiers (page )
-val
-    : constant_decl
+val :
+      constant_decl
     | VAR LEFT_PAREN ( Identifier | StringLiteral ) RIGHT_PAREN
     | Identifier
     ;
 
 constant_decl
     : CONSTANT LEFT_PAREN const RIGHT_PAREN
+    /*    
     | CONSTANT LEFT_PAREN const RIGHT_PAREN
     | CONSTANT LEFT_PAREN const RIGHT_PAREN
     | CONSTANT LEFT_PAREN const RIGHT_PAREN
     | CONSTANT LEFT_PAREN const RIGHT_PAREN
     | CONSTANT LEFT_PAREN const RIGHT_PAREN
     | CONSTANT LEFT_PAREN const RIGHT_PAREN
+    */
     ;
 
 const

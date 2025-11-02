@@ -32,7 +32,7 @@ Function("test", true, [
     Copy(Constant(ConstInt(1)), Var("main.16"))
 
     Label(main.17)
-    Return(Var("main.16"))
+    Return(Var(main.16))
 
     return(Constant(ConstInt(0)))
 

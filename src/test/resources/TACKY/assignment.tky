@@ -2,23 +2,42 @@ Program("test")
 
 Function("test", true, [
 
-    result = Var("result")
-    result = Constant(ConstInt(1))
+    compare = Var("compare")
 
+    // OK
+    //result = Var("result")
+
+    // This does not work! Is this defined?
+    //result = Constant(ConstInt(1))
+
+    // OK
     tmp.2 = Var("tmp.2")
     tmp.2 = 10 + 1
+    // check if tmp.2 stores the value 11
+    compare = tmp.2 == 11
+    jumpIfNotZero(compare, end)
+    printf("Should contain 11!")
+    return(Constant(ConstInt(1))) // non-zero return value equals error
 
+    // OK
     a.1 = Var("a.1")
     a.1 = tmp.2
+    // check if a.1 stores the value 11
+    compare = a.1 == 11
+    jumpIfNotZero(compare, end)
+    printf("Should contain 11!")
+    return(Constant(ConstInt(1))) // non-zero return value equals error
     
     tmp.3 = Var("tmp.3")
     tmp.3 = a.1 * 2
+    // check if tmp.3 stores the value 22
+    compare = tmp.3 == 22
+    jumpIfNotZero(compare, end)
+    printf("Should contain 22!")
+    return(Constant(ConstInt(1))) // non-zero return value equals error
     
-    b.0 = Var("b.0")
-    b.0 = tmp.3
-    
-    //return(b.0)
-
-    return(Var(b.0))
+Label(end)
+    printf("done")
+    return(Constant(ConstInt(0)))
 
 ])

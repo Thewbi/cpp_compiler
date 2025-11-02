@@ -1,10 +1,15 @@
 package tacky.ast;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import ast.ASTNode;
 
 public class FunctionCallASTNode extends TACKYASTNode {
 
     public String returnVariable;
+    
+    public List<Integer> actualParameters = new ArrayList<>();
 
     public void printRecursive(final StringBuilder stringBuilder, final int indent) {
         printRecursive(stringBuilder, indent, true);

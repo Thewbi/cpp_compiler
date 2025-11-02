@@ -66,6 +66,7 @@ import structure.DefaultStructureCallback;
 import tacky.ast.FunctionDefinitionASTNode;
 import tacky.ast.ProgramASTNode;
 import tacky.runtime.DefaultTACKYExecutor;
+import tacky.runtime.TACKYStackFrame;
 import types.FuncDecl;
 import types.Type;
 
@@ -670,7 +671,7 @@ public class Main {
         // All scripts should return the value 0. Otherwise validation
         // throws an error
         //
-        //final String filename = "src/test/resources/TACKY/main_function_return_value.tky";
+        // final String filename = "src/test/resources/TACKY/main_function_return_value.tky";
         // final String filename = "src/test/resources/TACKY/jump.tky";
         // final String filename = "src/test/resources/TACKY/assignment.tky";
         // final String filename = "src/test/resources/TACKY/expression_add.tky";
@@ -678,10 +679,16 @@ public class Main {
         // final String filename = "src/test/resources/TACKY/expression_less_than_var_constant.tky";
         // final String filename = "src/test/resources/TACKY/if_else.tky";
         // final String filename = "src/test/resources/TACKY/for_loop.tky";
-        final String filename = "src/test/resources/TACKY/while_loop.tky";
+        // final String filename = "src/test/resources/TACKY/while_loop.tky";
+        // final String filename = "src/test/resources/TACKY/do_while_loop.tky";
+        // TODO
         // final String filename = "src/test/resources/TACKY/pointer_creation.tky";
+        // TODO
         // final String filename = "src/test/resources/TACKY/array_int.tky";
+        // final String filename = "src/test/resources/TACKY/printf_function_call.tky";
         // final String filename = "src/test/resources/TACKY/function_call.tky";
+        // final String filename = "src/test/resources/TACKY/function_call_return_value.tky";
+        final String filename = "src/test/resources/TACKY/function_call_pass_by_value.tky";
 
         final CharStream charStream = CharStreams
                 .fromFileName(filename);
@@ -757,9 +764,11 @@ public class Main {
 
         System.out.println("mainFunction found is \"" + mainFunction.value + "\"");
 
+        TACKYStackFrame newTackyStackFrame = new TACKYStackFrame();
+
         DefaultTACKYExecutor tackyExecutor = new DefaultTACKYExecutor();
         tackyExecutor.functionDefinitionMap = structureTACKYParserListener.functionDefinitionMap;
-        int returnValue = tackyExecutor.executeFunction(rootNode, 0, mainFunction);
+        int returnValue = tackyExecutor.executeFunction(newTackyStackFrame, rootNode, 0, mainFunction);
 
         if (returnValue == 0) {
             System.out.println("[OK]");

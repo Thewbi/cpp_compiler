@@ -12,16 +12,13 @@ Function("main", true, [
     // Function Call
     // provide actual parameters for both arguments
     // provide a parameter for the return value
-    funccall(test_function, false, Constant(ConstInt(2)), Constant(ConstInt(3)), tmp.0)
+    funccall(test_function, false, 
+        Constant(ConstInt(30)), Constant(ConstInt(3)),
+        tmp.0
+    )
 
-    // check if tmp.0 stores the value 50
-    compare = Var("compare")
-    compare = tmp.0 == 50
-    jumpIfNotZero(compare, end)
-    printf("Should contain non-zero (true)")
-    return(Constant(ConstInt(1))) // non-zero return value equals error
+    printf("tmp.0: %s", tmp.0)
 
-Label(end)
     return(Constant(ConstInt(0)))
 
 ])
@@ -33,10 +30,17 @@ Label(end)
 // Statements: [ ... ]
 Function("test_function", true, param_a, param_b, [
 
-    tmp.0 = Var("tmp.0")
-    tmp.0 = Constant(ConstInt(20)) + Constant(ConstInt(30))
+    printf("param_a: %d", param_a)
+    printf("param_b: %d", param_b)
 
-    //return(Constant(ConstInt(0)))
+    tmp.0 = Var("tmp.0")
+    //tmp.0 = param_a + param_b
+    //tmp.0 = param_a - param_b
+    //tmp.0 = param_a * param_b
+    tmp.0 = param_a / param_b
+
+    //return(Constant(ConstInt(17)))
+
     return(Var("tmp.0"))
     
 ])

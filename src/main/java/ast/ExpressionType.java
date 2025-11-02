@@ -17,6 +17,9 @@ public enum ExpressionType {
     /** Multiplication: * */
     Mul,
 
+    /** Division: * */
+    Div,
+
     /** Division Assignment: /= */
     Div_Assign,
 
@@ -46,6 +49,12 @@ public enum ExpressionType {
 
     Primary, // expressions that are not subdivided further
 
+    StringLiteral,
+
+    IntegerLiteral,
+
+    Identifier, 
+
     Constant,
 
     Cast, // used during cast operations. The type is stored in the rhs property
@@ -67,6 +76,8 @@ public enum ExpressionType {
             return UnaryDecrement;
         } else if (tempData.equalsIgnoreCase("*")) {
             return Mul;
+        } else if (tempData.equalsIgnoreCase("/")) {
+            return Div;
         } else if (tempData.equalsIgnoreCase("/=")) {
             return Div_Assign;
         } else if (tempData.equalsIgnoreCase("==")) {
@@ -91,9 +102,5 @@ public enum ExpressionType {
             throw new RuntimeException("Unknown type: " + data);
         }
     }
-
-    // public String toString() {
-    //     return "";
-    // }
 
 }

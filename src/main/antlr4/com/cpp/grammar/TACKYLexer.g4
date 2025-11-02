@@ -148,9 +148,6 @@ fragment Universalcharactername
 
 Identifier
     :
-	/*
-	 Identifiernondigit | Identifier Identifiernondigit | Identifier DIGIT
-	 */
 	Identifiernondigit ( DOT | Identifiernondigit | DIGIT )*
     ;
 
