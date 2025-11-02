@@ -1,6 +1,8 @@
 Program("main")
 Function("main", true, [
 
+    // every non-zero return value is an error
+    // returning zero means OK
     return(Constant(ConstInt(0)))
 
 ])

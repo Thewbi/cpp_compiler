@@ -681,14 +681,15 @@ public class Main {
         // final String filename = "src/test/resources/TACKY/for_loop.tky";
         // final String filename = "src/test/resources/TACKY/while_loop.tky";
         // final String filename = "src/test/resources/TACKY/do_while_loop.tky";
-        // TODO
-        final String filename = "src/test/resources/TACKY/pointer_creation.tky";
+        // final String filename = "src/test/resources/TACKY/pointer_creation.tky";
+        // final String filename = "src/test/resources/TACKY/function_call_pass_by_const_value.tky";
+        // final String filename = "src/test/resources/TACKY/function_call_pass_by_pointer.tky";
+        // final String filename = "src/test/resources/TACKY/function_call_pass_by_variable_copy.tky";
+        // final String filename = "src/test/resources/TACKY/function_call_return_value.tky";
+        // final String filename = "src/test/resources/TACKY/function_call.tky";
         // TODO
         // final String filename = "src/test/resources/TACKY/array_int.tky";
-        // final String filename = "src/test/resources/TACKY/printf_function_call.tky";
-        // final String filename = "src/test/resources/TACKY/function_call.tky";
-        // final String filename = "src/test/resources/TACKY/function_call_return_value.tky";
-        //final String filename = "src/test/resources/TACKY/function_call_pass_by_value.tky";
+        final String filename = "src/test/resources/TACKY/printf_function_call.tky";
 
         final CharStream charStream = CharStreams
                 .fromFileName(filename);

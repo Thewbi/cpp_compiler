@@ -4,12 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ast.ASTNode;
+import grammar.ActualParameter;
 
 public class FunctionCallASTNode extends TACKYASTNode {
 
     public String returnVariable;
     
-    public List<Integer> actualParameters = new ArrayList<>();
+    public List<ActualParameter> actualParameters = new ArrayList<>();
 
     public void printRecursive(final StringBuilder stringBuilder, final int indent) {
         printRecursive(stringBuilder, indent, true);

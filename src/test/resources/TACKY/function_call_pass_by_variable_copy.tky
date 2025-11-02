@@ -9,11 +9,14 @@ Function("main", true, [
 
     tmp.0 = Var("tmp.0")
 
+    param_a = Var("param_a")
+    param_a = 1
+
     // Function Call
     // provide actual parameters for both arguments
     // provide a parameter for the return value
     funccall(test_function, false, 
-        Constant(ConstInt(30)), Constant(ConstInt(3)),
+        param_a,
         tmp.0
     )
 
@@ -28,16 +31,13 @@ Function("main", true, [
 // Global: true
 // Parameters: param_a, param_b
 // Statements: [ ... ]
-Function("test_function", true, param_a, param_b, [
+Function("test_function", true, param_a [
 
     printf("param_a: %d", param_a)
-    printf("param_b: %d", param_b)
+    //printf("param_b: %d", param_b)
 
     tmp.0 = Var("tmp.0")
-    //tmp.0 = param_a + param_b
-    //tmp.0 = param_a - param_b
-    //tmp.0 = param_a * param_b
-    tmp.0 = param_a / param_b
+    tmp.0 = param_a + 1
 
     //return(Constant(ConstInt(17)))
 

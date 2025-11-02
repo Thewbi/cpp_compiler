@@ -2,23 +2,35 @@ Program("main")
 
 Function("main", true, [
 
-    Jump(target_label)
-
-    //JumpIfZero(Constant(ConstInt(0)), target_label)
-
-    //JumpIfNotZero(Constant(ConstInt(0)), target_label)
-
-    //tmp.0 = Var("tmp.0")
-    //tmp.0 = 0
-    //JumpIfZero(tmp.0, target_label)
-
-    //tmp.0 = Var("tmp.0")
-    //tmp.0 = 1
-    //JumpIfNotZero(tmp.0, target_label)
-
-    printf("This should not print!");
+    Jump(label_2)
+    printf("error 1 - this should not be executed!")
     return(Constant(ConstInt(1)))
 
+Label(label_2)
+    JumpIfZero(Constant(ConstInt(0)), label_3)
+    printf("error 2 - this should not be executed!")
+    return(Constant(ConstInt(2)))
+
+Label(label_3)
+    JumpIfNotZero(Constant(ConstInt(1)), label_4)
+    printf("error 3 - this should not be executed!")
+    return(Constant(ConstInt(3)))
+
+Label(label_4)
+    tmp.0 = Var("tmp.0")
+    tmp.0 = 0
+    JumpIfZero(tmp.0, label_5)
+    printf("error 4 - this should not be executed!")
+    return(Constant(ConstInt(4)))
+
+Label(label_5)
+    tmp.1 = Var("tmp.1")
+    tmp.1 = 1
+    JumpIfNotZero(tmp.1, label_6)
+    printf("error 5 - this should not be executed!")
+    return(Constant(ConstInt(5)))
+
+Label(label_6)
 Label(target_label)
     return(Constant(ConstInt(0)))
 

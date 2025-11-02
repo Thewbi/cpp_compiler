@@ -278,11 +278,11 @@ printf_call :
     ;
 
 arg_list : 
-    val COMMA arg_list
+      val COMMA arg_list
     | val
     ;
 
-// VAR are either created using StringLiterals (page 37, e.g. Var("tmp.1")) or via identifiers (page )
+// VAR are either created using StringLiterals (page 37, e.g. Var("tmp.1")) or via identifiers (page ???)
 val :
       constant_decl
     | VAR LEFT_PAREN ( Identifier | StringLiteral ) RIGHT_PAREN

@@ -70,6 +70,12 @@ public class TACKYASTNodeFactory {
         return node;
     }
 
+    public StoreToAddressASTNode createStoreToAddressASTNode() {
+        StoreToAddressASTNode node = new StoreToAddressASTNode();
+        node.nodeType = NodeType.StoreToAddress;
+        return node;
+    }
+
     public FunctionCallASTNode createFunctionCallASTNode() {
         FunctionCallASTNode node = new FunctionCallASTNode();
         node.nodeType = NodeType.FunctionCall;

@@ -8,6 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import ast.ASTNode;
 import ast.ExpressionASTNode;
+import grammar.ActualParameter;
 import tacky.ast.AssignmentASTNode;
 import tacky.ast.ConstIntASTNode;
 import tacky.ast.ConstantDeclarationASTNode;
@@ -18,6 +19,7 @@ import tacky.ast.JumpASTNode;
 import tacky.ast.LabelASTNode;
 import tacky.ast.LoadFromAddressASTNode;
 import tacky.ast.ReturnASTNode;
+import tacky.ast.StoreToAddressASTNode;
 import tacky.ast.TACKYASTNode;
 import tacky.ast.ValueASTNode;
 import tacky.ast.VariableDeclarationASTNode;
@@ -142,7 +144,6 @@ public class DefaultTACKYExecutor implements TACKYExecutor {
                     break;
 
                 case Label:
-                    // createLabel(tackyStackFrame, (LabelASTNode) statement);
                     index++;
                     break;
 
@@ -206,6 +207,28 @@ public class DefaultTACKYExecutor implements TACKYExecutor {
                     index++;
                     break;
 
+                case StoreToAddress: {
+                    StoreToAddressASTNode storeToAddressASTNode = (StoreToAddressASTNode) statement;
+
+                    // assign value
+                    String variableName = storeToAddressASTNode.variableName;
+                    TACKYStackFrameVariableDescriptor descriptor = tackyStackFrame.variables.get(variableName);
+                    int varValue = memory[descriptor.address / 4];
+
+                    // retrieve address
+                    String ptrVariableName = storeToAddressASTNode.ptrVariableName;
+                    TACKYStackFrameVariableDescriptor ptrDescriptor = tackyStackFrame.variables.get(ptrVariableName);
+
+                    int address = ptrDescriptor.address;
+                    int ptrTargetAddressValue = memory[address / 4];
+
+                    memory[ptrTargetAddressValue / 4] = varValue;
+                }
+
+                    // execute next instruction
+                    index++;
+                    break;
+
                 case FunctionCall: {
 
                     FunctionCallASTNode functionCallASTNode = (FunctionCallASTNode) statement;
@@ -219,8 +242,19 @@ public class DefaultTACKYExecutor implements TACKYExecutor {
                     int i = 0;
                     for (FormalParameter formalParameter : functionDefinitionASTNode.formalParameters) {
 
-                        // int value = (int) (Math.random() * 10);
-                        int value = functionCallASTNode.actualParameters.get(i);
+                        ActualParameter actualParameter = functionCallASTNode.actualParameters.get(i);
+
+                        int value = 0;
+                        if (actualParameter.isConstant) {
+                            value = actualParameter.value;
+                        } else if (actualParameter.isVariable) {
+                            // retrieve variable from current stackframe
+                            TACKYStackFrameVariableDescriptor varDesc = tackyStackFrame.variables
+                                    .get(actualParameter.name);
+                            value = memory[varDesc.address / 4];
+                        } else {
+                            throw new RuntimeException("Not implemented yet!");
+                        }
 
                         insertVariableIntoStackFrame(newTackyStackFrame, formalParameter.getName(),
                                 value);
@@ -414,7 +448,6 @@ public class DefaultTACKYExecutor implements TACKYExecutor {
 
         StringBuilder stringBuilder = new StringBuilder();
         constantDeclarationASTNode.printRecursive(stringBuilder, 0, false);
-        System.out.println(stringBuilder.toString());
     }
 
     private void createVariable(TACKYStackFrame tackyStackFrame, VariableDeclarationASTNode variableDeclaration) {

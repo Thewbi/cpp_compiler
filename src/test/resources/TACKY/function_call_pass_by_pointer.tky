@@ -1,0 +1,62 @@
+Program("main")
+
+// Function
+// Name: "main"
+// Global: true
+// Parameters: None
+// Statements: [ ... ]
+Function("main", true, [
+
+    tmp.0 = Var("tmp.0")            // address: 0
+
+    tmp.1 = Var("tmp.1")            // address: 4
+    tmp.1 = 0
+
+    tmp.1.ptr = Var("tmp.1.ptr")    // address: 8
+
+    // make the address of tmp.1 (which is 4) the value of tmp.1.ptr
+    GetAddress(tmp.1, tmp.1.ptr)
+
+    // Function Call
+    // provide actual parameters for both arguments
+    // provide a parameter for the return value
+    funccall(test_function, false, 
+        tmp.1.ptr,
+        tmp.0
+    )
+
+    tmp.deref = Var("tmp.deref")
+
+    Load(tmp.1.ptr, tmp.deref)
+
+    printf("tmp.deref: %d", tmp.deref)
+
+    compare = Var("compare")
+    compare = tmp.deref == 123
+    jumpIfNotZero(compare, end)
+    printf("Should contain 123!")
+    return(Constant(ConstInt(1))) // non-zero return value equals error
+
+Label(end)
+    return(Constant(ConstInt(0)))
+
+])
+
+// Function
+// Name: "test_function"
+// Global: true
+// Parameters: ptr_a
+// Statements: [ ... ]
+Function("test_function", true, 
+    ptr_a,                          // address: 12
+[
+
+    tmp.0 = Var("tmp.0")            // address: 16
+    tmp.0 = 123
+
+    // store the value in tmp.0 at the address stored as the value of the ptr_a variable
+    Store(ptr_a, tmp.0)
+
+    return(Constant(ConstInt(0)))
+    
+])

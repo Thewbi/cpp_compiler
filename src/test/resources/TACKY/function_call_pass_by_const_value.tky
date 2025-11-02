@@ -1,0 +1,44 @@
+Program("main")
+
+// Function
+// Name: "main"
+// Global: true
+// Parameters: None
+// Statements: [ ... ]
+Function("main", true, [
+
+    tmp.0 = Var("tmp.0")
+
+    // Function Call
+    // provide actual parameters for both arguments
+    // provide a parameter for the return value
+    funccall(test_function, false, 
+        Constant(ConstInt(30)), Constant(ConstInt(3)),
+        tmp.0
+    )
+
+    printf("tmp.0: %s", tmp.0)
+
+    return(Constant(ConstInt(0)))
+
+])
+
+// Function
+// Name: "test_function"
+// Global: true
+// Parameters: param_a, param_b
+// Statements: [ ... ]
+Function("test_function", true, param_a, param_b, [
+
+    printf("param_a: %d", param_a)
+    printf("param_b: %d", param_b)
+
+    tmp.0 = Var("tmp.0")
+    //tmp.0 = param_a + param_b
+    //tmp.0 = param_a - param_b
+    //tmp.0 = param_a * param_b
+    tmp.0 = param_a / param_b
+
+    return(Var("tmp.0"))
+    
+])

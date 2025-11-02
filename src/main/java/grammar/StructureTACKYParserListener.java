@@ -8,7 +8,6 @@ import org.antlr.v4.runtime.tree.TerminalNodeImpl;
 
 import com.cpp.grammar.TACKYParser;
 import com.cpp.grammar.TACKYParser.Arg_listContext;
-import com.cpp.grammar.TACKYParser.ConstContext;
 import com.cpp.grammar.TACKYParser.Constant_declContext;
 import com.cpp.grammar.TACKYParser.ValContext;
 import com.cpp.grammar.TACKYParserBaseListener;
@@ -30,6 +29,7 @@ import tacky.ast.LoadFromAddressASTNode;
 import tacky.ast.PrintfASTNode;
 import tacky.ast.ProgramASTNode;
 import tacky.ast.ReturnASTNode;
+import tacky.ast.StoreToAddressASTNode;
 import tacky.ast.TACKYASTNodeFactory;
 import tacky.ast.ValueASTNode;
 import tacky.ast.VariableDeclarationASTNode;
@@ -182,6 +182,24 @@ public class StructureTACKYParserListener extends TACKYParserBaseListener {
         ascend();
     }
 
+    @Override
+    public void enterStore(TACKYParser.StoreContext ctx) {
+        String ptrVariableName = ctx.getChild(2).getText();
+        String variableName = ctx.getChild(4).getText();
+
+        StoreToAddressASTNode storeToAddressASTNode = tackyASTNodeFactory.createStoreToAddressASTNode();
+        storeToAddressASTNode.ptrVariableName = ptrVariableName;
+        storeToAddressASTNode.variableName = variableName;
+
+        connectToParent(currentNode, storeToAddressASTNode);
+        descend(storeToAddressASTNode);
+    }
+
+    @Override
+    public void exitStore(TACKYParser.StoreContext ctx) {
+        ascend();
+    }
+
     //
     // Constant Declaration
     //
@@ -262,7 +280,7 @@ public class StructureTACKYParserListener extends TACKYParserBaseListener {
 
     @Override
     public void exitPrintf_call(TACKYParser.Printf_callContext ctx) {
-        System.out.println("[" + ctx.hashCode() + "] " + ctx.getText());
+        // System.out.println("[" + ctx.hashCode() + "] " + ctx.getText());
 
         // PrintfASTNode printfASTNode = tackyASTNodeFactory.createPrintfASTNode();
         // printfASTNode.value = ctx.getChild(2).getText();
@@ -278,7 +296,6 @@ public class StructureTACKYParserListener extends TACKYParserBaseListener {
 
     @Override
     public void enterFunction_call(TACKYParser.Function_callContext ctx) {
-        
         // System.out.println("[" + ctx.hashCode() + "] " + ctx.getText());
 
         FunctionCallASTNode functionCallASTNode = tackyASTNodeFactory.createFunctionCallASTNode();
@@ -291,14 +308,33 @@ public class StructureTACKYParserListener extends TACKYParserBaseListener {
         //
 
         while (arg_listContext.arg_list() != null) {
+
+            // DEBUG
             // System.out.println(arg_listContext);
-            System.out.println(arg_listContext.val().getText());
+            // System.out.println(arg_listContext.val().getText());
 
             ValContext valContext = arg_listContext.val();
 
-            int aval = retrieveConstantValue(valContext);
+            ParseTree parseTree = valContext.children.get(0);
 
-            functionCallASTNode.actualParameters.add(aval);
+            ActualParameter actualParameter = new ActualParameter();
+
+            int aval = 0;
+            if (parseTree instanceof Constant_declContext) {
+                aval = retrieveConstantValue(valContext);
+                actualParameter.isVariable = false;
+                actualParameter.isConstant = true;
+                actualParameter.value = aval;
+            } else if (parseTree instanceof TerminalNodeImpl) {
+                String val = parseTree.getText();
+                actualParameter.isVariable = true;
+                actualParameter.isConstant = false;
+                actualParameter.name = val;
+            } else {
+                throw new RuntimeException("unknown node type");
+            }
+
+            functionCallASTNode.actualParameters.add(actualParameter);
 
             arg_listContext = arg_listContext.arg_list();
         }
@@ -382,16 +418,6 @@ public class StructureTACKYParserListener extends TACKYParserBaseListener {
     @Override
     public void exitJump_if_zero(TACKYParser.Jump_if_zeroContext ctx) {
         // System.out.println("[" + ctx.hashCode() + "] " + ctx.getText());
-
-        // JumpASTNode jumpASTNode = tackyASTNodeFactory.createJumpASTNode();
-        // jumpASTNode.jumpType = JumpType.fromString(ctx.getChild(0).getText());
-        // jumpASTNode.variable = ctx.getChild(2).getText();
-        // jumpASTNode.value = ctx.getChild(4).getText();
-
-        // FunctionDefinitionASTNode functionDefinitionASTNode = (FunctionDefinitionASTNode) currentNode;
-
-        // functionDefinitionASTNode.children.add(jumpASTNode);
-
         ascend();
     }
 
@@ -412,16 +438,6 @@ public class StructureTACKYParserListener extends TACKYParserBaseListener {
     @Override
     public void exitJump_if_not_zero(TACKYParser.Jump_if_not_zeroContext ctx) {
         // System.out.println("[" + ctx.hashCode() + "] " + ctx.getText());
-
-        // JumpASTNode jumpASTNode = tackyASTNodeFactory.createJumpASTNode();
-        // jumpASTNode.jumpType = JumpType.fromString(ctx.getChild(0).getText());
-        // jumpASTNode.variable = ctx.getChild(2).getText();
-        // jumpASTNode.value = ctx.getChild(4).getText();
-
-        // FunctionDefinitionASTNode functionDefinitionASTNode = (FunctionDefinitionASTNode) currentNode;
-
-        // functionDefinitionASTNode.children.add(jumpASTNode);
-
         ascend();
     }
 
@@ -449,7 +465,7 @@ public class StructureTACKYParserListener extends TACKYParserBaseListener {
 
     @Override
     public void enterExpr(TACKYParser.ExprContext ctx) {
-        System.out.println("ENTER [" + ctx.hashCode() + "] " + ctx.getText());
+        // System.out.println("ENTER [" + ctx.hashCode() + "] " + ctx.getText());
 
         ExpressionASTNode expressionASTNode = new ExpressionASTNode();
         expressionASTNode.ctx = ctx;
@@ -508,7 +524,7 @@ public class StructureTACKYParserListener extends TACKYParserBaseListener {
 
     @Override
     public void enterVal(ValContext ctx) {
-        System.out.println("[" + ctx.hashCode() + "] " + ctx.getText());
+        // System.out.println("[" + ctx.hashCode() + "] " + ctx.getText());
 
         // in the return() statement, if a variable name is used instead of a constant
         // this branch stores the variable name into a ValueASTNode
@@ -544,18 +560,20 @@ public class StructureTACKYParserListener extends TACKYParserBaseListener {
 
     private int retrieveConstantValue(ValContext val) {
         
-        System.out.println(val.getText());
+        // DEBUG
+        // System.out.println(val.getText());
 
         ParseTree child = val.getChild(0);
         Constant_declContext constantDecl = (Constant_declContext) child;
 
         child = constantDecl.getChild(2);
-        ConstContext constContext = (ConstContext) child;
+        // ConstContext constContext = (ConstContext) child;
 
         child = constantDecl.getChild(2);
         child = child.getChild(2);
 
-        System.out.println(child.getText());
+        // DEBUG
+        // System.out.println(child.getText());
 
         return Integer.parseInt(child.getText());
     }
