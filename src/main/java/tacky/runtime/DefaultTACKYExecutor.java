@@ -127,7 +127,7 @@ public class DefaultTACKYExecutor implements TACKYExecutor {
                                 outputString = outputString.replaceFirst("%.", "" + identifierVal);
                                 break;
 
-                            default: 
+                            default:
                                 throw new RuntimeException("Unknown type: " + expressionASTNode.expressionType);
                         }
 
@@ -264,12 +264,13 @@ public class DefaultTACKYExecutor implements TACKYExecutor {
         ASTNode astNode = returnASTNode.getChildren().get(0);
 
         if (astNode instanceof ConstantDeclarationASTNode) {
-            returnResult.returnValue = retrieveConstantValue((ConstantDeclarationASTNode) returnASTNode.getChildren().get(0));
+            returnResult.returnValue = retrieveConstantValue(
+                    (ConstantDeclarationASTNode) returnASTNode.getChildren().get(0));
         } else if (astNode instanceof ValueASTNode) {
 
-            // remove Var("")
+            // remove Var(" prefix and ") suffix
             String data = astNode.value;
-            data = data.substring(5, data.length()-2);
+            data = data.substring(5, data.length() - 2);
 
             TACKYStackFrameVariableDescriptor varDesc = tackyStackFrame.variables.get(data);
             returnResult.returnValue = memory[varDesc.address / 4];
@@ -406,7 +407,8 @@ public class DefaultTACKYExecutor implements TACKYExecutor {
     }
 
     private int retrieveConstantValue(ConstantDeclarationASTNode constantDeclarationASTNode) {
-        // ConstantDeclarationASTNode constantDeclarationASTNode = (ConstantDeclarationASTNode) astNode.children.get(0);
+        // ConstantDeclarationASTNode constantDeclarationASTNode =
+        // (ConstantDeclarationASTNode) astNode.children.get(0);
         ConstIntASTNode constIntASTNode = (ConstIntASTNode) constantDeclarationASTNode.getChildren().get(0);
         return Integer.parseInt(constIntASTNode.value);
     }

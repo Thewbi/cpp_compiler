@@ -16,7 +16,6 @@ import com.cpp.grammar.TACKYParserBaseListener;
 import ast.ASTNode;
 import ast.ExpressionASTNode;
 import ast.ExpressionType;
-import ast.ValASTNode;
 import common.StringUtil;
 import tacky.ast.AssignmentASTNode;
 import tacky.ast.ConstIntASTNode;
