@@ -104,8 +104,6 @@ public class DefaultTACKYExecutor implements TACKYExecutor {
                     String outputString = StringUtils.unwrap(statement.value, '"');
                     for (ASTNode childASTNode : statement.children) {
 
-                        // System.out.println(childASTNode.getClass());
-
                         ExpressionASTNode expressionASTNode = (ExpressionASTNode) childASTNode;
 
                         switch (expressionASTNode.expressionType) {
@@ -247,7 +245,7 @@ public class DefaultTACKYExecutor implements TACKYExecutor {
                 }
 
                 default:
-                    throw new RuntimeException("default");
+                    throw new RuntimeException("Unknown node type: " + statement.nodeType);
             }
 
         }
@@ -407,35 +405,23 @@ public class DefaultTACKYExecutor implements TACKYExecutor {
     }
 
     private int retrieveConstantValue(ConstantDeclarationASTNode constantDeclarationASTNode) {
-        // ConstantDeclarationASTNode constantDeclarationASTNode =
-        // (ConstantDeclarationASTNode) astNode.children.get(0);
         ConstIntASTNode constIntASTNode = (ConstIntASTNode) constantDeclarationASTNode.getChildren().get(0);
         return Integer.parseInt(constIntASTNode.value);
     }
 
     private void createConstant(TACKYStackFrame tackyStackFrame,
             ConstantDeclarationASTNode constantDeclarationASTNode) {
-        // createVariable(tackyStackFrame, variableDeclaration);
 
         StringBuilder stringBuilder = new StringBuilder();
         constantDeclarationASTNode.printRecursive(stringBuilder, 0, false);
         System.out.println(stringBuilder.toString());
-
-        // String varName = constantDeclarationASTNode.value;
-        // System.out.println(varName);
     }
 
     private void createVariable(TACKYStackFrame tackyStackFrame, VariableDeclarationASTNode variableDeclaration) {
-        // System.out.println(variableDeclaration);
-
         // TODO: a variable should initially go into a register. It should not
         // immediately spill into memory (stack or heap)
-
         String varName = variableDeclaration.variableName;
-
-        // descriptor.value = (int) (Math.random() * Integer.MAX_VALUE);
         insertVariableIntoStackFrame(tackyStackFrame, varName, (int) (Math.random() * Integer.MAX_VALUE));
-
     }
 
     private void insertVariableIntoStackFrame(TACKYStackFrame tackyStackFrame, String varName, int value) {
@@ -457,17 +443,12 @@ public class DefaultTACKYExecutor implements TACKYExecutor {
     }
 
     private void createLabel(TACKYStackFrame tackyStackFrame, LabelASTNode labelASTNode, int index) {
-
         String labelName = labelASTNode.value;
-
         if (tackyStackFrame.labels.containsKey(labelName)) {
             throw new RuntimeException("Label \"" + labelName + "\" declared already!");
         }
-
         // map label to line
         tackyStackFrame.labels.put(labelName, index);
-
-        // System.out.println("Label: " + labelName + " --> " + index);
     }
 
 }

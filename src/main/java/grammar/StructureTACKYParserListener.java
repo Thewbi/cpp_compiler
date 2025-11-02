@@ -146,11 +146,7 @@ public class StructureTACKYParserListener extends TACKYParserBaseListener {
 
     @Override
     public void enterGet_address(TACKYParser.Get_addressContext ctx) {
-    }
-
-    @Override
-    public void exitGet_address(TACKYParser.Get_addressContext ctx) {
-
+        
         String variableName = ctx.getChild(2).getText();
         String ptrVariableName = ctx.getChild(4).getText();
 
@@ -158,15 +154,17 @@ public class StructureTACKYParserListener extends TACKYParserBaseListener {
         getAddressASTNode.variableName = variableName;
         getAddressASTNode.ptrVariableName = ptrVariableName;
 
-        currentNode.children.add(getAddressASTNode);
+        connectToParent(currentNode, getAddressASTNode);
+        descend(getAddressASTNode);
+    }
+
+    @Override
+    public void exitGet_address(TACKYParser.Get_addressContext ctx) {
+        ascend();
     }
 
     @Override
     public void enterLoad(TACKYParser.LoadContext ctx) {
-    }
-
-    @Override
-    public void exitLoad(TACKYParser.LoadContext ctx) {
 
         String ptrVariableName = ctx.getChild(2).getText();
         String variableName = ctx.getChild(4).getText();
@@ -175,7 +173,13 @@ public class StructureTACKYParserListener extends TACKYParserBaseListener {
         loadFromAddressASTNode.ptrVariableName = ptrVariableName;
         loadFromAddressASTNode.variableName = variableName;
 
-        currentNode.children.add(loadFromAddressASTNode);
+        connectToParent(currentNode, loadFromAddressASTNode);
+        descend(loadFromAddressASTNode);
+    }
+
+    @Override
+    public void exitLoad(TACKYParser.LoadContext ctx) {
+        ascend();
     }
 
     //
@@ -519,8 +523,13 @@ public class StructureTACKYParserListener extends TACKYParserBaseListener {
     // utility
     //
 
+    /**
+     * connect parent and child
+     * 
+     * @param parent
+     * @param child
+     */
     private void connectToParent(ASTNode parent, ASTNode child) {
-        // connect parent and child
         parent.children.add(child);
         child.parent = parent;
     }

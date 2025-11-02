@@ -1,7 +1,8 @@
 // page 371
 
-Program("test")
-Function("test", true, [
+Program("main")
+
+Function("main", true, [
 
     // create pointer (page 370) -- *<exp>
 
@@ -28,6 +29,8 @@ Function("test", true, [
     Load(ptr, result) // dereference operator: load the value that the pointer points to into result
 
     // now the result-variable has to have the value 17
+
+    printf("test: %d", result)
 
     return(Constant(ConstInt(0)))
 
