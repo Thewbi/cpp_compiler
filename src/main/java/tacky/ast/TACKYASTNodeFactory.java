@@ -88,4 +88,16 @@ public class TACKYASTNodeFactory {
         return node;
     }
 
+    public DataType createDataTypeASTNode() {
+        DataType node = new DataType();
+        node.nodeType = NodeType.DataType;
+        return node;
+    }
+
+    public SizeofASTNode createSizeofASTNode() {
+        SizeofASTNode node = new SizeofASTNode();
+        node.nodeType = NodeType.Sizeof;
+        return node;
+    }
+
 }

@@ -28,6 +28,10 @@ public enum NodeType {
 
     FunctionCall,
 
-    Value;
+    Value,
+    
+    DataType, 
+    
+    Sizeof;
 
 }

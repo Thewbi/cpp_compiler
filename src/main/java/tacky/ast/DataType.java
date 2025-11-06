@@ -1,8 +1,12 @@
 package tacky.ast;
 
-import ast.ASTNode;
+public class DataType extends TACKYASTNode {
 
-public class ReturnASTNode extends TACKYASTNode {
+    public String typeName;
+
+    public boolean isArray;
+
+    public int arraySize;
 
     public void printRecursive(final StringBuilder stringBuilder, final int indent) {
         printRecursive(stringBuilder, indent, true);
@@ -10,20 +14,16 @@ public class ReturnASTNode extends TACKYASTNode {
 
     public void printRecursive(final StringBuilder stringBuilder, final int indent, final boolean addLineBreak) {
 
-        // indent and operator or symbol
         for (int i = 0; i < indent; i++) {
             stringBuilder.append("  ");
         }
-        stringBuilder.append("[return] ");
+        stringBuilder.append("[data_type] name: \"").append(typeName).append("\"");
 
-        if (addLineBreak) {
-            stringBuilder.append("\n");
+        if (isArray) {
+            stringBuilder.append(" array: true, arraySize: " + arraySize);
         }
 
-        // all children
-        for (ASTNode child : children) {
-            child.printRecursive(stringBuilder, indent + 1);
-        }
+        stringBuilder.append("\n");
     }
-
+    
 }

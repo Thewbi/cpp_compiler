@@ -687,9 +687,11 @@ public class Main {
         // final String filename = "src/test/resources/TACKY/function_call_pass_by_variable_copy.tky";
         // final String filename = "src/test/resources/TACKY/function_call_return_value.tky";
         // final String filename = "src/test/resources/TACKY/function_call.tky";
+        //final String filename = "src/test/resources/TACKY/printf_function_call.tky";
+
         // TODO
-        // final String filename = "src/test/resources/TACKY/array_int.tky";
-        final String filename = "src/test/resources/TACKY/printf_function_call.tky";
+        final String filename = "src/test/resources/TACKY/array_1.tky";
+        //final String filename = "src/test/resources/TACKY/array_int.tky";
 
         final CharStream charStream = CharStreams
                 .fromFileName(filename);

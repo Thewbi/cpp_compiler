@@ -12,6 +12,7 @@ import grammar.ActualParameter;
 import tacky.ast.AssignmentASTNode;
 import tacky.ast.ConstIntASTNode;
 import tacky.ast.ConstantDeclarationASTNode;
+import tacky.ast.DataType;
 import tacky.ast.FunctionCallASTNode;
 import tacky.ast.FunctionDefinitionASTNode;
 import tacky.ast.GetAddressASTNode;
@@ -23,6 +24,7 @@ import tacky.ast.StoreToAddressASTNode;
 import tacky.ast.TACKYASTNode;
 import tacky.ast.ValueASTNode;
 import tacky.ast.VariableDeclarationASTNode;
+import tacky.ast.SizeofASTNode;
 import types.FormalParameter;
 
 public class DefaultTACKYExecutor implements TACKYExecutor {
@@ -219,10 +221,37 @@ public class DefaultTACKYExecutor implements TACKYExecutor {
                     String ptrVariableName = storeToAddressASTNode.ptrVariableName;
                     TACKYStackFrameVariableDescriptor ptrDescriptor = tackyStackFrame.variables.get(ptrVariableName);
 
+                    if (ptrDescriptor == null) {
+                        throw new RuntimeException("Variable \"" + ptrVariableName + "\" is undefined!");
+                    }
                     int address = ptrDescriptor.address;
                     int ptrTargetAddressValue = memory[address / 4];
 
                     memory[ptrTargetAddressValue / 4] = varValue;
+                }
+
+                    // execute next instruction
+                    index++;
+                    break;
+
+                case Sizeof: {
+                    SizeofASTNode sizeof = (SizeofASTNode) statement;
+
+                    int varValue = 0;
+
+                    String type = sizeof.type;
+                    if (type.equalsIgnoreCase("int")) {
+                        varValue = 4;
+                    } else {
+                        throw new RuntimeException("Unknown type: " + type);
+                    }
+
+                    // retrieve address
+                    String targetVariableName = sizeof.targetVariableName;
+                    TACKYStackFrameVariableDescriptor varDescriptor = tackyStackFrame.variables.get(targetVariableName);
+
+                    int address = varDescriptor.address;
+                    memory[address / 4] = varValue;
                 }
 
                     // execute next instruction
@@ -453,8 +482,28 @@ public class DefaultTACKYExecutor implements TACKYExecutor {
     private void createVariable(TACKYStackFrame tackyStackFrame, VariableDeclarationASTNode variableDeclaration) {
         // TODO: a variable should initially go into a register. It should not
         // immediately spill into memory (stack or heap)
+
         String varName = variableDeclaration.variableName;
-        insertVariableIntoStackFrame(tackyStackFrame, varName, (int) (Math.random() * Integer.MAX_VALUE));
+
+        if (variableDeclaration.getChildren().size() > 0) {
+            DataType dataType = (DataType) variableDeclaration.getChildren().get(0);
+            if (dataType.isArray) {
+
+                for (int i = 0; i < dataType.arraySize; i++) {
+
+                    String tempVarName = "";
+                    if (i > 0) {
+                        tempVarName = varName + "_" + i;
+                    } else {
+                        tempVarName = varName;
+                    }
+
+                    insertVariableIntoStackFrame(tackyStackFrame, tempVarName, (int) (Math.random() * Integer.MAX_VALUE));
+                }
+            }
+        } else {
+            insertVariableIntoStackFrame(tackyStackFrame, varName, (int) (Math.random() * Integer.MAX_VALUE));
+        }
     }
 
     private void insertVariableIntoStackFrame(TACKYStackFrame tackyStackFrame, String varName, int value) {

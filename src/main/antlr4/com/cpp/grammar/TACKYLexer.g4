@@ -27,10 +27,23 @@ fragment X:[xX];
 fragment Y:[yY];
 fragment Z:[zZ];
 
+//
+// Custom
+//
+
+PRINTF : P R I N T F ;
+
+SIZEOF : S I Z E O F ;
+
+//
+// Base Tacky
+//
+
 ADD : A D D ;
 ADDPTR : A D D P T R ;
 ASCII : A S C I I ;
 ASCIIZ : A S C I I Z ;
+ARRAY : A R R A Y ;
 
 BINARY : B I N A R Y ;
 BOOL : B O O L ;
@@ -86,7 +99,6 @@ NOT : N O T ;
 NOTEQUAL : N O T E Q U A L ;
 
 POINTERINIT : P O I N T E R I N I T ;
-PRINTF : P R I N T F ;
 PROGRAM : P R O G R A M ;
 
 REMAINDER : R E M A I N D E R ;

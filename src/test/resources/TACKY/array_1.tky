@@ -1,0 +1,54 @@
+// C
+//
+// // declare one-dimensional array of type int, the variable is named "array1d"
+// int array1d[5];
+//
+// // access an element
+// int array1d_5 = array1d[5];
+
+Program("main")
+
+Function("main", true, [
+
+    // define the array as a variable
+    array1d = Var("array1d", Array(int, 5))
+    
+    //array2d = Var("array2d", Array(Array(int, 7), 5))
+
+    // create a pointer (= normal variable that stores an address) to the first element of the array
+    array1d.ptr = Var("array1d.ptr")
+    GetAddress(array1d, array1d.ptr)
+
+    // determine the size of the array element type and store it into a variable for later use
+    sizeof_int = Var("sizeof_int")
+    sizeof(int, sizeof_int)
+
+    // advance the pointer forward to the requested fifth element
+    // To point to element #5, move the pointer four times
+    array1d.ptr = array1d.ptr + 4 * sizeof_int
+
+    // write data into the array element
+    tmp.0 = Var("tmp.0")
+    tmp.0 = 18
+
+    // write data into the array element
+    Store(tmp.0, array1d.ptr)
+
+    // load the element (dereference). Load the value stored at the address 
+    // that the pointer points to into the variable "tmp.1"
+    tmp.1 = Var("tmp.1")
+    Load(array1d.ptr, tmp.1)
+
+    // DEBUG
+    printf("element: %d", tmp.1)
+
+    compare = Var("compare")
+    compare = tmp.1 == 18
+    jumpIfNotZero(compare, end)
+    printf("Should contain 18!")
+    return(Constant(ConstInt(1))) // non-zero return value equals error
+
+Label(end)
+    return(Constant(ConstInt(0)))
+
+]);

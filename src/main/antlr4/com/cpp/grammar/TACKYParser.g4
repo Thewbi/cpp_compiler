@@ -40,6 +40,10 @@ type :
     | ASCIIZ
     ;
 
+array_type :
+    ARRAY LEFT_PAREN ( type | array_type ) COMMA IntegerLiteral RIGHT_PAREN
+    ;
+
 static_init_list : 
       static_init static_init_list
     | static_init
@@ -123,6 +127,7 @@ statement :
     | assignment_statement
     | function_call
     | printf_call
+    | sizeof_call
     ;
 
 sign_extend : 
@@ -246,6 +251,8 @@ label :
 
 var_declaration_statement : 
     Identifier EQUAL_SIGN VAR LEFT_PAREN ( Identifier | StringLiteral ) RIGHT_PAREN
+    |
+    Identifier EQUAL_SIGN VAR LEFT_PAREN ( Identifier | StringLiteral ) COMMA ( type | array_type ) RIGHT_PAREN
     ;
 
 assignment_statement : 
@@ -275,6 +282,10 @@ function_call :
 
 printf_call : 
     PRINTF LEFT_PAREN StringLiteral (COMMA exprList)? RIGHT_PAREN
+    ;
+
+sizeof_call : 
+    SIZEOF LEFT_PAREN type COMMA expr RIGHT_PAREN
     ;
 
 arg_list : 

@@ -1,14 +1,10 @@
 package tacky.ast;
 
-public class StoreToAddressASTNode extends TACKYASTNode {
+public class SizeofASTNode extends TACKYASTNode {
 
-    public String ptrVariableName;
+    public String type;
 
-    /**
-     * The value stored in this variable is transferred to memory at the location
-     * where ptrVariableName points to
-     */
-    public String variableName;
+    public String targetVariableName;
 
     public void printRecursive(final StringBuilder stringBuilder, final int indent) {
         printRecursive(stringBuilder, indent, true);
@@ -20,7 +16,7 @@ public class StoreToAddressASTNode extends TACKYASTNode {
         for (int i = 0; i < indent; i++) {
             stringBuilder.append("  ");
         }
-        stringBuilder.append("[Store()] ").append("*(").append(variableName).append(") = ").append(ptrVariableName);
+        stringBuilder.append("[Sizeof()] ").append(type).append(" = *(").append(targetVariableName).append(")");
 
         stringBuilder.append("\n");
 

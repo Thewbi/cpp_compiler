@@ -29,10 +29,12 @@ import tacky.ast.LoadFromAddressASTNode;
 import tacky.ast.PrintfASTNode;
 import tacky.ast.ProgramASTNode;
 import tacky.ast.ReturnASTNode;
+import tacky.ast.SizeofASTNode;
 import tacky.ast.StoreToAddressASTNode;
 import tacky.ast.TACKYASTNodeFactory;
 import tacky.ast.ValueASTNode;
 import tacky.ast.VariableDeclarationASTNode;
+import tacky.ast.DataType;
 import types.FormalParameter;
 
 public class StructureTACKYParserListener extends TACKYParserBaseListener {
@@ -113,6 +115,10 @@ public class StructureTACKYParserListener extends TACKYParserBaseListener {
 
     @Override
     public void enterVar_declaration_statement(TACKYParser.Var_declaration_statementContext ctx) {
+        // create a VariableDeclarationASTNode
+        VariableDeclarationASTNode variableDeclarationASTNode = tackyASTNodeFactory.createVariableDeclarationASTNode();
+        connectToParent(currentNode, variableDeclarationASTNode);
+        descend(variableDeclarationASTNode);
     }
 
     @Override
@@ -125,19 +131,38 @@ public class StructureTACKYParserListener extends TACKYParserBaseListener {
         // System.out.println("variableSymbolName=\"" + variableSymbolName + "\",
         // variableName=\"" + variableName + "\"");
 
-        // create a VariableDeclarationASTNode
-        VariableDeclarationASTNode variableDeclarationASTNode = tackyASTNodeFactory.createVariableDeclarationASTNode();
+        VariableDeclarationASTNode variableDeclarationASTNode = (VariableDeclarationASTNode) currentNode;
         variableDeclarationASTNode.variableSymbolName = variableSymbolName;
         variableDeclarationASTNode.variableName = variableName;
 
-        FunctionDefinitionASTNode functionDefinitionASTNode = (FunctionDefinitionASTNode) currentNode;
+        FunctionDefinitionASTNode functionDefinitionASTNode = (FunctionDefinitionASTNode) currentNode.parent;
 
         // add local variables to a special list, because why not! There is no reason.
         // Maybe remove this
         functionDefinitionASTNode.localVariables.add(variableDeclarationASTNode);
 
         // all statements are inserted into the children list
-        functionDefinitionASTNode.children.add(variableDeclarationASTNode);
+        // functionDefinitionASTNode.children.add(variableDeclarationASTNode);
+
+        ascend();
+    }
+
+    @Override 
+    public void enterArray_type(TACKYParser.Array_typeContext ctx) {
+        System.out.println("[" + ctx.hashCode() + "] " + ctx.getText());
+
+        DataType dataTypeAstNode = tackyASTNodeFactory.createDataTypeASTNode();
+        dataTypeAstNode.isArray = true;
+        dataTypeAstNode.typeName = ctx.children.get(2).getText();
+        dataTypeAstNode.arraySize = Integer.parseInt(ctx.children.get(4).getText());
+
+        connectToParent(currentNode, dataTypeAstNode);
+        descend(dataTypeAstNode);
+    }
+	
+	@Override 
+    public void exitArray_type(TACKYParser.Array_typeContext ctx) {
+        ascend();
     }
 
     //
@@ -184,8 +209,8 @@ public class StructureTACKYParserListener extends TACKYParserBaseListener {
 
     @Override
     public void enterStore(TACKYParser.StoreContext ctx) {
-        String ptrVariableName = ctx.getChild(2).getText();
-        String variableName = ctx.getChild(4).getText();
+        String ptrVariableName = ctx.getChild(4).getText();
+        String variableName = ctx.getChild(2).getText();
 
         StoreToAddressASTNode storeToAddressASTNode = tackyASTNodeFactory.createStoreToAddressASTNode();
         storeToAddressASTNode.ptrVariableName = ptrVariableName;
@@ -197,6 +222,24 @@ public class StructureTACKYParserListener extends TACKYParserBaseListener {
 
     @Override
     public void exitStore(TACKYParser.StoreContext ctx) {
+        ascend();
+    }
+
+    @Override 
+    public void enterSizeof_call(TACKYParser.Sizeof_callContext ctx) { 
+        String type = ctx.getChild(2).getText();
+        String targetVariableName = ctx.getChild(4).getText();
+
+        SizeofASTNode sizeofASTNode = tackyASTNodeFactory.createSizeofASTNode();
+        sizeofASTNode.type = type;
+        sizeofASTNode.targetVariableName = targetVariableName;
+
+        connectToParent(currentNode, sizeofASTNode);
+        descend(sizeofASTNode);
+    }
+
+	@Override 
+    public void exitSizeof_call(TACKYParser.Sizeof_callContext ctx) { 
         ascend();
     }
 
