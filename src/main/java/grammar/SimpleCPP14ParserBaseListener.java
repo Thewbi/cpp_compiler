@@ -4,6 +4,8 @@ import org.antlr.v4.runtime.ParserRuleContext;
 
 import com.cpp.grammar.CPP14Parser;
 import com.cpp.grammar.CPP14Parser.IdExpressionContext;
+import com.cpp.grammar.CPP14Parser.InitializerContext;
+import com.cpp.grammar.CPP14Parser.ParametersAndQualifiersContext;
 import com.cpp.grammar.CPP14ParserBaseListener;
 
 import ast.ASTNode;
@@ -12,6 +14,8 @@ import ast.ExpressionASTNode;
 import ast.ExpressionType;
 import ast.FunctionDeclarationASTNode;
 import ast.IterationStatementASTNode;
+import ast.NoPointerDeclarator;
+import ast.ParametersAndQualifiersASTNode;
 import ast.PostFixExpressionASTNode;
 import ast.SimpleDeclarationASTNode;
 import ast.StatementType;
@@ -46,53 +50,148 @@ public class SimpleCPP14ParserBaseListener extends CPP14ParserBaseListener {
     @Override
     public void enterInitDeclarator(CPP14Parser.InitDeclaratorContext ctx) {
 
-        DeclaratorASTNode declaratorASTNode = new DeclaratorASTNode();
-        declaratorASTNode.ctx = ctx;
+        if (ctx.children.size() == 1) {
+            return;
+        }
 
-        connectToParent(currentNode, declaratorASTNode);
-        descend(declaratorASTNode);
+        //NoPointerDeclarator noPointerDeclarator = new NoPointerDeclarator();
+        DeclaratorASTNode noPointerDeclarator = new DeclaratorASTNode();
+        noPointerDeclarator.ctx = ctx;
+
+        connectToParent(currentNode, noPointerDeclarator);
+        descend(noPointerDeclarator);
     }
 
     @Override
     public void exitInitDeclarator(CPP14Parser.InitDeclaratorContext ctx) {
 
-        // detect array declaration in exitNoPointerDeclarator()
+        System.out.println("[" + ctx.hashCode() + "] " + ctx.getText());
+
+        if (ctx.children.size() == 1) {
+            return;
+        }
+
+        // NoPointerDeclarator noPointerDeclarator = (NoPointerDeclarator) currentNode;
+        DeclaratorASTNode noPointerDeclarator = (DeclaratorASTNode) currentNode;
+
+        processDeclarator(ctx, noPointerDeclarator);
 
         ascend();
     }
 
     @Override
-    public void exitNoPointerDeclarator(CPP14Parser.NoPointerDeclaratorContext ctx) {
-        // System.out.println("[" + ctx.hashCode() + "] " + ctx.getText());
-        if (currentNode == null) {
+    public void enterNoPointerDeclarator(CPP14Parser.NoPointerDeclaratorContext ctx) {
+
+        if (ctx.children.size() == 1) {
             return;
         }
 
-        if ((ctx.children.size() == 3) && (ctx.getChild(1).getText().equalsIgnoreCase("["))
+        //NoPointerDeclarator noPointerDeclarator = new NoPointerDeclarator();
+        DeclaratorASTNode noPointerDeclarator = new DeclaratorASTNode();
+        noPointerDeclarator.ctx = ctx;
+
+        connectToParent(currentNode, noPointerDeclarator);
+        descend(noPointerDeclarator);
+    }
+
+    @Override
+    public void exitNoPointerDeclarator(CPP14Parser.NoPointerDeclaratorContext ctx) {
+
+        System.out.println("[" + ctx.hashCode() + "] " + ctx.getText());
+
+        if (ctx.children.size() == 1) {
+            return;
+        }
+
+        // NoPointerDeclarator noPointerDeclarator = (NoPointerDeclarator) currentNode;
+        DeclaratorASTNode noPointerDeclarator = (DeclaratorASTNode) currentNode;
+
+        processDeclarator(ctx, noPointerDeclarator);
+
+        ascend();
+    }
+
+    private void processDeclarator(org.antlr.v4.runtime.ParserRuleContext ctx, DeclaratorASTNode declaratorASTNode) {
+        if ((ctx.children.size() == 3)
+                && (ctx.getChild(1).getText().equalsIgnoreCase("["))
                 && (ctx.getChild(2).getText().equalsIgnoreCase("]"))) {
 
-            ((DeclaratorASTNode) currentNode).isArray = true;
+            declaratorASTNode.isArray = true;
 
-        } else if ((ctx.children.size() > 3) && (ctx.getChild(1).getText().equalsIgnoreCase("["))
+        } else if ((ctx.children.size() > 3)
+                && (ctx.getChild(1).getText().equalsIgnoreCase("["))
                 && (ctx.getChild(3).getText().equalsIgnoreCase("]"))) {
 
             currentNode.value = ctx.getChild(0).getText();
             currentNode.children.remove(0);
 
-            ((DeclaratorASTNode) currentNode).indexExpression = (ExpressionASTNode) currentNode.children.get(0);
+            declaratorASTNode.indexExpression = (ExpressionASTNode) currentNode.children.get(0);
             currentNode.children.remove(0);
 
-            ((DeclaratorASTNode) currentNode).isArray = true;
+            declaratorASTNode.isArray = true;
 
         } else if (currentNode instanceof FunctionDeclarationASTNode) {
+
             // do not copy trash into the value attribute. The function name is identified
             // by a NoPointerDeclarator node that has a single child only
             if (ctx.children.size() == 1) {
                 currentNode.value = ctx.getText();
             }
+
         } else {
+
             currentNode.value = ctx.getText();
+
+            declaratorASTNode.isFunctionCall = currentNode.children.stream().filter(e -> {
+                if (e instanceof ParametersAndQualifiersASTNode) {
+                    return true;
+                }
+                return false;
+            }).count() > 0;
+
+            if (ctx.children.get(1) instanceof InitializerContext) {
+
+                InitializerContext child1 = (InitializerContext) ctx.children.get(1);
+                if (child1.children.get(0).getText().equalsIgnoreCase(("("))) {
+                    declaratorASTNode.isFunctionCall = true;
+                }
+            }
         }
+    }
+
+    @Override
+    public void enterParametersAndQualifiers(CPP14Parser.ParametersAndQualifiersContext ctx) {
+
+        ParametersAndQualifiersASTNode parametersAndQualifiersASTNode = new ParametersAndQualifiersASTNode();
+        parametersAndQualifiersASTNode.ctx = ctx;
+
+        connectToParent(currentNode, parametersAndQualifiersASTNode);
+        descend(parametersAndQualifiersASTNode);
+    }
+
+    @Override
+    public void exitParametersAndQualifiers(CPP14Parser.ParametersAndQualifiersContext ctx) {
+        ascend();
+    }
+
+    //
+    // Function Definition
+    //
+
+    @Override
+    public void enterFunctionDefinition(CPP14Parser.FunctionDefinitionContext ctx) {
+
+        FunctionDeclarationASTNode functionDeclarationASTNode = new FunctionDeclarationASTNode();
+        functionDeclarationASTNode.ctx = ctx;
+        functionDeclarationASTNode.returnType = ctx.getChild(0).getText();
+        
+        connectToParent(currentNode, functionDeclarationASTNode);
+        descend(functionDeclarationASTNode);
+    }
+
+    @Override
+    public void exitFunctionDefinition(CPP14Parser.FunctionDefinitionContext ctx) {
+        ascend();
     }
 
     //

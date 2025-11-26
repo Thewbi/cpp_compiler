@@ -1,6 +1,6 @@
 package ast;
 
-public class DeclaratorASTNode extends ASTNode {
+public class NoPointerDeclarator extends ASTNode {
 
     public boolean isPointer;
 
@@ -20,7 +20,7 @@ public class DeclaratorASTNode extends ASTNode {
         for (int i = 0; i < indent; i++) {
             stringBuilder.append("  ");
         }
-        stringBuilder.append("[INIT_DECL] ");
+        stringBuilder.append("[NO_PTR_DECL] ");
         stringBuilder.append("name='").append(value).append("', ");
         if (type != null) {
             stringBuilder.append("type='").append(type).append("', ");
@@ -51,5 +51,5 @@ public class DeclaratorASTNode extends ASTNode {
             child.printRecursive(stringBuilder, indent + 1);
         }
     }
-
+    
 }

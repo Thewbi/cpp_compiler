@@ -17,10 +17,13 @@ int main()
 }
 */
 
-// start-symbol: iterationStatement
-for (int i = 0; i < length; i++)
+int main()
 {
-    printf("a");
+    // start-symbol: iterationStatement
+    for (int i = 0; i < length; i++)
+    {
+        printf("a");
+    }
 }
 
 /*

@@ -866,13 +866,15 @@ public class Main {
         // final String filename = "src/test/resources/declaration.cpp";
         // final String filename = "src/test/resources/arrays.cpp";
         // final String filename = "src/test/resources/if.cpp";
-        // final String filename = "src/test/resources/for_loop.cpp"; // start rule: iterationStatement // <--- important
-        final String filename = "src/test/resources/arrays.cpp"; // start rule: declarationStatement // <--- important
+        // final String filename = "src/test/resources/for_loop.cpp"; // start rule: translationUnit // <--- important
+        // final String filename = "src/test/resources/arrays.cpp"; // start rule: translationUnit // <--- important
         // final String filename = "src/test/resources/function_definition.cpp";
-        // final String filename = "src/test/resources/function_call.cpp";
+        // final String filename = "src/test/resources/function_call.cpp"; // start rule: translationUnit // <--- important
         // final String filename = "src/test/resources/while.cpp";
         // final String filename = "src/test/resources/app1.cpp";
         // final String filename = "src/test/resources/ECO32/ECO32_1.cpp";
+
+        final String filename = "src/test/resources/examples/matrix_test.cpp";
 
         final CharStream charStream = CharStreams
                 .fromFileName(filename);
@@ -888,9 +890,9 @@ public class Main {
         // parse
         //
 
-        // TranslationUnitContext root = parser.translationUnit();
+        TranslationUnitContext root = parser.translationUnit();
         // IterationStatementContext root = parser.iterationStatement();
-        DeclarationStatementContext root = parser.declarationStatement();
+        // DeclarationStatementContext root = parser.declarationStatement();
 
         // else {
 
