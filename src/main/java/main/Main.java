@@ -27,6 +27,8 @@ import com.cpp.grammar.CPreprocessorParser;
 import com.cpp.grammar.CPreprocessorParser.ProgramContext;
 import com.cpp.grammar.PreprocessorLexer;
 import com.cpp.grammar.PreprocessorParser;
+import com.cpp.grammar.CPP14Parser.DeclarationStatementContext;
+import com.cpp.grammar.CPP14Parser.IterationStatementContext;
 import com.cpp.grammar.CPP14Parser.TranslationUnitContext;
 import com.cpp.grammar.PreprocessorParser.Code_fileContext;
 import com.cpp.grammar.RISCVParser.Asm_fileContext;
@@ -45,6 +47,7 @@ import grammar.RISCVRow;
 import grammar.RISCVRowListener;
 import grammar.RISCVRowParam;
 import grammar.SemantCPP14ParserListener;
+import grammar.SimpleCPP14ParserBaseListener;
 import grammar.StructureCPP14ParserListener;
 import grammar.StructureTACKYParserListener;
 import grammar.SyntaxErrorListener;
@@ -65,6 +68,7 @@ import com.cpp.grammar.TACKYLexer;
 import structure.DefaultStructureCallback;
 import tacky.ast.FunctionDefinitionASTNode;
 import tacky.ast.ProgramASTNode;
+import tacky.generation.x86.X86CodeGenerator;
 import tacky.runtime.DefaultTACKYExecutor;
 import tacky.runtime.TACKYStackFrame;
 import types.FuncDecl;
@@ -76,6 +80,7 @@ import types.Type;
 public class Main {
 
     public static void main(String[] args) throws IOException {
+
         System.out.println("Start");
 
         // preprocessor();
@@ -84,11 +89,11 @@ public class Main {
         // preprocessor_2(); <----------------- Continue here
 
         // preprocessor_3();
-        // translationUnit();
+        translationUnit();
         // riscvassembler();
         // riscvdecoder();
         // riscvencoder();
-        tacky();
+        // tacky();
         // manualExpressionParsing();
 
         // manualExpressionParsing2();
@@ -687,11 +692,12 @@ public class Main {
         // final String filename = "src/test/resources/TACKY/function_call_pass_by_variable_copy.tky";
         // final String filename = "src/test/resources/TACKY/function_call_return_value.tky";
         // final String filename = "src/test/resources/TACKY/function_call.tky";
-        //final String filename = "src/test/resources/TACKY/printf_function_call.tky";
+        // final String filename = "src/test/resources/TACKY/printf_function_call.tky";
+        final String filename = "src/test/resources/TACKY/hello_assembly.tky";
 
         // TODO
-        final String filename = "src/test/resources/TACKY/array_1.tky";
-        //final String filename = "src/test/resources/TACKY/array_int.tky";
+        // final String filename = "src/test/resources/TACKY/array_1.tky";
+        // final String filename = "src/test/resources/TACKY/array_int.tky";
 
         final CharStream charStream = CharStreams
                 .fromFileName(filename);
@@ -750,29 +756,36 @@ public class Main {
 
         System.out.println("----------------------------------------------------------\n");
 
-        System.out.println("-- 4 - Run the TACKY code ----------------------------------");
+        System.out.println("-- 4 - Generate assembly code ----------------------------------");
+
+        TACKYStackFrame newTackyStackFrameGen = new TACKYStackFrame();
+
+        FunctionDefinitionASTNode mainFunctionGen = getMainFunction(rootNode, structureTACKYParserListener);
+
+        X86CodeGenerator x86CodeGenerator = new X86CodeGenerator();
+        x86CodeGenerator.executeFunction(newTackyStackFrameGen, rootNode, 0, mainFunctionGen);
+
+        System.out.println("```");
+        System.out.println(x86CodeGenerator.stringBuilder.toString());
+        System.out.println("```");
+
+        System.out.println("----------------------------------------------------------\n");
+
+        System.out.println("-- 5 - Run the TACKY code ----------------------------------");
 
         //
         // run the TACKY code
         //
 
-        // find the 'program' statement
-        ProgramASTNode program = (ProgramASTNode) rootNode.children.stream().filter(e -> e instanceof ProgramASTNode)
-                .findFirst().get();
-        String mainEntryPointName = program.value;
-
-        System.out.println("MainEntryPoint is \"" + mainEntryPointName + "\"");
-        FunctionDefinitionASTNode mainFunction = structureTACKYParserListener.functionDefinitionMap
-                .get(mainEntryPointName);
-
-        System.out.println("mainFunction found is \"" + mainFunction.value + "\"");
+        FunctionDefinitionASTNode mainFunction = getMainFunction(rootNode, structureTACKYParserListener);
 
         TACKYStackFrame newTackyStackFrame = new TACKYStackFrame();
 
         DefaultTACKYExecutor tackyExecutor = new DefaultTACKYExecutor();
         tackyExecutor.functionDefinitionMap = structureTACKYParserListener.functionDefinitionMap;
+        
+        // start execution with the main function
         int returnValue = tackyExecutor.executeFunction(newTackyStackFrame, rootNode, 0, mainFunction);
-
         if (returnValue == 0) {
             System.out.println("[OK]");
             System.out.println("[OK]");
@@ -784,6 +797,21 @@ public class Main {
         System.out.println("----------------------------------------------------------\n");
 
         System.out.println("Application is done!");
+    }
+
+    private static FunctionDefinitionASTNode getMainFunction(ASTNode rootNode,
+            StructureTACKYParserListener structureTACKYParserListener) {
+        // find the 'program' statement
+        ProgramASTNode program = (ProgramASTNode) rootNode.children.stream().filter(e -> e instanceof ProgramASTNode)
+                .findFirst().get();
+        String mainEntryPointName = program.value;
+
+        System.out.println("MainEntryPoint is \"" + mainEntryPointName + "\"");
+        FunctionDefinitionASTNode mainFunction = structureTACKYParserListener.functionDefinitionMap
+                .get(mainEntryPointName);
+
+        System.out.println("mainFunction found is \"" + mainFunction.value + "\"");
+        return mainFunction;
     }
 
     /**
@@ -822,7 +850,7 @@ public class Main {
         // final String filename = "src/test/resources/drawPath.cpp";
 
         // final String filename = "src/test/resources/palindrome_number.cpp";
-        final String filename = "src/test/resources/array_example.c";
+        // final String filename = "src/test/resources/array_example.c";
 
         // final String filename = "src/test/resources/sample1.cpp";
         // final String filename = "src/test/resources/helloworld.cpp";
@@ -838,7 +866,8 @@ public class Main {
         // final String filename = "src/test/resources/declaration.cpp";
         // final String filename = "src/test/resources/arrays.cpp";
         // final String filename = "src/test/resources/if.cpp";
-        // final String filename = "src/test/resources/for_loop.cpp";
+        // final String filename = "src/test/resources/for_loop.cpp"; // start rule: iterationStatement // <--- important
+        final String filename = "src/test/resources/arrays.cpp"; // start rule: declarationStatement // <--- important
         // final String filename = "src/test/resources/function_definition.cpp";
         // final String filename = "src/test/resources/function_call.cpp";
         // final String filename = "src/test/resources/while.cpp";
@@ -855,8 +884,13 @@ public class Main {
 
         final CPP14Parser parser = new CPP14Parser(tokens);
 
+        //
         // parse
-        TranslationUnitContext root = parser.translationUnit();
+        //
+
+        // TranslationUnitContext root = parser.translationUnit();
+        // IterationStatementContext root = parser.iterationStatement();
+        DeclarationStatementContext root = parser.declarationStatement();
 
         // else {
 
@@ -918,10 +952,11 @@ public class Main {
         ASTNode rootNode = new ASTNode();
         rootNode.value = "[CompilationUnit] root";
 
-        StructureCPP14ParserListener structureCPP14ParserListener = new StructureCPP14ParserListener();
-        structureCPP14ParserListener.currentNode = rootNode;
+        // StructureCPP14ParserListener cpp14ParserListener = new StructureCPP14ParserListener();
+        SimpleCPP14ParserBaseListener cpp14ParserListener = new SimpleCPP14ParserBaseListener();
+        cpp14ParserListener.currentNode = rootNode;
 
-        CPP14ParserListener listener = structureCPP14ParserListener;
+        CPP14ParserListener listener = cpp14ParserListener;
 
         // Create a generic parse tree walker that can trigger callbacks
         final ParseTreeWalker walker = new ParseTreeWalker();
@@ -945,6 +980,7 @@ public class Main {
         // System.out.println(typeMap);
 
         boolean printAST = true;
+        // boolean printAST = false;
         if (printAST) {
             StringBuilder stringBuilder = new StringBuilder();
             rootNode.printRecursive(stringBuilder, 0);
@@ -1004,6 +1040,13 @@ public class Main {
         // // dump output
         // Node rootNode = listener.getRootNode();
         // rootNode.print(0);
+
+        generateTACKY(rootNode);
+    }
+
+    private static void generateTACKY(ASTNode rootNode) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'generateTACKY'");
     }
 
     private static void preprocessor() throws IOException {

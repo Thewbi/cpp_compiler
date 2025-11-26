@@ -8,11 +8,11 @@ import types.FormalParameter;
 
 public class FunctionDefinitionASTNode extends TACKYASTNode {
 
-    public List<VariableDeclarationASTNode> localVariables = new ArrayList<>();
-
     public boolean global;
-
+    
     public List<FormalParameter> formalParameters = new ArrayList<>();
+    
+    public List<VariableDeclarationASTNode> localVariables = new ArrayList<>();
 
     public void printRecursive(final StringBuilder stringBuilder, final int indent) {
         printRecursive(stringBuilder, indent, true);

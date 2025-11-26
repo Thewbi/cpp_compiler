@@ -53,7 +53,7 @@ public enum ExpressionType {
 
     IntegerLiteral,
 
-    Identifier, 
+    Identifier,
 
     Constant,
 
@@ -82,6 +82,8 @@ public enum ExpressionType {
             return Div_Assign;
         } else if (tempData.equalsIgnoreCase("==")) {
             return Equality;
+        } else if (tempData.equalsIgnoreCase("=")) {
+            return Assignment;
         } else if (tempData.equalsIgnoreCase("!=")) {
             return Not_Equal;
         } else if (tempData.equalsIgnoreCase("<")) {

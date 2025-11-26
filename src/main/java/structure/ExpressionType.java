@@ -12,13 +12,13 @@ public enum ExpressionType {
 
     INT_LITERAL,
 
-    STRING_LITERAL, 
+    STRING_LITERAL,
     
-    CHAR_LITERAL, 
+    CHAR_LITERAL,
     
     FLOAT_LITERAL,
 
-    FUNCTION_CALL, 
+    FUNCTION_CALL,
     
     RETURN_VALUE_PREVIOUS_CALL,
 

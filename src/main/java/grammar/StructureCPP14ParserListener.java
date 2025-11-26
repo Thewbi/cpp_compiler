@@ -1,5 +1,6 @@
 package grammar;
 
+import java.util.EmptyStackException;
 import java.util.Stack;
 
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -190,7 +191,7 @@ public class StructureCPP14ParserListener extends CPP14ParserBaseListener {
     public void enterSimpleDeclaration(CPP14Parser.SimpleDeclarationContext ctx) {
         // why declaration list? This produces confusing output when parsing
         // initialize_struct.cpp
-        // For which case is this required?
+        // For which case is this required? For for-loops (iteration statement)
         DeclarationListASTNode declarationListASTNode = new DeclarationListASTNode();
         declarationListASTNode.ctx = ctx;
         connectToParent(currentNode, declarationListASTNode);
@@ -437,8 +438,7 @@ public class StructureCPP14ParserListener extends CPP14ParserBaseListener {
             }
         }
 
-        // is hit
-        // during pointer usage: dev->addPath(newpoly); // initialize_use_pointers.cpp
+        // is hit during pointer usage: dev->addPath(newpoly); // initialize_use_pointers.cpp
         // int value_1 = get_value_a(); // initialize_with_expressions.cpp
         if (ctx.children.size() == 3) {
 
@@ -840,7 +840,12 @@ public class StructureCPP14ParserListener extends CPP14ParserBaseListener {
     }
 
     private ExpressionASTNode expressionStackPop() {
-        return expressionStack.pop();
+        try {
+            return expressionStack.pop();
+        } catch (EmptyStackException e) {
+            System.out.println("test");
+            throw e;
+        }
     }
 
     private void expressionStackPush(ExpressionASTNode expressionASTNode) {

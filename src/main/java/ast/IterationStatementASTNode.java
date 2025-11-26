@@ -2,7 +2,7 @@ package ast;
 
 public class IterationStatementASTNode extends StatementASTNode {
 
-    /* left expresion that initializes */
+    /* left expression that initializes */
     public ExpressionASTNode initExpression;
 
     /* middle condition of a for loop */
