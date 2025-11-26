@@ -37,6 +37,7 @@ import com.cpp.grammar.TACKYParserListener;
 import com.cpp.grammar.TACKYParser;
 
 import ast.ASTNode;
+import ast.ASTNodeType;
 import ast.ExpressionASTNode;
 import expressionbuilder.ExpressionBuilderExecutor;
 import grammar.ConsoleCPP14ParserListener;
@@ -68,6 +69,7 @@ import com.cpp.grammar.TACKYLexer;
 import structure.DefaultStructureCallback;
 import tacky.ast.FunctionDefinitionASTNode;
 import tacky.ast.ProgramASTNode;
+import tacky.generation.tacky.TackyGenerator;
 import tacky.generation.x86.X86CodeGenerator;
 import tacky.runtime.DefaultTACKYExecutor;
 import tacky.runtime.TACKYStackFrame;
@@ -84,14 +86,14 @@ public class Main {
         System.out.println("Start");
 
         // preprocessor();
-        preprocessor_2(); // <----------------- Continue here
+        // preprocessor_2(); // <----------------- Continue here, Preprocessor 2 works
         // preprocessor_3();
 
-        // translationUnit();
+        // translationUnit(); // <---------------- C - Compiler
         // riscvassembler();
         // riscvdecoder();
         // riscvencoder();
-        // tacky();
+        tacky();
         // manualExpressionParsing();
 
         // manualExpressionParsing2();
@@ -667,6 +669,8 @@ public class Main {
 
     private static void tacky() throws IOException {
 
+        // @formatter:off
+
         //
         // for verification ordered by amount of dependencies used
         // from essential to higher level
@@ -674,35 +678,31 @@ public class Main {
         // All scripts should return the value 0. Otherwise validation
         // throws an error
         //
-        // final String filename =
-        // "src/test/resources/TACKY/main_function_return_value.tky";
+        // final String filename = "src/test/resources/TACKY/main_function_return_value.tky";
         // final String filename = "src/test/resources/TACKY/jump.tky";
         // final String filename = "src/test/resources/TACKY/assignment.tky";
         // final String filename = "src/test/resources/TACKY/expression_add.tky";
-        // final String filename =
-        // "src/test/resources/TACKY/expression_less_than_constants.tky";
-        // final String filename =
-        // "src/test/resources/TACKY/expression_less_than_var_constant.tky";
+        // final String filename = "src/test/resources/TACKY/expression_less_than_constants.tky";
+        // final String filename = "src/test/resources/TACKY/expression_less_than_var_constant.tky";
         // final String filename = "src/test/resources/TACKY/if_else.tky";
         // final String filename = "src/test/resources/TACKY/for_loop.tky";
+        final String filename = "src/test/resources/TACKY/for_loop_2.tky";
         // final String filename = "src/test/resources/TACKY/while_loop.tky";
         // final String filename = "src/test/resources/TACKY/do_while_loop.tky";
         // final String filename = "src/test/resources/TACKY/pointer_creation.tky";
-        // final String filename =
-        // "src/test/resources/TACKY/function_call_pass_by_const_value.tky";
-        // final String filename =
-        // "src/test/resources/TACKY/function_call_pass_by_pointer.tky";
-        // final String filename =
-        // "src/test/resources/TACKY/function_call_pass_by_variable_copy.tky";
-        // final String filename =
-        // "src/test/resources/TACKY/function_call_return_value.tky";
+        // final String filename = "src/test/resources/TACKY/function_call_pass_by_const_value.tky";
+        // final String filename = "src/test/resources/TACKY/function_call_pass_by_pointer.tky";
+        // final String filename = "src/test/resources/TACKY/function_call_pass_by_variable_copy.tky";
+        // final String filename = "src/test/resources/TACKY/function_call_return_value.tky";
         // final String filename = "src/test/resources/TACKY/function_call.tky";
         // final String filename = "src/test/resources/TACKY/printf_function_call.tky";
-        final String filename = "src/test/resources/TACKY/hello_assembly.tky";
+        // final String filename = "src/test/resources/TACKY/hello_assembly.tky";
 
         // TODO
         // final String filename = "src/test/resources/TACKY/array_1.tky";
         // final String filename = "src/test/resources/TACKY/array_int.tky";
+
+        // @formatter:on
 
         final CharStream charStream = CharStreams
                 .fromFileName(filename);
@@ -761,22 +761,7 @@ public class Main {
 
         System.out.println("----------------------------------------------------------\n");
 
-        System.out.println("-- 4 - Generate assembly code ----------------------------------");
-
-        TACKYStackFrame newTackyStackFrameGen = new TACKYStackFrame();
-
-        FunctionDefinitionASTNode mainFunctionGen = getMainFunction(rootNode, structureTACKYParserListener);
-
-        X86CodeGenerator x86CodeGenerator = new X86CodeGenerator();
-        x86CodeGenerator.executeFunction(newTackyStackFrameGen, rootNode, 0, mainFunctionGen);
-
-        System.out.println("```");
-        System.out.println(x86CodeGenerator.stringBuilder.toString());
-        System.out.println("```");
-
-        System.out.println("----------------------------------------------------------\n");
-
-        System.out.println("-- 5 - Run the TACKY code ----------------------------------");
+        System.out.println("-- 4 - Run the TACKY code ----------------------------------");
 
         //
         // run the TACKY code
@@ -799,6 +784,21 @@ public class Main {
             throw new RuntimeException("\n[ERROR]\n[ERROR] Script did not return zero but " + returnValue
                     + "! Unit Test failed!\n[ERROR]");
         }
+
+        System.out.println("----------------------------------------------------------\n");
+
+        System.out.println("-- 5 - Generate assembly code ----------------------------------");
+
+        TACKYStackFrame newTackyStackFrameGen = new TACKYStackFrame();
+
+        FunctionDefinitionASTNode mainFunctionGen = getMainFunction(rootNode, structureTACKYParserListener);
+
+        X86CodeGenerator x86CodeGenerator = new X86CodeGenerator();
+        x86CodeGenerator.executeFunction(newTackyStackFrameGen, rootNode, 0, mainFunctionGen);
+
+        System.out.println("```");
+        System.out.println(x86CodeGenerator.stringBuilder.toString());
+        System.out.println("```");
 
         System.out.println("----------------------------------------------------------\n");
 
@@ -856,7 +856,6 @@ public class Main {
         // final String filename = "src/test/resources/drawPath.cpp";
 
         // final String filename = "src/test/resources/palindrome_number.cpp";
-        // final String filename = "src/test/resources/array_example.c";
 
         // final String filename = "src/test/resources/sample1.cpp";
         // final String filename = "src/test/resources/helloworld.cpp";
@@ -872,7 +871,7 @@ public class Main {
         // final String filename = "src/test/resources/declaration.cpp";
         // final String filename = "src/test/resources/arrays.cpp";
         // final String filename = "src/test/resources/if.cpp";
-        // final String filename = "src/test/resources/for_loop.cpp"; // start rule:
+        final String filename = "src/test/resources/for_loop.cpp"; // start rule:
         // translationUnit // <--- important
         // final String filename = "src/test/resources/arrays.cpp"; // start rule:
         // translationUnit // <--- important
@@ -884,7 +883,14 @@ public class Main {
         // final String filename = "src/test/resources/ECO32/ECO32_1.cpp";
 
         // final String filename = "src/test/resources/examples/matrix_test.cpp";
-        final String filename = "src/test/resources/examples/matrix_tester.cpp";
+        // final String filename = "src/test/resources/examples/matrix_tester.cpp";
+
+        // preprocessed with preprocessor 2
+        // final String filename = "src/test/resources/examples/matrix_tester.cpp.out";
+        // // <--- continue here
+        // final String filename =
+        // "src/test/resources/examples/matrix_pretty_print.cpp";
+        // final String filename = "src/test/resources/array_example.c";
 
         final CharStream charStream = CharStreams
                 .fromFileName(filename);
@@ -963,6 +969,7 @@ public class Main {
 
         ASTNode rootNode = new ASTNode();
         rootNode.value = "[CompilationUnit] root";
+        rootNode.astNodeType = ASTNodeType.ROOT;
 
         // StructureCPP14ParserListener cpp14ParserListener = new
         // StructureCPP14ParserListener();
@@ -1058,8 +1065,13 @@ public class Main {
     }
 
     private static void generateTACKY(ASTNode rootNode) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'generateTACKY'");
+
+        TackyGenerator tackyGenerator = new TackyGenerator();
+        tackyGenerator.process(rootNode);
+
+        System.out.println("--- TACKY ----------------------------- \n");
+        System.out.println(tackyGenerator.stringBuilder.toString());
+        System.out.println("--------------------------------------- \n");
     }
 
     private static void preprocessor() throws IOException {

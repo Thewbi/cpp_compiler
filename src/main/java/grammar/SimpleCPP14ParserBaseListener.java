@@ -6,6 +6,7 @@ import com.cpp.grammar.CPP14Parser.InitializerContext;
 import com.cpp.grammar.CPP14ParserBaseListener;
 
 import ast.ASTNode;
+import ast.ASTNodeType;
 import ast.BodyASTNode;
 import ast.DeclaratorASTNode;
 import ast.ExpressionASTNode;
@@ -30,12 +31,10 @@ public class SimpleCPP14ParserBaseListener extends CPP14ParserBaseListener {
     @Override
     public void enterSimpleDeclaration(CPP14Parser.SimpleDeclarationContext ctx) {
 
-        // why declaration list? This produces confusing output when parsing
-        // initialize_struct.cpp For which case is this required? For for-loops
-        // (iteration statement)
         SimpleDeclarationASTNode simpleDeclarationASTNode = new SimpleDeclarationASTNode();
         simpleDeclarationASTNode.ctx = ctx;
-        simpleDeclarationASTNode.type = ctx.children.get(0).getText();
+        //simpleDeclarationASTNode.type = ctx.children.get(0).getText();
+        simpleDeclarationASTNode.astNodeType = ASTNodeType.SIMPLE_DECLARATION;
 
         connectToParent(currentNode, simpleDeclarationASTNode);
         descend(simpleDeclarationASTNode);
@@ -53,9 +52,9 @@ public class SimpleCPP14ParserBaseListener extends CPP14ParserBaseListener {
             return;
         }
 
-        // NoPointerDeclarator noPointerDeclarator = new NoPointerDeclarator();
         DeclaratorASTNode noPointerDeclarator = new DeclaratorASTNode();
         noPointerDeclarator.ctx = ctx;
+        noPointerDeclarator.astNodeType = ASTNodeType.INIT_DECLARATION;
 
         connectToParent(currentNode, noPointerDeclarator);
         descend(noPointerDeclarator);
@@ -201,7 +200,6 @@ public class SimpleCPP14ParserBaseListener extends CPP14ParserBaseListener {
         currentNode.type = ctx.getChild(0).getText();
     }
 
-
     //
     // Function Definition
     //
@@ -212,6 +210,7 @@ public class SimpleCPP14ParserBaseListener extends CPP14ParserBaseListener {
         FunctionDeclarationASTNode functionDeclarationASTNode = new FunctionDeclarationASTNode();
         functionDeclarationASTNode.ctx = ctx;
         functionDeclarationASTNode.returnType = ctx.getChild(0).getText();
+        functionDeclarationASTNode.astNodeType = ASTNodeType.FUNCTION_DECLARATION;
 
         connectToParent(currentNode, functionDeclarationASTNode);
         descend(functionDeclarationASTNode);
@@ -289,6 +288,7 @@ public class SimpleCPP14ParserBaseListener extends CPP14ParserBaseListener {
         expressionASTNode.ctx = ctx;
         expressionASTNode.value = ctx.getText();
         expressionASTNode.expressionType = ExpressionType.Primary;
+        expressionASTNode.astNodeType = ASTNodeType.EXPRESSION;
 
         connectToParent(currentNode, expressionASTNode);
     }
@@ -309,6 +309,7 @@ public class SimpleCPP14ParserBaseListener extends CPP14ParserBaseListener {
         expressionASTNode.ctx = ctx;
         expressionASTNode.value = ctx.getText();
         expressionASTNode.expressionType = ExpressionType.Identifier;
+        expressionASTNode.astNodeType = ASTNodeType.EXPRESSION;
 
         connectToParent(currentNode, expressionASTNode);
     }
@@ -327,6 +328,7 @@ public class SimpleCPP14ParserBaseListener extends CPP14ParserBaseListener {
         expressionASTNode.value = ctx.getText();
         expressionASTNode.expressionType = ExpressionType.fromString(ctx.children.get(1).getText());
         expressionASTNode.type = "REL";
+        expressionASTNode.astNodeType = ASTNodeType.EXPRESSION;
 
         connectToParent(currentNode, expressionASTNode);
         descend(expressionASTNode);
@@ -357,6 +359,7 @@ public class SimpleCPP14ParserBaseListener extends CPP14ParserBaseListener {
                 PostFixExpressionASTNode postFixExpressionASTNode = new PostFixExpressionASTNode();
                 // postFixExpressionASTNode.lhs = expressionStackPop();
                 postFixExpressionASTNode.expressionType = ExpressionType.fromString("++");
+                postFixExpressionASTNode.type = "UNARY";
 
                 connectToParent(currentNode, postFixExpressionASTNode);
                 descend(postFixExpressionASTNode);
@@ -389,6 +392,7 @@ public class SimpleCPP14ParserBaseListener extends CPP14ParserBaseListener {
 
         ExpressionASTNode exprASTNode = new ExpressionASTNode();
         exprASTNode.expressionType = ExpressionType.Add;
+        exprASTNode.astNodeType = ASTNodeType.EXPRESSION;
 
         //processExpressionOperator(ctx, ExpressionType.Add);
 
@@ -420,6 +424,7 @@ public class SimpleCPP14ParserBaseListener extends CPP14ParserBaseListener {
 
         ExpressionASTNode exprASTNode = new ExpressionASTNode();
         exprASTNode.expressionType = ExpressionType.Mul;
+        exprASTNode.astNodeType = ASTNodeType.EXPRESSION;
         
         // String operatorAsString = ctx.getChild(1).getText();
         //processExpressionOperator(ctx, ExpressionType.fromString(operatorAsString));
@@ -451,6 +456,7 @@ public class SimpleCPP14ParserBaseListener extends CPP14ParserBaseListener {
         iterationStatementASTNode.ctx = ctx;
         iterationStatementASTNode.value = ctx.getText();
         iterationStatementASTNode.statementType = StatementType.valueOf(ctx.getChild(0).getText().toUpperCase());
+        iterationStatementASTNode.astNodeType = ASTNodeType.ITERATION_STATEMENT;
 
         connectToParent(currentNode, iterationStatementASTNode);
         descend(iterationStatementASTNode);

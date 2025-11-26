@@ -19,6 +19,7 @@ int main()
 
 int main()
 {
+    int length = 10;
     // start-symbol: iterationStatement
     for (int i = 0; i < length; i++)
     {

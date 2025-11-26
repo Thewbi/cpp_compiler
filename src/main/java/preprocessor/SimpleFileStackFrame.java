@@ -6,6 +6,7 @@ import java.util.Map;
 import org.antlr.runtime.tree.Tree;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.Token;
+import org.apache.commons.lang3.math.NumberUtils;
 
 import com.cpp.grammar.PreprocessorLexer2;
 
@@ -628,16 +629,52 @@ public class SimpleFileStackFrame extends AbstractFileStackFrame {
         TreeNode treeNode = (TreeNode) defineValueMap.get(data);
 
         StringBuilder stringBuilder = new StringBuilder();
-        evaluatePreprocessorTreeNode(treeNode, stringBuilder);
+        // evaluatePreprocessorTreeNodeInteger(treeNode, stringBuilder);
+        // evaluatePreprocessorTreeNodeAsString(treeNode, stringBuilder);
+        evaluatePreprocessorTreeNode(treeNode);
+
+        stringBuilder.append(treeNode.stringValueEval);
 
         return stringBuilder.toString();
     }
 
-    private void evaluatePreprocessorTreeNode(TreeNode treeNode, StringBuilder stringBuilder) {
+    private void evaluatePreprocessorTreeNode(TreeNode treeNode) {
+
         if (treeNode == null) {
             return;
         }
-        //if (treeNode.children.size() == 0) {
+        
+        if ((treeNode.rhs == null) && (treeNode.lhs == null)) {
+
+            if (defineValueMap.containsKey(treeNode.value)) {
+                TreeNode valueTreeNode = (TreeNode) defineValueMap.get(treeNode.value);
+                treeNode.stringValueEval = valueTreeNode.value;
+                if (NumberUtils.isParsable(valueTreeNode.value)) {
+                    treeNode.integerValueEval = Integer.valueOf(valueTreeNode.value);
+                }
+            } else {
+                treeNode.stringValueEval = treeNode.value;
+            }
+
+            return;
+        }
+
+        evaluatePreprocessorTreeNode(treeNode.lhs);
+        evaluatePreprocessorTreeNode(treeNode.rhs);
+
+        if (treeNode.value.equalsIgnoreCase("*")) {
+            treeNode.integerValueEval = treeNode.lhs.integerValueEval * treeNode.rhs.integerValueEval;
+            treeNode.stringValueEval = treeNode.integerValueEval.toString();
+        }
+
+    }
+
+    private void evaluatePreprocessorTreeNodeAsString(TreeNode treeNode, StringBuilder stringBuilder) {
+        
+        if (treeNode == null) {
+            return;
+        }
+        
         if ((treeNode.rhs == null) && (treeNode.lhs == null)) {
             if (defineValueMap.containsKey(treeNode.value)) {
                 stringBuilder.append(defineValueMap.get(treeNode.value).value);
@@ -646,9 +683,10 @@ public class SimpleFileStackFrame extends AbstractFileStackFrame {
             }
             return;
         }
-        evaluatePreprocessorTreeNode(treeNode.lhs, stringBuilder);
+
+        evaluatePreprocessorTreeNodeAsString(treeNode.lhs, stringBuilder);
         stringBuilder.append(treeNode.value);
-        evaluatePreprocessorTreeNode(treeNode.rhs, stringBuilder);
+        evaluatePreprocessorTreeNodeAsString(treeNode.rhs, stringBuilder);
     }
 
     private void setParserMode(ParserMode parserMode) {

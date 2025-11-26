@@ -20,7 +20,7 @@
 
 
 
-
+/*
  void prettyPrintFormatMatrix ( int * matrix , int dim , const char * format ) ;
 
 
@@ -31,62 +31,8 @@
  void matrixAddInto ( int * matrixA , int * matrixB , int rows , int columns ) ;
  void getSubMatrix ( int * matrix , int dim , int xPos , int yPos , int width , int height , int * matrixC ) ;
  void setSubMatrix ( int * matrix , int dim , int xPos , int yPos , int width , int height , int * matrixC ) ;
-
- int main ( )
- {
-      printf ( "Matrix\n" ) ;
-
-      int matrixA [ 4*4 ] = {
-          9 , 0 , 9 , 4 ,
-          2 , 6 , 6 , 7 ,
-          9 , 3 , 8 , 1 ,
-          6 , 9 , 7 , 1
-      } ;
-      int matrixB [ 4*4 ] = {
-          1 , 2 , 4 , 2 ,
-          8 , 6 , 0 , 0 ,
-          7 , 6 , 8 , 5 ,
-          8 , 4 , 7 , 5
-      } ;
-      int matrixC [ 4*4 ] = {
-          0 , 0 , 0 , 0 ,
-          0 , 0 , 0 , 0 ,
-          0 , 0 , 0 , 0 ,
-          0 , 0 , 0 , 0
-      } ;
-
-     
-     
-     
-      printf ( "A\n" ) ;
-      prettyPrintFormatMatrix ( matrixA , 4 , "%6d" ) ;
-      printf ( "B\n" ) ;
-      prettyPrintFormatMatrix ( matrixB , 4 , "%6d" ) ;
-
-      standardMatrixMult ( matrixA , matrixB , matrixC , 4 , 4 ) ;
-     
-
-      printf ( "C\n" ) ;
-      prettyPrintFormatMatrix ( matrixC , 4 , "%6d" ) ;
-
-     
-     
-     
-     
-     
-     
-     
-
-     
-     
-     
-     
-     
-     
-     
-     
-      return 0 ;
- }
+*/
+ 
 
  void matrixAddInto ( int * matrixA , int * matrixB , int rows , int columns ) {
       for ( int i = 0 ; i < rows ; i ++ ) {
@@ -247,4 +193,65 @@
               count ++ ;
           }
       }
+ }
+
+
+
+
+
+
+ int main ( )
+ {
+      printf ( "Matrix\n" ) ;
+
+      int matrixA [ 16 ] = {
+          9 , 0 , 9 , 4 ,
+          2 , 6 , 6 , 7 ,
+          9 , 3 , 8 , 1 ,
+          6 , 9 , 7 , 1
+      } ;
+      int matrixB [ 16 ] = {
+          1 , 2 , 4 , 2 ,
+          8 , 6 , 0 , 0 ,
+          7 , 6 , 8 , 5 ,
+          8 , 4 , 7 , 5
+      } ;
+      int matrixC [ 16 ] = {
+          0 , 0 , 0 , 0 ,
+          0 , 0 , 0 , 0 ,
+          0 , 0 , 0 , 0 ,
+          0 , 0 , 0 , 0
+      } ;
+
+     
+     
+     
+      printf ( "A\n" ) ;
+      prettyPrintFormatMatrix ( matrixA , 4 , "%6d" ) ;
+      printf ( "B\n" ) ;
+      prettyPrintFormatMatrix ( matrixB , 4 , "%6d" ) ;
+
+      standardMatrixMult ( matrixA , matrixB , matrixC , 4 , 4 ) ;
+     
+
+      printf ( "C\n" ) ;
+      prettyPrintFormatMatrix ( matrixC , 4 , "%6d" ) ;
+
+     
+     
+     
+     
+     
+     
+     
+
+     
+     
+     
+     
+     
+     
+     
+     
+      return 0 ;
  }

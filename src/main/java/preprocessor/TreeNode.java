@@ -22,6 +22,10 @@ public class TreeNode extends ASTNode {
 
     public int balance;
 
+    public String stringValueEval;
+
+    public Integer integerValueEval;
+
     public void addChild(TreeNode node) {
 
         if (unaryOperator) {

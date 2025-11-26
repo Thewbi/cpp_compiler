@@ -20,6 +20,8 @@ public class ASTNode {
 
     public Token token;
 
+    public ASTNodeType astNodeType = ASTNodeType.UNKNOWN;
+
     public void printRecursive(final StringBuilder stringBuilder, final int indent) {
         printRecursive(stringBuilder, indent, true);
     }
