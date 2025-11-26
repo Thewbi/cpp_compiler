@@ -1,20 +1,19 @@
 package grammar;
 
-import org.antlr.v4.runtime.ParserRuleContext;
-
 import com.cpp.grammar.CPP14Parser;
 import com.cpp.grammar.CPP14Parser.IdExpressionContext;
 import com.cpp.grammar.CPP14Parser.InitializerContext;
-import com.cpp.grammar.CPP14Parser.ParametersAndQualifiersContext;
 import com.cpp.grammar.CPP14ParserBaseListener;
 
 import ast.ASTNode;
+import ast.BodyASTNode;
 import ast.DeclaratorASTNode;
 import ast.ExpressionASTNode;
 import ast.ExpressionType;
 import ast.FunctionDeclarationASTNode;
 import ast.IterationStatementASTNode;
-import ast.NoPointerDeclarator;
+import ast.ParameterDeclarationASTNode;
+import ast.ParameterDeclarationListASTNode;
 import ast.ParametersAndQualifiersASTNode;
 import ast.PostFixExpressionASTNode;
 import ast.SimpleDeclarationASTNode;
@@ -54,7 +53,7 @@ public class SimpleCPP14ParserBaseListener extends CPP14ParserBaseListener {
             return;
         }
 
-        //NoPointerDeclarator noPointerDeclarator = new NoPointerDeclarator();
+        // NoPointerDeclarator noPointerDeclarator = new NoPointerDeclarator();
         DeclaratorASTNode noPointerDeclarator = new DeclaratorASTNode();
         noPointerDeclarator.ctx = ctx;
 
@@ -65,7 +64,7 @@ public class SimpleCPP14ParserBaseListener extends CPP14ParserBaseListener {
     @Override
     public void exitInitDeclarator(CPP14Parser.InitDeclaratorContext ctx) {
 
-        System.out.println("[" + ctx.hashCode() + "] " + ctx.getText());
+        // System.out.println("[" + ctx.hashCode() + "] " + ctx.getText());
 
         if (ctx.children.size() == 1) {
             return;
@@ -80,13 +79,24 @@ public class SimpleCPP14ParserBaseListener extends CPP14ParserBaseListener {
     }
 
     @Override
+    public void enterPointerOperator(CPP14Parser.PointerOperatorContext ctx) {
+    }
+
+    @Override
+    public void exitPointerOperator(CPP14Parser.PointerOperatorContext ctx) {
+        if (currentNode instanceof DeclaratorASTNode) {
+            ((DeclaratorASTNode) currentNode).isPointer = true;
+        }
+    }
+    
+    @Override
     public void enterNoPointerDeclarator(CPP14Parser.NoPointerDeclaratorContext ctx) {
 
         if (ctx.children.size() == 1) {
             return;
         }
 
-        //NoPointerDeclarator noPointerDeclarator = new NoPointerDeclarator();
+        // NoPointerDeclarator noPointerDeclarator = new NoPointerDeclarator();
         DeclaratorASTNode noPointerDeclarator = new DeclaratorASTNode();
         noPointerDeclarator.ctx = ctx;
 
@@ -97,7 +107,7 @@ public class SimpleCPP14ParserBaseListener extends CPP14ParserBaseListener {
     @Override
     public void exitNoPointerDeclarator(CPP14Parser.NoPointerDeclaratorContext ctx) {
 
-        System.out.println("[" + ctx.hashCode() + "] " + ctx.getText());
+        // System.out.println("[" + ctx.hashCode() + "] " + ctx.getText());
 
         if (ctx.children.size() == 1) {
             return;
@@ -175,6 +185,24 @@ public class SimpleCPP14ParserBaseListener extends CPP14ParserBaseListener {
     }
 
     //
+    // Types
+    //
+
+    //
+    // Type specifier (int, float, double, custom types ...)
+    //
+
+    @Override
+    public void enterTypeSpecifier(CPP14Parser.TypeSpecifierContext ctx) {
+    }
+
+    @Override
+    public void exitTypeSpecifier(CPP14Parser.TypeSpecifierContext ctx) {
+        currentNode.type = ctx.getChild(0).getText();
+    }
+
+
+    //
     // Function Definition
     //
 
@@ -184,13 +212,55 @@ public class SimpleCPP14ParserBaseListener extends CPP14ParserBaseListener {
         FunctionDeclarationASTNode functionDeclarationASTNode = new FunctionDeclarationASTNode();
         functionDeclarationASTNode.ctx = ctx;
         functionDeclarationASTNode.returnType = ctx.getChild(0).getText();
-        
+
         connectToParent(currentNode, functionDeclarationASTNode);
         descend(functionDeclarationASTNode);
     }
 
     @Override
     public void exitFunctionDefinition(CPP14Parser.FunctionDefinitionContext ctx) {
+        ascend();
+    }
+
+    @Override
+    public void enterParameterDeclarationList(CPP14Parser.ParameterDeclarationListContext ctx) {
+        ParameterDeclarationListASTNode parameterDeclarationListASTNode = new ParameterDeclarationListASTNode();
+        parameterDeclarationListASTNode.ctx = ctx;
+        
+        connectToParent(currentNode, parameterDeclarationListASTNode);
+        descend(parameterDeclarationListASTNode);
+    }
+
+    @Override
+    public void exitParameterDeclarationList(CPP14Parser.ParameterDeclarationListContext ctx) {
+        ascend();
+    }
+
+    @Override
+    public void enterParameterDeclaration(CPP14Parser.ParameterDeclarationContext ctx) {
+        ParameterDeclarationASTNode parameterDeclarationASTNode = new ParameterDeclarationASTNode();
+        parameterDeclarationASTNode.ctx = ctx;
+        
+        connectToParent(currentNode, parameterDeclarationASTNode);
+        descend(parameterDeclarationASTNode);
+    }
+
+    @Override
+    public void exitParameterDeclaration(CPP14Parser.ParameterDeclarationContext ctx) {
+        ascend();
+    }
+    
+    @Override
+    public void enterFunctionBody(CPP14Parser.FunctionBodyContext ctx) {
+
+        BodyASTNode bodyASTNode = new BodyASTNode();
+
+        connectToParent(currentNode, bodyASTNode);
+        descend(bodyASTNode);
+    }
+
+    @Override
+    public void exitFunctionBody(CPP14Parser.FunctionBodyContext ctx) {
         ascend();
     }
 
@@ -306,6 +376,68 @@ public class SimpleCPP14ParserBaseListener extends CPP14ParserBaseListener {
         if (ctx.children.size() == 2) {
             ascend();
         }
+    }
+
+    @Override
+    public void enterAdditiveExpression(CPP14Parser.AdditiveExpressionContext ctx) {
+
+        // System.out.println("[" + ctx.hashCode() + "] " + ctx.getText());
+        
+        if (ctx.children.size() == 1) {
+            return;
+        }
+
+        ExpressionASTNode exprASTNode = new ExpressionASTNode();
+        exprASTNode.expressionType = ExpressionType.Add;
+
+        //processExpressionOperator(ctx, ExpressionType.Add);
+
+        connectToParent(currentNode, exprASTNode);
+        descend(exprASTNode);
+    }
+
+    @Override
+    public void exitAdditiveExpression(CPP14Parser.AdditiveExpressionContext ctx) {
+
+        // System.out.println("[" + ctx.hashCode() + "] " + ctx.getText());
+        
+        if (ctx.children.size() == 1) {
+            return;
+        }
+        //processExpressionOperator(ctx, ExpressionType.Add);
+
+        ascend();
+    }
+
+    @Override
+    public void enterMultiplicativeExpression(CPP14Parser.MultiplicativeExpressionContext ctx) {
+
+        // System.out.println("[" + ctx.hashCode() + "] " + ctx.getText());
+        
+        if (ctx.children.size() == 1) {
+            return;
+        }
+
+        ExpressionASTNode exprASTNode = new ExpressionASTNode();
+        exprASTNode.expressionType = ExpressionType.Mul;
+        
+        // String operatorAsString = ctx.getChild(1).getText();
+        //processExpressionOperator(ctx, ExpressionType.fromString(operatorAsString));
+
+        connectToParent(currentNode, exprASTNode);
+        descend(exprASTNode);
+    }
+
+    @Override
+    public void exitMultiplicativeExpression(CPP14Parser.MultiplicativeExpressionContext ctx) {
+
+        // System.out.println("[" + ctx.hashCode() + "] " + ctx.getText());
+        
+        if (ctx.children.size() == 1) {
+            return;
+        }
+
+        ascend();
     }
 
     //

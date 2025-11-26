@@ -1,0 +1,250 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ void prettyPrintFormatMatrix ( int * matrix , int dim , const char * format ) ;
+
+
+ void upCountingMatrix ( int * matrix , int dim ) ;
+
+ void standardMatrixMult ( int * matrixA , int * matrixB , int * matrixC , int rows , int columns ) ;
+ void segmentedMatrixMult ( int * matrixA , int * matrixB , int * matrixC , int rows , int columns ) ;
+ void matrixAddInto ( int * matrixA , int * matrixB , int rows , int columns ) ;
+ void getSubMatrix ( int * matrix , int dim , int xPos , int yPos , int width , int height , int * matrixC ) ;
+ void setSubMatrix ( int * matrix , int dim , int xPos , int yPos , int width , int height , int * matrixC ) ;
+
+ int main ( )
+ {
+      printf ( "Matrix\n" ) ;
+
+      int matrixA [ 4*4 ] = {
+          9 , 0 , 9 , 4 ,
+          2 , 6 , 6 , 7 ,
+          9 , 3 , 8 , 1 ,
+          6 , 9 , 7 , 1
+      } ;
+      int matrixB [ 4*4 ] = {
+          1 , 2 , 4 , 2 ,
+          8 , 6 , 0 , 0 ,
+          7 , 6 , 8 , 5 ,
+          8 , 4 , 7 , 5
+      } ;
+      int matrixC [ 4*4 ] = {
+          0 , 0 , 0 , 0 ,
+          0 , 0 , 0 , 0 ,
+          0 , 0 , 0 , 0 ,
+          0 , 0 , 0 , 0
+      } ;
+
+     
+     
+     
+      printf ( "A\n" ) ;
+      prettyPrintFormatMatrix ( matrixA , 4 , "%6d" ) ;
+      printf ( "B\n" ) ;
+      prettyPrintFormatMatrix ( matrixB , 4 , "%6d" ) ;
+
+      standardMatrixMult ( matrixA , matrixB , matrixC , 4 , 4 ) ;
+     
+
+      printf ( "C\n" ) ;
+      prettyPrintFormatMatrix ( matrixC , 4 , "%6d" ) ;
+
+     
+     
+     
+     
+     
+     
+     
+
+     
+     
+     
+     
+     
+     
+     
+     
+      return 0 ;
+ }
+
+ void matrixAddInto ( int * matrixA , int * matrixB , int rows , int columns ) {
+      for ( int i = 0 ; i < rows ; i ++ ) {
+          for ( int j = 0 ; j < columns ; j ++ ) {
+              matrixA [ i * rows + j ] += matrixB [ i * rows + j ] ;
+          }
+      }
+ }
+
+ void getSubMatrix ( int * matrix , int dim , int xPos , int yPos , int width , int height , int * matrixC ) {
+      int innerI = 0 ;
+      for ( int i = xPos ; i < xPos + width ; i ++ ) {
+          int innerJ = 0 ;
+          for ( int j = yPos ; j < yPos + height ; j ++ ) {
+              matrixC [ innerI * width + innerJ ] = matrix [ i * dim + j ] ;
+              innerJ ++ ;
+          }
+          innerI ++ ;
+      }
+ }
+
+ void setSubMatrix ( int * matrix , int dim , int xPos , int yPos , int width , int height , int * matrixC ) {
+      for ( int i = 0 ; i < height ; i ++ ) {
+          for ( int j = 0 ; j < width ; j ++ ) {
+              int tempData = matrixC [ i * width + j ] ;
+              matrix [ ( yPos + i ) * dim + ( xPos + j ) ] = tempData ;
+          }
+      }
+ }
+
+ void segmentedMatrixMult ( int * matrixA , int * matrixB , int * matrixC , int rows , int columns ) {
+     
+      int nc = 2 ;
+      int rowSteps = rows / nc ;
+
+      int kc = 2 ;
+      int columnsSteps = columns / kc ;
+
+      int mc = 2 ;
+      int innerSteps = rows / nc ;
+
+     
+     
+     
+
+     
+      int iterationCounter = 0 ;
+
+     
+     
+      for ( int jc = 0 ; jc < rowSteps ; jc ++ ) {
+
+         
+         
+          for ( int pc = 0 ; pc < columnsSteps ; pc ++ ) {
+
+             
+              int subMatrixB [ 2 * 2 ] ;
+              getSubMatrix ( matrixB , 4 , pc * kc , jc * nc , kc , nc , subMatrixB ) ;
+
+             
+             
+              for ( int ic = 0 ; ic < innerSteps ; ic ++ ) {
+
+                 
+                  int subMatrixA [ 2 * 2 ] = { 0 , 0 , 0 , 0 } ;
+                  getSubMatrix ( matrixA , 4 , ic * mc , pc * kc , mc , kc , subMatrixA ) ;
+
+                  printf ( "[\n" ) ;
+                  prettyPrintFormatMatrix ( subMatrixA , 2 , "%6d" ) ;
+                  printf ( "------------------------\n" ) ;
+                  prettyPrintFormatMatrix ( subMatrixB , 2 , "%6d" ) ;
+                  printf ( "]\n" ) ;
+
+                  iterationCounter ++ ;                 
+
+                 
+                 
+                  int tempMult [ 2 * 2 ] = { 0 , 0 , 0 , 0 } ;
+                  standardMatrixMult ( subMatrixA , subMatrixB , tempMult , 2 , 2 ) ;
+
+                 
+                 
+                 
+
+                 
+                 
+                  int tempAccum [ 2 * 2 ] = { 0 , 0 , 0 , 0 } ;
+                  getSubMatrix ( matrixC , 4 , ic * kc , jc * nc , nc , kc , tempAccum ) ;
+
+                 
+                 
+                  matrixAddInto ( tempAccum , tempMult , 2 , 2 ) ;
+
+                 
+                 
+                  setSubMatrix ( matrixC , 4 , jc * nc , ic * kc , nc , kc , tempAccum ) ;
+
+              }
+          }
+      }
+
+      printf ( "%d\n" , iterationCounter ) ;
+ }
+
+ void standardMatrixMult ( int * matrixA , int * matrixB , int * matrixC , int rows , int columns ) {
+     
+      for ( int i = 0 ; i < rows ; i ++ ) {
+         
+          for ( int j = 0 ; j < columns ; j ++ ) {
+             
+              for ( int k = 0 ; k < columns ; k ++ ) {
+                  matrixC [ i * rows + j ] += matrixA [ i * columns + k ] * matrixB [ k * columns + j ] ;
+              }
+          }
+      }
+ }
+
+
+
+
+
+
+
+
+
+
+ void prettyPrintFormatMatrix ( int * matrix , int dim , const char * format ) {
+      for ( int i = 0 ; i < dim ; i ++ ) {
+          for ( int j = 0 ; j < dim ; j ++ ) {
+              printf ( format , matrix [ dim * i + j ] ) ;
+          }
+          printf ( "\n" ) ;
+      }
+ }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ void upCountingMatrix ( int * matrix , int dim ) {
+      int count = 1 ;
+      for ( int i = 0 ; i < dim ; i ++ ) {
+          for ( int j = 0 ; j < dim ; j ++ ) {
+              matrix [ dim * i + j ] = count ;
+              count ++ ;
+          }
+      }
+ }

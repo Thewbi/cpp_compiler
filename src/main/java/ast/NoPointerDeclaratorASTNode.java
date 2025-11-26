@@ -1,6 +1,6 @@
 package ast;
 
-public class NoPointerDeclarator extends ASTNode {
+public class NoPointerDeclaratorASTNode extends ASTNode {
 
     public boolean isPointer;
 

@@ -1,7 +1,9 @@
 package preprocessor;
 
 import java.io.IOException;
+import java.util.Map;
 
+import org.antlr.runtime.tree.Tree;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.Token;
 
@@ -12,6 +14,7 @@ import common.StringUtil;
 
 public class SimpleFileStackFrame extends AbstractFileStackFrame {
 
+    public Map<String, ASTNode> defineValueMap;
     public boolean defineMode;
     public boolean defineModeKey;
     public boolean defineModeValue;
@@ -219,6 +222,8 @@ public class SimpleFileStackFrame extends AbstractFileStackFrame {
 
                 fileStack.push(fileStackFrame);
 
+                // setParserMode(ParserMode.NORMAL);
+
                 fileStackFrame.start();
 
             } else if (text.equalsIgnoreCase("(")) {
@@ -240,7 +245,7 @@ public class SimpleFileStackFrame extends AbstractFileStackFrame {
 
                     DefaultFileStackFrameCallback cb = (preprocessor.DefaultFileStackFrameCallback) callback;
                     if (cb.ifStack.isEmpty() || cb.ifStack.peek().performOutput) {
-                        outputStringBuilder.append(text);
+                        outputStringBuilder.append(" ").append(text);
                     }
 
                 }
@@ -367,7 +372,7 @@ public class SimpleFileStackFrame extends AbstractFileStackFrame {
 
                     DefaultFileStackFrameCallback cb = (preprocessor.DefaultFileStackFrameCallback) callback;
                     if (cb.ifStack.isEmpty() || cb.ifStack.peek().performOutput) {
-                        outputStringBuilder.append(text);
+                        outputStringBuilder.append(" ").append(text);
                     }
 
                 }
@@ -502,7 +507,21 @@ public class SimpleFileStackFrame extends AbstractFileStackFrame {
                         temp = token.getText();
                     }
 
-                    if (!temp.equalsIgnoreCase("(") && !temp.equalsIgnoreCase(")")) {
+                    if (
+                        
+                        currentNode.children.size() == 0
+                        && !temp.equalsIgnoreCase("(") 
+                        && !temp.equalsIgnoreCase(")")
+                        ||
+                        (token.getType() == Token.EOF)
+                        ||
+                        temp.equalsIgnoreCase("\n")
+                        
+                        // && !temp.equalsIgnoreCase("+")
+                        // && !temp.equalsIgnoreCase("-")
+                        // && !temp.equalsIgnoreCase("*")
+                        // && !temp.equalsIgnoreCase("/")
+                ) {
 
                         currentNode.children.add(expressionRootNode);
 
@@ -560,9 +579,18 @@ public class SimpleFileStackFrame extends AbstractFileStackFrame {
                     // throw new RuntimeException();
                     // System.out.println(text);
 
+                    // if (text.equalsIgnoreCase("DIMENSION")) {
+                    //     System.out.println("test");
+                    // }
+                    // if (text.equalsIgnoreCase("ELEMENTS")) {
+                    //     System.out.println("test");
+                    // }
+
+                    text = filterByPreprocessorValues(text);
+
                     DefaultFileStackFrameCallback cb = (preprocessor.DefaultFileStackFrameCallback) callback;
                     if (cb.ifStack.isEmpty() || cb.ifStack.peek().performOutput) {
-                        outputStringBuilder.append(text);
+                        outputStringBuilder.append(" ").append(text);
                     }
 
                     // ((DefaultFileStackFrameCallback) callback).stringBuilder =
@@ -589,6 +617,38 @@ public class SimpleFileStackFrame extends AbstractFileStackFrame {
 
         fileStack.pop();
 
+    }
+
+    private String filterByPreprocessorValues(String data) {
+
+        if (!defineValueMap.containsKey(data)) {
+            return data;
+        }
+
+        TreeNode treeNode = (TreeNode) defineValueMap.get(data);
+
+        StringBuilder stringBuilder = new StringBuilder();
+        evaluatePreprocessorTreeNode(treeNode, stringBuilder);
+
+        return stringBuilder.toString();
+    }
+
+    private void evaluatePreprocessorTreeNode(TreeNode treeNode, StringBuilder stringBuilder) {
+        if (treeNode == null) {
+            return;
+        }
+        //if (treeNode.children.size() == 0) {
+        if ((treeNode.rhs == null) && (treeNode.lhs == null)) {
+            if (defineValueMap.containsKey(treeNode.value)) {
+                stringBuilder.append(defineValueMap.get(treeNode.value).value);
+            } else {
+                stringBuilder.append(treeNode.value);
+            }
+            return;
+        }
+        evaluatePreprocessorTreeNode(treeNode.lhs, stringBuilder);
+        stringBuilder.append(treeNode.value);
+        evaluatePreprocessorTreeNode(treeNode.rhs, stringBuilder);
     }
 
     private void setParserMode(ParserMode parserMode) {
@@ -633,8 +693,10 @@ public class SimpleFileStackFrame extends AbstractFileStackFrame {
 
         identifier = AbstractFileStackFrame.isIdentifier(currentTokenAsString);
 
+        boolean isFuncCall = expressionRootNode != null ? expressionRootNode.functionCall : false;
+
         expressionRootNode = insertTokenIntoTree(expressionRootNode, currentTokenAsString, customWeight,
-                expressionRootNode != null ? expressionRootNode.functionCall : false);
+                isFuncCall);
         
 
         // // DEBUG

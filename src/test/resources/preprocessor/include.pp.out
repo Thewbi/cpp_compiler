@@ -1,0 +1,11 @@
+
+
+intmain(){
+
+
+    printf("Debug mode is ON\n");
+
+
+    return0;
+
+}

@@ -84,12 +84,10 @@ public class Main {
         System.out.println("Start");
 
         // preprocessor();
-        // continue here:
-
-        // preprocessor_2(); <----------------- Continue here
-
+        preprocessor_2(); // <----------------- Continue here
         // preprocessor_3();
-        translationUnit();
+
+        // translationUnit();
         // riscvassembler();
         // riscvdecoder();
         // riscvencoder();
@@ -676,21 +674,28 @@ public class Main {
         // All scripts should return the value 0. Otherwise validation
         // throws an error
         //
-        // final String filename = "src/test/resources/TACKY/main_function_return_value.tky";
+        // final String filename =
+        // "src/test/resources/TACKY/main_function_return_value.tky";
         // final String filename = "src/test/resources/TACKY/jump.tky";
         // final String filename = "src/test/resources/TACKY/assignment.tky";
         // final String filename = "src/test/resources/TACKY/expression_add.tky";
-        // final String filename = "src/test/resources/TACKY/expression_less_than_constants.tky";
-        // final String filename = "src/test/resources/TACKY/expression_less_than_var_constant.tky";
+        // final String filename =
+        // "src/test/resources/TACKY/expression_less_than_constants.tky";
+        // final String filename =
+        // "src/test/resources/TACKY/expression_less_than_var_constant.tky";
         // final String filename = "src/test/resources/TACKY/if_else.tky";
         // final String filename = "src/test/resources/TACKY/for_loop.tky";
         // final String filename = "src/test/resources/TACKY/while_loop.tky";
         // final String filename = "src/test/resources/TACKY/do_while_loop.tky";
         // final String filename = "src/test/resources/TACKY/pointer_creation.tky";
-        // final String filename = "src/test/resources/TACKY/function_call_pass_by_const_value.tky";
-        // final String filename = "src/test/resources/TACKY/function_call_pass_by_pointer.tky";
-        // final String filename = "src/test/resources/TACKY/function_call_pass_by_variable_copy.tky";
-        // final String filename = "src/test/resources/TACKY/function_call_return_value.tky";
+        // final String filename =
+        // "src/test/resources/TACKY/function_call_pass_by_const_value.tky";
+        // final String filename =
+        // "src/test/resources/TACKY/function_call_pass_by_pointer.tky";
+        // final String filename =
+        // "src/test/resources/TACKY/function_call_pass_by_variable_copy.tky";
+        // final String filename =
+        // "src/test/resources/TACKY/function_call_return_value.tky";
         // final String filename = "src/test/resources/TACKY/function_call.tky";
         // final String filename = "src/test/resources/TACKY/printf_function_call.tky";
         final String filename = "src/test/resources/TACKY/hello_assembly.tky";
@@ -783,7 +788,7 @@ public class Main {
 
         DefaultTACKYExecutor tackyExecutor = new DefaultTACKYExecutor();
         tackyExecutor.functionDefinitionMap = structureTACKYParserListener.functionDefinitionMap;
-        
+
         // start execution with the main function
         int returnValue = tackyExecutor.executeFunction(newTackyStackFrame, rootNode, 0, mainFunction);
         if (returnValue == 0) {
@@ -791,7 +796,8 @@ public class Main {
             System.out.println("[OK]");
             System.out.println("[OK]");
         } else {
-            throw new RuntimeException("\n[ERROR]\n[ERROR] Script did not return zero but " + returnValue + "! Unit Test failed!\n[ERROR]");
+            throw new RuntimeException("\n[ERROR]\n[ERROR] Script did not return zero but " + returnValue
+                    + "! Unit Test failed!\n[ERROR]");
         }
 
         System.out.println("----------------------------------------------------------\n");
@@ -866,15 +872,19 @@ public class Main {
         // final String filename = "src/test/resources/declaration.cpp";
         // final String filename = "src/test/resources/arrays.cpp";
         // final String filename = "src/test/resources/if.cpp";
-        // final String filename = "src/test/resources/for_loop.cpp"; // start rule: translationUnit // <--- important
-        // final String filename = "src/test/resources/arrays.cpp"; // start rule: translationUnit // <--- important
+        // final String filename = "src/test/resources/for_loop.cpp"; // start rule:
+        // translationUnit // <--- important
+        // final String filename = "src/test/resources/arrays.cpp"; // start rule:
+        // translationUnit // <--- important
         // final String filename = "src/test/resources/function_definition.cpp";
-        // final String filename = "src/test/resources/function_call.cpp"; // start rule: translationUnit // <--- important
+        // final String filename = "src/test/resources/function_call.cpp"; // start
+        // rule: translationUnit // <--- important
         // final String filename = "src/test/resources/while.cpp";
         // final String filename = "src/test/resources/app1.cpp";
         // final String filename = "src/test/resources/ECO32/ECO32_1.cpp";
 
-        final String filename = "src/test/resources/examples/matrix_test.cpp";
+        // final String filename = "src/test/resources/examples/matrix_test.cpp";
+        final String filename = "src/test/resources/examples/matrix_tester.cpp";
 
         final CharStream charStream = CharStreams
                 .fromFileName(filename);
@@ -954,7 +964,8 @@ public class Main {
         ASTNode rootNode = new ASTNode();
         rootNode.value = "[CompilationUnit] root";
 
-        // StructureCPP14ParserListener cpp14ParserListener = new StructureCPP14ParserListener();
+        // StructureCPP14ParserListener cpp14ParserListener = new
+        // StructureCPP14ParserListener();
         SimpleCPP14ParserBaseListener cpp14ParserListener = new SimpleCPP14ParserBaseListener();
         cpp14ParserListener.currentNode = rootNode;
 
@@ -1063,7 +1074,8 @@ public class Main {
         // final String filename = "src/test/resources/for_loop.cpp";
         // final String filename = "src/test/resources/helloworld.cpp";
         // final String filename = "src/test/resources/helloworld2.cpp";
-        final String filename = "src/test/resources/declaration_type_error.cpp";
+        // final String filename = "src/test/resources/declaration_type_error.cpp";
+        final String filename = "src/test/resources/examples/matrix_tester.cpp";
 
         List<String> processedIncludeFiles = new ArrayList<>();
 
@@ -1085,6 +1097,7 @@ public class Main {
         // function call including the formal parameter and the define map contains
         // the macro body
         // final String filename = "src/test/resources/preprocessor/define.pp";
+        // final String filename = "src/test/resources/preprocessor/define_2.pp";
 
         // TODO:
         // STATUS: goes into PREPROCESSOR parse mode and this is throwing a
@@ -1127,7 +1140,9 @@ public class Main {
 
         // TODO: next
         //
-        final String filename = "src/test/resources/preprocessor/printf_test_1.pp";
+        // final String filename = "src/test/resources/preprocessor/printf_test_1.pp";
+
+        final String filename = "src/test/resources/examples/matrix_tester.cpp";
 
         ASTNode dummyASTNode = new ASTNode();
         dummyASTNode.value = "__DUMMY___11223344__";
@@ -1146,6 +1161,7 @@ public class Main {
         SimpleFileStackFrame fileStackFrame = new SimpleFileStackFrame();
         fileStackFrame.callback = defaultFileStackFrameCallback;
         fileStackFrame.filename = filename;
+        fileStackFrame.defineValueMap = defineMap;
         fileStackFrame.outputStringBuilder = outputStringBuilder;
 
         Stack<IFileStackFrame> fileStack = new Stack<>();
@@ -1166,9 +1182,9 @@ public class Main {
         for (Map.Entry<String, ASTNode> entry : defineKeyMap.entrySet()) {
 
             String entryKey = entry.getKey();
-            TreeNode entryValue = (TreeNode) entry.getValue();
+            ASTNode entryValue = (ASTNode) entry.getValue();
 
-            System.out.println("functionCall: " + entryValue.functionCall);
+            // System.out.println("functionCall: " + entryValue.functionCall);
 
             StringBuilder stringBuilder = new StringBuilder();
             entryValue.printRecursive(stringBuilder, 0);
@@ -1341,7 +1357,8 @@ public class Main {
         }
     }
 
-    public static void preProcessor(String filename, List<String> processedIncludeFiles, StringBuilder stringBuilder)
+    public static void preProcessor(String filename, List<String> processedIncludeFiles,
+            StringBuilder stringBuilder)
             throws IOException {
 
         File file = new File(filename);
