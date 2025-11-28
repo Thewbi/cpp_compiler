@@ -26,6 +26,8 @@ public class TackyGenerator {
 
     public TACKYStackFrame tackyStackFrame;
 
+    private int tempCounter = 0;
+
     public void process(int indent, ASTNode astNode) {
 
         switch (astNode.astNodeType) {
@@ -277,7 +279,7 @@ public class TackyGenerator {
     }
 
     private void enterSimpleDeclaration(int indent, SimpleDeclarationASTNode simpleDeclarationASTNode) {
-        System.out.println();
+        // System.out.println();
         for (ASTNode astNode : simpleDeclarationASTNode.children) {
             process(indent, astNode);
         }
@@ -290,10 +292,10 @@ public class TackyGenerator {
 
         // System.out.println(declaratorASTNode);
 
-        // DEBUG
-        StringBuilder debugStringBuilder = new StringBuilder();
-        declaratorASTNode.printRecursive(debugStringBuilder, 0);
-        System.out.println(debugStringBuilder.toString());
+        // // DEBUG
+        // StringBuilder debugStringBuilder = new StringBuilder();
+        // declaratorASTNode.printRecursive(debugStringBuilder, 0);
+        // System.out.println(debugStringBuilder.toString());
 
         if (declaratorASTNode.isFunctionCall) {
             processFunctionCall(indent, declaratorASTNode);
@@ -417,33 +419,70 @@ public class TackyGenerator {
 
                 stringBuilder.append("\n");
 
-                int arrayIndex = Integer.parseInt(assignedValueExpression.children.get(1).value);
+                ASTNode c1 = assignedValueExpression.children.get(1);
+
+                // int arrayIndex = 0;
+                // if (NumberUtils.isParsable(c1.value)) {
+                // arrayIndex = Integer.parseInt(c1.value);
+                // } else {
+                // System.out.println();
+                // arrayIndex = (int) evaluate((ExpressionASTNode) c1);
+                // }
+
+                // DEBUG
+                System.out.println(tackyStackFrame.variables.size());
 
                 String arrayName = child1ASTNode.value;
 
                 String destinationVariableName = child0ASTNode.value;
-
                 defineVariable(indent + 1, destinationVariableName, null);
 
-                retrieveValueFromArrayElement(indent + 1, declaratorASTNode, arrayName, arrayIndex, destinationVariableName);
+                if (NumberUtils.isParsable(c1.value)) {
+                    int arrayIndex = (int) evaluate((ExpressionASTNode) c1);
+                    retrieveValueFromArrayElement(indent + 1, declaratorASTNode, arrayName, arrayIndex,
+                            destinationVariableName);
+                } else {
+                    // throw new RuntimeException("Need indexing by variable!");
+                    retrieveValueFromArrayElementByVariable(indent + 1, declaratorASTNode, arrayName, c1.value,
+                            destinationVariableName);
+                }
 
             } else {
 
-                Object assignedValue = evaluate(assignedValueExpression);
+                addVariableToScope(name, TackyDataType.fromString(type), isArray);
+
+                // Object assignedValue = evaluate(assignedValueExpression);
+                String exprAsString = evaluateToString(indent, assignedValueExpression);
 
                 System.out.println("Declaration. type=" + type + ", name=" + name + ", isArray=" + isArray
-                        + ", assignedValue=" + assignedValue);
+                        + ", assignedValue=" + exprAsString);
 
                 // i = Var("i")
-                stringBuilder.append(indentString).append(name).append(" = Var(").append("\"").append(name)
-                        .append("\")").append("\n");
+                // @formatter:off
+                stringBuilder.append(indentString)
+                    .append(name).append(" = Var(").append("\"").append(name).append("\")")
+                    .append("\n");
+                // @formatter:on
 
-                if (type.equalsIgnoreCase("int")) {
-                    // i = Constant(ConstInt(0))
-                    stringBuilder.append(indentString).append(name).append(" = Constant(").append("ConstInt(")
-                            .append(assignedValue)
-                            .append("))").append("\n");
-                }
+                // if (type.equalsIgnoreCase("int")) {
+                //     // i = Constant(ConstInt(0))
+                //     // @formatter:off
+                //     stringBuilder.append(indentString).append(name)
+                //         .append(" = Constant(").append("ConstInt(")
+                //         // .append(assignedValue)
+                //         .append(exprAsString)
+                //         .append("))").append("\n");
+                //     // @formatter:on
+                // }
+
+                // @formatter:off
+                    stringBuilder.append(indentString).append(name).append(" = ")
+                        //.append("Constant(").append("ConstInt(")
+                        // .append(assignedValue)
+                        .append(exprAsString)
+                        //.append("))")
+                        .append("\n");
+                    // @formatter:on
 
             }
 
@@ -489,7 +528,10 @@ public class TackyGenerator {
         }
     }
 
-    private void assignValueToArrayElement(int indent, DeclaratorASTNode declaratorASTNode, String arrayName, int arrayElementIndex,
+    
+
+    private void assignValueToArrayElement(int indent, DeclaratorASTNode declaratorASTNode, String arrayName,
+            int arrayElementIndex,
             String value) {
 
         String indentString = "";
@@ -506,10 +548,10 @@ public class TackyGenerator {
         // array1d.ptr = array1d.ptr + (n-1) * sizeof_int
         defineVariable(indent, arrayName + ".ptr.tmp", null);
         stringBuilder.append(indentString)
-            .append(arrayName + ".ptr.tmp").append(" = ")
-            .append(arrayName + ".ptr").append(" + ")
-            .append(arrayElementIndex).append(" * sizeof_array_type")
-            .append("\n");
+                .append(arrayName + ".ptr.tmp").append(" = ")
+                .append(arrayName + ".ptr").append(" + ")
+                .append(arrayElementIndex).append(" * sizeof_array_type")
+                .append("\n");
 
         // write data into the array element
         // tmp.0 = 18
@@ -517,11 +559,13 @@ public class TackyGenerator {
 
         // write data into the array element
         // Store(tmp.0, array1d.ptr)
-        stringBuilder.append(indentString).append("Store(").append(arrayName + ".tmp.0").append(", ").append(arrayName + ".ptr.tmp").append(")")
+        stringBuilder.append(indentString).append("Store(").append(arrayName + ".tmp.0").append(", ")
+                .append(arrayName + ".ptr.tmp").append(")")
                 .append("\n");
     }
 
-    private void retrieveValueFromArrayElement(int indent, DeclaratorASTNode declaratorASTNode, String arrayName, int arrayElementIndex, String destinationVariableName) {
+    private void retrieveValueFromArrayElement(int indent, DeclaratorASTNode declaratorASTNode,
+            String arrayName, int arrayElementIndex, String destinationVariableName) {
 
         // stringBuilder.append("\n");
 
@@ -538,37 +582,65 @@ public class TackyGenerator {
         // array1d.ptr = array1d.ptr + 4 * sizeof_int
         defineVariable(indent, arrayName + ".ptr.tmp", null);
         stringBuilder.append(indentString)
-            .append(arrayName + ".ptr.tmp").append(" = ")
-            .append(arrayName + ".ptr").append(" + ")
-            .append(arrayElementIndex).append(" * sizeof_array_type")
-            .append("\n");
+                .append(arrayName + ".ptr.tmp").append(" = ")
+                .append(arrayName + ".ptr").append(" + ")
+                .append(arrayElementIndex).append(" * sizeof_array_type")
+                .append("\n");
 
         // // write data into the array element
         // // tmp.0 = 18
-        // stringBuilder.append(arrayName + ".tmp.0").append(" = ").append(value).append("\n");
+        // stringBuilder.append(arrayName + ".tmp.0").append(" =
+        // ").append(value).append("\n");
 
         // write data into the array element
         // Store(tmp.0, array1d.ptr)
         stringBuilder.append(indentString).append("Load(")
-            .append(arrayName + ".ptr.tmp")
-            .append(", ")
-            .append(destinationVariableName)
-        .append(")")
-        .append("\n");
+                .append(arrayName + ".ptr.tmp")
+                .append(", ")
+                .append(destinationVariableName)
+                .append(")")
+                .append("\n");
     }
 
-    private Object evaluate(ExpressionASTNode expr) {
+    private void retrieveValueFromArrayElementByVariable(int indent, DeclaratorASTNode declaratorASTNode,
+            String arrayName, String indexVarName, String destinationVariableName) {
 
-        if (expr.children.size() == 0) {
-            if (NumberUtils.isParsable(expr.value)) {
-                return Integer.parseInt(expr.value);
-            } else {
-                return expr.value;
-            }
+        // stringBuilder.append("\n");
+
+        String indentString = "";
+        for (int i = 0; i < indent; i++) {
+            indentString += "  ";
         }
 
-        throw new RuntimeException();
+        stringBuilder.append("\n");
+        stringBuilder.append(indentString).append("// retrieve from array-element").append("\n");
+
+        // advance the pointer forward to the requested fifth element
+        // to point to element #5, move the pointer four times
+        // array1d.ptr = array1d.ptr + 4 * sizeof_int
+        defineVariable(indent, arrayName + ".ptr.tmp", null);
+        stringBuilder.append(indentString)
+                .append(arrayName + ".ptr.tmp").append(" = ")
+                .append(arrayName + ".ptr").append(" + ")
+                .append(indexVarName).append(" * sizeof_array_type")
+                .append("\n");
+
+        // // write data into the array element
+        // // tmp.0 = 18
+        // stringBuilder.append(arrayName + ".tmp.0").append(" =
+        // ").append(value).append("\n");
+
+        // write data into the array element
+        // Store(tmp.0, array1d.ptr)
+        stringBuilder.append(indentString).append("Load(")
+                .append(arrayName + ".ptr.tmp")
+                .append(", ")
+                .append(destinationVariableName)
+                .append(")")
+                .append("\n");
     }
+
+    
 
     private void exitInitDeclaration(DeclaratorASTNode declaratorASTNode) {
         System.out.println(declaratorASTNode);
@@ -821,7 +893,8 @@ public class TackyGenerator {
         defineVariable(indent, name, tackyDataType, false, 0);
     }
 
-    private void defineVariable(int indent, String name, TackyDataType tackyDataType, boolean isArray, int arraySize) {
+    private void defineVariable(int indent, String name, TackyDataType tackyDataType, 
+        boolean isArray, int arraySize) {
 
         String indentString = "";
         for (int i = 0; i < indent; i++) {
@@ -891,4 +964,82 @@ public class TackyGenerator {
         throw new RuntimeException();
     }
 
+    private Object evaluate(ExpressionASTNode expr) {
+
+        if (expr.children.size() == 0) {
+            if (NumberUtils.isParsable(expr.value)) {
+                return Integer.parseInt(expr.value);
+            } else {
+                // retrieve local variable
+                return expr.value;
+
+                // TACKYStackFrameVariableDescriptor varDesc =
+                // tackyStackFrame.variables.get(expr.value);
+                // memory[varDesc.address / 4];
+            }
+        } else if (expr.children.size() == 2) {
+            switch (expr.expressionType) {
+
+                case Add:
+                    return (int) evaluate((ExpressionASTNode) expr.children.get(0))
+                            + (int) evaluate((ExpressionASTNode) expr.children.get(1));
+
+                default:
+                    throw new RuntimeException();
+            }
+        }
+
+        throw new RuntimeException();
+    }
+
+    private String evaluateToString(int indent, ExpressionASTNode expressionASTNode) {
+        
+        // System.out.println();
+
+        String indentString = "";
+        for (int i = 0; i < indent; i++) {
+            indentString += "  ";
+        }
+
+        StringBuilder exprStringBuilder = new StringBuilder();
+        String lhs = "";
+        String rhs = "";
+
+        String operator = "";
+        switch (expressionASTNode.expressionType) {
+            case Add:
+                operator = " + ";
+                break;
+            case Mul:
+                operator = " * ";
+                break;
+        }
+
+        switch (expressionASTNode.expressionType) {
+
+            case Primary:
+                exprStringBuilder.append("Constant(").append("ConstInt(").append(expressionASTNode.value).append("))");
+                return exprStringBuilder.toString();
+
+            case Mul:
+            case Add:
+                lhs = evaluateToString(indent, (ExpressionASTNode) expressionASTNode.children.get(0));
+                rhs = evaluateToString(indent, (ExpressionASTNode) expressionASTNode.children.get(1));
+
+                String tempVarName = "exprTemp_" + tempCounter;
+                tempCounter++;
+                
+                defineVariable(indent + 1, tempVarName, null);
+                exprStringBuilder.append(indentString)
+                    .append(tempVarName).append(" = ").append(lhs).append(operator).append(rhs);
+                    stringBuilder.append(exprStringBuilder.toString()).append("\n");
+                return tempVarName;
+
+            case Identifier:
+                return expressionASTNode.value;
+
+            default:
+                throw new RuntimeException();
+        }
+    }
 }

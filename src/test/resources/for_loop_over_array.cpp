@@ -1,12 +1,13 @@
 int main()
 {
     int length = 3;
-    int numbers[3] = {10, 20, 30};
+    int numbers[3] = {11, 22, 33};
 
     for (int i = 0; i < length; i++)
     {
         //printf("a");
         //printf("%d", i);
-        printf("%d", numbers[i]);
+        int data = numbers[i];
+        printf("%d", data);
     }
 }

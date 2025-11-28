@@ -544,7 +544,9 @@ public class DefaultTACKYExecutor implements TACKYExecutor {
         // local variable inside the loop and this is expected!
         if (tackyStackFrame.variables.containsKey(varName)) {
             //throw new RuntimeException("Variable \"" + varName + "\" declared already!");
-            System.out.println("Variable \"" + varName + "\" declared already!");
+
+            // TODO
+            // System.out.println("Variable \"" + varName + "\" declared already!");
         }
 
         TACKYStackFrameVariableDescriptor descriptor = new TACKYStackFrameVariableDescriptor();
@@ -561,7 +563,9 @@ public class DefaultTACKYExecutor implements TACKYExecutor {
     private void createLabel(TACKYStackFrame tackyStackFrame, LabelASTNode labelASTNode, int index) {
         String labelName = labelASTNode.value;
         if (tackyStackFrame.labels.containsKey(labelName)) {
-            throw new RuntimeException("Label \"" + labelName + "\" declared already!");
+
+            // TODO
+            // throw new RuntimeException("Label \"" + labelName + "\" declared already!");
         }
         // map label to line
         tackyStackFrame.labels.put(labelName, index);

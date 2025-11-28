@@ -32,7 +32,7 @@ public enum TackyDataType {
             return INT_8;
         } else if ("int16".equalsIgnoreCase(data)) {
             return INT_16;
-        } else if ("int32".equalsIgnoreCase(data)) {
+        } else if ("int".equalsIgnoreCase(data) || "int32".equalsIgnoreCase(data)) {
             return INT_32;
         } else if ("string".equalsIgnoreCase(data)) {
             return STRING;

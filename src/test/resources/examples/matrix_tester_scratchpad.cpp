@@ -16,14 +16,21 @@ int main()
         for (int j = 0; j < DIMENSION; j++)
         {
             // printf ( "%d" , matrixA [ dim * i + j ] ) ;
-            printf("b");
+
+            int temp = DIMENSION * i + j;
+            // printf("%d: ", temp);
+
+            int val = matrixA [ temp ];
+            printf("%d", val);
+            
+            //printf("b");
         }
         //printf("\n");
 
-        printf("a");
+        // printf("a");
     }
 
-    printf("END");
+    // printf("END");
 
     return 0;
 }
