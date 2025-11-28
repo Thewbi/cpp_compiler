@@ -74,7 +74,6 @@ import tacky.generation.x86.X86CodeGenerator;
 import tacky.runtime.DefaultTACKYExecutor;
 import tacky.runtime.TACKYStackFrame;
 import types.FuncDecl;
-import types.Type;
 
 /**
  * https://en.cppreference.com/w/cpp/language/translation_phases
@@ -86,10 +85,13 @@ public class Main {
         System.out.println("Start");
 
         // preprocessor();
-        // preprocessor_2(); // <----------------- Continue here, Preprocessor 2 works
+        preprocessor_2(); // <----------------- Continue here, Preprocessor 2 works
         // preprocessor_3();
 
-        // translationUnit(); // <---------------- C - Compiler
+        ASTNode rootNode = translationUnit(); // <---------------- C - Compiler
+
+        generateTACKY(rootNode);
+
         // riscvassembler();
         // riscvdecoder();
         // riscvencoder();
@@ -686,7 +688,7 @@ public class Main {
         // final String filename = "src/test/resources/TACKY/expression_less_than_var_constant.tky";
         // final String filename = "src/test/resources/TACKY/if_else.tky";
         // final String filename = "src/test/resources/TACKY/for_loop.tky";
-        final String filename = "src/test/resources/TACKY/for_loop_2.tky";
+        // final String filename = "src/test/resources/TACKY/for_loop_2.tky";
         // final String filename = "src/test/resources/TACKY/while_loop.tky";
         // final String filename = "src/test/resources/TACKY/do_while_loop.tky";
         // final String filename = "src/test/resources/TACKY/pointer_creation.tky";
@@ -701,6 +703,8 @@ public class Main {
         // TODO
         // final String filename = "src/test/resources/TACKY/array_1.tky";
         // final String filename = "src/test/resources/TACKY/array_int.tky";
+
+        final String filename = "generated_tacky.tky";
 
         // @formatter:on
 
@@ -723,9 +727,8 @@ public class Main {
         System.out.println("-- 1 - Parsing Input ------------------------------------");
 
         // DEBUG output parse tree while parsing
-        boolean printParseTree = true;
-        // boolean printParseTree = false;
-
+        // boolean printParseTree = true;
+        boolean printParseTree = false;
         if (printParseTree) {
             ConsoleTACKYParserListener printListener = new ConsoleTACKYParserListener();
             walker.walk(printListener, root);
@@ -825,7 +828,7 @@ public class Main {
      *
      * @throws IOException
      */
-    private static void translationUnit() throws IOException {
+    private static ASTNode translationUnit() throws IOException {
 
         System.out.println("translationUnit");
 
@@ -871,7 +874,8 @@ public class Main {
         // final String filename = "src/test/resources/declaration.cpp";
         // final String filename = "src/test/resources/arrays.cpp";
         // final String filename = "src/test/resources/if.cpp";
-        final String filename = "src/test/resources/for_loop.cpp"; // start rule:
+        // final String filename = "src/test/resources/for_loop.cpp"; // start rule: translation_unit
+        // final String filename = "src/test/resources/printf.cpp";
         // translationUnit // <--- important
         // final String filename = "src/test/resources/arrays.cpp"; // start rule:
         // translationUnit // <--- important
@@ -892,6 +896,8 @@ public class Main {
         // "src/test/resources/examples/matrix_pretty_print.cpp";
         // final String filename = "src/test/resources/array_example.c";
 
+        final String filename = "src/test/resources/preprocessor/preprocessed.pp";
+
         final CharStream charStream = CharStreams
                 .fromFileName(filename);
 
@@ -911,7 +917,7 @@ public class Main {
         // DeclarationStatementContext root = parser.declarationStatement();
 
         // else {
-
+/*
         final Map<String, Type> typeMap = new HashMap<>();
 
         // Type bonk1122Type = new Type();
@@ -945,7 +951,7 @@ public class Main {
         Type stringType = new Type();
         stringType.setName("std::string");
         typeMap.put(stringType.getName(), stringType);
-
+ */
         DefaultStructureCallback structureCallback = new DefaultStructureCallback();
 
         /*
@@ -999,8 +1005,8 @@ public class Main {
 
         // System.out.println(typeMap);
 
-        boolean printAST = true;
-        // boolean printAST = false;
+        // boolean printAST = true;
+        boolean printAST = false;
         if (printAST) {
             StringBuilder stringBuilder = new StringBuilder();
             rootNode.printRecursive(stringBuilder, 0);
@@ -1021,8 +1027,8 @@ public class Main {
             }
         }
 
-        boolean debugOutputListenerData = true;
-        // boolean debugOutputListenerData = false;
+        // boolean debugOutputListenerData = true;
+        boolean debugOutputListenerData = false;
         if (debugOutputListenerData) {
 
             if (listener instanceof SemantCPP14ParserListener) {
@@ -1036,15 +1042,15 @@ public class Main {
                 // throw new RuntimeException("SemAntModeStack invalid!");
                 // }
 
-                System.out.println("");
-                System.out.println("Variables (VarName | VarType)");
-                System.out.println("-------------------------------------------");
+                // System.out.println("");
+                // System.out.println("Variables (VarName | VarType)");
+                // System.out.println("-------------------------------------------");
                 // System.out.println("VarTypeMap: " + lstnr.getVarTypeMap());
-                for (Map.Entry<String, Type> entry : lstnr.getVarTypeMap().entrySet()) {
-                    // System.out.println("VarName: \"" + entry.getKey() + "\" VarType: " +
-                    // entry.getValue());
-                    System.out.println(entry.getKey() + " | " + entry.getValue());
-                }
+                // for (Map.Entry<String, Type> entry : lstnr.getVarTypeMap().entrySet()) {
+                //     // System.out.println("VarName: \"" + entry.getKey() + "\" VarType: " +
+                //     // entry.getValue());
+                //     System.out.println(entry.getKey() + " | " + entry.getValue());
+                // }
 
                 System.out.println("");
                 System.out.println("Functions");
@@ -1061,17 +1067,21 @@ public class Main {
         // Node rootNode = listener.getRootNode();
         // rootNode.print(0);
 
-        generateTACKY(rootNode);
+        return rootNode;
     }
 
-    private static void generateTACKY(ASTNode rootNode) {
+    private static void generateTACKY(ASTNode rootNode) throws IOException {
 
         TackyGenerator tackyGenerator = new TackyGenerator();
-        tackyGenerator.process(rootNode);
+        tackyGenerator.outputMainEntryPoint("main");
+        tackyGenerator.process(0, rootNode);
+        String tackyCode = tackyGenerator.stringBuilder.toString();
 
         System.out.println("--- TACKY ----------------------------- \n");
-        System.out.println(tackyGenerator.stringBuilder.toString());
+        System.out.println(tackyCode);
         System.out.println("--------------------------------------- \n");
+
+        Files.writeString(Paths.get("generated_tacky.tky"), tackyCode);
     }
 
     private static void preprocessor() throws IOException {
@@ -1154,7 +1164,15 @@ public class Main {
         //
         // final String filename = "src/test/resources/preprocessor/printf_test_1.pp";
 
-        final String filename = "src/test/resources/examples/matrix_tester.cpp";
+        // final String filename = "src/test/resources/examples/matrix_tester.cpp";
+        // final String filename = "src/test/resources/printf.cpp";
+        // final String filename = "src/test/resources/array_example.c";
+        final String filename = "src/test/resources/array_indexing.cpp";
+        // final String filename = "src/test/resources/examples/matrix_tester_scratchpad.cpp";
+        // final String filename = "src/test/resources/function_call_2.cpp";
+        // final String filename = "src/test/resources/function_call_3.cpp";
+        // final String filename = "src/test/resources/function_call_4.cpp";
+        // final String filename = "src/test/resources/for_loop_over_array.cpp";
 
         ASTNode dummyASTNode = new ASTNode();
         dummyASTNode.value = "__DUMMY___11223344__";
@@ -1187,7 +1205,12 @@ public class Main {
         String result = outputStringBuilder.toString();
         System.out.println(result);
 
-        Files.writeString(Paths.get(filename + ".out"), result);
+        // write to a file that has the same filename as the input file
+        // Files.writeString(Paths.get(filename + ".out"), result);
+
+        // write to default temporary file
+        final String outputFilename = "src/test/resources/preprocessor/preprocessed.pp";
+        Files.writeString(Paths.get(outputFilename), result);
 
         System.out.println("\n\n---------------- Define Key Map ------------------");
 

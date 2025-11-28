@@ -828,9 +828,9 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
         this.typeMap = typeMap;
     }
 
-    public Map<String, Type> getVarTypeMap() {
-        return varTypeMap;
-    }
+    // public Map<String, Type> getVarTypeMap() {
+    //     return varTypeMap;
+    // }
 
     public Map<String, FuncDecl> getFuncDeclMap() {
         return funcDeclMap;

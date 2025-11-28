@@ -1,0 +1,41 @@
+Program("main")
+Function("main", true, [
+length = Var("length")
+length = Constant(ConstInt(3))
+numbers = Var("numbers", Array(int32, 3))
+sizeof_array_type = Var("sizeof_array_type")
+sizeof(int32, sizeof_array_type)
+numbers.ptr = Var("numbers.ptr")
+GetAddress(numbers, numbers.ptr)
+numbers.tmp.0 = Var("numbers.tmp.0")
+
+  // assign to array-element
+  numbers.ptr.tmp = Var("numbers.ptr.tmp")
+  numbers.ptr.tmp = numbers.ptr + 0 * sizeof_array_type
+  numbers.tmp.0 = 11
+  Store(numbers.tmp.0, numbers.ptr.tmp)
+
+  // assign to array-element
+  numbers.ptr.tmp = Var("numbers.ptr.tmp")
+  numbers.ptr.tmp = numbers.ptr + 1 * sizeof_array_type
+  numbers.tmp.0 = 22
+  Store(numbers.tmp.0, numbers.ptr.tmp)
+
+  // assign to array-element
+  numbers.ptr.tmp = Var("numbers.ptr.tmp")
+  numbers.ptr.tmp = numbers.ptr + 2 * sizeof_array_type
+  numbers.tmp.0 = 33
+  Store(numbers.tmp.0, numbers.ptr.tmp)
+
+  idxResult = Var("idxResult")
+
+  // retrieve from array-element
+  numbers.ptr.tmp = Var("numbers.ptr.tmp")
+  numbers.ptr.tmp = numbers.ptr + 1 * sizeof_array_type
+  Load(numbers.ptr.tmp, idxResult)
+
+printf("%d",idxResult)
+
+  return(Constant(ConstInt(0)))
+])
+

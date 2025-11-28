@@ -5,6 +5,7 @@ Program("main")
 // Global: true
 // Parameters: None
 // Statements: [ ... ]
+// Return: implicitly returns int
 Function("main", true, [
 
     tmp.0 = Var("tmp.0")
@@ -31,6 +32,7 @@ Label(end)
 // Global: true
 // Parameters: param_a, param_b
 // Statements: [ ... ]
+// Return: implicitly returns int
 Function("test_function", true, param_a, param_b, [
 
     tmp.0 = Var("tmp.0")

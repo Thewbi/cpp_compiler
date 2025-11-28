@@ -1,5 +1,7 @@
 package grammar;
 
+import org.apache.commons.lang3.math.NumberUtils;
+
 import com.cpp.grammar.CPP14Parser;
 import com.cpp.grammar.CPP14Parser.IdExpressionContext;
 import com.cpp.grammar.CPP14Parser.InitializerContext;
@@ -33,7 +35,6 @@ public class SimpleCPP14ParserBaseListener extends CPP14ParserBaseListener {
 
         SimpleDeclarationASTNode simpleDeclarationASTNode = new SimpleDeclarationASTNode();
         simpleDeclarationASTNode.ctx = ctx;
-        //simpleDeclarationASTNode.type = ctx.children.get(0).getText();
         simpleDeclarationASTNode.astNodeType = ASTNodeType.SIMPLE_DECLARATION;
 
         connectToParent(currentNode, simpleDeclarationASTNode);
@@ -69,10 +70,10 @@ public class SimpleCPP14ParserBaseListener extends CPP14ParserBaseListener {
             return;
         }
 
-        // NoPointerDeclarator noPointerDeclarator = (NoPointerDeclarator) currentNode;
-        DeclaratorASTNode noPointerDeclarator = (DeclaratorASTNode) currentNode;
-
-        processDeclarator(ctx, noPointerDeclarator);
+        if (currentNode instanceof DeclaratorASTNode) {
+            DeclaratorASTNode noPointerDeclarator = (DeclaratorASTNode) currentNode;
+            processDeclarator(ctx, noPointerDeclarator);
+        }
 
         ascend();
     }
@@ -87,15 +88,16 @@ public class SimpleCPP14ParserBaseListener extends CPP14ParserBaseListener {
             ((DeclaratorASTNode) currentNode).isPointer = true;
         }
     }
-    
+
     @Override
     public void enterNoPointerDeclarator(CPP14Parser.NoPointerDeclaratorContext ctx) {
+
+        // System.out.println("[" + ctx.hashCode() + "] " + ctx.getText());
 
         if (ctx.children.size() == 1) {
             return;
         }
 
-        // NoPointerDeclarator noPointerDeclarator = new NoPointerDeclarator();
         DeclaratorASTNode noPointerDeclarator = new DeclaratorASTNode();
         noPointerDeclarator.ctx = ctx;
 
@@ -121,6 +123,7 @@ public class SimpleCPP14ParserBaseListener extends CPP14ParserBaseListener {
     }
 
     private void processDeclarator(org.antlr.v4.runtime.ParserRuleContext ctx, DeclaratorASTNode declaratorASTNode) {
+
         if ((ctx.children.size() == 3)
                 && (ctx.getChild(1).getText().equalsIgnoreCase("["))
                 && (ctx.getChild(2).getText().equalsIgnoreCase("]"))) {
@@ -151,19 +154,26 @@ public class SimpleCPP14ParserBaseListener extends CPP14ParserBaseListener {
 
             currentNode.value = ctx.getText();
 
-            declaratorASTNode.isFunctionCall = currentNode.children.stream().filter(e -> {
-                if (e instanceof ParametersAndQualifiersASTNode) {
-                    return true;
-                }
-                return false;
-            }).count() > 0;
+            if (currentNode.parent instanceof SimpleDeclarationASTNode) {
 
-            if (ctx.children.get(1) instanceof InitializerContext) {
+                declaratorASTNode.isFunctionCall = currentNode.children.stream().filter(e -> {
+                    if (e instanceof ParametersAndQualifiersASTNode) {
+                        return true;
+                    }
+                    return false;
+                }).count() > 0;
 
-                InitializerContext child1 = (InitializerContext) ctx.children.get(1);
-                if (child1.children.get(0).getText().equalsIgnoreCase(("("))) {
-                    declaratorASTNode.isFunctionCall = true;
+                if (ctx.children.get(1) instanceof InitializerContext) {
+                    InitializerContext child1 = (InitializerContext) ctx.children.get(1);
+                    if (child1.children.get(0).getText().equalsIgnoreCase(("("))) {
+                        declaratorASTNode.isFunctionCall = true;
+                    }
                 }
+
+                if (declaratorASTNode.isFunctionCall) {
+                    declaratorASTNode.astNodeType = ASTNodeType.FUNCTION_CALL;
+                }
+
             }
         }
     }
@@ -225,7 +235,7 @@ public class SimpleCPP14ParserBaseListener extends CPP14ParserBaseListener {
     public void enterParameterDeclarationList(CPP14Parser.ParameterDeclarationListContext ctx) {
         ParameterDeclarationListASTNode parameterDeclarationListASTNode = new ParameterDeclarationListASTNode();
         parameterDeclarationListASTNode.ctx = ctx;
-        
+
         connectToParent(currentNode, parameterDeclarationListASTNode);
         descend(parameterDeclarationListASTNode);
     }
@@ -239,7 +249,7 @@ public class SimpleCPP14ParserBaseListener extends CPP14ParserBaseListener {
     public void enterParameterDeclaration(CPP14Parser.ParameterDeclarationContext ctx) {
         ParameterDeclarationASTNode parameterDeclarationASTNode = new ParameterDeclarationASTNode();
         parameterDeclarationASTNode.ctx = ctx;
-        
+
         connectToParent(currentNode, parameterDeclarationASTNode);
         descend(parameterDeclarationASTNode);
     }
@@ -248,7 +258,7 @@ public class SimpleCPP14ParserBaseListener extends CPP14ParserBaseListener {
     public void exitParameterDeclaration(CPP14Parser.ParameterDeclarationContext ctx) {
         ascend();
     }
-    
+
     @Override
     public void enterFunctionBody(CPP14Parser.FunctionBodyContext ctx) {
 
@@ -284,10 +294,24 @@ public class SimpleCPP14ParserBaseListener extends CPP14ParserBaseListener {
             }
         }
 
+        String rawValue = ctx.getText();
+
+        if (NumberUtils.isParsable(rawValue)) {
+
+        }
+
         ExpressionASTNode expressionASTNode = new ExpressionASTNode();
         expressionASTNode.ctx = ctx;
-        expressionASTNode.value = ctx.getText();
-        expressionASTNode.expressionType = ExpressionType.Primary;
+        expressionASTNode.value = rawValue;
+
+        if (NumberUtils.isParsable(rawValue)) {
+            expressionASTNode.expressionType = ExpressionType.Primary;
+        } else if (rawValue.startsWith("\"") && rawValue.endsWith("\"")) {
+            expressionASTNode.expressionType = ExpressionType.StringLiteral;
+        } else {
+            throw new RuntimeException();
+        }
+
         expressionASTNode.astNodeType = ASTNodeType.EXPRESSION;
 
         connectToParent(currentNode, expressionASTNode);
@@ -353,11 +377,12 @@ public class SimpleCPP14ParserBaseListener extends CPP14ParserBaseListener {
             return;
         }
 
+        System.out.println("[" + ctx.hashCode() + "] " + ctx.getText());
+
         if (ctx.children.size() == 2) {
             if (ctx.children.get(1).getText().equalsIgnoreCase("++")) {
 
                 PostFixExpressionASTNode postFixExpressionASTNode = new PostFixExpressionASTNode();
-                // postFixExpressionASTNode.lhs = expressionStackPop();
                 postFixExpressionASTNode.expressionType = ExpressionType.fromString("++");
                 postFixExpressionASTNode.type = "UNARY";
 
@@ -366,6 +391,28 @@ public class SimpleCPP14ParserBaseListener extends CPP14ParserBaseListener {
 
                 return;
             }
+        } else if (ctx.children.size() == 4) {
+
+            String startSymbol = ctx.children.get(1).getText();
+            String endSymbol = ctx.children.get(3).getText();
+
+            if (startSymbol.equalsIgnoreCase("[")
+                    && endSymbol.equalsIgnoreCase("]")) {
+
+                System.out.print("array-indexing");
+                PostFixExpressionASTNode postFixExpressionASTNode = new PostFixExpressionASTNode();
+                postFixExpressionASTNode.expressionType = ExpressionType.ArrayIndexing;
+                postFixExpressionASTNode.type = "UNARY";
+                postFixExpressionASTNode.value = ctx.children.get(0).getText();
+
+                connectToParent(currentNode, postFixExpressionASTNode);
+                descend(postFixExpressionASTNode);
+
+            } else {
+                throw new RuntimeException();
+            }
+        } else {
+            throw new RuntimeException();
         }
     }
 
@@ -385,7 +432,7 @@ public class SimpleCPP14ParserBaseListener extends CPP14ParserBaseListener {
     public void enterAdditiveExpression(CPP14Parser.AdditiveExpressionContext ctx) {
 
         // System.out.println("[" + ctx.hashCode() + "] " + ctx.getText());
-        
+
         if (ctx.children.size() == 1) {
             return;
         }
@@ -394,7 +441,7 @@ public class SimpleCPP14ParserBaseListener extends CPP14ParserBaseListener {
         exprASTNode.expressionType = ExpressionType.Add;
         exprASTNode.astNodeType = ASTNodeType.EXPRESSION;
 
-        //processExpressionOperator(ctx, ExpressionType.Add);
+        // processExpressionOperator(ctx, ExpressionType.Add);
 
         connectToParent(currentNode, exprASTNode);
         descend(exprASTNode);
@@ -404,11 +451,11 @@ public class SimpleCPP14ParserBaseListener extends CPP14ParserBaseListener {
     public void exitAdditiveExpression(CPP14Parser.AdditiveExpressionContext ctx) {
 
         // System.out.println("[" + ctx.hashCode() + "] " + ctx.getText());
-        
+
         if (ctx.children.size() == 1) {
             return;
         }
-        //processExpressionOperator(ctx, ExpressionType.Add);
+        // processExpressionOperator(ctx, ExpressionType.Add);
 
         ascend();
     }
@@ -417,7 +464,7 @@ public class SimpleCPP14ParserBaseListener extends CPP14ParserBaseListener {
     public void enterMultiplicativeExpression(CPP14Parser.MultiplicativeExpressionContext ctx) {
 
         // System.out.println("[" + ctx.hashCode() + "] " + ctx.getText());
-        
+
         if (ctx.children.size() == 1) {
             return;
         }
@@ -425,9 +472,9 @@ public class SimpleCPP14ParserBaseListener extends CPP14ParserBaseListener {
         ExpressionASTNode exprASTNode = new ExpressionASTNode();
         exprASTNode.expressionType = ExpressionType.Mul;
         exprASTNode.astNodeType = ASTNodeType.EXPRESSION;
-        
+
         // String operatorAsString = ctx.getChild(1).getText();
-        //processExpressionOperator(ctx, ExpressionType.fromString(operatorAsString));
+        // processExpressionOperator(ctx, ExpressionType.fromString(operatorAsString));
 
         connectToParent(currentNode, exprASTNode);
         descend(exprASTNode);
@@ -437,7 +484,7 @@ public class SimpleCPP14ParserBaseListener extends CPP14ParserBaseListener {
     public void exitMultiplicativeExpression(CPP14Parser.MultiplicativeExpressionContext ctx) {
 
         // System.out.println("[" + ctx.hashCode() + "] " + ctx.getText());
-        
+
         if (ctx.children.size() == 1) {
             return;
         }

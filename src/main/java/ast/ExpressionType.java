@@ -62,6 +62,8 @@ public enum ExpressionType {
     // used in for loop variable initialization
     Assignment,
 
+    ArrayIndexing,
+
     UNKNOWN;
 
     public static ExpressionType fromString(final String data) {

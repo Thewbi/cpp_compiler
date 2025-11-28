@@ -225,7 +225,10 @@ public class SimpleFileStackFrame extends AbstractFileStackFrame {
 
                 // setParserMode(ParserMode.NORMAL);
 
-                fileStackFrame.start();
+                // TODO: reactivate
+                // fileStackFrame.start();
+
+                setParserMode(ParserMode.NORMAL);
 
             } else if (text.equalsIgnoreCase("(")) {
 

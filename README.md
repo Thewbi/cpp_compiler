@@ -4,6 +4,13 @@ C++ compiler written in Java
 
 ## TODO
 
+* Add Scopes to For-Loops so that temporary variables declared inside the scope of a nested loop do not lead to an error for variables declared twice!
+* Expressions in array indexer e.g. matrixA[i * rows + j] += matrixB[i * rows + j];
+* Function Protoypes
+* Function Declarations
+* Function Calls
+* Pointers
+
 Learn about SSA (Static Single Assignment). See https://yosyshq.readthedocs.io/projects/yosys/en/latest/appendix/primer.html
 
 ## Phases

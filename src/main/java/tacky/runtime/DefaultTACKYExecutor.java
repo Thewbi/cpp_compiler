@@ -24,9 +24,15 @@ import tacky.ast.StoreToAddressASTNode;
 import tacky.ast.TACKYASTNode;
 import tacky.ast.ValueASTNode;
 import tacky.ast.VariableDeclarationASTNode;
+import tacky.generation.tacky.TackyDataType;
 import tacky.ast.SizeofASTNode;
 import types.FormalParameter;
 
+/**
+ * TODO: currently unclear if the TACKY executor should handle scopes or not!
+ * Maybe checking scopes is the job of the frontend!
+ * In assembly, no scopes exist!
+ */
 public class DefaultTACKYExecutor implements TACKYExecutor {
 
     private static final boolean DEBUG_OUTPUT_STATEMENTS = false;
@@ -41,6 +47,8 @@ public class DefaultTACKYExecutor implements TACKYExecutor {
 
     public int executeFunction(TACKYStackFrame tackyStackFrame, ASTNode rootNode, int currentIndex,
             FunctionDefinitionASTNode functionDefinition) {
+
+        System.out.println("Executing function: '" + functionDefinition.value + "'");
 
         tackyStackFrame.startAddress = stackPointer;
         tackyStackFrame.endAddress = stackPointer;
@@ -68,8 +76,13 @@ public class DefaultTACKYExecutor implements TACKYExecutor {
 
         int returnValue = -1;
 
-        boolean done = false;
+        // execute all statements within the function body
+        boolean done = functionDefinition.children.size() <= 0;
         while (!done) {
+
+            // if (index == 58) {
+            //     System.out.println("");
+            // }
 
             TACKYASTNode statement = (TACKYASTNode) functionDefinition.children.get(index);
 
@@ -191,7 +204,8 @@ public class DefaultTACKYExecutor implements TACKYExecutor {
 
                     // retrieve address
                     String ptrVariableName = loadFromAddressASTNode.ptrVariableName;
-                    int address = tackyStackFrame.variables.get(ptrVariableName).address;
+                    TACKYStackFrameVariableDescriptor ptr = tackyStackFrame.variables.get(ptrVariableName);
+                    int address = ptr.address;
 
                     // get the address that the pointer points to
                     int value = memory[address / 4];
@@ -240,11 +254,14 @@ public class DefaultTACKYExecutor implements TACKYExecutor {
                     int varValue = 0;
 
                     String type = sizeof.type;
-                    if (type.equalsIgnoreCase("int")) {
-                        varValue = 4;
-                    } else {
-                        throw new RuntimeException("Unknown type: " + type);
-                    }
+
+                    varValue = TackyDataType.sizeOf(type);
+
+                    // if (type.equalsIgnoreCase("int32")) {
+                    //     varValue = 4;
+                    // } else {
+                    //     throw new RuntimeException("Unknown type: " + type);
+                    // }
 
                     // retrieve address
                     String targetVariableName = sizeof.targetVariableName;
@@ -275,7 +292,17 @@ public class DefaultTACKYExecutor implements TACKYExecutor {
 
                         int value = 0;
                         if (actualParameter.isConstant) {
-                            value = actualParameter.value;
+
+                            switch (actualParameter.tackyDataType) {
+
+                                case INT_32:
+                                    value = actualParameter.intValue;
+                                    break;
+
+                                default:
+                                    throw new RuntimeException();
+                            }
+                            
                         } else if (actualParameter.isVariable) {
                             // retrieve variable from current stackframe
                             TACKYStackFrameVariableDescriptor varDesc = tackyStackFrame.variables
@@ -372,9 +399,11 @@ public class DefaultTACKYExecutor implements TACKYExecutor {
         if (astNode instanceof ConstantDeclarationASTNode) {
             value = retrieveConstantValue((ConstantDeclarationASTNode) astNode);
         } else if (astNode instanceof ValueASTNode) {
+
             if (!tackyStackFrame.variables.containsKey(astNode.value)) {
-                throw new RuntimeException("Variable \"" + astNode.value + "\" declared already!");
+                throw new RuntimeException("Variable \"" + astNode.value + "\" is not defined in stack frame!");
             }
+
             TACKYStackFrameVariableDescriptor varDesc = tackyStackFrame.variables.get(astNode.value);
             value = memory[varDesc.address / 4];
         }
@@ -508,11 +537,16 @@ public class DefaultTACKYExecutor implements TACKYExecutor {
 
     private void insertVariableIntoStackFrame(TACKYStackFrame tackyStackFrame, String varName, int value) {
 
+        // TODO: should TACKY executor handle scopes or are scopes part of the frontend only?
+        //
+        // In Assembly, no scopes exist! Variables will remain defined
+        // even across for-loop iterations! This message will be output for each
+        // local variable inside the loop and this is expected!
         if (tackyStackFrame.variables.containsKey(varName)) {
-            throw new RuntimeException("Variable \"" + varName + "\" declared already!");
+            //throw new RuntimeException("Variable \"" + varName + "\" declared already!");
+            System.out.println("Variable \"" + varName + "\" declared already!");
         }
 
-        // simulate random memory content
         TACKYStackFrameVariableDescriptor descriptor = new TACKYStackFrameVariableDescriptor();
         descriptor.name = varName;
         descriptor.address = stackPointer;

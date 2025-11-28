@@ -8,6 +8,8 @@ public enum ASTNodeType {
 
     FUNCTION_DECLARATION,
 
+    FUNCTION_CALL,
+
     INIT_DECLARATION,
 
     ITERATION_STATEMENT,

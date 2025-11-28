@@ -11,9 +11,9 @@ Program("main")
 Function("main", true, [
 
     // define the array as a variable
-    array1d = Var("array1d", Array(int, 5))
+    array1d = Var("array1d", Array(int8, 5))
     
-    //array2d = Var("array2d", Array(Array(int, 7), 5))
+    //array2d = Var("array2d", Array(Array(int8, 7), 5))
 
     // create a pointer (= normal variable that stores an address) to the first element of the array
     array1d.ptr = Var("array1d.ptr")
@@ -21,7 +21,7 @@ Function("main", true, [
 
     // determine the size of the array element type and store it into a variable for later use
     sizeof_int = Var("sizeof_int")
-    sizeof(int, sizeof_int)
+    sizeof(int8, sizeof_int)
 
     // advance the pointer forward to the requested fifth element
     // To point to element #5, move the pointer four times
@@ -34,8 +34,9 @@ Function("main", true, [
     // write data into the array element
     Store(tmp.0, array1d.ptr)
 
-    // load the element (dereference). Load the value stored at the address 
-    // that the pointer points to into the variable "tmp.1"
+    // load the element (dereference). 
+    // Load the value stored at the address that the pointer points to 
+    // into the variable "tmp.1"
     tmp.1 = Var("tmp.1")
     Load(array1d.ptr, tmp.1)
 

@@ -34,7 +34,7 @@ static_constant :
     ;
 
 type : 
-      INT
+      INT8 | INT16 | INT32
     | BOOL
     | ASCII
     | ASCIIZ
@@ -320,4 +320,5 @@ const :
     | CONSTLONG LEFT_PAREN IntegerLiteral RIGHT_PAREN
     | CONSTULONG LEFT_PAREN IntegerLiteral RIGHT_PAREN
     | CONSTDOUBLE LEFT_PAREN IntegerLiteral RIGHT_PAREN
+    | CONSTSTRING LEFT_PAREN StringLiteral RIGHT_PAREN
     ;

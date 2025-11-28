@@ -8,6 +8,7 @@ import org.antlr.v4.runtime.tree.TerminalNodeImpl;
 
 import com.cpp.grammar.TACKYParser;
 import com.cpp.grammar.TACKYParser.Arg_listContext;
+import com.cpp.grammar.TACKYParser.ConstContext;
 import com.cpp.grammar.TACKYParser.Constant_declContext;
 import com.cpp.grammar.TACKYParser.ValContext;
 import com.cpp.grammar.TACKYParserBaseListener;
@@ -34,6 +35,7 @@ import tacky.ast.StoreToAddressASTNode;
 import tacky.ast.TACKYASTNodeFactory;
 import tacky.ast.ValueASTNode;
 import tacky.ast.VariableDeclarationASTNode;
+import tacky.generation.tacky.TackyDataType;
 import tacky.ast.DataType;
 import types.FormalParameter;
 
@@ -362,12 +364,33 @@ public class StructureTACKYParserListener extends TACKYParserBaseListener {
 
             ActualParameter actualParameter = new ActualParameter();
 
-            int aval = 0;
+            ResultContainer resultContainer = new ResultContainer();
+
+            // Object aval = 0;
             if (parseTree instanceof Constant_declContext) {
-                aval = retrieveConstantValue(valContext);
+
+                // aval = retrieveConstantValue(valContext, resultContainer);
+                retrieveConstantValue(valContext, resultContainer);
                 actualParameter.isVariable = false;
                 actualParameter.isConstant = true;
-                actualParameter.value = aval;
+
+                switch (resultContainer.tackyDataType) {
+
+                    case STRING:
+                        actualParameter.tackyDataType = TackyDataType.STRING;
+                        actualParameter.stringValue = resultContainer.stringValue;
+                        break;
+
+                    case INT_32:
+                        actualParameter.tackyDataType = TackyDataType.INT_32;
+                        actualParameter.intValue = resultContainer.integerValue;
+                        break;
+
+                    default:
+                        throw new RuntimeException();
+
+                }
+
             } else if (parseTree instanceof TerminalNodeImpl) {
                 String val = parseTree.getText();
                 actualParameter.isVariable = true;
@@ -601,7 +624,7 @@ public class StructureTACKYParserListener extends TACKYParserBaseListener {
         currentNode = astNode;
     }
 
-    private int retrieveConstantValue(ValContext val) {
+    private void retrieveConstantValue(ValContext val, ResultContainer resultContainer) {
         
         // DEBUG
         // System.out.println(val.getText());
@@ -609,16 +632,38 @@ public class StructureTACKYParserListener extends TACKYParserBaseListener {
         ParseTree child = val.getChild(0);
         Constant_declContext constantDecl = (Constant_declContext) child;
 
-        child = constantDecl.getChild(2);
-        // ConstContext constContext = (ConstContext) child;
+        // child = constantDecl.getChild(2);
+        ConstContext constContext = (ConstContext) constantDecl.getChild(2);
+        
+        TerminalNodeImpl constType = (TerminalNodeImpl) constContext.children.get(0);
+        
+        // System.out.println(constType.getText());
 
-        child = constantDecl.getChild(2);
-        child = child.getChild(2);
+        String constTypeAsString = constType.getText();
 
         // DEBUG
         // System.out.println(child.getText());
 
-        return Integer.parseInt(child.getText());
+        // String rawValue = child.getText();
+
+        child = constantDecl.getChild(2);
+        child = child.getChild(2);
+
+        if (constTypeAsString.equalsIgnoreCase("ConstInt")) {
+
+            resultContainer.tackyDataType = TackyDataType.INT_32;
+            resultContainer.integerValue = Integer.parseInt(child.getText());
+            return;
+
+        } else if (constTypeAsString.equalsIgnoreCase("ConstString")) {
+
+            resultContainer.tackyDataType = TackyDataType.STRING;
+            resultContainer.stringValue = child.getText();
+            return;
+
+        }
+
+        throw new RuntimeException();
     }
 
     private ValContext getLastArgumentListValue(Arg_listContext arg_listContext) {
