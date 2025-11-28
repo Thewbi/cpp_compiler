@@ -40,7 +40,7 @@ public class DefaultTACKYExecutor implements TACKYExecutor {
 
     public int stackPointer = 0;
 
-    public int memory[] = new int[1024];
+    public int memory[] = new int[2048];
 
     public Stack<TACKYStackFrame> executionStack = new Stack<>();
 

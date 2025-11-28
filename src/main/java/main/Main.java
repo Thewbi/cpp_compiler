@@ -464,7 +464,7 @@ public class Main {
             rootNode.printRecursive(stringBuilder, 0);
             System.out.println(stringBuilder.toString());
 
-            System.out.println("--------------------------------------");
+            System.out.println("---------------------------------------------------");
         }
     }
 
@@ -724,7 +724,7 @@ public class Main {
         // create a generic parse tree walker that can trigger callbacks
         final ParseTreeWalker walker = new ParseTreeWalker();
 
-        System.out.println("-- 1 - Parsing Input ------------------------------------");
+        System.out.println("-- 1 - Parsing TACKY Input -------------------------------\n");
 
         // DEBUG output parse tree while parsing
         // boolean printParseTree = true;
@@ -736,7 +736,7 @@ public class Main {
 
         System.out.println("----------------------------------------------------------\n");
 
-        System.out.println("-- 2 - Parsing Tree ---> Abstract Syntax Tree ------------");
+        System.out.println("-- 2 - Parsing Tree ---> TACKY Abstract Syntax Tree ------");
 
         ASTNode rootNode = new ASTNode();
         rootNode.value = "[tacky_file] root";
@@ -751,7 +751,7 @@ public class Main {
 
         System.out.println("----------------------------------------------------------\n");
 
-        System.out.println("-- 3 - DEBUG OUTPUT Abstract Syntax Tree -------------------");
+        System.out.println("-- 3 - DEBUG OUTPUT TACKY Abstract Syntax Tree -----------");
 
         // DEBUG print AST
         boolean printAST = true;
@@ -762,7 +762,7 @@ public class Main {
             System.out.print(stringBuilder.toString());
         }
 
-        System.out.println("----------------------------------------------------------\n");
+        System.out.println("------------------------------------------------------------\n");
 
         System.out.println("-- 4 - Run the TACKY code ----------------------------------");
 
@@ -788,7 +788,7 @@ public class Main {
                     + "! Unit Test failed!\n[ERROR]");
         }
 
-        System.out.println("----------------------------------------------------------\n");
+        System.out.println("----------------------------------------------------------------\n");
 
         System.out.println("-- 5 - Generate assembly code ----------------------------------");
 
@@ -1005,13 +1005,17 @@ public class Main {
 
         // System.out.println(typeMap);
 
-        // boolean printAST = true;
-        boolean printAST = false;
+        System.out.println("-- 1 - Print C AST Input -------------------------------\n");
+
+        boolean printAST = true;
+        // boolean printAST = false;
         if (printAST) {
             StringBuilder stringBuilder = new StringBuilder();
             rootNode.printRecursive(stringBuilder, 0);
             System.out.println(stringBuilder.toString());
         }
+
+        System.out.println("--------------------------------------------------------\n");
 
         // check if expression stack is empty
         if (listener instanceof StructureCPP14ParserListener) {
@@ -1181,7 +1185,8 @@ public class Main {
         // final String filename = "src/test/resources/function_call_2.cpp";
         // final String filename = "src/test/resources/function_call_3.cpp";
         // final String filename = "src/test/resources/function_call_4.cpp"; // <--- test
-        final String filename = "src/test/resources/function_call_5.cpp";
+        // final String filename = "src/test/resources/function_call_5.cpp";
+        final String filename = "src/test/resources/function_call_6.cpp";
         // final String filename = "src/test/resources/for_loop_over_array.cpp";
 
         ASTNode dummyASTNode = new ASTNode();
