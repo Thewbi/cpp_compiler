@@ -26,9 +26,7 @@ public class SimpleCPP14ParserBaseListener extends CPP14ParserBaseListener {
 
     public ASTNode currentNode;
 
-    //
     // Variable declarations
-    //
 
     @Override
     public void enterSimpleDeclaration(CPP14Parser.SimpleDeclarationContext ctx) {
@@ -43,6 +41,9 @@ public class SimpleCPP14ParserBaseListener extends CPP14ParserBaseListener {
 
     @Override
     public void exitSimpleDeclaration(CPP14Parser.SimpleDeclarationContext ctx) {
+        if (!(currentNode instanceof SimpleDeclarationASTNode)) {
+            throw new RuntimeException("Node Hierarchy is broken! Expected SimpleDeclarationASTNode");
+        }
         ascend();
     }
 
@@ -119,6 +120,9 @@ public class SimpleCPP14ParserBaseListener extends CPP14ParserBaseListener {
 
         processDeclarator(ctx, noPointerDeclarator);
 
+        if (!(currentNode instanceof DeclaratorASTNode)) {
+            throw new RuntimeException("Node Hierarchy is broken! Expected DeclaratorASTNode");
+        }
         ascend();
     }
 
@@ -193,13 +197,9 @@ public class SimpleCPP14ParserBaseListener extends CPP14ParserBaseListener {
         ascend();
     }
 
-    //
     // Types
-    //
 
-    //
     // Type specifier (int, float, double, custom types ...)
-    //
 
     @Override
     public void enterTypeSpecifier(CPP14Parser.TypeSpecifierContext ctx) {
@@ -210,9 +210,7 @@ public class SimpleCPP14ParserBaseListener extends CPP14ParserBaseListener {
         currentNode.type = ctx.getChild(0).getText();
     }
 
-    //
     // Function Definition
-    //
 
     @Override
     public void enterFunctionDefinition(CPP14Parser.FunctionDefinitionContext ctx) {
@@ -228,11 +226,15 @@ public class SimpleCPP14ParserBaseListener extends CPP14ParserBaseListener {
 
     @Override
     public void exitFunctionDefinition(CPP14Parser.FunctionDefinitionContext ctx) {
+        if (!(currentNode instanceof FunctionDeclarationASTNode)) {
+            throw new RuntimeException("Node Hierarchy is broken! Expected FunctionDeclarationASTNode");
+        }
         ascend();
     }
 
     @Override
     public void enterParameterDeclarationList(CPP14Parser.ParameterDeclarationListContext ctx) {
+        
         ParameterDeclarationListASTNode parameterDeclarationListASTNode = new ParameterDeclarationListASTNode();
         parameterDeclarationListASTNode.ctx = ctx;
 
@@ -242,11 +244,16 @@ public class SimpleCPP14ParserBaseListener extends CPP14ParserBaseListener {
 
     @Override
     public void exitParameterDeclarationList(CPP14Parser.ParameterDeclarationListContext ctx) {
+        
+        if (!(currentNode instanceof ParameterDeclarationListASTNode)) {
+            throw new RuntimeException("Node Hierarchy is broken! Expected ParameterDeclarationListASTNode");
+        }
         ascend();
     }
 
     @Override
     public void enterParameterDeclaration(CPP14Parser.ParameterDeclarationContext ctx) {
+        
         ParameterDeclarationASTNode parameterDeclarationASTNode = new ParameterDeclarationASTNode();
         parameterDeclarationASTNode.ctx = ctx;
 
@@ -256,6 +263,10 @@ public class SimpleCPP14ParserBaseListener extends CPP14ParserBaseListener {
 
     @Override
     public void exitParameterDeclaration(CPP14Parser.ParameterDeclarationContext ctx) {
+
+        if (!(currentNode instanceof ParameterDeclarationASTNode)) {
+            throw new RuntimeException("Node Hierarchy is broken! Expected ParameterDeclarationASTNode");
+        }
         ascend();
     }
 
@@ -270,12 +281,14 @@ public class SimpleCPP14ParserBaseListener extends CPP14ParserBaseListener {
 
     @Override
     public void exitFunctionBody(CPP14Parser.FunctionBodyContext ctx) {
+
+        if (!(currentNode instanceof BodyASTNode)) {
+            throw new RuntimeException("Node Hierarchy is broken! Expected BodyASTNode");
+        }
         ascend();
     }
 
-    //
     // Expressions
-    //
 
     @Override
     public void exitPrimaryExpression(CPP14Parser.PrimaryExpressionContext ctx) {
@@ -365,6 +378,9 @@ public class SimpleCPP14ParserBaseListener extends CPP14ParserBaseListener {
             return;
         }
 
+        if (!(currentNode instanceof ExpressionASTNode)) {
+            throw new RuntimeException("Node Hierarchy is broken! Expected ExpressionASTNode");
+        }
         ascend();
     }
 
@@ -424,7 +440,23 @@ public class SimpleCPP14ParserBaseListener extends CPP14ParserBaseListener {
         }
 
         if (ctx.children.size() == 2) {
+            if (!(currentNode instanceof PostFixExpressionASTNode)) {
+                throw new RuntimeException("Node Hierarchy is broken! Expected PostFixExpressionASTNode");
+            }
             ascend();
+        }
+
+        if (ctx.children.size() == 4) {
+            String startSymbol = ctx.children.get(1).getText();
+            String endSymbol = ctx.children.get(3).getText();
+            if (startSymbol.equalsIgnoreCase("[")
+                    && endSymbol.equalsIgnoreCase("]")) {
+
+                if (!(currentNode instanceof PostFixExpressionASTNode)) {
+                    throw new RuntimeException("Node Hierarchy is broken! Expected PostFixExpressionASTNode");
+                }
+                ascend();
+            }
         }
     }
 
@@ -437,8 +469,10 @@ public class SimpleCPP14ParserBaseListener extends CPP14ParserBaseListener {
             return;
         }
 
+        String operatorAsString = ctx.getChild(1).getText();
+
         ExpressionASTNode exprASTNode = new ExpressionASTNode();
-        exprASTNode.expressionType = ExpressionType.Add;
+        exprASTNode.expressionType = ExpressionType.fromString(operatorAsString);
         exprASTNode.astNodeType = ASTNodeType.EXPRESSION;
 
         // processExpressionOperator(ctx, ExpressionType.Add);
@@ -469,11 +503,12 @@ public class SimpleCPP14ParserBaseListener extends CPP14ParserBaseListener {
             return;
         }
 
+        String operatorAsString = ctx.getChild(1).getText();
+
         ExpressionASTNode exprASTNode = new ExpressionASTNode();
-        exprASTNode.expressionType = ExpressionType.Mul;
+        exprASTNode.expressionType = ExpressionType.fromString(operatorAsString);
         exprASTNode.astNodeType = ASTNodeType.EXPRESSION;
 
-        // String operatorAsString = ctx.getChild(1).getText();
         // processExpressionOperator(ctx, ExpressionType.fromString(operatorAsString));
 
         connectToParent(currentNode, exprASTNode);
@@ -492,9 +527,7 @@ public class SimpleCPP14ParserBaseListener extends CPP14ParserBaseListener {
         ascend();
     }
 
-    //
     // Loops
-    //
 
     @Override
     public void enterIterationStatement(CPP14Parser.IterationStatementContext ctx) {
@@ -514,9 +547,7 @@ public class SimpleCPP14ParserBaseListener extends CPP14ParserBaseListener {
         ascend();
     }
 
-    //
     // utility
-    //
 
     /**
      * connect parent and child

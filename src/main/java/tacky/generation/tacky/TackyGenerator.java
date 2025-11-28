@@ -179,6 +179,8 @@ public class TackyGenerator {
                             // check if the identifier is an array
                             if (tackyStackFrameVariableDescriptor.isArray) {
 
+                                stringBuilder.append("// parameter for function call").append("\n");
+
                                 // tmp.1.ptr = Var("tmp.1.ptr") // address: 8
                                 defineVariable(0, "tmp.1.ptr", TackyDataType.INT_32);
                                 addVariableToScope("tmp.1.ptr", TackyDataType.INT_32, false);
@@ -380,6 +382,10 @@ public class TackyGenerator {
 
                 defineVariable(0, name, TackyDataType.INT_32, isArray, arraySize);
 
+                // sizeof
+                //sizeof_int = Var("sizeof_int")
+                //sizeof(int8, sizeof_int)
+
                 // determine the size of the array element type and store it into a variable for
                 // later use
                 stringBuilder.append(indentString).append("sizeof_array_type = Var(\"sizeof_array_type\")")
@@ -465,7 +471,7 @@ public class TackyGenerator {
                 // @formatter:on
 
                 // if (type.equalsIgnoreCase("int")) {
-                //     // i = Constant(ConstInt(0))
+                // // i = Constant(ConstInt(0))
                 //     // @formatter:off
                 //     stringBuilder.append(indentString).append(name)
                 //         .append(" = Constant(").append("ConstInt(")
@@ -528,8 +534,6 @@ public class TackyGenerator {
         }
     }
 
-    
-
     private void assignValueToArrayElement(int indent, DeclaratorASTNode declaratorASTNode, String arrayName,
             int arrayElementIndex,
             String value) {
@@ -566,8 +570,20 @@ public class TackyGenerator {
 
     private void retrieveValueFromArrayElement(int indent, DeclaratorASTNode declaratorASTNode,
             String arrayName, int arrayElementIndex, String destinationVariableName) {
+        generateArrayAccessIndexer(indent, arrayName, "" + arrayElementIndex, destinationVariableName);
+    }
 
-        // stringBuilder.append("\n");
+    private void retrieveValueFromArrayElementByVariable(int indent, DeclaratorASTNode declaratorASTNode,
+            String arrayName, String indexVarName, String destinationVariableName) {
+        generateArrayAccessIndexer(indent, arrayName, indexVarName, destinationVariableName);
+    }
+
+    private void generateArrayAccessIndexer(int indent, String arrayName, String arrayElementIndex,
+            String destinationVariableName) {
+
+                // WBI
+        TACKYStackFrameVariableDescriptor tackyStackFrameVariableDescriptor 
+            = tackyStackFrame.variables.get(arrayName);
 
         String indentString = "";
         for (int i = 0; i < indent; i++) {
@@ -575,7 +591,16 @@ public class TackyGenerator {
         }
 
         stringBuilder.append("\n");
-        stringBuilder.append(indentString).append("// retrieve from array-element").append("\n");
+        stringBuilder.append(indentString)
+                .append("// retrieve from array-element").append("\n");
+
+        // determine the size of the array element type and store it into a variable for
+        // later use
+        stringBuilder.append(indentString).append("sizeof_array_type = Var(\"sizeof_array_type\")")
+                .append("\n");
+        stringBuilder.append(indentString)
+                .append("sizeof(" + TackyDataType.toString(TackyDataType.INT_32) + ", sizeof_array_type)")
+                .append("\n");
 
         // advance the pointer forward to the requested fifth element
         // to point to element #5, move the pointer four times
@@ -583,7 +608,9 @@ public class TackyGenerator {
         defineVariable(indent, arrayName + ".ptr.tmp", null);
         stringBuilder.append(indentString)
                 .append(arrayName + ".ptr.tmp").append(" = ")
-                .append(arrayName + ".ptr").append(" + ")
+                // .append(arrayName + ".ptr").append(" + ")
+                .append(arrayName).append(" + ")
+                //.append(arrayElementIndex).append(" * sizeof_array_type")
                 .append(arrayElementIndex).append(" * sizeof_array_type")
                 .append("\n");
 
@@ -601,46 +628,6 @@ public class TackyGenerator {
                 .append(")")
                 .append("\n");
     }
-
-    private void retrieveValueFromArrayElementByVariable(int indent, DeclaratorASTNode declaratorASTNode,
-            String arrayName, String indexVarName, String destinationVariableName) {
-
-        // stringBuilder.append("\n");
-
-        String indentString = "";
-        for (int i = 0; i < indent; i++) {
-            indentString += "  ";
-        }
-
-        stringBuilder.append("\n");
-        stringBuilder.append(indentString).append("// retrieve from array-element").append("\n");
-
-        // advance the pointer forward to the requested fifth element
-        // to point to element #5, move the pointer four times
-        // array1d.ptr = array1d.ptr + 4 * sizeof_int
-        defineVariable(indent, arrayName + ".ptr.tmp", null);
-        stringBuilder.append(indentString)
-                .append(arrayName + ".ptr.tmp").append(" = ")
-                .append(arrayName + ".ptr").append(" + ")
-                .append(indexVarName).append(" * sizeof_array_type")
-                .append("\n");
-
-        // // write data into the array element
-        // // tmp.0 = 18
-        // stringBuilder.append(arrayName + ".tmp.0").append(" =
-        // ").append(value).append("\n");
-
-        // write data into the array element
-        // Store(tmp.0, array1d.ptr)
-        stringBuilder.append(indentString).append("Load(")
-                .append(arrayName + ".ptr.tmp")
-                .append(", ")
-                .append(destinationVariableName)
-                .append(")")
-                .append("\n");
-    }
-
-    
 
     private void exitInitDeclaration(DeclaratorASTNode declaratorASTNode) {
         System.out.println(declaratorASTNode);
@@ -893,8 +880,8 @@ public class TackyGenerator {
         defineVariable(indent, name, tackyDataType, false, 0);
     }
 
-    private void defineVariable(int indent, String name, TackyDataType tackyDataType, 
-        boolean isArray, int arraySize) {
+    private void defineVariable(int indent, String name, TackyDataType tackyDataType,
+            boolean isArray, int arraySize) {
 
         String indentString = "";
         for (int i = 0; i < indent; i++) {
@@ -993,7 +980,7 @@ public class TackyGenerator {
     }
 
     private String evaluateToString(int indent, ExpressionASTNode expressionASTNode) {
-        
+
         // System.out.println();
 
         String indentString = "";
@@ -1010,8 +997,14 @@ public class TackyGenerator {
             case Add:
                 operator = " + ";
                 break;
+            case Subtract:
+                operator = " - ";
+                break;
             case Mul:
                 operator = " * ";
+                break;
+            case Div:
+                operator = " / ";
                 break;
         }
 
@@ -1021,18 +1014,21 @@ public class TackyGenerator {
                 exprStringBuilder.append("Constant(").append("ConstInt(").append(expressionASTNode.value).append("))");
                 return exprStringBuilder.toString();
 
-            case Mul:
             case Add:
+            case Subtract:
+            case Mul:
+            case Div:
+
                 lhs = evaluateToString(indent, (ExpressionASTNode) expressionASTNode.children.get(0));
                 rhs = evaluateToString(indent, (ExpressionASTNode) expressionASTNode.children.get(1));
 
                 String tempVarName = "exprTemp_" + tempCounter;
                 tempCounter++;
-                
+
                 defineVariable(indent + 1, tempVarName, null);
                 exprStringBuilder.append(indentString)
-                    .append(tempVarName).append(" = ").append(lhs).append(operator).append(rhs);
-                    stringBuilder.append(exprStringBuilder.toString()).append("\n");
+                        .append(tempVarName).append(" = ").append(lhs).append(operator).append(rhs);
+                stringBuilder.append(exprStringBuilder.toString()).append("\n");
                 return tempVarName;
 
             case Identifier:

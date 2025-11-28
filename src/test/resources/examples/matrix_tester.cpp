@@ -161,7 +161,7 @@ void segmentedMatrixMult(int* matrixA, int* matrixB, int* matrixC, int rows, int
                 prettyPrintFormatMatrix(subMatrixB, 2, "%6d");
                 printf("]\n");
 
-                iterationCounter++;                
+                iterationCounter++;
 
                 // perform a matrix mult of the sub matrices
                 //Matrix temp = subMatrixA.mult(subMatrixB);

@@ -1,6 +1,25 @@
 
 
 
+
+
+
+ void prettyPrintFormatMatrix ( int * matrix , int dim ) {
+      for ( int i = 0 ; i < dim ; i ++ ) {
+          for ( int j = 0 ; j < dim ; j ++ ) {
+
+             
+             
+
+              int idx = dim * i + j ;
+             
+              int temp = matrix [ idx ] ;
+              printf ( "%d" , temp ) ;
+          }
+         
+      }
+ }
+
  int main ( )
  {
       printf ( "Matrix\n" ) ;
@@ -11,26 +30,12 @@
           9 , 3 , 8 , 1 ,
           6 , 9 , 7 , 1 } ;
 
-      for ( int i = 0 ; i < 4 ; i ++ )
-      {
-          for ( int j = 0 ; j < 4 ; j ++ )
-          {
-             
-
-              int temp = 4 * i + j ;
-             
-
-              int val = matrixA [ temp ] ;
-              printf ( "%d" , val ) ;
-             
-             
-          }
          
-
-         
-      }
 
      
+      prettyPrintFormatMatrix ( matrixA , 4 ) ;
+
+      printf ( "END" ) ;
 
       return 0 ;
  }

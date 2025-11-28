@@ -7,11 +7,16 @@
 void prettyPrintFormatMatrix(int* matrix, int dim) {
     for (int i = 0; i < dim; i++) {
         for (int j = 0; j < dim; j++) {
+
             //printf(format, matrix[dim*i + j]);
             //printf("a");
-            printf("%d", matrix[i]);
+
+            int idx = dim * i + j;
+            
+            int temp = matrix[idx];
+            printf("%d", temp);
         }
-        printf("\n");
+        //printf("b");
     }
 }
 

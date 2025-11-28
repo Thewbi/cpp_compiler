@@ -80,9 +80,9 @@ public class DefaultTACKYExecutor implements TACKYExecutor {
         boolean done = functionDefinition.children.size() <= 0;
         while (!done) {
 
-            // if (index == 58) {
-            //     System.out.println("");
-            // }
+            if (index == 17) {
+                System.out.println("");
+            }
 
             TACKYASTNode statement = (TACKYASTNode) functionDefinition.children.get(index);
 
@@ -493,6 +493,9 @@ public class DefaultTACKYExecutor implements TACKYExecutor {
         }
         // retrieve variable from current stackframe
         TACKYStackFrameVariableDescriptor varDesc = tackyStackFrame.variables.get(expressionVal);
+        if (varDesc == null) {
+            throw new RuntimeException("'" + expressionVal + "' is not defined!");
+        }
         return memory[varDesc.address / 4];
     }
 

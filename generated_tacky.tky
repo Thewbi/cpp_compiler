@@ -1,40 +1,181 @@
 Program("main")
+Function("prettyPrintFormatMatrix", true, matrix, dim, [
+//
+// Loop 0
+//
+tmp.0.0 = Var("tmp.0.0")
+tmp.1.0 = Var("tmp.1.0")
+// <instructions for init>
+i = Var("i")
+i = Constant(ConstInt(0))
+Label(start_0)
+// <instructions for condition>
+tmp.0.0 = i < dim
+JumpIfZero(tmp.0.0, break_label_0)
+// <start body statements>
+  //
+  // Loop 1
+  //
+  tmp.0.1 = Var("tmp.0.1")
+  tmp.1.1 = Var("tmp.1.1")
+  // <instructions for init>
+  j = Var("j")
+  j = Constant(ConstInt(0))
+  Label(start_1)
+  // <instructions for condition>
+  tmp.0.1 =   j < dim
+  JumpIfZero(tmp.0.1, break_label_1)
+  // <start body statements>
+      exprTemp_0 = Var("exprTemp_0")
+    exprTemp_0 = dim * i
+      exprTemp_1 = Var("exprTemp_1")
+    exprTemp_1 = exprTemp_0 + j
+    idx = Var("idx")
+    idx = exprTemp_1
+
+      temp = Var("temp")
+
+      // retrieve from array-element
+      sizeof_array_type = Var("sizeof_array_type")
+      sizeof(int32, sizeof_array_type)
+      matrix.ptr.tmp = Var("matrix.ptr.tmp")
+      matrix.ptr.tmp = matrix + idx * sizeof_array_type
+      Load(matrix.ptr.tmp, temp)
+
+    printf("%d",temp)
+  // <end body statements>
+  // <continue label> 
+  Label(continue_label_1)
+  // <instructions for post>
+  tmp.1.1 =   j + Constant(ConstInt(1))
+  j = tmp.1.1
+  Jump(start_1)
+  Label(break_label_1)
+// <end body statements>
+// <continue label> 
+Label(continue_label_0)
+// <instructions for post>
+tmp.1.0 = i + Constant(ConstInt(1))
+i = tmp.1.0
+Jump(start_0)
+Label(break_label_0)
+
+  return(Constant(ConstInt(0)))
+])
+
 Function("main", true, [
-length = Var("length")
-length = Constant(ConstInt(3))
-numbers = Var("numbers", Array(int32, 3))
+
+printf("Matrix\n")
+matrixA = Var("matrixA", Array(int32, 16))
 sizeof_array_type = Var("sizeof_array_type")
 sizeof(int32, sizeof_array_type)
-numbers.ptr = Var("numbers.ptr")
-GetAddress(numbers, numbers.ptr)
-numbers.tmp.0 = Var("numbers.tmp.0")
+matrixA.ptr = Var("matrixA.ptr")
+GetAddress(matrixA, matrixA.ptr)
+matrixA.tmp.0 = Var("matrixA.tmp.0")
 
   // assign to array-element
-  numbers.ptr.tmp = Var("numbers.ptr.tmp")
-  numbers.ptr.tmp = numbers.ptr + 0 * sizeof_array_type
-  numbers.tmp.0 = 11
-  Store(numbers.tmp.0, numbers.ptr.tmp)
+  matrixA.ptr.tmp = Var("matrixA.ptr.tmp")
+  matrixA.ptr.tmp = matrixA.ptr + 0 * sizeof_array_type
+  matrixA.tmp.0 = 9
+  Store(matrixA.tmp.0, matrixA.ptr.tmp)
 
   // assign to array-element
-  numbers.ptr.tmp = Var("numbers.ptr.tmp")
-  numbers.ptr.tmp = numbers.ptr + 1 * sizeof_array_type
-  numbers.tmp.0 = 22
-  Store(numbers.tmp.0, numbers.ptr.tmp)
+  matrixA.ptr.tmp = Var("matrixA.ptr.tmp")
+  matrixA.ptr.tmp = matrixA.ptr + 1 * sizeof_array_type
+  matrixA.tmp.0 = 0
+  Store(matrixA.tmp.0, matrixA.ptr.tmp)
 
   // assign to array-element
-  numbers.ptr.tmp = Var("numbers.ptr.tmp")
-  numbers.ptr.tmp = numbers.ptr + 2 * sizeof_array_type
-  numbers.tmp.0 = 33
-  Store(numbers.tmp.0, numbers.ptr.tmp)
+  matrixA.ptr.tmp = Var("matrixA.ptr.tmp")
+  matrixA.ptr.tmp = matrixA.ptr + 2 * sizeof_array_type
+  matrixA.tmp.0 = 9
+  Store(matrixA.tmp.0, matrixA.ptr.tmp)
 
-  idxResult = Var("idxResult")
+  // assign to array-element
+  matrixA.ptr.tmp = Var("matrixA.ptr.tmp")
+  matrixA.ptr.tmp = matrixA.ptr + 3 * sizeof_array_type
+  matrixA.tmp.0 = 4
+  Store(matrixA.tmp.0, matrixA.ptr.tmp)
 
-  // retrieve from array-element
-  numbers.ptr.tmp = Var("numbers.ptr.tmp")
-  numbers.ptr.tmp = numbers.ptr + 1 * sizeof_array_type
-  Load(numbers.ptr.tmp, idxResult)
+  // assign to array-element
+  matrixA.ptr.tmp = Var("matrixA.ptr.tmp")
+  matrixA.ptr.tmp = matrixA.ptr + 4 * sizeof_array_type
+  matrixA.tmp.0 = 2
+  Store(matrixA.tmp.0, matrixA.ptr.tmp)
 
-printf("%d",idxResult)
+  // assign to array-element
+  matrixA.ptr.tmp = Var("matrixA.ptr.tmp")
+  matrixA.ptr.tmp = matrixA.ptr + 5 * sizeof_array_type
+  matrixA.tmp.0 = 6
+  Store(matrixA.tmp.0, matrixA.ptr.tmp)
+
+  // assign to array-element
+  matrixA.ptr.tmp = Var("matrixA.ptr.tmp")
+  matrixA.ptr.tmp = matrixA.ptr + 6 * sizeof_array_type
+  matrixA.tmp.0 = 6
+  Store(matrixA.tmp.0, matrixA.ptr.tmp)
+
+  // assign to array-element
+  matrixA.ptr.tmp = Var("matrixA.ptr.tmp")
+  matrixA.ptr.tmp = matrixA.ptr + 7 * sizeof_array_type
+  matrixA.tmp.0 = 7
+  Store(matrixA.tmp.0, matrixA.ptr.tmp)
+
+  // assign to array-element
+  matrixA.ptr.tmp = Var("matrixA.ptr.tmp")
+  matrixA.ptr.tmp = matrixA.ptr + 8 * sizeof_array_type
+  matrixA.tmp.0 = 9
+  Store(matrixA.tmp.0, matrixA.ptr.tmp)
+
+  // assign to array-element
+  matrixA.ptr.tmp = Var("matrixA.ptr.tmp")
+  matrixA.ptr.tmp = matrixA.ptr + 9 * sizeof_array_type
+  matrixA.tmp.0 = 3
+  Store(matrixA.tmp.0, matrixA.ptr.tmp)
+
+  // assign to array-element
+  matrixA.ptr.tmp = Var("matrixA.ptr.tmp")
+  matrixA.ptr.tmp = matrixA.ptr + 10 * sizeof_array_type
+  matrixA.tmp.0 = 8
+  Store(matrixA.tmp.0, matrixA.ptr.tmp)
+
+  // assign to array-element
+  matrixA.ptr.tmp = Var("matrixA.ptr.tmp")
+  matrixA.ptr.tmp = matrixA.ptr + 11 * sizeof_array_type
+  matrixA.tmp.0 = 1
+  Store(matrixA.tmp.0, matrixA.ptr.tmp)
+
+  // assign to array-element
+  matrixA.ptr.tmp = Var("matrixA.ptr.tmp")
+  matrixA.ptr.tmp = matrixA.ptr + 12 * sizeof_array_type
+  matrixA.tmp.0 = 6
+  Store(matrixA.tmp.0, matrixA.ptr.tmp)
+
+  // assign to array-element
+  matrixA.ptr.tmp = Var("matrixA.ptr.tmp")
+  matrixA.ptr.tmp = matrixA.ptr + 13 * sizeof_array_type
+  matrixA.tmp.0 = 9
+  Store(matrixA.tmp.0, matrixA.ptr.tmp)
+
+  // assign to array-element
+  matrixA.ptr.tmp = Var("matrixA.ptr.tmp")
+  matrixA.ptr.tmp = matrixA.ptr + 14 * sizeof_array_type
+  matrixA.tmp.0 = 7
+  Store(matrixA.tmp.0, matrixA.ptr.tmp)
+
+  // assign to array-element
+  matrixA.ptr.tmp = Var("matrixA.ptr.tmp")
+  matrixA.ptr.tmp = matrixA.ptr + 15 * sizeof_array_type
+  matrixA.tmp.0 = 1
+  Store(matrixA.tmp.0, matrixA.ptr.tmp)
+
+tmp.prettyPrintFormatMatrix = Var("tmp.prettyPrintFormatMatrix")
+// parameter for function call
+tmp.1.ptr = Var("tmp.1.ptr")
+GetAddress(matrixA, tmp.1.ptr)
+funccall(prettyPrintFormatMatrix, false, tmp.1.ptr, Constant(ConstInt(4)), tmp.prettyPrintFormatMatrix)
+
+printf("END")
 
   return(Constant(ConstInt(0)))
 ])
