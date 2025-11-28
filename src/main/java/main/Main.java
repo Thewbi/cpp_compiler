@@ -1172,15 +1172,17 @@ public class Main {
         // final String filename = "src/test/resources/expressions_6.cpp";
         // final String filename = "src/test/resources/examples/matrix_tester.cpp";
         // final String filename = "src/test/resources/printf.cpp";
-        // final String filename = "src/test/resources/array_example.c"; // <--- test here
-        // final String filename = "src/test/resources/array_indexing.cpp"; // <--- test here
+        // final String filename = "src/test/resources/array_example.c";
+        // final String filename = "src/test/resources/array_indexing.cpp";
         // final String filename = "src/test/resources/array_indexing_2.cpp";
+        // final String filename = "src/test/resources/array_indexing_3.cpp"; // <------
         // final String filename = "src/test/resources/examples/matrix_tester_scratchpad.cpp";
         // final String filename = "src/test/resources/function_call.cpp";
         // final String filename = "src/test/resources/function_call_2.cpp";
         // final String filename = "src/test/resources/function_call_3.cpp";
-        final String filename = "src/test/resources/function_call_4.cpp";
-        // final String filename = "src/test/resources/for_loop_over_array.cpp"; // <-- continue here
+        // final String filename = "src/test/resources/function_call_4.cpp"; // <--- test
+        final String filename = "src/test/resources/function_call_5.cpp";
+        // final String filename = "src/test/resources/for_loop_over_array.cpp";
 
         ASTNode dummyASTNode = new ASTNode();
         dummyASTNode.value = "__DUMMY___11223344__";

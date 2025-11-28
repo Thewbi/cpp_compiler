@@ -117,12 +117,16 @@ public class TackyGenerator {
         tackyStackFrame = executionStack.peek();
     }
 
-    private void addVariableToScope(String name, TackyDataType tackyDataType, boolean isArray) {
+    private void addVariableToScope(String name, TackyDataType tackyDataType, boolean isArray, boolean isPointer) {
 
+        if (name.equalsIgnoreCase("matrix")) {
+            System.out.println("");
+        }
         TACKYStackFrameVariableDescriptor tackyStackFrameVariableDescriptor = new TACKYStackFrameVariableDescriptor();
         tackyStackFrameVariableDescriptor.name = name;
         tackyStackFrameVariableDescriptor.tackyDataType = tackyDataType;
         tackyStackFrameVariableDescriptor.isArray = isArray;
+        tackyStackFrameVariableDescriptor.isPointer = isPointer;
 
         tackyStackFrame.variables.put(name, tackyStackFrameVariableDescriptor);
     }
@@ -183,7 +187,7 @@ public class TackyGenerator {
 
                                 // tmp.1.ptr = Var("tmp.1.ptr") // address: 8
                                 defineVariable(0, "tmp.1.ptr", TackyDataType.INT_32);
-                                addVariableToScope("tmp.1.ptr", TackyDataType.INT_32, false);
+                                addVariableToScope("tmp.1.ptr", TackyDataType.INT_32, false, false);
 
                                 // store an address into the pointer
                                 // GetAddress(tmp.1, tmp.1.ptr)
@@ -383,8 +387,8 @@ public class TackyGenerator {
                 defineVariable(0, name, TackyDataType.INT_32, isArray, arraySize);
 
                 // sizeof
-                //sizeof_int = Var("sizeof_int")
-                //sizeof(int8, sizeof_int)
+                // sizeof_int = Var("sizeof_int")
+                // sizeof(int8, sizeof_int)
 
                 // determine the size of the array element type and store it into a variable for
                 // later use
@@ -397,19 +401,20 @@ public class TackyGenerator {
                 // create a pointer (= normal variable that stores an address)
                 // to the first element of the array
                 // array1d.ptr = Var("array1d.ptr")
-                defineVariable(0, name + ".ptr", TackyDataType.INT_32);
+                String pointerName = name + ".ptr";
+                defineVariable(0, pointerName, TackyDataType.INT_32);
                 // GetAddress(array1d, array1d.ptr)
                 stringBuilder.append(indentString).append("GetAddress(" + name + ", " + name + ".ptr)").append("\n");
 
-                // temp variable for loading data into the array
-                // tmp.0 = Var("tmp.0")
-                defineVariable(0, name + ".tmp.0", TackyDataType.INT_32);
+                // // temp variable for loading data into the array
+                // // tmp.0 = Var("tmp.0")
+                // defineVariable(0, name + ".tmp.0", TackyDataType.INT_32);
 
                 int index = 0;
                 for (int i = 1; i < declaratorASTNode.children.size(); i++) {
 
                     String tempValue = declaratorASTNode.children.get(i).value;
-                    assignValueToArrayElement(indent + 1, declaratorASTNode, name, index, tempValue);
+                    assignValueToArrayElement(indent + 1, declaratorASTNode, pointerName, Integer.toString(index), tempValue);
 
                     index++;
 
@@ -439,23 +444,53 @@ public class TackyGenerator {
                 System.out.println(tackyStackFrame.variables.size());
 
                 String arrayName = child1ASTNode.value;
+                TACKYStackFrameVariableDescriptor tackyStackFrameVariableDescriptor = findVariableDescriptorInStack(
+                        arrayName);
 
                 String destinationVariableName = child0ASTNode.value;
                 defineVariable(indent + 1, destinationVariableName, null);
 
-                if (NumberUtils.isParsable(c1.value)) {
-                    int arrayIndex = (int) evaluate((ExpressionASTNode) c1);
-                    retrieveValueFromArrayElement(indent + 1, declaratorASTNode, arrayName, arrayIndex,
-                            destinationVariableName);
+                String arrayPointerName = null;
+                if (tackyStackFrameVariableDescriptor.isPointer) {
+
+                    // if a pointer is available already, use it
+                    arrayPointerName = tackyStackFrameVariableDescriptor.name;
+
                 } else {
-                    // throw new RuntimeException("Need indexing by variable!");
-                    retrieveValueFromArrayElementByVariable(indent + 1, declaratorASTNode, arrayName, c1.value,
+
+                    // if no pointer is available, create a pointer first
+
+                    String tempVarName = arrayName + ".addr.ptr";
+
+                    defineVariable(indent + 1, tempVarName, null);
+
+                    // store an address into the pointer
+                    // GetAddress(tmp.1, tmp.1.ptr)
+                    stringBuilder.append(indentString).append("GetAddress(")
+                            .append(arrayName).append(", ").append(tempVarName).append(")");
+                    stringBuilder.append("\n");
+
+                    // 
+                    arrayPointerName = tempVarName;
+
+                }
+
+                if (NumberUtils.isParsable(c1.value)) {
+
+                    int arrayIndex = (int) evaluate((ExpressionASTNode) c1);
+                    retrieveValueFromArrayElement(indent + 1, declaratorASTNode, arrayPointerName, arrayIndex,
                             destinationVariableName);
+
+                } else {
+
+                    retrieveValueFromArrayElementByVariable(indent + 1, declaratorASTNode, arrayPointerName, c1.value,
+                            destinationVariableName);
+
                 }
 
             } else {
 
-                addVariableToScope(name, TackyDataType.fromString(type), isArray);
+                addVariableToScope(name, TackyDataType.fromString(type), isArray, false);
 
                 // Object assignedValue = evaluate(assignedValueExpression);
                 String exprAsString = evaluateToString(indent, assignedValueExpression);
@@ -497,23 +532,66 @@ public class TackyGenerator {
             // existing variable is initialized
 
             boolean isArray = false;
-            int index = 0;
+            String index = "0";
 
             ASTNode child0ASTNode = declaratorASTNode.children.get(0);
             if (child0ASTNode instanceof DeclaratorASTNode) {
 
                 DeclaratorASTNode child0 = (DeclaratorASTNode) child0ASTNode;
                 isArray = child0.isArray;
-                index = (int) evaluate(child0.indexExpression);
 
-                String name = child0ASTNode.value;
+                ExpressionASTNode expressionASTNode = child0.indexExpression;
+
+                switch (expressionASTNode.expressionType) {
+
+                    case Identifier:
+                        index = evaluate(expressionASTNode).toString();
+                        break;
+
+                    case IntegerLiteral:
+                        index = evaluate(expressionASTNode).toString();
+                        break;
+
+                    default:
+                        throw new RuntimeException("");
+                }
+
+                String arrayName = child0ASTNode.value;
 
                 Object assignedValue = evaluate((ExpressionASTNode) declaratorASTNode.children.get(1));
 
-                System.out.println("Assignment. name=" + name + ", isArray=" + isArray + ", index=" + index
+                System.out.println("Assignment. name=" + arrayName + ", isArray=" + isArray + ", index=" + index
                         + ", assignedValue=" + assignedValue);
 
-                assignValueToArrayElement(indent + 1, declaratorASTNode, name, index, assignedValue.toString());
+                TACKYStackFrameVariableDescriptor tackyStackFrameVariableDescriptor = findVariableDescriptorInStack(
+                        arrayName);
+
+                String arrayPointerName = null;
+                if (tackyStackFrameVariableDescriptor.isPointer) {
+
+                    // if a pointer is available already, use it
+                    arrayPointerName = tackyStackFrameVariableDescriptor.name;
+
+                } else {
+
+                    // if no pointer is available, create a pointer first
+
+                    String tempVarName = arrayName + ".addr.ptr";
+
+                    defineVariable(indent + 1, tempVarName, null);
+
+                    // store an address into the pointer
+                    // GetAddress(tmp.1, tmp.1.ptr)
+                    stringBuilder.append(indentString).append("GetAddress(")
+                            .append(arrayName).append(", ").append(tempVarName).append(")");
+                    stringBuilder.append("\n");
+
+                    // 
+                    arrayPointerName = tempVarName;
+
+                }
+
+                assignValueToArrayElement(indent + 1, declaratorASTNode, arrayPointerName, index, assignedValue.toString());
 
             } else if (child0ASTNode instanceof ExpressionASTNode) {
 
@@ -534,9 +612,26 @@ public class TackyGenerator {
         }
     }
 
-    private void assignValueToArrayElement(int indent, DeclaratorASTNode declaratorASTNode, String arrayName,
-            int arrayElementIndex,
-            String value) {
+    private TACKYStackFrameVariableDescriptor findVariableDescriptorInStack(String varName) {
+
+        // for (TACKYStackFrame tackyStackFrame : executionStack) {
+        //     System.out.println(tackyStackFrame);
+        // }
+
+        for (int i = executionStack.size() - 1; i >= 0; i--) {
+            TACKYStackFrame tackyStackFrame = executionStack.elementAt(i);
+            // System.out.println(tackyStackFrame);
+
+            if (tackyStackFrame.variables.containsKey(varName)) {
+                return tackyStackFrame.variables.get(varName);
+            }
+        }
+
+        return null;
+    }
+
+    private void assignValueToArrayElement(int indent, DeclaratorASTNode declaratorASTNode, 
+        String arrayPtrName, String arrayElementIndex, String value) {
 
         String indentString = "";
         for (int i = 0; i < indent; i++) {
@@ -546,44 +641,65 @@ public class TackyGenerator {
         stringBuilder.append("\n");
         stringBuilder.append(indentString).append("// assign to array-element").append("\n");
 
+        stringBuilder.append(indentString).append("// " + arrayElementIndex).append("\n");
+
         // advance the pointer forward to the requested n-th element
         // to point to element #n, move the pointer four times
         //
         // array1d.ptr = array1d.ptr + (n-1) * sizeof_int
-        defineVariable(indent, arrayName + ".ptr.tmp", null);
-        stringBuilder.append(indentString)
-                .append(arrayName + ".ptr.tmp").append(" = ")
-                .append(arrayName + ".ptr").append(" + ")
-                .append(arrayElementIndex).append(" * sizeof_array_type")
+        // @formatter:off
+        defineVariable(indent, arrayPtrName + ".ptr.tmp", null);
+
+        // determine the size of the array element type and store it into a variable for
+        // later use
+        stringBuilder.append(indentString).append("sizeof_array_type = Var(\"sizeof_array_type\")")
                 .append("\n");
+        stringBuilder.append(indentString)
+                .append("sizeof(" + TackyDataType.toString(TackyDataType.INT_32) + ", sizeof_array_type)")
+                .append("\n");
+
+        // compute the correct address for the index used
+        stringBuilder.append(indentString)
+            .append(arrayPtrName + ".ptr.tmp").append(" = ")
+            .append(arrayPtrName).append(" + ")
+            .append(arrayElementIndex).append(" * sizeof_array_type")
+            .append("\n");
+        // @formatter:on
+
+        // temp variable for loading data into the array
+        // tmp.0 = Var("tmp.0")
+        defineVariable(0, arrayPtrName + ".tmp.0", TackyDataType.INT_32);
 
         // write data into the array element
         // tmp.0 = 18
-        stringBuilder.append(indentString).append(arrayName + ".tmp.0").append(" = ").append(value).append("\n");
+        stringBuilder.append(indentString).append(arrayPtrName + ".tmp.0").append(" = ").append(value).append("\n");
 
         // write data into the array element
         // Store(tmp.0, array1d.ptr)
-        stringBuilder.append(indentString).append("Store(").append(arrayName + ".tmp.0").append(", ")
-                .append(arrayName + ".ptr.tmp").append(")")
-                .append("\n");
+        // @formatter:off
+        stringBuilder.append(indentString)
+            .append("Store(").append(arrayPtrName + ".tmp.0").append(", ")
+            .append(arrayPtrName + ".ptr.tmp").append(")")
+            .append("\n");
+        // @formatter:on
     }
 
     private void retrieveValueFromArrayElement(int indent, DeclaratorASTNode declaratorASTNode,
-            String arrayName, int arrayElementIndex, String destinationVariableName) {
-        generateArrayAccessIndexer(indent, arrayName, "" + arrayElementIndex, destinationVariableName);
+            String arrayPtrName, int arrayElementIndex, String destinationVariableName) {
+        generateArrayAccessIndexer(indent, arrayPtrName, "" + arrayElementIndex, destinationVariableName);
     }
 
     private void retrieveValueFromArrayElementByVariable(int indent, DeclaratorASTNode declaratorASTNode,
-            String arrayName, String indexVarName, String destinationVariableName) {
-        generateArrayAccessIndexer(indent, arrayName, indexVarName, destinationVariableName);
+            String arrayPtrName, String indexVarName, String destinationVariableName) {
+        generateArrayAccessIndexer(indent, arrayPtrName, indexVarName, destinationVariableName);
     }
 
-    private void generateArrayAccessIndexer(int indent, String arrayName, String arrayElementIndex,
+    private void generateArrayAccessIndexer(int indent, String arrayPtrName, String arrayElementIndex,
             String destinationVariableName) {
 
-                // WBI
-        TACKYStackFrameVariableDescriptor tackyStackFrameVariableDescriptor 
-            = tackyStackFrame.variables.get(arrayName);
+        // WBI
+        TACKYStackFrameVariableDescriptor tackyStackFrameVariableDescriptor = tackyStackFrame.variables
+                .get(arrayPtrName);
 
         String indentString = "";
         for (int i = 0; i < indent; i++) {
@@ -605,12 +721,12 @@ public class TackyGenerator {
         // advance the pointer forward to the requested fifth element
         // to point to element #5, move the pointer four times
         // array1d.ptr = array1d.ptr + 4 * sizeof_int
-        defineVariable(indent, arrayName + ".ptr.tmp", null);
+        defineVariable(indent, arrayPtrName + ".ptr.tmp", null);
         stringBuilder.append(indentString)
-                .append(arrayName + ".ptr.tmp").append(" = ")
+                .append(arrayPtrName + ".ptr.tmp").append(" = ")
                 // .append(arrayName + ".ptr").append(" + ")
-                .append(arrayName).append(" + ")
-                //.append(arrayElementIndex).append(" * sizeof_array_type")
+                .append(arrayPtrName).append(" + ")
+                // .append(arrayElementIndex).append(" * sizeof_array_type")
                 .append(arrayElementIndex).append(" * sizeof_array_type")
                 .append("\n");
 
@@ -622,7 +738,7 @@ public class TackyGenerator {
         // write data into the array element
         // Store(tmp.0, array1d.ptr)
         stringBuilder.append(indentString).append("Load(")
-                .append(arrayName + ".ptr.tmp")
+                .append(arrayPtrName + ".ptr.tmp")
                 .append(", ")
                 .append(destinationVariableName)
                 .append(")")
@@ -646,13 +762,17 @@ public class TackyGenerator {
         // System.out.println(debugStringBuilder.toString());
 
         ASTNode child0 = astNode.getChildren().get(0);
+
+        // function name
         String functionName = child0.value.substring(0, child0.value.indexOf("("));
+
+        // global (TODO, this is a hardcoded value!)
         boolean global = true;
 
         ParametersAndQualifiersASTNode parametersAndQualifiersASTNode = (ParametersAndQualifiersASTNode) child0
                 .getChildren().get(1);
 
-        // DEBUG
+        // DEBUG - print all parameters
         StringBuilder debugStringBuilder = new StringBuilder();
         parametersAndQualifiersASTNode.printRecursive(debugStringBuilder, 0);
         System.out.println("++++++++++++++++++++++++++++++++++++");
@@ -662,6 +782,7 @@ public class TackyGenerator {
         stringBuilder.append(global);
 
         if (parametersAndQualifiersASTNode.children.size() > 0) {
+
             ParameterDeclarationListASTNode parameterDeclarationList = (ParameterDeclarationListASTNode) parametersAndQualifiersASTNode.children
                     .get(0);
 
@@ -669,10 +790,22 @@ public class TackyGenerator {
             for (ASTNode tempASTNode : parameterDeclarationList.getChildren()) {
 
                 ParameterDeclarationASTNode parameter = (ParameterDeclarationASTNode) tempASTNode;
-                ASTNode paramName = parameter.children.get(0);
+                ASTNode paramNameASTNode = parameter.children.get(0);
+                String paramName = paramNameASTNode.value;
                 String paramType = parameter.type;
 
-                stringBuilder.append(", ").append(paramName.value);
+                stringBuilder.append(", ").append(paramName);
+
+                // asdf
+
+                // TACKYStackFrameVariableDescriptor tackyStackFrameVariableDescriptor = new TACKYStackFrameVariableDescriptor();
+                // tackyStackFrameVariableDescriptor.name = paramName;
+                // tackyStackFrameVariableDescriptor.tackyDataType = TackyDataType.fromString(paramType);
+                // tackyStackFrameVariableDescriptor.isPointer = parameter.isPointer;
+
+                // tackyStackFrame.variables.put(paramName, tackyStackFrameVariableDescriptor);
+
+                addVariableToScope(paramName, TackyDataType.fromString(paramType), parameter.isArray, parameter.isPointer);
             }
         }
 
@@ -894,12 +1027,12 @@ public class TackyGenerator {
             // array1d = Var("array1d", Array(int, 5));
             stringBuilder.append(name + " = Var(\"" + name + "\", Array(" + TackyDataType.toString(tackyDataType) + ", "
                     + arraySize + "))");
-            addVariableToScope(name, tackyDataType, isArray);
+            addVariableToScope(name, tackyDataType, isArray, false);
 
         } else {
 
             stringBuilder.append(name + " = Var(\"" + name + "\")");
-            addVariableToScope(name, tackyDataType, isArray);
+            addVariableToScope(name, tackyDataType, isArray, false);
 
         }
         stringBuilder.append("\n");
@@ -963,6 +1096,10 @@ public class TackyGenerator {
                 // TACKYStackFrameVariableDescriptor varDesc =
                 // tackyStackFrame.variables.get(expr.value);
                 // memory[varDesc.address / 4];
+
+                //TACKYStackFrameVariableDescriptor desc = findVariableDescriptorInStack(expr.value);
+
+                //return memory[desc.address / 4];
             }
         } else if (expr.children.size() == 2) {
             switch (expr.expressionType) {

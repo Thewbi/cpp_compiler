@@ -35,11 +35,12 @@ import types.FormalParameter;
  */
 public class DefaultTACKYExecutor implements TACKYExecutor {
 
+    // private static final boolean DEBUG_OUTPUT_STATEMENTS = true;
     private static final boolean DEBUG_OUTPUT_STATEMENTS = false;
 
     public int stackPointer = 0;
 
-    public int memory[] = new int[256];
+    public int memory[] = new int[1024];
 
     public Stack<TACKYStackFrame> executionStack = new Stack<>();
 
@@ -79,10 +80,6 @@ public class DefaultTACKYExecutor implements TACKYExecutor {
         // execute all statements within the function body
         boolean done = functionDefinition.children.size() <= 0;
         while (!done) {
-
-            if (index == 17) {
-                System.out.println("");
-            }
 
             TACKYASTNode statement = (TACKYASTNode) functionDefinition.children.get(index);
 
@@ -251,22 +248,17 @@ public class DefaultTACKYExecutor implements TACKYExecutor {
                 case Sizeof: {
                     SizeofASTNode sizeof = (SizeofASTNode) statement;
 
-                    int varValue = 0;
-
+                    // find data type
                     String type = sizeof.type;
+                    int varValue = TackyDataType.sizeOf(type);
 
-                    varValue = TackyDataType.sizeOf(type);
+                    // store value into target variable
 
-                    // if (type.equalsIgnoreCase("int32")) {
-                    //     varValue = 4;
-                    // } else {
-                    //     throw new RuntimeException("Unknown type: " + type);
-                    // }
-
-                    // retrieve address
+                    // retrieve the target variable
                     String targetVariableName = sizeof.targetVariableName;
                     TACKYStackFrameVariableDescriptor varDescriptor = tackyStackFrame.variables.get(targetVariableName);
 
+                    // retrieve and use address
                     int address = varDescriptor.address;
                     memory[address / 4] = varValue;
                 }

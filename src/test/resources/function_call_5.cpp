@@ -2,18 +2,30 @@
 
 #define DIMENSION 4
 #define ELEMENTS DIMENSION *DIMENSION
-
+/**/
 void prettyPrintFormatMatrix(int* matrix, int dim) {
     for (int i = 0; i < dim; i++) {
         for (int j = 0; j < dim; j++) {
-
             int idx = dim * i + j;
-            
             int temp = matrix[idx];
             printf("%d", temp);
         }
     }
 }
+
+void upCountingMatrix(int* matrix, int dim) {
+    int count = 1;
+    for (int i = 0; i < dim; i++) {
+        for (int j = 0; j < dim; j++) {
+            int idx = dim * i + j;
+            matrix[idx] = count;
+            
+            count++;
+            //count = count + 1;
+        }
+    }
+}
+
 
 int main()
 {
@@ -25,6 +37,7 @@ int main()
         9, 3, 8, 1,
         6, 9, 7, 1 };
 
+    upCountingMatrix(matrixA, DIMENSION);
     prettyPrintFormatMatrix(matrixA, DIMENSION);
 
     printf("END");

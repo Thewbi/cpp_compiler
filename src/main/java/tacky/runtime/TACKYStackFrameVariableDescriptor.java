@@ -12,4 +12,6 @@ public class TACKYStackFrameVariableDescriptor {
 
     public boolean isArray;
 
+    public boolean isPointer;
+
 }
