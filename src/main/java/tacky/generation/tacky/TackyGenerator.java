@@ -135,12 +135,18 @@ public class TackyGenerator {
 
     private void enterFunctionCall(int indent, DeclaratorASTNode astNode) {
 
+        // -- add new line for improved readability --
+
         stringBuilder.append("\n");
+
+        // -- build indent string --
 
         String indentString = "";
         for (int i = 0; i < indent; i++) {
             indentString += "  ";
         }
+
+        // -- function return value + actual parameters --
 
         String calledFunctionName = astNode.value.substring(0, astNode.value.indexOf("("));
 
@@ -171,10 +177,10 @@ public class TackyGenerator {
                     ExpressionASTNode expr = (ExpressionASTNode) param;
                     switch (expr.expressionType) {
 
-                        // case Primary:
-                        // stringBuilder.append(",
-                        // Constant(ConstInt(").append(param.value).append("))");
-                        // break;
+                        case Primary:
+                            // ignored: Just pass the number as is without wrapping it in const
+                            // stringBuilder.append(", Constant(ConstInt(").append(param.value).append("))");
+                            break;
 
                         case Identifier:
                             TACKYStackFrameVariableDescriptor tackyStackFrameVariableDescriptor = tackyStackFrame.variables
@@ -183,23 +189,24 @@ public class TackyGenerator {
                             // check if the identifier is an array
                             if (tackyStackFrameVariableDescriptor.isArray) {
 
-                                stringBuilder.append("// parameter for function call").append("\n");
+                                stringBuilder.append("// parameter " + i + " for function call").append("\n");
 
                                 // tmp.1.ptr = Var("tmp.1.ptr") // address: 8
-                                defineVariable(0, "tmp.1.ptr", TackyDataType.INT_32);
-                                addVariableToScope("tmp.1.ptr", TackyDataType.INT_32, false, false);
+                                String varName = "tmp." + i + ".ptr";
+                                defineVariable(0, varName, TackyDataType.INT_32);
+                                addVariableToScope(varName, TackyDataType.INT_32, false, false);
 
                                 // store an address into the pointer
                                 // GetAddress(tmp.1, tmp.1.ptr)
                                 stringBuilder.append(indentString).append("GetAddress(")
-                                        .append(param.value).append(", ").append("tmp.1.ptr").append(")");
+                                        .append(param.value).append(", ").append(varName).append(")");
                                 stringBuilder.append("\n");
 
                             }
                             break;
 
                         default:
-                            break;
+                            throw new RuntimeException("Case not treated! type=" + expr.expressionType);
                     }
                 }
             }
@@ -210,7 +217,14 @@ public class TackyGenerator {
             // funccall(test_function, false, Constant(ConstInt(2)), Constant(ConstInt(3)),
             // tmp.0)
 
-            stringBuilder.append(indentString).append("funccall(").append(calledFunctionName).append(", false");
+            // @formatter:off
+
+            stringBuilder.append(indentString).
+                append("funccall(")
+                .append(calledFunctionName)
+                .append(", false");
+
+            // @formatter:on
 
             // actual parameters
             for (int i = 1; i < astNode.children.size(); i++) {
@@ -257,7 +271,7 @@ public class TackyGenerator {
                                 // tmp.1.ptr,
                                 // tmp.0
                                 // )
-                                stringBuilder.append(indentString).append(", tmp.1.ptr");
+                                stringBuilder.append(indentString).append(", tmp." + i + ".ptr");
 
                             } else {
                                 throw new RuntimeException();

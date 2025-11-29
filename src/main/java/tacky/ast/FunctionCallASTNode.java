@@ -36,6 +36,11 @@ public class FunctionCallASTNode extends TACKYASTNode {
 
         // expression.printRecursive(stringBuilder, indent + 1);
 
+        // all actual parameters
+        for (ActualParameter actualParameter : actualParameters) {
+            actualParameter.printRecursive(stringBuilder, indent + 1);
+        }
+
         // all children
         for (ASTNode child : children) {
             child.printRecursive(stringBuilder, indent + 1);

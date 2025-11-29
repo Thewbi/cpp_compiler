@@ -393,7 +393,7 @@ public class SimpleCPP14ParserBaseListener extends CPP14ParserBaseListener {
             return;
         }
 
-        System.out.println("[" + ctx.hashCode() + "] " + ctx.getText());
+        // System.out.println("[" + ctx.hashCode() + "] " + ctx.getText());
 
         if (ctx.children.size() == 2) {
             if (ctx.children.get(1).getText().equalsIgnoreCase("++")) {

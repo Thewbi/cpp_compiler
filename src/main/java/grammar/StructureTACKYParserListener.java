@@ -151,7 +151,7 @@ public class StructureTACKYParserListener extends TACKYParserBaseListener {
 
     @Override 
     public void enterArray_type(TACKYParser.Array_typeContext ctx) {
-        System.out.println("[" + ctx.hashCode() + "] " + ctx.getText());
+        // System.out.println("[" + ctx.hashCode() + "] " + ctx.getText());
 
         DataType dataTypeAstNode = tackyASTNodeFactory.createDataTypeASTNode();
         dataTypeAstNode.isArray = true;
@@ -341,6 +341,7 @@ public class StructureTACKYParserListener extends TACKYParserBaseListener {
 
     @Override
     public void enterFunction_call(TACKYParser.Function_callContext ctx) {
+
         // System.out.println("[" + ctx.hashCode() + "] " + ctx.getText());
 
         FunctionCallASTNode functionCallASTNode = tackyASTNodeFactory.createFunctionCallASTNode();
@@ -348,9 +349,7 @@ public class StructureTACKYParserListener extends TACKYParserBaseListener {
 
         Arg_listContext arg_listContext = ctx.arg_list();
 
-        //
-        // actual parameters
-        //
+        // -- actual parameters --
 
         while (arg_listContext.arg_list() != null) {
 
@@ -366,10 +365,8 @@ public class StructureTACKYParserListener extends TACKYParserBaseListener {
 
             ResultContainer resultContainer = new ResultContainer();
 
-            // Object aval = 0;
             if (parseTree instanceof Constant_declContext) {
 
-                // aval = retrieveConstantValue(valContext, resultContainer);
                 retrieveConstantValue(valContext, resultContainer);
                 actualParameter.isVariable = false;
                 actualParameter.isConstant = true;
@@ -405,9 +402,7 @@ public class StructureTACKYParserListener extends TACKYParserBaseListener {
             arg_listContext = arg_listContext.arg_list();
         }
 
-        //
-        // Return Value Variable
-        //
+        // -- Return Value Variable --
 
         arg_listContext = ctx.arg_list();
 
@@ -421,6 +416,11 @@ public class StructureTACKYParserListener extends TACKYParserBaseListener {
 
         // descend
         descend(functionCallASTNode);
+
+        // DEBUG
+        StringBuilder stringBuilder = new StringBuilder();
+        functionCallASTNode.printRecursive(stringBuilder, 0);
+        System.out.println(stringBuilder.toString());
     }
 
     @Override

@@ -789,7 +789,7 @@ public class Main {
         }
 
         System.out.println("----------------------------------------------------------------\n");
-
+/*
         System.out.println("-- 5 - Generate assembly code ----------------------------------");
 
         TACKYStackFrame newTackyStackFrameGen = new TACKYStackFrame();
@@ -804,7 +804,7 @@ public class Main {
         System.out.println("```");
 
         System.out.println("----------------------------------------------------------\n");
-
+ */
         System.out.println("Application is done!");
     }
 

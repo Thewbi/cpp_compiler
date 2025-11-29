@@ -53,87 +53,69 @@
 
 
 
- void standardMatrixMult ( int * matrixA , int * matrixB , int * matrixC , int rows , int columns ) {
-      printf ( "test" ) ;
-     
-      for ( int i = 0 ; i < rows ; i ++ ) {
-         
-          for ( int j = 0 ; j < columns ; j ++ ) {
-             
-              for ( int k = 0 ; k < columns ; k ++ ) {
 
-                 
-                  int aIdx = i * columns + k ;
-                  int bIdx = k * columns + j ;
-                  int cIdx = i * rows + j ;
 
-                  int aVal = matrixA [ aIdx ] ;
-                  int bVal = matrixB [ bIdx ] ;
 
-                  int temp = aVal * bVal ;
 
-                 
-                 
-                 
 
-                  printf ( "aVal: %d" , aVal ) ;
-                  printf ( "bVal: %d" , bVal ) ;
 
-                 
-                 
 
-                  matrixC [ cIdx ] = temp ;
-              }
-          }
-      }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ void multiParamTest ( int * matrixA , int * matrixB , int rows , int columns ) {
+
+      printf ( "multiParamTest()" ) ;
+
+
+      int temp = matrixA [ 0 ] ;
+      printf ( "%d" , temp ) ;
+
+      int temp = matrixB [ 0 ] ;
+      printf ( "%d" , temp ) ;
+
  }
-
-
-
-
-
-
-
-
-
-
- void prettyPrintFormatMatrix ( int * matrix , int dim ) {
-      for ( int i = 0 ; i < dim ; i ++ ) {
-          for ( int j = 0 ; j < dim ; j ++ ) {
-              int idx = dim * i + j ;
-              int temp = matrix [ idx ] ;
-              printf ( "%d" , temp ) ;
-          }
-      }
- }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
  int main ( )
  {
@@ -167,11 +149,13 @@
      
      
 
-      standardMatrixMult ( matrixA , matrixB , matrixC , 4 , 4 ) ;
      
+     
+     
+      multiParamTest ( matrixA , matrixB , 4 , 5 ) ;
 
-      printf ( "C\n" ) ;
-      prettyPrintFormatMatrix ( matrixC , 4 ) ;
+     
+     
 
      
      

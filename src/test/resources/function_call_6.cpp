@@ -128,6 +128,7 @@ void segmentedMatrixMult(int* matrixA, int* matrixB, int* matrixC, int rows, int
 }
 */
 
+/*
 void standardMatrixMult(int* matrixA, int* matrixB, int* matrixC, int rows, int columns) {
     printf("test");
     // over row of matrix B
@@ -162,6 +163,7 @@ void standardMatrixMult(int* matrixA, int* matrixB, int* matrixC, int rows, int 
         }
     }
 }
+*/
 
 // void printMatrix(int* matrix, int dim) {
 //     for (int i = 0; i < dim; i++) {
@@ -172,15 +174,15 @@ void standardMatrixMult(int* matrixA, int* matrixB, int* matrixC, int rows, int 
 //     }
 // }
 
-void prettyPrintFormatMatrix(int* matrix, int dim) {
-    for (int i = 0; i < dim; i++) {
-        for (int j = 0; j < dim; j++) {
-            int idx = dim * i + j;
-            int temp = matrix[idx];
-            printf("%d", temp);
-        }
-    }
-}
+// void prettyPrintFormatMatrix(int* matrix, int dim) {
+//     for (int i = 0; i < dim; i++) {
+//         for (int j = 0; j < dim; j++) {
+//             int idx = dim * i + j;
+//             int temp = matrix[idx];
+//             printf("%d", temp);
+//         }
+//     }
+// }
 
 /*
 void prettyPrintFormatMatrix(int* matrix, int dim, const char* format) {
@@ -219,6 +221,41 @@ void prettyPrintFormatMatrix(int* matrix, int dim, const char* format) {
 //     }
 // }
 
+//void multiParamTest(int* matrixA, int* matrixB, int* matrixC, int rows, int columns) {
+//void multiParamTest(int* matrixA, int rows, int columns) {
+void multiParamTest(int* matrixA, int* matrixB, int rows, int columns) {
+
+    printf("multiParamTest()");
+/*
+    printf("-- A -------------------------------------");
+    int dim = 4;
+    for (int i = 0; i < dim; i++) {
+        for (int j = 0; j < dim; j++) {
+            int idx = dim * i + j;
+            int temp = matrixA[idx];
+            printf("%d", temp);
+        }
+    }
+
+    printf("-- B -------------------------------------");
+    int dim = 4;
+    for (int i = 0; i < dim; i++) {
+        for (int j = 0; j < dim; j++) {
+            int idx = dim * i + j;
+            int temp = matrixB[idx];
+            printf("%d", temp);
+        }
+    }
+*/
+
+    int temp = matrixA[0];
+    printf("%d", temp);
+
+    int temp = matrixB[0];
+    printf("%d", temp);
+
+}
+
 int main()
 {
     printf("Matrix\n");
@@ -251,11 +288,13 @@ int main()
     // printf("B\n");
     // prettyPrintFormatMatrix(matrixB, DIMENSION);
 
-    standardMatrixMult(matrixA, matrixB, matrixC, DIMENSION, DIMENSION);
+    //standardMatrixMult(matrixA, matrixB, matrixC, DIMENSION, DIMENSION);
     //segmentedMatrixMult(matrixA, matrixB, matrixC, DIMENSION, DIMENSION);
+    //multiParamTest(matrixA, matrixB, matrixC, DIMENSION, DIMENSION);
+    multiParamTest(matrixA, matrixB, 4, 5);
 
-    printf("C\n");
-    prettyPrintFormatMatrix(matrixC, DIMENSION);
+    //printf("C\n");
+    //prettyPrintFormatMatrix(matrixC, DIMENSION);
 
     // Expected result for two up-counting matrices:
     // int[] intArray = new int[] {
