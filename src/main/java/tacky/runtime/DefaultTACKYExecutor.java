@@ -479,6 +479,12 @@ public class DefaultTACKYExecutor implements TACKYExecutor {
     }
 
     private int evaluateExpressionValue(TACKYStackFrame tackyStackFrame, String expressionVal) {
+
+        // CHECK
+        if (expressionVal == null) {
+            throw new RuntimeException("Parameter 'expressionVal' is null!");
+        }
+
         boolean isNumeric = StringUtils.isNumeric(expressionVal);
         if (isNumeric) {
             return Integer.parseInt(expressionVal);

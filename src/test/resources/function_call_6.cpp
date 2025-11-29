@@ -30,17 +30,44 @@
 //     }
 // }
 
-// void getSubMatrix(int* matrix, int dim, int xPos, int yPos, int width, int height, int* matrixC) {
-//     int innerI = 0;
-//     for (int i = xPos; i < xPos + width; i++) {
-//         int innerJ = 0;
-//         for (int j = yPos; j < yPos + height; j++) {
-//             matrixC[innerI * width + innerJ] = matrix[i * dim + j];
-//             innerJ++;
-//         }
-//         innerI++;
-//     }
-// }
+void getSubMatrix(int* matrix, int dim, int xPos, int yPos, int width, int height, int* matrixC) {
+//void getSubMatrix(int* matrix, int dim, int xPos, int yPos, int width, int height) {
+//void getSubMatrix(int* matrix, int dim) {
+
+    // int xPos = 0;
+    // int yPos = 0;
+    // int width = 2;
+    // int height = 2;
+
+    int xEnd = xPos + width;
+    int yEnd = yPos + height;
+
+    int innerI = 0;
+    for (int i = xPos; i < xEnd; i++) {
+
+        int innerJ = 0;
+        for (int j = yPos; j < yEnd; j++) {
+
+            // matrixC[innerI * width + innerJ] = matrix[i * dim + j];
+            int idx = i * dim + j;
+            int idxC = innerI * width + innerJ;
+            
+            int gaga = matrix[idx];
+            matrixC[idxC] = gaga;
+
+            // innerJ++;
+            int t = innerJ + 1;
+            innerJ = t;
+            
+            //printf("test");
+
+        }
+
+        //innerI++;
+        int u = innerI + 1;
+        innerI = u;
+    }
+}
 
 // void setSubMatrix(int* matrix, int dim, int xPos, int yPos, int width, int height, int* matrixC) {
 //     for (int i = 0; i < height; i++) {
@@ -128,9 +155,9 @@ void segmentedMatrixMult(int* matrixA, int* matrixB, int* matrixC, int rows, int
 }
 */
 
-/*
+/**/
 void standardMatrixMult(int* matrixA, int* matrixB, int* matrixC, int rows, int columns) {
-    printf("test");
+    printf("standardMatrixMult()");
     // over row of matrix B
     for (int i = 0; i < rows; i++) {
         // over column of matrix A
@@ -152,18 +179,20 @@ void standardMatrixMult(int* matrixA, int* matrixB, int* matrixC, int rows, int 
                 // printf("bIdx: %d", bIdx);
                 // printf("cIdx: %d", cIdx);
 
-                printf("aVal: %d", aVal);
-                printf("bVal: %d", bVal);
+                //printf("aVal: %d", aVal);
+                //printf("bVal: %d", bVal);
 
                 //printf("aVal: %d", aVal);
                 //printf("bVal: %d", bVal);
 
-                matrixC[cIdx] = temp;
+                int abc = matrixC[cIdx];
+                int cde = abc + temp;
+                matrixC[cIdx] = cde;
             }
         }
     }
 }
-*/
+
 
 // void printMatrix(int* matrix, int dim) {
 //     for (int i = 0; i < dim; i++) {
@@ -174,15 +203,15 @@ void standardMatrixMult(int* matrixA, int* matrixB, int* matrixC, int rows, int 
 //     }
 // }
 
-// void prettyPrintFormatMatrix(int* matrix, int dim) {
-//     for (int i = 0; i < dim; i++) {
-//         for (int j = 0; j < dim; j++) {
-//             int idx = dim * i + j;
-//             int temp = matrix[idx];
-//             printf("%d", temp);
-//         }
-//     }
-// }
+void prettyPrintFormatMatrix(int* matrix, int dim) {
+    for (int i = 0; i < dim; i++) {
+        for (int j = 0; j < dim; j++) {
+            int idx = dim * i + j;
+            int temp = matrix[idx];
+            printf("%d", temp);
+        }
+    }
+}
 
 /*
 void prettyPrintFormatMatrix(int* matrix, int dim, const char* format) {
@@ -211,22 +240,27 @@ void prettyPrintFormatMatrix(int* matrix, int dim, const char* format) {
 //     }
 // }
 
-// void upCountingMatrix(int* matrix, int dim) {
-//     int count = 1;
-//     for (int i = 0; i < dim; i++) {
-//         for (int j = 0; j < dim; j++) {
-//             matrix[dim*i + j] = count;
-//             count++;
-//         }
-//     }
-// }
+void upCountingMatrix(int* matrix, int dim) {
+    int count = 1;
+    for (int i = 0; i < dim; i++) {
+        for (int j = 0; j < dim; j++) {
 
+            int idx = dim * i + j;
+            matrix[idx] = count;
+
+            int t = count + 1;
+            count = t;
+        }
+    }
+}
+
+/*
 //void multiParamTest(int* matrixA, int* matrixB, int* matrixC, int rows, int columns) {
 //void multiParamTest(int* matrixA, int rows, int columns) {
 void multiParamTest(int* matrixA, int* matrixB, int rows, int columns) {
 
     printf("multiParamTest()");
-/*
+
     printf("-- A -------------------------------------");
     int dim = 4;
     for (int i = 0; i < dim; i++) {
@@ -246,15 +280,14 @@ void multiParamTest(int* matrixA, int* matrixB, int rows, int columns) {
             printf("%d", temp);
         }
     }
-*/
 
-    int temp = matrixA[0];
-    printf("%d", temp);
+    // int temp = matrixA[0];
+    // printf("%d", temp);
 
-    int temp = matrixB[0];
-    printf("%d", temp);
+    // int temp = matrixB[0];
+    // printf("%d", temp);
 
-}
+}*/
 
 int main()
 {
@@ -282,27 +315,27 @@ int main()
     //upCountingMatrix(matrixA, DIMENSION);
     //upCountingMatrix(matrixB, DIMENSION);
     
-    // printf("A\n");
-    // prettyPrintFormatMatrix(matrixA, DIMENSION);
+    //printf("A\n");
+    //prettyPrintFormatMatrix(matrixA, DIMENSION);
 
     // printf("B\n");
     // prettyPrintFormatMatrix(matrixB, DIMENSION);
 
+    int subMatrixB[4] = { 0, 0, 0, 0 };
+    getSubMatrix(matrixB, DIMENSION, 0, 0, 2, 2, subMatrixB);
+    //getSubMatrix(matrixB, DIMENSION, 0, 0, 2, 2);
+    //getSubMatrix(matrixB, DIMENSION);
+
+    printf("subMatrixB\n");
+    prettyPrintFormatMatrix(subMatrixB, 2);
+
     //standardMatrixMult(matrixA, matrixB, matrixC, DIMENSION, DIMENSION);
     //segmentedMatrixMult(matrixA, matrixB, matrixC, DIMENSION, DIMENSION);
     //multiParamTest(matrixA, matrixB, matrixC, DIMENSION, DIMENSION);
-    multiParamTest(matrixA, matrixB, 4, 5);
+    //multiParamTest(matrixA, matrixB, 4, 5);
 
     //printf("C\n");
     //prettyPrintFormatMatrix(matrixC, DIMENSION);
-
-    // Expected result for two up-counting matrices:
-    // int[] intArray = new int[] {
-    //      90,   100,   110,   120,
-    //     202,   228,   254,   280,
-    //     314,   356,   398,   440,
-    //     426,   484,   542,   600
-    // };
 
     // Expected result for the two sample matrixes
     // int[] intArray = new int[] {
@@ -312,5 +345,13 @@ int main()
     //     135,   112,    87,    52
     // };
     
+    // Expected result for two up-counting matrices:
+    // int[] intArray = new int[] {
+    //      90,   100,   110,   120,
+    //     202,   228,   254,   280,
+    //     314,   356,   398,   440,
+    //     426,   484,   542,   600
+    // };
+
     return 0;
 }

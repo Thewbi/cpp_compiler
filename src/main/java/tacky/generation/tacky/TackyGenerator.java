@@ -150,6 +150,9 @@ public class TackyGenerator {
 
         String calledFunctionName = astNode.value.substring(0, astNode.value.indexOf("("));
 
+        // DEBUG
+        System.out.println("Processing function: \"" + calledFunctionName + "\"");
+
         if (calledFunctionName.equalsIgnoreCase("printf")) {
 
             // special treatment for printf()
@@ -170,7 +173,9 @@ public class TackyGenerator {
             for (int i = 1; i < astNode.children.size(); i++) {
 
                 ASTNode param = astNode.children.get(i);
-                // System.out.println(param);
+                
+                // DEBUG
+                System.out.println(param);
 
                 if (param instanceof ExpressionASTNode) {
 
@@ -185,6 +190,11 @@ public class TackyGenerator {
                         case Identifier:
                             TACKYStackFrameVariableDescriptor tackyStackFrameVariableDescriptor = tackyStackFrame.variables
                                     .get(param.value);
+
+                            // CHECK
+                            if (tackyStackFrameVariableDescriptor == null) {
+                                System.out.println("Parameter cannot be identified: \"" + param.value + "\"");
+                            }
 
                             // check if the identifier is an array
                             if (tackyStackFrameVariableDescriptor.isArray) {
@@ -1150,7 +1160,7 @@ public class TackyGenerator {
                             / (int) evaluate((ExpressionASTNode) expr.children.get(1));
 
                 default:
-                    throw new RuntimeException();
+                    throw new RuntimeException("Unknown expression type: " + expr.expressionType);
             }
         }
 
