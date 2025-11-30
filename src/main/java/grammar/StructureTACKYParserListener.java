@@ -14,6 +14,7 @@ import com.cpp.grammar.TACKYParser.ValContext;
 import com.cpp.grammar.TACKYParserBaseListener;
 
 import ast.ASTNode;
+import ast.ASTNodeType;
 import ast.ExpressionASTNode;
 import ast.ExpressionType;
 import common.StringUtil;
@@ -115,8 +116,11 @@ public class StructureTACKYParserListener extends TACKYParserBaseListener {
 
     @Override
     public void enterVar_declaration_statement(TACKYParser.Var_declaration_statementContext ctx) {
+        
         // create a VariableDeclarationASTNode
         VariableDeclarationASTNode variableDeclarationASTNode = tackyASTNodeFactory.createVariableDeclarationASTNode();
+        variableDeclarationASTNode.astNodeType = ASTNodeType.INIT_DECLARATION;
+
         connectToParent(currentNode, variableDeclarationASTNode);
         descend(variableDeclarationASTNode);
     }
@@ -307,6 +311,7 @@ public class StructureTACKYParserListener extends TACKYParserBaseListener {
 
         PrintfASTNode printfASTNode = tackyASTNodeFactory.createPrintfASTNode();
         printfASTNode.value = ctx.getChild(2).getText();
+        printfASTNode.astNodeType = ASTNodeType.FUNCTION_CALL;
 
         // connect parent and child
         connectToParent(currentNode, printfASTNode);

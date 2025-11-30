@@ -7,8 +7,8 @@ int main()
     {
         printf("%d \n", i);
 
-        if (i > 5) {
-            break;
-        }
+        // if (i > 5) {
+        //     break;
+        // }
     }
 }

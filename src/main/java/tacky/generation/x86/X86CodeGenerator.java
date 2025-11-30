@@ -1,7 +1,5 @@
 package tacky.generation.x86;
 
-import java.lang.classfile.instruction.ReturnInstruction;
-
 import ast.ASTNode;
 import tacky.ast.ConstIntASTNode;
 import tacky.ast.ConstantDeclarationASTNode;

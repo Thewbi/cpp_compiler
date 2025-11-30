@@ -69,6 +69,7 @@ import com.cpp.grammar.TACKYLexer;
 import structure.DefaultStructureCallback;
 import tacky.ast.FunctionDefinitionASTNode;
 import tacky.ast.ProgramASTNode;
+import tacky.generation.riscv.RISCVCodeGenerator;
 import tacky.generation.tacky.TackyGenerator;
 import tacky.generation.x86.X86CodeGenerator;
 import tacky.runtime.DefaultTACKYExecutor;
@@ -789,7 +790,7 @@ public class Main {
 
         System.out.println("----------------------------------------------------------------\n");
 /*
-        System.out.println("-- 5 - Generate assembly code ----------------------------------");
+        System.out.println("-- 5 - Generate x86 assembly code ------------------------------");
 
         TACKYStackFrame newTackyStackFrameGen = new TACKYStackFrame();
 
@@ -803,7 +804,23 @@ public class Main {
         System.out.println("```");
 
         System.out.println("----------------------------------------------------------\n");
- */
+*/
+
+        System.out.println("-- 5 - Generate RISC-V assembly code ----------------------");
+
+        TACKYStackFrame newTackyStackFrameGen = new TACKYStackFrame();
+
+        FunctionDefinitionASTNode mainFunctionGen = getMainFunction(rootNode, structureTACKYParserListener);
+
+        RISCVCodeGenerator riscvCodeGenerator = new RISCVCodeGenerator();
+        riscvCodeGenerator.executeFunction(newTackyStackFrameGen, rootNode, 0, mainFunctionGen);
+
+        System.out.println("```");
+        System.out.println(riscvCodeGenerator.stringBuilder.toString());
+        System.out.println("```");
+
+        System.out.println("----------------------------------------------------------\n");
+
         System.out.println("Application is done!");
     }
 
@@ -1185,6 +1202,7 @@ public class Main {
         // final String filename = "src/test/resources/examples/matrix_tester_scratchpad.cpp";
 
         // final String filename = "src/test/resources/printf.cpp";
+        // final String filename = "src/test/resources/printf_2.cpp";
 
         // final String filename = "src/test/resources/array_example.c";
         // final String filename = "src/test/resources/array_indexing.cpp";
@@ -1196,11 +1214,11 @@ public class Main {
         // final String filename = "src/test/resources/function_call_3.cpp";
         // final String filename = "src/test/resources/function_call_4.cpp"; // <--- test
         // final String filename = "src/test/resources/function_call_5.cpp";
-        final String filename = "src/test/resources/function_call_6.cpp";
+        // final String filename = "src/test/resources/function_call_6.cpp";
         // final String filename = "src/test/resources/function_call_7.cpp";
 
         // final String filename = "src/test/resources/for_loop.cpp";
-        // final String filename = "src/test/resources/for_loop_2.cpp";
+        final String filename = "src/test/resources/for_loop_2.cpp";
         // final String filename = "src/test/resources/for_loop_over_array.cpp";
 
         ASTNode dummyASTNode = new ASTNode();
