@@ -1,12 +1,20 @@
 package tacky.ast;
 
 import ast.ASTNode;
+import tacky.generation.riscv.RISCVStackEntry;
+import tacky.generation.riscv.RISCVStackFrame;
 
 public class VariableDeclarationASTNode extends TACKYASTNode {
 
     public String variableSymbolName;
 
     public String variableName;
+
+    public RISCVStackEntry stackEntry;
+
+    public void addToStackFrame(RISCVStackFrame stackFrame) {
+        stackEntry = stackFrame.addVariable(variableName);
+    }
 
     public void printRecursive(final StringBuilder stringBuilder, final int indent) {
         printRecursive(stringBuilder, indent, true);

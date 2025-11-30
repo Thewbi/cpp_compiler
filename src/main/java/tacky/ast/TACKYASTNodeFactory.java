@@ -1,5 +1,6 @@
 package tacky.ast;
 
+import ast.ASTNodeType;
 import ast.ValASTNode;
 
 public class TACKYASTNodeFactory {
@@ -31,6 +32,7 @@ public class TACKYASTNodeFactory {
     public AssignmentASTNode createAssignmentASTNode() {
         AssignmentASTNode node = new AssignmentASTNode();
         node.nodeType = NodeType.Assignment;
+        node.astNodeType = ASTNodeType.ASSIGNMENT;
         return node;
     }
 
@@ -43,18 +45,21 @@ public class TACKYASTNodeFactory {
     public LabelASTNode createLabelASTNode() {
         LabelASTNode node = new LabelASTNode();
         node.nodeType = NodeType.Label;
+        node.astNodeType = ASTNodeType.LABEL;
         return node;
     }
 
     public JumpASTNode createJumpASTNode() {
         JumpASTNode node = new JumpASTNode();
         node.nodeType = NodeType.Jump;
+        node.astNodeType = ASTNodeType.JUMP_STATEMENT;
         return node;
     }
 
     public ReturnASTNode createReturnASTNode() {
         ReturnASTNode node = new ReturnASTNode();
         node.nodeType = NodeType.Return;
+        node.astNodeType = ASTNodeType.RETURN;
         return node;
     }
 

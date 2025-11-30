@@ -6,6 +6,8 @@ import java.util.List;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.ParseTree;
 
+import tacky.generation.riscv.RISCVStackFrame;
+
 public class ASTNode {
 
     public ASTNode parent;
@@ -81,6 +83,10 @@ public class ASTNode {
 
     public List<ASTNode> getChildren() {
         return children;
+    }
+
+    public void addToStackFrame(RISCVStackFrame stackFrame) {
+        ;
     }
 
 }

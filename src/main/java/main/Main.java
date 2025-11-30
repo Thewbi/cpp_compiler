@@ -813,7 +813,10 @@ public class Main {
         FunctionDefinitionASTNode mainFunctionGen = getMainFunction(rootNode, structureTACKYParserListener);
 
         RISCVCodeGenerator riscvCodeGenerator = new RISCVCodeGenerator();
-        riscvCodeGenerator.executeFunction(newTackyStackFrameGen, rootNode, 0, mainFunctionGen);
+        riscvCodeGenerator.stackPointer = 0x00020000;
+
+        //riscvCodeGenerator.executeFunction(newTackyStackFrameGen, rootNode, 0, mainFunctionGen);
+        riscvCodeGenerator.executeFunction(rootNode.getChildren().get(1));
 
         System.out.println("```");
         System.out.println(riscvCodeGenerator.stringBuilder.toString());

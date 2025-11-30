@@ -18,6 +18,12 @@ public enum ASTNodeType {
 
     SIMPLE_DECLARATION,
     
-    EXPRESSION;
+    EXPRESSION,
+    
+    ASSIGNMENT,
+    
+    LABEL,
+    
+    RETURN;
 
 }

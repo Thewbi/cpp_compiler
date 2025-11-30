@@ -6,6 +6,8 @@ import tacky.runtime.TACKYStackFrame;
 
 public interface Generator {
 
+    void start();
+
     /**
      * 
      * @param tackyStackFrame
@@ -14,7 +16,10 @@ public interface Generator {
      * @param functionDefinition
      * @return
      */
-    int executeFunction(TACKYStackFrame tackyStackFrame, ASTNode rootNode, int currentIndex,
-            FunctionDefinitionASTNode functionDefinition);
+    // int executeFunction(TACKYStackFrame tackyStackFrame, ASTNode rootNode, int currentIndex,
+    //         FunctionDefinitionASTNode functionDefinition);
+    int executeFunction(ASTNode functionAstNode);
+
+    void end();
 
 }
