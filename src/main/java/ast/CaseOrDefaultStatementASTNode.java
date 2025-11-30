@@ -1,7 +1,5 @@
 package ast;
 
-import java.lang.Thread.State;
-
 public class CaseOrDefaultStatementASTNode extends StatementASTNode {
 
     public ExpressionASTNode expression;

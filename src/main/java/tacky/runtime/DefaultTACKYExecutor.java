@@ -40,7 +40,7 @@ public class DefaultTACKYExecutor implements TACKYExecutor {
 
     public int stackPointer = 0;
 
-    public int memory[] = new int[2048];
+    public int memory[] = new int[8000];
 
     public Stack<TACKYStackFrame> executionStack = new Stack<>();
 
@@ -49,7 +49,8 @@ public class DefaultTACKYExecutor implements TACKYExecutor {
     public int executeFunction(TACKYStackFrame tackyStackFrame, ASTNode rootNode, int currentIndex,
             FunctionDefinitionASTNode functionDefinition) {
 
-        System.out.println("Executing function: '" + functionDefinition.value + "'");
+        // // DEBUG
+        // System.out.println("Executing function: '" + functionDefinition.value + "'");
 
         tackyStackFrame.startAddress = stackPointer;
         tackyStackFrame.endAddress = stackPointer;
@@ -115,36 +116,7 @@ public class DefaultTACKYExecutor implements TACKYExecutor {
                     break;
 
                 case Printf:
-                    String outputString = StringUtils.unwrap(statement.value, '"');
-                    for (ASTNode childASTNode : statement.children) {
-
-                        ExpressionASTNode expressionASTNode = (ExpressionASTNode) childASTNode;
-
-                        switch (expressionASTNode.expressionType) {
-
-                            case StringLiteral:
-                                outputString = outputString.replaceFirst("%.",
-                                        StringUtils.unwrap(childASTNode.value, '"'));
-                                break;
-
-                            case IntegerLiteral:
-                                outputString = outputString.replaceFirst("%.",
-                                        StringUtils.unwrap(childASTNode.value, '"'));
-                                break;
-
-                            case Identifier:
-                                TACKYStackFrameVariableDescriptor descriptor = tackyStackFrame.variables
-                                        .get(expressionASTNode.value);
-                                int identifierVal = memory[descriptor.address / 4];
-                                outputString = outputString.replaceFirst("%.", "" + identifierVal);
-                                break;
-
-                            default:
-                                throw new RuntimeException("Unknown type: " + expressionASTNode.expressionType);
-                        }
-
-                    }
-                    System.out.println(outputString);
+                    executePrintfBuildInFunction(tackyStackFrame, statement);
                     index++;
                     break;
 
@@ -294,7 +266,7 @@ public class DefaultTACKYExecutor implements TACKYExecutor {
                                 default:
                                     throw new RuntimeException();
                             }
-                            
+
                         } else if (actualParameter.isVariable) {
                             // retrieve variable from current stackframe
                             TACKYStackFrameVariableDescriptor varDesc = tackyStackFrame.variables
@@ -336,6 +308,81 @@ public class DefaultTACKYExecutor implements TACKYExecutor {
         executionStack.pop();
 
         return returnValue;
+    }
+
+    /**
+     * To ease development, a built in printf() is provided.
+     * 
+     * @param tackyStackFrame
+     * @param statement
+     */
+    private void executePrintfBuildInFunction(TACKYStackFrame tackyStackFrame, TACKYASTNode statement) {
+
+        // retrieve the format string
+        String outputString = StringUtils.unwrap(statement.value, '"');
+
+        // sibling nodes to the format string carry the data to replace the placeholders with.
+        // Replace all placeholders.
+        for (ASTNode childASTNode : statement.children) {
+
+            ExpressionASTNode expressionASTNode = (ExpressionASTNode) childASTNode;
+
+            switch (expressionASTNode.expressionType) {
+
+                case StringLiteral:
+                    outputString = outputString.replaceFirst("%.",
+                            StringUtils.unwrap(childASTNode.value, '"'));
+                    break;
+
+                case IntegerLiteral:
+                    outputString = outputString.replaceFirst("%.",
+                            StringUtils.unwrap(childASTNode.value, '"'));
+                    break;
+
+                case Identifier:
+                    TACKYStackFrameVariableDescriptor descriptor = tackyStackFrame.variables
+                            .get(expressionASTNode.value);
+                    int identifierVal = memory[descriptor.address / 4];
+                    outputString = outputString.replaceFirst("%.", "" + identifierVal);
+                    break;
+
+                default:
+                    throw new RuntimeException("Unknown type: " + expressionASTNode.expressionType);
+            }
+        }
+
+        // Escape characters
+
+        // replace tab with four spaces
+        outputString = outputString.replaceAll("\\\\t", "    ");
+
+        // newline
+        String[] newLineSplit = outputString.split("\\\\n", -1);
+
+        int counter = 1;
+        for (String line : newLineSplit) {
+
+            if (counter < newLineSplit.length) {
+                System.out.println(line);
+            } else {
+                System.out.print(line);
+            }
+
+            counter++;
+            
+            // if (counter < newLineSplit.length) {
+            //     System.out.print(line);
+            //     System.out.print("\n");
+            // } else {
+            //     // last split element
+            //     if ((line == null) || (line.length() == 0)) {
+            //         ;
+            //     } else {
+            //         System.out.print("\n");
+            //     }
+            // }
+            // counter++;
+        }
     }
 
     private ReturnResult returnStatement(TACKYStackFrame tackyStackFrame, ReturnASTNode returnASTNode) {
@@ -528,7 +575,8 @@ public class DefaultTACKYExecutor implements TACKYExecutor {
                         tempVarName = varName;
                     }
 
-                    insertVariableIntoStackFrame(tackyStackFrame, tempVarName, (int) (Math.random() * Integer.MAX_VALUE));
+                    insertVariableIntoStackFrame(tackyStackFrame, tempVarName,
+                            (int) (Math.random() * Integer.MAX_VALUE));
                 }
             }
         } else {
@@ -538,13 +586,14 @@ public class DefaultTACKYExecutor implements TACKYExecutor {
 
     private void insertVariableIntoStackFrame(TACKYStackFrame tackyStackFrame, String varName, int value) {
 
-        // TODO: should TACKY executor handle scopes or are scopes part of the frontend only?
+        // TODO: should TACKY executor handle scopes or are scopes part of the frontend
+        // only?
         //
         // In Assembly, no scopes exist! Variables will remain defined
         // even across for-loop iterations! This message will be output for each
         // local variable inside the loop and this is expected!
         if (tackyStackFrame.variables.containsKey(varName)) {
-            //throw new RuntimeException("Variable \"" + varName + "\" declared already!");
+            // throw new RuntimeException("Variable \"" + varName + "\" declared already!");
 
             // TODO
             // System.out.println("Variable \"" + varName + "\" declared already!");

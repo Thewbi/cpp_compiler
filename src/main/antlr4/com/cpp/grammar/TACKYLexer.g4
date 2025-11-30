@@ -47,6 +47,7 @@ ARRAY : A R R A Y ;
 
 BINARY : B I N A R Y ;
 BOOL : B O O L ;
+BREAK : B R E A K ;
 
 CHARINIT : C H A R I N I T ;
 COMPLEMENT : C O M P L E M E N T ;

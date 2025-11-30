@@ -9,9 +9,75 @@ C++ compiler written in Java
 * Function Protoypes
 * Function Declarations
 * Function Calls
+* if statements
 * Pointers
+* Learn about SSA (Static Single Assignment). See https://yosyshq.readthedocs.io/projects/yosys/en/latest/appendix/primer.html
 
-Learn about SSA (Static Single Assignment). See https://yosyshq.readthedocs.io/projects/yosys/en/latest/appendix/primer.html
+## Language Bugs
+
+### Array Variables need Initializer!
+
+Currently an array variable always has to be initialized:
+
+```
+int subMatrixB[4] = { 0, 0, 0, 0 };
+```
+
+If it is not initialized, it is not created on the current stack frame!
+
+```
+int subMatrixB[4];
+```
+
+### For Loops cannot evaluate expressions!
+
+Currently, for loops can only use constraints that are atomic:
+
+```
+int xEnd = xPos + width;
+for (int i = xPos; i < xEnd; i++) {
+    ...
+}
+```
+
+Constraints that are combined expressions cannot be used!
+
+```
+for (int i = xPos; i < xPos + width; i++) {
+    ...
+}
+```
+
+### Postfix Operator ++ does not work
+
+A intermediate variable needs to be used
+
+```
+int tttt = ctr + 1;
+ctr = tttt;
+```
+
+The ++ postfix operator does not work currently.
+
+```
+int ctr = 0;
+ctr++;
+```
+
+### += operator not working
+
+```
+matrixA[temp] += matrixB[temp];
+```
+
+currently an intermediate value is needed.
+
+```
+int tempIndex = i * rows + j;
+int tempValue = matrixB[tempIndex];
+matrixA[tempIndex] = tempValue;
+```
+
 
 ## Phases
 

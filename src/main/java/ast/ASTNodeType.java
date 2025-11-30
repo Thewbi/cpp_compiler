@@ -14,6 +14,8 @@ public enum ASTNodeType {
 
     ITERATION_STATEMENT,
 
+    JUMP_STATEMENT,
+
     SIMPLE_DECLARATION,
     
     EXPRESSION;

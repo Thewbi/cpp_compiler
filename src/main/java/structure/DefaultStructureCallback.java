@@ -19,13 +19,11 @@ public class DefaultStructureCallback implements StructureCallback {
     @Override
     public void startScope() {
         System.out.println("[STR-CB] startScope()");
-        System.out.println("");
     }
 
     @Override
     public void endScope() {
         System.out.println("[STR-CB] endScope()");
-        System.out.println("");
     }
 
     @Override

@@ -111,9 +111,7 @@ public class StructureTACKYParserListener extends TACKYParserBaseListener {
         functionDefinitionASTNode.formalParameters.add(formalParameter);
     }
 
-    //
     // Variable Declaration
-    //
 
     @Override
     public void enterVar_declaration_statement(TACKYParser.Var_declaration_statementContext ctx) {
@@ -149,7 +147,7 @@ public class StructureTACKYParserListener extends TACKYParserBaseListener {
         ascend();
     }
 
-    @Override 
+    @Override
     public void enterArray_type(TACKYParser.Array_typeContext ctx) {
         // System.out.println("[" + ctx.hashCode() + "] " + ctx.getText());
 
@@ -161,19 +159,17 @@ public class StructureTACKYParserListener extends TACKYParserBaseListener {
         connectToParent(currentNode, dataTypeAstNode);
         descend(dataTypeAstNode);
     }
-	
-	@Override 
+
+    @Override
     public void exitArray_type(TACKYParser.Array_typeContext ctx) {
         ascend();
     }
 
-    //
     // Pointers
-    //
 
     @Override
     public void enterGet_address(TACKYParser.Get_addressContext ctx) {
-        
+
         String variableName = ctx.getChild(2).getText();
         String ptrVariableName = ctx.getChild(4).getText();
 
@@ -227,8 +223,8 @@ public class StructureTACKYParserListener extends TACKYParserBaseListener {
         ascend();
     }
 
-    @Override 
-    public void enterSizeof_call(TACKYParser.Sizeof_callContext ctx) { 
+    @Override
+    public void enterSizeof_call(TACKYParser.Sizeof_callContext ctx) {
         String type = ctx.getChild(2).getText();
         String targetVariableName = ctx.getChild(4).getText();
 
@@ -240,14 +236,12 @@ public class StructureTACKYParserListener extends TACKYParserBaseListener {
         descend(sizeofASTNode);
     }
 
-	@Override 
-    public void exitSizeof_call(TACKYParser.Sizeof_callContext ctx) { 
+    @Override
+    public void exitSizeof_call(TACKYParser.Sizeof_callContext ctx) {
         ascend();
     }
 
-    //
     // Constant Declaration
-    //
 
     /**
      * e.g. ConstInt(0)
@@ -306,9 +300,7 @@ public class StructureTACKYParserListener extends TACKYParserBaseListener {
         ascend();
     }
 
-    //
     // printf()
-    //
 
     @Override
     public void enterPrintf_call(TACKYParser.Printf_callContext ctx) {
@@ -335,9 +327,7 @@ public class StructureTACKYParserListener extends TACKYParserBaseListener {
         ascend();
     }
 
-    //
     // Function Call
-    //
 
     @Override
     public void enterFunction_call(TACKYParser.Function_callContext ctx) {
@@ -417,10 +407,10 @@ public class StructureTACKYParserListener extends TACKYParserBaseListener {
         // descend
         descend(functionCallASTNode);
 
-        // DEBUG
-        StringBuilder stringBuilder = new StringBuilder();
-        functionCallASTNode.printRecursive(stringBuilder, 0);
-        System.out.println(stringBuilder.toString());
+        // // DEBUG
+        // StringBuilder stringBuilder = new StringBuilder();
+        // functionCallASTNode.printRecursive(stringBuilder, 0);
+        // System.out.println(stringBuilder.toString());
     }
 
     @Override
@@ -428,9 +418,7 @@ public class StructureTACKYParserListener extends TACKYParserBaseListener {
         ascend();
     }
 
-    //
     // Label
-    //
 
     @Override
     public void enterLabel(TACKYParser.LabelContext ctx) {
@@ -446,9 +434,7 @@ public class StructureTACKYParserListener extends TACKYParserBaseListener {
         currentNode.children.add(labelASTNode);
     }
 
-    //
     // Jump
-    //
 
     @Override
     public void enterJump(TACKYParser.JumpContext ctx) {
@@ -507,9 +493,23 @@ public class StructureTACKYParserListener extends TACKYParserBaseListener {
         ascend();
     }
 
-    //
+    // break
+
+    @Override
+    public void enterBreak(TACKYParser.BreakContext ctx) {
+
+        JumpASTNode jumpASTNode = tackyASTNodeFactory.createJumpASTNode();
+        jumpASTNode.jumpType = JumpType.fromString(ctx.getChild(0).getText());
+
+        // connect parent and child
+        connectToParent(currentNode, jumpASTNode);
+    }
+
+    @Override
+    public void exitBreak(TACKYParser.BreakContext ctx) {
+    }
+
     // return
-    //
 
     @Override
     public void enterReturn_statement(TACKYParser.Return_statementContext ctx) {
@@ -525,9 +525,7 @@ public class StructureTACKYParserListener extends TACKYParserBaseListener {
         ascend();
     }
 
-    //
     // expressions
-    //
 
     @Override
     public void enterExpr(TACKYParser.ExprContext ctx) {
@@ -541,7 +539,7 @@ public class StructureTACKYParserListener extends TACKYParserBaseListener {
             ParseTree parseTree = ctx.children.get(0);
 
             if (parseTree instanceof TerminalNodeImpl) {
-            
+
                 TerminalNodeImpl terminalNodeImpl = (TerminalNodeImpl) parseTree;
                 int type = terminalNodeImpl.getSymbol().getType();
                 switch (type) {
@@ -558,8 +556,7 @@ public class StructureTACKYParserListener extends TACKYParserBaseListener {
                         throw new RuntimeException("Unknown type: " + type);
                 }
 
-            } 
-            else if (parseTree instanceof Constant_declContext) {
+            } else if (parseTree instanceof Constant_declContext) {
                 expressionASTNode.expressionType = ExpressionType.Primary;
             }
         } else if (ctx.children.size() == 3) {
@@ -601,9 +598,7 @@ public class StructureTACKYParserListener extends TACKYParserBaseListener {
         }
     }
 
-    //
     // utility
-    //
 
     /**
      * connect parent and child
@@ -625,7 +620,7 @@ public class StructureTACKYParserListener extends TACKYParserBaseListener {
     }
 
     private void retrieveConstantValue(ValContext val, ResultContainer resultContainer) {
-        
+
         // DEBUG
         // System.out.println(val.getText());
 
@@ -634,9 +629,9 @@ public class StructureTACKYParserListener extends TACKYParserBaseListener {
 
         // child = constantDecl.getChild(2);
         ConstContext constContext = (ConstContext) constantDecl.getChild(2);
-        
+
         TerminalNodeImpl constType = (TerminalNodeImpl) constContext.children.get(0);
-        
+
         // System.out.println(constType.getText());
 
         String constTypeAsString = constType.getText();

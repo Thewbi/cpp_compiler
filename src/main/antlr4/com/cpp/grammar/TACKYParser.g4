@@ -249,6 +249,10 @@ label :
     LABEL LEFT_PAREN ( Identifier | StringLiteral ) RIGHT_PAREN
     ;
 
+break : 
+    BREAK
+    ;
+
 var_declaration_statement : 
     Identifier EQUAL_SIGN VAR LEFT_PAREN ( Identifier | StringLiteral ) RIGHT_PAREN
     |

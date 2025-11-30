@@ -2,4 +2,7 @@
     "java.debug.settings.onBuildFailureProceed": true,
     "editor.renderWhitespace": "all",
     "java.configuration.updateBuildConfiguration": "interactive",
+    "files.associations": {
+        "xiosbase": "cpp"
+    },
 }

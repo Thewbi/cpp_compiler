@@ -8,6 +8,7 @@ import ast.ASTNode;
 import ast.DeclaratorASTNode;
 import ast.ExpressionASTNode;
 import ast.ExpressionType;
+import ast.JumpStatementASTNode;
 import ast.ParameterDeclarationASTNode;
 import ast.ParameterDeclarationListASTNode;
 import ast.ParametersAndQualifiersASTNode;
@@ -44,11 +45,12 @@ public class TackyGenerator {
                 break;
 
             case FUNCTION_DECLARATION:
-                enterFunctionDeclaration(astNode);
+                enterFunctionDeclaration(indent, astNode);
+                // all children
                 for (ASTNode child : astNode.children) {
-                    process(indent, child);
+                    process(indent + 1, child);
                 }
-                exitFunctionDeclaration(indent + 1, astNode);
+                exitFunctionDeclaration(indent, astNode);
                 break;
 
             case FUNCTION_CALL:
@@ -57,20 +59,18 @@ public class TackyGenerator {
                 break;
 
             case ITERATION_STATEMENT:
-                System.out.println("");
-
                 StatementASTNode statementASTNode = (StatementASTNode) astNode;
                 switch (statementASTNode.statementType) {
                     case FOR:
-                        enterForLoop(statementASTNode);
+                        enterForLoop(indent, statementASTNode);
                         // the children of the FOR loop are visited within enterForLoop()
-                        exitForLoop(statementASTNode);
+                        exitForLoop(indent, statementASTNode);
                         break;
 
                     default:
                         enterUnknown(astNode);
                         for (ASTNode child : astNode.children) {
-                            process(indent + 1, child);
+                            process(indent, child);
                         }
                         exitUnknown(astNode);
                         break;
@@ -89,9 +89,17 @@ public class TackyGenerator {
                 exitInitDeclaration(declaratorASTNode);
                 break;
 
-            // case EXPRESSION:
-            // System.out.println("");
-            // break;
+            case JUMP_STATEMENT:
+                JumpStatementASTNode jumpStatementASTNode = (JumpStatementASTNode) astNode;
+                switch (jumpStatementASTNode.statementType) {
+                    case BREAK:
+                        enterBreak(indent, jumpStatementASTNode);
+                        exitBreak(indent, jumpStatementASTNode);
+                        break;
+                    default:
+                        throw new RuntimeException();
+                }
+                break;
 
             default:
                 System.out.println("Unknown type: \"" + astNode.astNodeType + "\" ");
@@ -119,9 +127,9 @@ public class TackyGenerator {
 
     private void addVariableToScope(String name, TackyDataType tackyDataType, boolean isArray, boolean isPointer) {
 
-        if (name.equalsIgnoreCase("matrix")) {
-            System.out.println("");
-        }
+        // if (name.equalsIgnoreCase("matrix")) {
+        // System.out.println("");
+        // }
         TACKYStackFrameVariableDescriptor tackyStackFrameVariableDescriptor = new TACKYStackFrameVariableDescriptor();
         tackyStackFrameVariableDescriptor.name = name;
         tackyStackFrameVariableDescriptor.tackyDataType = tackyDataType;
@@ -137,21 +145,18 @@ public class TackyGenerator {
 
         // -- add new line for improved readability --
 
-        stringBuilder.append("\n");
+        // stringBuilder.append("\n");
 
         // -- build indent string --
 
-        String indentString = "";
-        for (int i = 0; i < indent; i++) {
-            indentString += "  ";
-        }
+        String indentString = buildIndentString(indent);
 
         // -- function return value + actual parameters --
 
         String calledFunctionName = astNode.value.substring(0, astNode.value.indexOf("("));
 
-        // DEBUG
-        System.out.println("Processing function: \"" + calledFunctionName + "\"");
+        // // DEBUG
+        // System.out.println("Processing function: \"" + calledFunctionName + "\"");
 
         if (calledFunctionName.equalsIgnoreCase("printf")) {
 
@@ -167,15 +172,15 @@ public class TackyGenerator {
             String returnValueVariableName = "tmp." + calledFunctionName;
             defineVariable(indent, returnValueVariableName, TackyDataType.INT_8);
 
-            // Determine if a parameter requires a pointer variable
+            // determine if a parameter requires a pointer variable
 
             // actual parameters
             for (int i = 1; i < astNode.children.size(); i++) {
 
                 ASTNode param = astNode.children.get(i);
-                
+
                 // DEBUG
-                System.out.println(param);
+                // System.out.println(param);
 
                 if (param instanceof ExpressionASTNode) {
 
@@ -184,26 +189,34 @@ public class TackyGenerator {
 
                         case Primary:
                             // ignored: Just pass the number as is without wrapping it in const
-                            // stringBuilder.append(", Constant(ConstInt(").append(param.value).append("))");
+                            // stringBuilder.append(",
+                            // Constant(ConstInt(").append(param.value).append("))");
                             break;
 
                         case Identifier:
-                            TACKYStackFrameVariableDescriptor tackyStackFrameVariableDescriptor = tackyStackFrame.variables
-                                    .get(param.value);
+
+                            // // DEBUG
+                            // if (param.value.equalsIgnoreCase("subMatrixB")) {
+                            // System.out.println("subMatrixB");
+                            // }
+
+                            TACKYStackFrameVariableDescriptor tackyStackFrameVariableDescriptor = findVariableDescriptorInStack(
+                                    param.value);
 
                             // CHECK
                             if (tackyStackFrameVariableDescriptor == null) {
-                                System.out.println("Parameter cannot be identified: \"" + param.value + "\"");
+                                throw new RuntimeException("Parameter cannot be identified: \"" + param.value + "\"");
                             }
 
                             // check if the identifier is an array
                             if (tackyStackFrameVariableDescriptor.isArray) {
 
+                                stringBuilder.append(indentString);
                                 stringBuilder.append("// parameter " + i + " for function call").append("\n");
 
                                 // tmp.1.ptr = Var("tmp.1.ptr") // address: 8
                                 String varName = "tmp." + i + ".ptr";
-                                defineVariable(0, varName, TackyDataType.INT_32);
+                                defineVariable(indent, varName, TackyDataType.INT_32);
                                 addVariableToScope(varName, TackyDataType.INT_32, false, false);
 
                                 // store an address into the pointer
@@ -257,8 +270,12 @@ public class TackyGenerator {
 
                         case Identifier:
 
-                            TACKYStackFrameVariableDescriptor tackyStackFrameVariableDescriptor = tackyStackFrame.variables
-                                    .get(param.value);
+                            // TACKYStackFrameVariableDescriptor tackyStackFrameVariableDescriptor =
+                            // tackyStackFrame.variables
+                            // .get(param.value);
+
+                            TACKYStackFrameVariableDescriptor tackyStackFrameVariableDescriptor = findVariableDescriptorInStack(
+                                    param.value);
 
                             // System.out.println("test");
 
@@ -281,10 +298,12 @@ public class TackyGenerator {
                                 // tmp.1.ptr,
                                 // tmp.0
                                 // )
-                                stringBuilder.append(indentString).append(", tmp." + i + ".ptr");
+                                stringBuilder/*.append(indentString) */.append(", tmp." + i + ".ptr");
 
                             } else {
-                                throw new RuntimeException();
+                                // throw new RuntimeException();
+                                stringBuilder/*.append(indentString) */
+                                        .append(", " + tackyStackFrameVariableDescriptor.name);
                             }
 
                             break;
@@ -309,23 +328,23 @@ public class TackyGenerator {
     }
 
     private void enterSimpleDeclaration(int indent, SimpleDeclarationASTNode simpleDeclarationASTNode) {
-        // System.out.println();
         for (ASTNode astNode : simpleDeclarationASTNode.children) {
             process(indent, astNode);
         }
     }
 
     private void exitSimpleDeclaration(SimpleDeclarationASTNode simpleDeclarationASTNode) {
+        ;
     }
 
     private void enterInitDeclaration(int indent, DeclaratorASTNode declaratorASTNode) {
 
         // System.out.println(declaratorASTNode);
 
-        // DEBUG
-        StringBuilder debugStringBuilder = new StringBuilder();
-        declaratorASTNode.printRecursive(debugStringBuilder, 0);
-        System.out.println(debugStringBuilder.toString());
+        // // DEBUG
+        // StringBuilder debugStringBuilder = new StringBuilder();
+        // declaratorASTNode.printRecursive(debugStringBuilder, 0);
+        // System.out.println(debugStringBuilder.toString());
 
         if (declaratorASTNode.isFunctionCall) {
             processFunctionCall(indent, declaratorASTNode);
@@ -334,12 +353,13 @@ public class TackyGenerator {
         }
     }
 
+    private void exitInitDeclaration(DeclaratorASTNode declaratorASTNode) {
+        // System.out.println(declaratorASTNode);
+    }
+
     private void processFunctionCall(int indent, DeclaratorASTNode declaratorASTNode) {
 
-        String indentString = "";
-        for (int i = 0; i < indent; i++) {
-            indentString += "  ";
-        }
+        String indentString = buildIndentString(indent);
 
         String functionName = declaratorASTNode.getChildren().get(0).value;
 
@@ -357,7 +377,6 @@ public class TackyGenerator {
                     stringBuilder.append(",");
                 }
                 stringBuilder.append(child.value);
-
             }
 
             stringBuilder.append(")");
@@ -367,10 +386,7 @@ public class TackyGenerator {
 
     private void processVariableDeclaration(int indent, DeclaratorASTNode declaratorASTNode) {
 
-        String indentString = "";
-        for (int i = 0; i < indent; i++) {
-            indentString += "  ";
-        }
+        String indentString = buildIndentString(indent);
 
         // retrieve type from parent
         SimpleDeclarationASTNode parent = (SimpleDeclarationASTNode) declaratorASTNode.parent;
@@ -408,7 +424,7 @@ public class TackyGenerator {
 
                 // create a variable for the array. Define the array as a variable
 
-                defineVariable(0, name, TackyDataType.INT_32, isArray, arraySize);
+                defineVariable(indent, name, TackyDataType.INT_32, isArray, arraySize);
 
                 // sizeof
                 // sizeof_int = Var("sizeof_int")
@@ -426,7 +442,7 @@ public class TackyGenerator {
                 // to the first element of the array
                 // array1d.ptr = Var("array1d.ptr")
                 String pointerName = name + ".ptr";
-                defineVariable(0, pointerName, TackyDataType.INT_32);
+                defineVariable(indent, pointerName, TackyDataType.INT_32);
                 // GetAddress(array1d, array1d.ptr)
                 stringBuilder.append(indentString).append("GetAddress(" + name + ", " + name + ".ptr)").append("\n");
 
@@ -438,7 +454,7 @@ public class TackyGenerator {
                 for (int i = 1; i < declaratorASTNode.children.size(); i++) {
 
                     String tempValue = declaratorASTNode.children.get(i).value;
-                    assignValueToArrayElement(indent + 1, declaratorASTNode, pointerName, Integer.toString(index),
+                    assignValueToArrayElement(indent, declaratorASTNode, pointerName, Integer.toString(index),
                             tempValue);
 
                     index++;
@@ -451,9 +467,9 @@ public class TackyGenerator {
 
             } else if (assignedValueExpression.expressionType == ExpressionType.ArrayIndexing) {
 
-                System.out.println("ArrayIndexing");
+                // System.out.println("ArrayIndexing");
 
-                stringBuilder.append("\n");
+                // stringBuilder.append("\n");
 
                 ASTNode c1 = assignedValueExpression.children.get(1);
 
@@ -465,7 +481,7 @@ public class TackyGenerator {
                         arrayName);
 
                 String destinationVariableName = child0ASTNode.value;
-                defineVariable(indent + 1, destinationVariableName, null);
+                defineVariable(indent, destinationVariableName, null);
 
                 String arrayPointerName = null;
                 if (tackyStackFrameVariableDescriptor.isPointer) {
@@ -479,7 +495,7 @@ public class TackyGenerator {
 
                     String tempVarName = arrayName + ".addr.ptr";
 
-                    defineVariable(indent + 1, tempVarName, null);
+                    defineVariable(indent, tempVarName, null);
 
                     // store an address into the pointer
                     // GetAddress(tmp.1, tmp.1.ptr)
@@ -494,12 +510,12 @@ public class TackyGenerator {
                 if (NumberUtils.isParsable(c1.value)) {
 
                     int arrayIndex = (int) evaluate((ExpressionASTNode) c1);
-                    retrieveValueFromArrayElement(indent + 1, declaratorASTNode, arrayPointerName, arrayIndex,
+                    retrieveValueFromArrayElement(indent, declaratorASTNode, arrayPointerName, arrayIndex,
                             destinationVariableName);
 
                 } else {
 
-                    retrieveValueFromArrayElementByVariable(indent + 1, declaratorASTNode, arrayPointerName, c1.value,
+                    retrieveValueFromArrayElementByVariable(indent, declaratorASTNode, arrayPointerName, c1.value,
                             destinationVariableName);
 
                 }
@@ -508,11 +524,12 @@ public class TackyGenerator {
 
                 addVariableToScope(name, TackyDataType.fromString(type), isArray, false);
 
-                // Object assignedValue = evaluate(assignedValueExpression);
                 String exprAsString = evaluateToString(indent, assignedValueExpression);
 
-                System.out.println("Declaration. type=" + type + ", name=" + name + ", isArray=" + isArray
-                        + ", assignedValue=" + exprAsString);
+                // // DEBUG
+                // System.out.println("Declaration. type=" + type + ", name=" + name + ",
+                // isArray=" + isArray
+                // + ", assignedValue=" + exprAsString);
 
                 // i = Var("i")
                 // @formatter:off
@@ -534,10 +551,7 @@ public class TackyGenerator {
 
                 // @formatter:off
                 stringBuilder.append(indentString).append(name).append(" = ")
-                    //.append("Constant(").append("ConstInt(")
-                    // .append(assignedValue)
                     .append(exprAsString)
-                    //.append("))")
                     .append("\n");
                 // @formatter:on
 
@@ -547,14 +561,14 @@ public class TackyGenerator {
 
             // existing variable is initialized
 
-            boolean isArray = false;
+            // boolean isArray = false;
             String index = "0";
 
             ASTNode child0ASTNode = declaratorASTNode.children.get(0);
             if (child0ASTNode instanceof DeclaratorASTNode) {
 
                 DeclaratorASTNode child0 = (DeclaratorASTNode) child0ASTNode;
-                isArray = child0.isArray;
+                // isArray = child0.isArray;
 
                 ExpressionASTNode expressionASTNode = child0.indexExpression;
 
@@ -576,8 +590,10 @@ public class TackyGenerator {
 
                 Object assignedValue = evaluate((ExpressionASTNode) declaratorASTNode.children.get(1));
 
-                System.out.println("Assignment. name=" + arrayName + ", isArray=" + isArray + ", index=" + index
-                        + ", assignedValue=" + assignedValue);
+                // DEBUG
+                // System.out.println("Assignment. name=" + arrayName + ", isArray=" + isArray +
+                // ", index=" + index
+                // + ", assignedValue=" + assignedValue);
 
                 TACKYStackFrameVariableDescriptor tackyStackFrameVariableDescriptor = findVariableDescriptorInStack(
                         arrayName);
@@ -594,7 +610,7 @@ public class TackyGenerator {
 
                     String tempVarName = arrayName + ".addr.ptr";
 
-                    defineVariable(indent + 1, tempVarName, null);
+                    defineVariable(indent, tempVarName, null);
 
                     // store an address into the pointer
                     // GetAddress(tmp.1, tmp.1.ptr)
@@ -602,28 +618,25 @@ public class TackyGenerator {
                             .append(arrayName).append(", ").append(tempVarName).append(")");
                     stringBuilder.append("\n");
 
-                    //
                     arrayPointerName = tempVarName;
 
                 }
 
-                assignValueToArrayElement(indent + 1, declaratorASTNode, arrayPointerName, index,
+                assignValueToArrayElement(indent, declaratorASTNode, arrayPointerName, index,
                         assignedValue.toString());
 
             } else if (child0ASTNode instanceof ExpressionASTNode) {
 
                 ExpressionASTNode child0ExpressionASTNode = (ExpressionASTNode) child0ASTNode;
 
-                //ASTNode child1ASTNode = declaratorASTNode.children.get(1);
+                // ASTNode child1ASTNode = declaratorASTNode.children.get(1);
                 ExpressionASTNode child1expressionASTNode = (ExpressionASTNode) declaratorASTNode.children.get(1);
 
-                //String expr = outputExpression(child1expressionASTNode);
+                // String expr = outputExpression(child1expressionASTNode);
                 String expr = evaluateToString(indent + 1, child1expressionASTNode);
 
-                // stringBuilder.append(indentString).append(expr).append("\n");
-
                 stringBuilder.append(indentString).append(child0ExpressionASTNode.value).append(" = ");
-        stringBuilder.append(indentString).append(expr).append("\n");
+                stringBuilder/* .append(indentString) */.append(expr).append("\n");
 
                 // // @formatter:off
                 // stringBuilder.append(child0ExpressionASTNode.value)
@@ -668,12 +681,9 @@ public class TackyGenerator {
     private void assignValueToArrayElement(int indent, DeclaratorASTNode declaratorASTNode,
             String arrayPtrName, String arrayElementIndex, String value) {
 
-        String indentString = "";
-        for (int i = 0; i < indent; i++) {
-            indentString += "  ";
-        }
+        String indentString = buildIndentString(indent);
 
-        stringBuilder.append("\n");
+        // stringBuilder.append("\n");
         stringBuilder.append(indentString).append("// assign to array-element").append("\n");
 
         stringBuilder.append(indentString).append("// " + arrayElementIndex).append("\n");
@@ -703,7 +713,7 @@ public class TackyGenerator {
 
         // temp variable for loading data into the array
         // tmp.0 = Var("tmp.0")
-        defineVariable(0, arrayPtrName + ".tmp.0", TackyDataType.INT_32);
+        defineVariable(indent, arrayPtrName + ".tmp.0", TackyDataType.INT_32);
 
         // write data into the array element
         // tmp.0 = 18
@@ -732,16 +742,14 @@ public class TackyGenerator {
     private void generateArrayAccessIndexer(int indent, String arrayPtrName, String arrayElementIndex,
             String destinationVariableName) {
 
-        // WBI
-        TACKYStackFrameVariableDescriptor tackyStackFrameVariableDescriptor = tackyStackFrame.variables
-                .get(arrayPtrName);
+        // // WBI
+        // TACKYStackFrameVariableDescriptor tackyStackFrameVariableDescriptor =
+        // tackyStackFrame.variables
+        // .get(arrayPtrName);
 
-        String indentString = "";
-        for (int i = 0; i < indent; i++) {
-            indentString += "  ";
-        }
+        String indentString = buildIndentString(indent);
 
-        stringBuilder.append("\n");
+        // stringBuilder.append("\n");
         stringBuilder.append(indentString)
                 .append("// retrieve from array-element").append("\n");
 
@@ -775,13 +783,9 @@ public class TackyGenerator {
                 .append("\n");
     }
 
-    private void exitInitDeclaration(DeclaratorASTNode declaratorASTNode) {
-        System.out.println(declaratorASTNode);
-    }
-
     // Function Declaration
 
-    private void enterFunctionDeclaration(ASTNode astNode) {
+    private void enterFunctionDeclaration(int indent, ASTNode astNode) {
 
         addScope();
 
@@ -803,10 +807,13 @@ public class TackyGenerator {
                 .getChildren().get(1);
 
         // DEBUG - print all parameters
-        StringBuilder debugStringBuilder = new StringBuilder();
-        parametersAndQualifiersASTNode.printRecursive(debugStringBuilder, 0);
-        System.out.println("++++++++++++++++++++++++++++++++++++");
-        System.out.println(debugStringBuilder.toString());
+        boolean printAllParameters = false;
+        if (printAllParameters) {
+            StringBuilder debugStringBuilder = new StringBuilder();
+            parametersAndQualifiersASTNode.printRecursive(debugStringBuilder, 0);
+            System.out.println("++++++++++++++++++++++++++++++++++++");
+            System.out.println(debugStringBuilder.toString());
+        }
 
         stringBuilder.append("Function(\"").append(functionName).append("\", ");
         stringBuilder.append(global);
@@ -825,8 +832,6 @@ public class TackyGenerator {
                 String paramType = parameter.type;
 
                 stringBuilder.append(", ").append(paramName);
-
-                // asdf
 
                 // TACKYStackFrameVariableDescriptor tackyStackFrameVariableDescriptor = new
                 // TACKYStackFrameVariableDescriptor();
@@ -856,12 +861,9 @@ public class TackyGenerator {
      */
     private void exitFunctionDeclaration(int indent, ASTNode astNode) {
 
-        String indentString = "";
-        for (int i = 0; i < indent; i++) {
-            indentString += "  ";
-        }
+        String indentString = buildIndentString(indent + 1);
 
-        stringBuilder.append("\n");
+        // stringBuilder.append("\n");
 
         stringBuilder.append(indentString);
 
@@ -877,16 +879,33 @@ public class TackyGenerator {
 
     // For-Loop
 
-    private void enterForLoop(StatementASTNode statementASTNode) {
+    private void enterForLoop(int indent, StatementASTNode statementASTNode) {
         addScope();
-        generateForLoop(statementASTNode);
+        generateForLoop(indent, statementASTNode);
     }
 
-    private void exitForLoop(StatementASTNode statementASTNode) {
-        // TODO Auto-generated method stub
-        // throw new UnsupportedOperationException("Unimplemented method
-        // 'exitForLoop'");
+    private void exitForLoop(int indent, StatementASTNode statementASTNode) {
         removeScope();
+    }
+
+    // Jump
+
+    private void enterBreak(int indent, JumpStatementASTNode jumpStatementASTNode) {
+        // System.out.println(jumpStatementASTNode.toString());
+
+        int uniqueForLoopIndex = forLoopCount;
+        // int indent = uniqueForLoopIndex;
+
+        String indentString = buildIndentString(indent);
+
+        String breakLabelName = "break_label_" + (uniqueForLoopIndex - 1);
+
+        stringBuilder.append(indentString).append("// break statement").append("\n");
+        stringBuilder.append(indentString).append("Jump(").append(breakLabelName).append(")").append("\n");
+    }
+
+    private void exitBreak(int indent, JumpStatementASTNode jumpStatementASTNode) {
+        ;
     }
 
     // Unknown
@@ -903,21 +922,17 @@ public class TackyGenerator {
 
     public void outputMainEntryPoint(String data) {
         stringBuilder.append("Program(\"" + data + "\")").append("\n");
+        stringBuilder.append("\n");
     }
 
     // For Loop
 
-    private void generateForLoop(StatementASTNode statementASTNode) {
+    private void generateForLoop(int indent, StatementASTNode statementASTNode) {
 
         int uniqueForLoopIndex = forLoopCount;
         forLoopCount++;
 
-        int indent = uniqueForLoopIndex;
-
-        String indentString = "";
-        for (int i = 0; i < indent; i++) {
-            indentString += "  ";
-        }
+        String indentString = buildIndentString(indent);
 
         String startLabelName = "start_" + uniqueForLoopIndex;
         String breakLabelName = "break_label_" + uniqueForLoopIndex;
@@ -930,9 +945,7 @@ public class TackyGenerator {
         stringBuilder.append(indentString).append("// Loop " + uniqueForLoopIndex).append("\n");
         stringBuilder.append(indentString).append("//").append("\n");
 
-        //
         // loop variable declaration + initialization
-        //
 
         ASTNode astNode0 = statementASTNode.getChildren().get(0);
         SimpleDeclarationASTNode simpleDeclarationASTNode = (SimpleDeclarationASTNode) astNode0;
@@ -942,9 +955,10 @@ public class TackyGenerator {
         // simpleDeclarationASTNode.printRecursive(debugStringBuilder, 0);
         // System.out.println(debugStringBuilder.toString());
 
-        // Declare temp variables outside the loop so that the declaration
+        // TODO: Declare temp variables outside the loop so that the declaration
         // is not executed several times in the loop which causes an error
         // in the execution engine
+
         defineVariable(indent, tmp0Name, TackyDataType.INT_32);
         defineVariable(indent, tmp1Name, TackyDataType.INT_32);
 
@@ -956,9 +970,7 @@ public class TackyGenerator {
         // Label(start)
         stringBuilder.append(indentString).append("Label(").append(startLabelName).append(")").append("\n");
 
-        //
         // loop condition expression
-        //
 
         ASTNode astNode1 = statementASTNode.getChildren().get(1);
         ExpressionASTNode expressionASTNode = (ExpressionASTNode) astNode1;
@@ -971,15 +983,14 @@ public class TackyGenerator {
         stringBuilder.append(indentString).append("// <instructions for condition>").append("\n");
         // stringBuilder.append("tmp.0 = Var(\"tmp.0\")").append("\n");
         stringBuilder.append(indentString).append(tmp0Name).append(" = ");
-        stringBuilder.append(indentString).append(outputExpression(expressionASTNode)).append("\n");
+        stringBuilder/* .append(indentString) */.append(outputExpression(expressionASTNode)).append("\n");
         // JumpIfZero(tmp.0, break_label)
         stringBuilder.append(indentString).append("JumpIfZero(").append(tmp0Name).append(", " + breakLabelName + ")")
                 .append("\n");
 
-        //
         // body statements
-        //
 
+        indentString = buildIndentString(indent + 1);
         stringBuilder.append(indentString).append("// <start body statements>").append("\n");
 
         // body of the for loop
@@ -997,16 +1008,14 @@ public class TackyGenerator {
 
         stringBuilder.append(indentString).append("// <end body statements>").append("\n");
 
-        //
+        indentString = buildIndentString(indent);
+
         // Continue Label
-        //
 
         stringBuilder.append(indentString).append("// <continue label> ").append("\n");
         stringBuilder.append(indentString).append("Label(" + continueLabelName + ")").append("\n");
 
-        //
         // loop postfix
-        //
 
         ASTNode astNode2 = statementASTNode.getChildren().get(2);
         // ExpressionASTNode postFixExpressionASTNode = (ExpressionASTNode) astNode2;
@@ -1016,9 +1025,7 @@ public class TackyGenerator {
         // astNode2.printRecursive(debugStringBuilder, 0);
         // System.out.println(debugStringBuilder.toString());
 
-        //
         // <instructions for post>
-        //
 
         stringBuilder.append(indentString).append("// <instructions for post>").append("\n");
 
@@ -1029,7 +1036,7 @@ public class TackyGenerator {
         expressionASTNode = (ExpressionASTNode) astNode2;
 
         String expr = outputExpression(expressionASTNode);
-        stringBuilder.append(indentString).append(expr).append("\n");
+        stringBuilder./* append(indentString). */append(expr).append("\n");
 
         // i = tmp.1
         String iteratorVariable = expressionASTNode.children.get(0).value;
@@ -1040,6 +1047,8 @@ public class TackyGenerator {
 
         // end label
         stringBuilder.append(indentString).append("Label(" + breakLabelName + ")").append("\n");
+
+        // forLoopCount--;
     }
 
     private void defineVariable(int indent, String name, TackyDataType tackyDataType) {
@@ -1049,13 +1058,20 @@ public class TackyGenerator {
     private void defineVariable(int indent, String name, TackyDataType tackyDataType,
             boolean isArray, int arraySize) {
 
-        String indentString = "";
-        for (int i = 0; i < indent; i++) {
-            indentString += "  ";
-        }
+        String indentString = buildIndentString(indent);
         stringBuilder.append(indentString);
 
+        if (indentString == "") {
+            System.out.println("temp");
+        }
+
         if (isArray) {
+
+            // if (indentString == "") {
+            // System.out.println("temp");
+            // }
+
+            // stringBuilder.append("zzz" + indentString);
 
             // array1d = Var("array1d", Array(int, 5));
             stringBuilder.append(name + " = Var(\"" + name + "\", Array(" + TackyDataType.toString(tackyDataType) + ", "
@@ -1075,10 +1091,10 @@ public class TackyGenerator {
 
         // System.out.println(expressionASTNode);
 
-        // DEBUG 
-        StringBuilder debugStringBuilder = new StringBuilder();
-        expressionASTNode.printRecursive(debugStringBuilder, 0);
-        System.out.println(debugStringBuilder.toString());
+        // // DEBUG
+        // StringBuilder debugStringBuilder = new StringBuilder();
+        // expressionASTNode.printRecursive(debugStringBuilder, 0);
+        // System.out.println(debugStringBuilder.toString());
 
         StringBuilder tempStringBuilder = new StringBuilder();
 
@@ -1141,26 +1157,56 @@ public class TackyGenerator {
                 // return memory[desc.address / 4];
             }
         } else if (expr.children.size() == 2) {
-            switch (expr.expressionType) {
 
-                case Add:
-                    return (int) evaluate((ExpressionASTNode) expr.children.get(0))
-                            + (int) evaluate((ExpressionASTNode) expr.children.get(1));
+            ExpressionASTNode exprA = (ExpressionASTNode) expr.children.get(0);
+            ExpressionASTNode exprB = (ExpressionASTNode) expr.children.get(1);
 
-                case Subtract:
-                    return (int) evaluate((ExpressionASTNode) expr.children.get(0))
-                            - (int) evaluate((ExpressionASTNode) expr.children.get(1));
+            boolean exprAIsParseable = NumberUtils.isParsable(exprA.value);
+            boolean exprBIsParseable = NumberUtils.isParsable(exprB.value);
 
-                case Mul:
-                    return (int) evaluate((ExpressionASTNode) expr.children.get(0))
-                            * (int) evaluate((ExpressionASTNode) expr.children.get(1));
+            if (exprAIsParseable && exprBIsParseable) {
 
-                case Div:
-                    return (int) evaluate((ExpressionASTNode) expr.children.get(0))
-                            / (int) evaluate((ExpressionASTNode) expr.children.get(1));
+                int a = (int) evaluate(exprA);
+                int b = (int) evaluate(exprB);
 
-                default:
-                    throw new RuntimeException("Unknown expression type: " + expr.expressionType);
+                switch (expr.expressionType) {
+
+                    case Add:
+                        return a + b;
+
+                    case Subtract:
+                        return a - b;
+
+                    case Mul:
+                        return a * b;
+
+                    case Div:
+                        return a / b;
+
+                    default:
+                        throw new RuntimeException("Unknown expression type: " + expr.expressionType);
+                }
+
+            } else {
+
+                switch (expr.expressionType) {
+
+                    case Add:
+                        return exprA.value + " + " + exprB.value;
+
+                    case Subtract:
+                        return exprA.value + " - " + exprB.value;
+
+                    case Mul:
+                        return exprA.value + " * " + exprB.value;
+
+                    case Div:
+                        return exprA.value + " / " + exprB.value;
+
+                    default:
+                        throw new RuntimeException("Unknown expression type: " + expr.expressionType);
+                }
+
             }
         }
 
@@ -1171,10 +1217,7 @@ public class TackyGenerator {
 
         // System.out.println();
 
-        String indentString = "";
-        for (int i = 0; i < indent; i++) {
-            indentString += "  ";
-        }
+        String indentString = buildIndentString(indent);
 
         StringBuilder exprStringBuilder = new StringBuilder();
         String lhs = "";
@@ -1213,7 +1256,7 @@ public class TackyGenerator {
                 String tempVarName = "exprTemp_" + tempCounter;
                 tempCounter++;
 
-                defineVariable(indent + 1, tempVarName, null);
+                defineVariable(indent, tempVarName, null);
                 exprStringBuilder.append(indentString)
                         .append(tempVarName).append(" = ").append(lhs).append(operator).append(rhs);
                 stringBuilder.append(exprStringBuilder.toString()).append("\n");
@@ -1225,5 +1268,13 @@ public class TackyGenerator {
             default:
                 throw new RuntimeException();
         }
+    }
+
+    private String buildIndentString(int indent) {
+        String indentString = "";
+        for (int i = 0; i < indent; i++) {
+            indentString += "    ";
+        }
+        return indentString;
     }
 }

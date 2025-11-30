@@ -9,6 +9,8 @@ public enum JumpType {
 
     JumpIfNotZero,
 
+    Break,
+
     UNKNOWN;
 
     public static JumpType fromString(final String data) {
@@ -19,6 +21,8 @@ public enum JumpType {
             return JumpIfZero;
         } else if (tempData.equalsIgnoreCase("JumpIfNotZero")) {
             return JumpIfNotZero;
+        } else if (tempData.equalsIgnoreCase("Break")) {
+            return Break;
         } else {
             throw new RuntimeException("Unknown type: " + data);
         }

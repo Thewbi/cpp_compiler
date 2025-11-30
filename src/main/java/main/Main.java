@@ -704,10 +704,11 @@ public class Main {
         // final String filename = "src/test/resources/TACKY/array_1.tky";
         // final String filename = "src/test/resources/TACKY/array_int.tky";
 
-        final String filename = "generated_tacky.tky";
-
         // @formatter:on
 
+        System.out.println("-- 1 - Parsing TACKY Input -------------------------------");
+
+        final String filename = "generated_tacky.tky";
         final CharStream charStream = CharStreams
                 .fromFileName(filename);
 
@@ -723,8 +724,6 @@ public class Main {
 
         // create a generic parse tree walker that can trigger callbacks
         final ParseTreeWalker walker = new ParseTreeWalker();
-
-        System.out.println("-- 1 - Parsing TACKY Input -------------------------------\n");
 
         // DEBUG output parse tree while parsing
         // boolean printParseTree = true;
@@ -754,8 +753,8 @@ public class Main {
         System.out.println("-- 3 - DEBUG OUTPUT TACKY Abstract Syntax Tree -----------");
 
         // DEBUG print AST
-        boolean printAST = true;
-        // boolean printAST = false;
+        // boolean printAST = true;
+        boolean printAST = false;
         if (printAST) {
             StringBuilder stringBuilder = new StringBuilder();
             rootNode.printRecursive(stringBuilder, 0, true);
@@ -815,11 +814,15 @@ public class Main {
                 .findFirst().get();
         String mainEntryPointName = program.value;
 
-        System.out.println("MainEntryPoint is \"" + mainEntryPointName + "\"");
+        
         FunctionDefinitionASTNode mainFunction = structureTACKYParserListener.functionDefinitionMap
                 .get(mainEntryPointName);
 
-        System.out.println("mainFunction found is \"" + mainFunction.value + "\"");
+        if (null == mainFunction) {
+            System.out.println("MainEntryPoint is \"" + mainEntryPointName + "\"");
+            System.out.println("MainEntryPoint Function \"" + mainEntryPointName + "\" not found!");
+        }
+
         return mainFunction;
     }
 
@@ -1007,8 +1010,8 @@ public class Main {
 
         System.out.println("-- 1 - Print C AST Input -------------------------------\n");
 
-        boolean printAST = true;
-        // boolean printAST = false;
+        // boolean printAST = true;
+        boolean printAST = false;
         if (printAST) {
             StringBuilder stringBuilder = new StringBuilder();
             rootNode.printRecursive(stringBuilder, 0);
@@ -1081,9 +1084,12 @@ public class Main {
         tackyGenerator.process(0, rootNode);
         String tackyCode = tackyGenerator.stringBuilder.toString();
 
-        System.out.println("--- TACKY ----------------------------- \n");
-        System.out.println(tackyCode);
-        System.out.println("--------------------------------------- \n");
+        boolean outputGeneratedTACKYSourceCode = false;
+        if (outputGeneratedTACKYSourceCode) {
+            System.out.println("--- TACKY ----------------------------- \n");
+            System.out.println(tackyCode);
+            System.out.println("--------------------------------------- \n");
+        }
 
         Files.writeString(Paths.get("generated_tacky.tky"), tackyCode);
     }
@@ -1174,19 +1180,27 @@ public class Main {
         // final String filename = "src/test/resources/expressions_4.cpp";
         // final String filename = "src/test/resources/expressions_5.cpp";
         // final String filename = "src/test/resources/expressions_6.cpp";
+
         // final String filename = "src/test/resources/examples/matrix_tester.cpp";
+        // final String filename = "src/test/resources/examples/matrix_tester_scratchpad.cpp";
+
         // final String filename = "src/test/resources/printf.cpp";
+
         // final String filename = "src/test/resources/array_example.c";
         // final String filename = "src/test/resources/array_indexing.cpp";
         // final String filename = "src/test/resources/array_indexing_2.cpp";
         // final String filename = "src/test/resources/array_indexing_3.cpp"; // <------
-        // final String filename = "src/test/resources/examples/matrix_tester_scratchpad.cpp";
+
         // final String filename = "src/test/resources/function_call.cpp";
         // final String filename = "src/test/resources/function_call_2.cpp";
         // final String filename = "src/test/resources/function_call_3.cpp";
         // final String filename = "src/test/resources/function_call_4.cpp"; // <--- test
         // final String filename = "src/test/resources/function_call_5.cpp";
         final String filename = "src/test/resources/function_call_6.cpp";
+        // final String filename = "src/test/resources/function_call_7.cpp";
+
+        // final String filename = "src/test/resources/for_loop.cpp";
+        // final String filename = "src/test/resources/for_loop_2.cpp";
         // final String filename = "src/test/resources/for_loop_over_array.cpp";
 
         ASTNode dummyASTNode = new ASTNode();
@@ -1218,7 +1232,8 @@ public class Main {
         fileStackFrame.start();
 
         String result = outputStringBuilder.toString();
-        System.out.println(result);
+
+        // System.out.println(result);
 
         // write to a file that has the same filename as the input file
         // Files.writeString(Paths.get(filename + ".out"), result);
@@ -1227,30 +1242,34 @@ public class Main {
         final String outputFilename = "src/test/resources/preprocessor/preprocessed.pp";
         Files.writeString(Paths.get(outputFilename), result);
 
-        System.out.println("\n\n---------------- Define Key Map ------------------");
+        boolean printMaps = false;
+        if (printMaps) {
 
-        for (Map.Entry<String, ASTNode> entry : defineKeyMap.entrySet()) {
+            System.out.println("\n\n---------------- Define Key Map ------------------");
 
-            String entryKey = entry.getKey();
-            ASTNode entryValue = (ASTNode) entry.getValue();
+            for (Map.Entry<String, ASTNode> entry : defineKeyMap.entrySet()) {
 
-            // System.out.println("functionCall: " + entryValue.functionCall);
+                String entryKey = entry.getKey();
+                ASTNode entryValue = (ASTNode) entry.getValue();
 
-            StringBuilder stringBuilder = new StringBuilder();
-            entryValue.printRecursive(stringBuilder, 0);
-            System.out.println(entryKey + " - " + stringBuilder.toString());
-        }
+                // System.out.println("functionCall: " + entryValue.functionCall);
 
-        System.out.println("\n\n---------------- Define Value Map ------------------");
+                StringBuilder stringBuilder = new StringBuilder();
+                entryValue.printRecursive(stringBuilder, 0);
+                System.out.println(entryKey + " - " + stringBuilder.toString());
+            }
 
-        for (Map.Entry<String, ASTNode> entry : defineMap.entrySet()) {
+            System.out.println("\n\n---------------- Define Value Map ------------------");
 
-            String entryKey = entry.getKey();
-            ASTNode entryValue = entry.getValue();
+            for (Map.Entry<String, ASTNode> entry : defineMap.entrySet()) {
 
-            StringBuilder stringBuilder = new StringBuilder();
-            entryValue.printRecursive(stringBuilder, 0);
-            System.out.println(entryKey + " - " + stringBuilder.toString());
+                String entryKey = entry.getKey();
+                ASTNode entryValue = entry.getValue();
+
+                StringBuilder stringBuilder = new StringBuilder();
+                entryValue.printRecursive(stringBuilder, 0);
+                System.out.println(entryKey + " - " + stringBuilder.toString());
+            }
         }
 
     }
