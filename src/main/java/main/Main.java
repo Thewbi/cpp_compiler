@@ -816,7 +816,10 @@ public class Main {
         riscvCodeGenerator.stackPointer = 0x00020000;
 
         //riscvCodeGenerator.executeFunction(newTackyStackFrameGen, rootNode, 0, mainFunctionGen);
+
+        riscvCodeGenerator.start();
         riscvCodeGenerator.executeFunction(rootNode.getChildren().get(1));
+        riscvCodeGenerator.end();
 
         System.out.println("```");
         System.out.println(riscvCodeGenerator.stringBuilder.toString());

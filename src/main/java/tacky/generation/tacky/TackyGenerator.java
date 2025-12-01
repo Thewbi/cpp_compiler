@@ -21,13 +21,15 @@ public class TackyGenerator {
 
     public StringBuilder stringBuilder = new StringBuilder();
 
-    private int forLoopCount = 0;
+    public int forLoopCount = 0;
 
     public Stack<TACKYStackFrame> executionStack = new Stack<>();
 
     public TACKYStackFrame tackyStackFrame;
 
-    private int tempCounter = 0;
+    public int tempCounter = 0;
+
+    public boolean generateDefaultLoopConditionExpression = false;
 
     public void process(int indent, ASTNode astNode) {
 
@@ -161,8 +163,11 @@ public class TackyGenerator {
         if (calledFunctionName.equalsIgnoreCase("printf")) {
 
             // special treatment for printf()
-            // stringBuilder.append("printf(\"test\")");
-            // stringBuilder.append(astNode.value).append("\n");
+            processFunctionCall(indent, astNode);
+
+        } else if (calledFunctionName.equalsIgnoreCase("exit")) {
+
+            // special treatment for exit()
             processFunctionCall(indent, astNode);
 
         } else {
@@ -381,6 +386,29 @@ public class TackyGenerator {
 
             stringBuilder.append(")");
             stringBuilder.append("\n");
+
+        } else if (functionName.equalsIgnoreCase("exit")) {
+
+            stringBuilder.append(indentString).append("exit").append("(");
+
+            int counter = 0;
+            for (ASTNode child : declaratorASTNode.getChildren()) {
+                counter++;
+                if (counter == 1) {
+                    continue;
+                }
+                if (counter > 2) {
+                    stringBuilder.append(",");
+                }
+
+                if (child.value != null) {
+                    stringBuilder.append(child.value);
+                }
+            }
+
+            stringBuilder.append(")");
+            stringBuilder.append("\n");
+
         }
     }
 
@@ -981,12 +1009,35 @@ public class TackyGenerator {
         // System.out.println(debugStringBuilder.toString());
 
         stringBuilder.append(indentString).append("// <instructions for condition>").append("\n");
-        // stringBuilder.append("tmp.0 = Var(\"tmp.0\")").append("\n");
-        stringBuilder.append(indentString).append(tmp0Name).append(" = ");
-        stringBuilder/* .append(indentString) */.append(outputExpression(expressionASTNode)).append("\n");
-        // JumpIfZero(tmp.0, break_label)
-        stringBuilder.append(indentString).append("JumpIfZero(").append(tmp0Name).append(", " + breakLabelName + ")")
-                .append("\n");
+        
+        if (generateDefaultLoopConditionExpression) {
+
+            // expression + temp variable
+            stringBuilder.append(indentString).append(tmp0Name).append(" = ");
+            stringBuilder.append(outputExpression(expressionASTNode)).append("\n");
+
+            // JumpIfZero(tmp.0, break_label)
+            stringBuilder.append(indentString).append("JumpIfZero(").append(tmp0Name).append(", " + breakLabelName + ")")
+                    .append("\n");
+
+        } else {
+
+            switch (expressionASTNode.expressionType) {
+
+                case LessThen: {
+                    String lhs = evaluate((ExpressionASTNode) expressionASTNode.children.get(0)).toString();
+                    String rhs = evaluate((ExpressionASTNode) expressionASTNode.children.get(1)).toString();
+
+                    stringBuilder.append(indentString);
+                    stringBuilder.append("JumpGreaterThanOrEqual(").append(rhs).append(", ").append(lhs).append(", ").append(breakLabelName).append(")").append("\n");
+                }
+                    break;
+
+                default:
+                    throw new RuntimeException();
+            }
+
+        }
 
         // body statements
 
@@ -1146,15 +1197,6 @@ public class TackyGenerator {
             } else {
                 // retrieve local variable
                 return expr.value;
-
-                // TACKYStackFrameVariableDescriptor varDesc =
-                // tackyStackFrame.variables.get(expr.value);
-                // memory[varDesc.address / 4];
-
-                // TACKYStackFrameVariableDescriptor desc =
-                // findVariableDescriptorInStack(expr.value);
-
-                // return memory[desc.address / 4];
             }
         } else if (expr.children.size() == 2) {
 

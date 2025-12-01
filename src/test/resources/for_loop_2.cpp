@@ -11,4 +11,8 @@ int main()
         //     break;
         // }
     }
+
+    exit();
+
+    return 0;
 }

@@ -42,6 +42,12 @@ public class TACKYASTNodeFactory {
         return node;
     }
 
+    public ExitASTNode createExitASTNode() {
+        ExitASTNode node = new ExitASTNode();
+        node.nodeType = NodeType.Exit;
+        return node;
+    }
+
     public LabelASTNode createLabelASTNode() {
         LabelASTNode node = new LabelASTNode();
         node.nodeType = NodeType.Label;

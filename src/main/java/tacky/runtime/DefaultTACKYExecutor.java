@@ -119,6 +119,13 @@ public class DefaultTACKYExecutor implements TACKYExecutor {
                     executePrintfBuildInFunction(tackyStackFrame, statement);
                     index++;
                     break;
+                
+                case Exit:
+                    executeExitBuildInFunction(tackyStackFrame, statement);
+                    done = true;
+                    returnValue = 0;
+                    index++;
+                    break;
 
                 case Return:
                     ReturnResult returnResult = returnStatement(tackyStackFrame, (ReturnASTNode) statement);
@@ -145,6 +152,9 @@ public class DefaultTACKYExecutor implements TACKYExecutor {
 
                         case JumpIfNotZero:
                             index = jumpIfNotZero(tackyStackFrame, jumpASTNode, index);
+                            break;
+                        case JumpGreaterThanOrEqual:
+                            index = jumpGreaterThanOrEqual(tackyStackFrame, jumpASTNode, index);
                             break;
 
                         default:
@@ -385,6 +395,10 @@ public class DefaultTACKYExecutor implements TACKYExecutor {
         }
     }
 
+    private void executeExitBuildInFunction(TACKYStackFrame tackyStackFrame, TACKYASTNode statement) {
+        // nop
+    }
+
     private ReturnResult returnStatement(TACKYStackFrame tackyStackFrame, ReturnASTNode returnASTNode) {
         ReturnResult returnResult = new ReturnResult();
 
@@ -415,7 +429,9 @@ public class DefaultTACKYExecutor implements TACKYExecutor {
     }
 
     private int jumpIfZero(TACKYStackFrame tackyStackFrame, JumpASTNode jumpASTNode, int index) {
-        int value = retrieveValueFromJumpInstruction(tackyStackFrame, jumpASTNode);
+
+        ASTNode astNode = jumpASTNode.getChildren().get(0);
+        int value = retrieveValueFromASTNode(tackyStackFrame, astNode);
         if (value == 0) {
             String targetLabel = jumpASTNode.value;
             return tackyStackFrame.labels.get(targetLabel);
@@ -424,7 +440,8 @@ public class DefaultTACKYExecutor implements TACKYExecutor {
     }
 
     private int jumpIfNotZero(TACKYStackFrame tackyStackFrame, JumpASTNode jumpASTNode, int index) {
-        int value = retrieveValueFromJumpInstruction(tackyStackFrame, jumpASTNode);
+        ASTNode astNode = jumpASTNode.getChildren().get(0);
+        int value = retrieveValueFromASTNode(tackyStackFrame, astNode);
         if (value != 0) {
             String targetLabel = jumpASTNode.value;
             return tackyStackFrame.labels.get(targetLabel);
@@ -432,8 +449,24 @@ public class DefaultTACKYExecutor implements TACKYExecutor {
         return index + 1;
     }
 
-    private int retrieveValueFromJumpInstruction(TACKYStackFrame tackyStackFrame, JumpASTNode jumpASTNode) {
-        ASTNode astNode = jumpASTNode.getChildren().get(0);
+    private int jumpGreaterThanOrEqual(TACKYStackFrame tackyStackFrame, JumpASTNode jumpASTNode, int index) {
+        
+        ASTNode astNodeLHS = jumpASTNode.getChildren().get(0);
+        ASTNode astNodeRHS = jumpASTNode.getChildren().get(1);
+        
+        int valueLHS = retrieveValueFromASTNode(tackyStackFrame, astNodeLHS);
+        int valueRHS = retrieveValueFromASTNode(tackyStackFrame, astNodeRHS);
+
+        String targetLabel = jumpASTNode.value;
+
+        if (valueLHS >= valueRHS) {
+            return tackyStackFrame.labels.get(targetLabel);
+        }
+
+        return index + 1;
+    }
+
+    private int retrieveValueFromASTNode(TACKYStackFrame tackyStackFrame, ASTNode astNode) {
         int value = 0;
         if (astNode instanceof ConstantDeclarationASTNode) {
             value = retrieveConstantValue((ConstantDeclarationASTNode) astNode);

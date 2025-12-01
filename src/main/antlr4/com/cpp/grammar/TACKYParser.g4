@@ -122,10 +122,12 @@ statement :
     | jump
     | jump_if_zero
     | jump_if_not_zero
+    | jump_greater_than_or_equal
     | label
     | var_declaration_statement
     | assignment_statement
     | function_call
+    | exit_call
     | printf_call
     | sizeof_call
     ;
@@ -243,6 +245,10 @@ jump_if_not_zero :
     JUMPIFNOTZERO LEFT_PAREN val COMMA ( Identifier | StringLiteral ) RIGHT_PAREN
     ;
 
+jump_greater_than_or_equal :
+    JUMPGREATERTHANOREQUAL LEFT_PAREN val COMMA val COMMA ( Identifier | StringLiteral ) RIGHT_PAREN
+    ;
+
 // Label is used with Identifier and with StringLiteral
 // page 76, e.g. Label("there"). page 76, e.g. Label(false_label)
 label : 
@@ -282,6 +288,10 @@ exprList :
 // page 479
 function_call : 
     FUNCCALL LEFT_PAREN Identifier COMMA ( TRUE | FALSE ) ( COMMA arg_list )? ( COMMA val )? RIGHT_PAREN
+    ;
+
+exit_call : 
+    EXIT LEFT_PAREN RIGHT_PAREN
     ;
 
 printf_call : 

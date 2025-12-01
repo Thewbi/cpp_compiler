@@ -1,0 +1,260 @@
+int main() {
+	
+	int temp_array[3] = { 1, 2, 3 };
+	
+	temp_array[1] = 17;
+	
+	return 0;
+}
+
+
+
+-- ARM
+
+.LC0:
+        .word   1
+        .word   2
+        .word   3
+main:
+        push    {r4, r7}
+        sub     sp, sp, #16
+        add     r7, sp, #0
+        movw    r3, #:lower16:.LC0
+        movt    r3, #:upper16:.LC0
+        adds    r4, r7, #4
+        ldm     r3, {r0, r1, r2}
+        stm     r4, {r0, r1, r2}
+        movs    r3, #17
+        str     r3, [r7, #8]
+        movs    r3, #0
+        mov     r0, r3
+        adds    r7, r7, #16
+        mov     sp, r7
+        pop     {r4, r7}
+        bx      lr
+		
+		
+		
+# LINKS
+
+https://student.cs.uwaterloo.ca/~cs452/docs/ts7200/arm-architecture.pdf
+https://shell-storm.org/online/Online-Assembler-and-Disassembler
+https://developer.arm.com/documentation/ddi0403/ee/?lang=en <----- ARMv7-M Architecture Reference Manual
+
+
+
+
+
+# UAL - Arm Unified Assembler Language
+
+This document uses the Arm Unified Assembler Language (UAL). This assembly language syntax provides a
+canonical form for all Arm and Thumb instructions.
+UAL describes the syntax for the mnemonic and the operands of each instruction. In addition, it assumes that
+instructions and data items can be given labels. It does not specify the syntax to be used for labels, nor what
+assembler directives and options are available. See your assembler documentation for these details.
+Earlier Arm assembly language mnemonics are still supported as synonyms, as described in the instruction details.
+
+
+
+
+
+
+
+# ADD - ARM (thumb)
+
+A7.1.8 ADD (6)
+
+```
+add     r7, sp, #0
+```
+
+little-endian machine code: 00 af 
+00 af -> af00h
+10101111 00000000
+[10101][111][00000000]
+        Rd   immed_8
+		
+The sp (stack pointer) register is not encoded but is implicitly assumed with the opcode 10101.
+Rd is the destination register. r7 in this case.
+immed_8 is the immediate #8 here.
+
+
+
+
+# MOV - Register, Register - ARM (thumb)
+
+A7.1.44 MOV (3) - PDF page 591
+
+1. Open https://shell-storm.org/online/Online-Assembler-and-Disassembler
+2. Select ARM (thumb)
+3. Select Hex
+4. Paste: mov r0, r3
+5. Click "Assemble"
+
+```
+mov r0, r3
+```
+
+This produces little-endian machine code: 18 46 (which is hex)
+
+Disassembling:
+
+1. Convert the value stored in little-endian format to a normal number
+1846h --> 4618h
+
+2. Convert 4618h to a binary number
+01000110 00011000 b
+
+3. Compare this bit pattern to A7.1.44 MOV (3) - PDF page 591
+
+[01000110] [0] [0] [011] [000]
+           H1  H2  Rm    Rd
+		   
+4. To decode the destination register, build H1+Rd = 0000d = 0d ==> r0
+
+4. To decode the source register, build H2+Rm = 0011d = 3d ==> r3
+
+
+
+
+# PUSH - ARM (thumb)
+
+A7.1.50 PUSH - PDF page 601
+
+The command is flexible in that the curly brackets allow a flexible list of registers to save to the stack.
+The registers allowed in the list are r0-r7.
+To encode which register are stored, the second byte called "Register List" is a bit field where a bit is
+set to 1 if the register has to be stored to the stack.
+The register LR can also be stored. If LR should be stored, the "R" bit is set to 1.
+LR is the is the Link Register (LR) Register 14 (see PDF page 29)
+
+```
+push    {r4, r7}
+```
+little-endian machine code: 90 b4
+90 b4 -> b490h
+10110100 10010000
+[1011010] [0] [10010000]
+          R   Register List
+
+```	  
+push    {r0, r1, r2}  
+```
+07 b4 -> b407h		  
+10110100 00000111
+[1011010] [0] [00000111]
+          R   Register List
+
+```
+push    {r0, r1, r2, r3, r4, r5, r6, r7}
+```
+ff b4 -> b4ffh
+10110100 11111111
+[1011010] [0] [11111111]
+          R   Register List
+
+
+
+
+# MOVW - ARM (thumb)
+
+This instruction is defined inside the "ARMv7-M Architecture Reference Manual" and not in the "ARM Architecture Reference Manual".
+
+https://stackoverflow.com/questions/7800055/movw-and-movt-in-arm-assembly
+
+```
+movw    r3, #:lower16:.LC0
+```
+
+```
+movw    r1, 0x5c18
+```
+
+Machine Code little-endian 45 f6 18 41 
+
+First, convert it to a normal 32 bit number
+45 f6 18 41 
+[45 f6] [18 41] --> [f6 45] [41 18] --> f6454118
+
+11110110 01000101 01000001 00011000
+
+[11110][1][10][0][1][0][0][0101][0][100][0001][00011000]
+        i                  imm4     imm3 Rd    imm8
+
+
+
+
+
+# RISC-V
+
+int main() {
+	
+	int temp_array[3] = { 1, 2, 3 };
+	
+	temp_array[1] = 17;
+	
+	return 0;
+}
+
+
+
+
+; structure of a stackframe
+; 
+; fp (frame pointer) points to the beginning of the stack frame (higher address than stack pointer since the stack grows towards address 0)
+; sp (stack pointer) points to the end       of the stack frame (lower  address than frame pointer since the stack grows towards address 0)
+;
+; ra (return address) needs to contain the return address to place into PC once the function ends and the stackframe is destroyed
+
+
+
+sp, s0/fp'  [32] -
+-------------------------------------------------------
+			[28] - ra (saved)
+			[24] - s0/fp (frame pointer) (old frame pointer)
+			[20] - not_used
+			[16] - not_used
+			[12] - 3
+			[ 8] - 2
+			[ 4] - 1
+sp'      	[ 0] - not_used
+
+
+
+
+main:
+		; create stack frame
+        addi    sp,sp,-32			; move stack pointer, make space for new stackframe (8 elements) (I think GCC always builds stack frames with a multiple of 16 byte sizes! Not all elements are used!)
+        sw      ra,28(sp)           ; store address to return to (stored in ra) onto the stack (SHOULD WE CALL MORE FUNCTIONS WITHIN THE BODY OF THIS FUNCTION)
+        sw      s0,24(sp)           ; store old s0/fp (frame pointer) on the stack so it can be restored later because it will be used within this function
+        
+		addi    s0,sp,32			; set new s0/fp (frame pointer) to the start of our new stackframe. 
+									; Now offseting (with negative offsets) from new s0/fp grants access to all elements of the new stack frame
+									
+		; throughout the code, a5 is used as a temporary, working, scratch register
+		; a5 is caller saved, so we need not save it on the stack
+		
+		; int temp_array[3] = { 1, 2, 3 };
+        li      a5,1
+        sw      a5,-28(s0)
+        li      a5,2
+        sw      a5,-24(s0)
+        li      a5,3
+        sw      a5,-20(s0)
+		
+		; temp_array[1] = 17;
+        li      a5,17
+        sw      a5,-24(s0)
+		
+		; prepare return value (here: 0)
+		; the return value goes into register a0 (and a1)
+        li      a5,0
+		mv      a0,a5
+		
+		; delete stack frame (inverse operation to create stack frame)
+        lw      ra,28(sp)			; restore address to return to
+        lw      s0,24(sp)           ; restore s0/fp (frame pointer)
+        addi    sp,sp,32            ; remove stack pointer, return space for new stackframe, 8 elements
+		
+		; return
+        jr      ra					; jump to return address

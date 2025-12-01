@@ -14,6 +14,8 @@ public enum NodeType {
 
     Printf,
 
+    Exit,
+
     Return,
 
     Label,
