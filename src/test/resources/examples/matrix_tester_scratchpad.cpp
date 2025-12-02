@@ -21,7 +21,7 @@ int main()
             int temp = DIMENSION * i + j;
             // printf("%d: ", temp);
 
-            int val = matrixA [ temp ];
+            int val = matrixA[temp];
             printf("%d", val);
             
             //printf("b");

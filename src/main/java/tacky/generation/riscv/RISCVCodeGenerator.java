@@ -273,20 +273,37 @@ public class RISCVCodeGenerator implements Generator {
             }
 
             case Add: {
-                String literalLhs = retrieveLiteralFromExpression(
-                        (ExpressionASTNode) expressionASTNode.children.get(0));
 
-                String literalRhs = retrieveLiteralFromExpression(
-                        (ExpressionASTNode) expressionASTNode.children.get(1));
+                String tempRegister0 = "t0";
+                String tempRegister1 = "t1";
 
-                String tempRegister = "t0";
-                loadVariableIntoTempRegister(tempRegister, literalLhs);
+                loadIntoTempRegisters(expressionASTNode, tempRegister0, tempRegister1);
 
                 // @formatter:off
                 stringBuilder.append(indent)
-                    .append("addi    a5, ")
-                    .append(tempRegister).append(", ")
-                    .append(literalRhs)
+                    .append("add     a5, ")
+                    .append(tempRegister0).append(", ")
+                    .append(tempRegister1)
+                    .append("\n");
+                // @formatter:on
+
+                value = "a5";
+                valueIsRegister = true;
+            }
+                break;
+
+            case Mul: {
+
+                String tempRegister0 = "t0";
+                String tempRegister1 = "t1";
+
+                loadIntoTempRegisters(expressionASTNode, tempRegister0, tempRegister1);
+
+                // @formatter:off
+                stringBuilder.append(indent)
+                    .append("mul     a5, ")
+                    .append(tempRegister0).append(", ")
+                    .append(tempRegister1)
                     .append("\n");
                 // @formatter:on
 
@@ -341,6 +358,48 @@ public class RISCVCodeGenerator implements Generator {
                 .append("\n");
     }
 
+    private void loadIntoTempRegisters(ExpressionASTNode expressionASTNode, String tempRegister0, String tempRegister1) {
+        ASTNode child0 = expressionASTNode.children.get(0);
+        // String literalLhs = retrieveLiteralFromExpression(child0);
+
+        ASTNode child1 = expressionASTNode.children.get(1);
+        // String literalRhs = retrieveLiteralFromExpression(child1);
+        
+        // loadVariableIntoTempRegister(tempRegister, literalLhs);
+        
+        if (child0 instanceof ValueASTNode) {
+            loadVariableIntoTempRegister(tempRegister0, child0.value);
+        } else if (child0 instanceof ExpressionASTNode) {
+            ExpressionASTNode child0ExpressionASTNode = (ExpressionASTNode) child0;
+            switch (child0ExpressionASTNode.expressionType) {
+                case Identifier:
+                    loadVariableIntoTempRegister(tempRegister0, child0.value);
+                    break;
+                case Constant:
+                    loadValueIntoTempRegister(tempRegister0, unwrapConstant(child0).value);
+                    break;
+                default:
+                    throw new RuntimeException();
+            }
+        }
+
+        if (child1 instanceof ValueASTNode) {
+            loadVariableIntoTempRegister(tempRegister1, child1.value);
+        } else if (child1 instanceof ExpressionASTNode) {
+            ExpressionASTNode child1ExpressionASTNode = (ExpressionASTNode) child1;
+            switch (child1ExpressionASTNode.expressionType) {
+                case Identifier:
+                    loadVariableIntoTempRegister(tempRegister1, child1.value);
+                    break;
+                case Constant:
+                    loadValueIntoTempRegister(tempRegister1, unwrapConstant(child1).value);
+                    break;
+                default:
+                    throw new RuntimeException();
+            }
+        }
+    }
+
     private String loadVariableIntoTempRegister(String register, String varName) {
 
         RISCVStackEntry riscvStackEntry = stackFrame.stackEntryMap.get(varName);
@@ -359,14 +418,10 @@ public class RISCVCodeGenerator implements Generator {
     
     private String loadValueIntoTempRegister(String register, String value) {
 
-        // RISCVStackEntry riscvStackEntry = stackFrame.stackEntryMap.get(varName);
-
-        // int address = riscvStackEntry.address;
-        // int offset = address - stackPointer;
-
         // load
         stringBuilder.append(indent)
-                .append("li      ").append(register).append(", ")
+                .append("li      ")
+                .append(register).append(", ")
                 .append(value)
                 .append("\n");
 
@@ -378,8 +433,7 @@ public class RISCVCodeGenerator implements Generator {
         switch (astNode.expressionType) {
 
             case Constant:
-                ConstantDeclarationASTNode temp = (ConstantDeclarationASTNode) astNode.getChildren().get(0);
-                ASTNode temp2 = temp.children.get(0);
+                ASTNode temp2 = unwrapConstant(astNode);
                 return temp2.value;
 
             case Identifier:
@@ -391,6 +445,12 @@ public class RISCVCodeGenerator implements Generator {
         }
 
         // return "";
+    }
+
+    private ASTNode unwrapConstant(ASTNode astNode) {
+        ConstantDeclarationASTNode temp = (ConstantDeclarationASTNode) astNode.getChildren().get(0);
+        ASTNode temp2 = temp.children.get(0);
+        return temp2;
     }
 
     private void processFunctionCall(ASTNode astNode) {
@@ -410,35 +470,18 @@ public class RISCVCodeGenerator implements Generator {
         // a7 describes the service that is called by the ecall
         // a0 is a parameter register. a0 contains the address of the data
 
-        //
-        // DATA SEGMENT
-        //
-
-        // stringBuilder.append(indent).append(".data").append("\n").append("\n");
-
-        // // define data to print inside printf
-        // String labelName = ".LABEL_0";
-        // stringBuilder.append(labelName).append(": ").append("\n");
-        // stringBuilder.append(indent).append(".string ").append(astNode.value).append("\n");
-
-        // //
-        // // CODE SEGMENT
-        // //
-
-        // //
-        // stringBuilder.append("\n").append(indent).append(".text").append("\n").append("\n");
-
-        // // start symbol
-        // stringBuilder.append("main:").append("\n");
-        // stringBuilder.append("_start:").append("\n");
-
-        // load address of data into a5
+        // parameter a0 is the format string's address
 
         // lui a5, %hi(.LC3)
         stringBuilder.append(indent).append("lui     a5, ").append("%hi(").append(printLabelName).append(")").append("\n");
         // addi a0, a5, %lo(.LC3)
         stringBuilder.append(indent).append("addi    a0, a5, ").append("%lo(").append(printLabelName).append(")")
                 .append("\n");
+
+        // parameter a1
+        stringBuilder.append(indent).append("lw      a5, 20(sp)").append("\n");
+        stringBuilder.append(indent).append("mv      a1, a5").append("\n");
+
         // call puts
         stringBuilder.append(indent).append("call    puts").append("\n");
 
