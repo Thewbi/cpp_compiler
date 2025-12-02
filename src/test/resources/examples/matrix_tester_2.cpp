@@ -16,6 +16,7 @@ int main()
 
     int temp_array[3] = { 1, 2, 3 };
 
+/*
     for (int i = 0; i < DIMENSION; i++)
     {
         for (int j = 0; j < DIMENSION; j++)
@@ -25,7 +26,7 @@ int main()
             printf("Matrix %d\n", temp);
         }
     }
-
+*/
     exit();
     return 0;
 }

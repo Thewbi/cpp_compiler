@@ -33,53 +33,6 @@ Function("main", true, [
     temp_array.ptr.tmp.0 = Var("temp_array.ptr.tmp.0")
     temp_array.ptr.tmp.0 = 3
     Store(temp_array.ptr.tmp.0, temp_array.ptr.ptr.tmp)
-    //
-    // Loop 0
-    //
-    tmp.0.0 = Var("tmp.0.0")
-    tmp.1.0 = Var("tmp.1.0")
-    // <instructions for init>
-    i = Var("i")
-    i = Constant(ConstInt(0))
-    Label(start_0)
-    // <instructions for condition>
-    JumpGreaterThanOrEqual(i, 4, break_label_0)
-        // <start body statements>
-        //
-        // Loop 1
-        //
-        tmp.0.1 = Var("tmp.0.1")
-        tmp.1.1 = Var("tmp.1.1")
-        // <instructions for init>
-        j = Var("j")
-        j = Constant(ConstInt(0))
-        Label(start_1)
-        // <instructions for condition>
-        JumpGreaterThanOrEqual(j, 4, break_label_1)
-            // <start body statements>
-            exprTemp_0 = Var("exprTemp_0")
-            exprTemp_0 = Constant(ConstInt(4)) * i
-            exprTemp_1 = Var("exprTemp_1")
-            exprTemp_1 = exprTemp_0 + j
-            temp = Var("temp")
-            temp = exprTemp_1
-            printf("Matrix %d\n",temp)
-            // <end body statements>
-        // <continue label> 
-        Label(continue_label_1)
-        // <instructions for post>
-        tmp.1.1 = j + Constant(ConstInt(1))
-        j = tmp.1.1
-        Jump(start_1)
-        Label(break_label_1)
-        // <end body statements>
-    // <continue label> 
-    Label(continue_label_0)
-    // <instructions for post>
-    tmp.1.0 = i + Constant(ConstInt(1))
-    i = tmp.1.0
-    Jump(start_0)
-    Label(break_label_0)
     exit()
     return(Constant(ConstInt(0)))
 ])

@@ -11,8 +11,10 @@ import tacky.ast.JumpASTNode;
 import tacky.ast.LabelASTNode;
 import tacky.ast.PrintfASTNode;
 import tacky.ast.ReturnASTNode;
+import tacky.ast.SizeofASTNode;
 import tacky.ast.ValueASTNode;
 import tacky.generation.Generator;
+import tacky.generation.tacky.TackyDataType;
 
 public class RISCVCodeGenerator implements Generator {
 
@@ -34,7 +36,7 @@ public class RISCVCodeGenerator implements Generator {
         // stringBuilder.append(indent).append(".data").append("\n").append("\n");
 
         // define data to print inside printf
-        
+
         stringBuilder.append(printLabelName).append(": ").append("\n");
         stringBuilder.append(indent).append(".string ").append("\"test_string_test\\n\"").append("\n");
 
@@ -77,25 +79,25 @@ public class RISCVCodeGenerator implements Generator {
     @Override
     public int executeFunction(ASTNode functionAstNode) {
 
-        //
-        // Build StackFrame for this function call
-        //
+        // build StackFrame for this function call
 
         stackFrame = new RISCVStackFrame();
 
-        // 1. for each local variable declaration used in this function, reserve space
-        // on the stack
+        // 1. for each local variable declaration used in this function,
+        // reserve space on the stack
         for (ASTNode astNode : functionAstNode.children) {
             astNode.addToStackFrame(stackFrame);
         }
 
-        //
         // advance stack pointer
-        //
 
         int stackSizeUsed = stackFrame.computeAddresses(stackPointer);
 
-        stringBuilder.append(indent).append("addi    sp, sp, ").append((-1) * stackSizeUsed).append("\n");
+        // @formatter:off
+        stringBuilder.append(indent)
+            .append("addi    sp, sp, ").append((-1) * stackSizeUsed)
+            .append("\n");
+        // @formatter:on
 
         stackPointer -= stackSizeUsed;
 
@@ -103,8 +105,6 @@ public class RISCVCodeGenerator implements Generator {
         for (ASTNode astNode : functionAstNode.children) {
             execute(astNode);
         }
-
-        // TODO:
 
         return 0;
     }
@@ -163,6 +163,82 @@ public class RISCVCodeGenerator implements Generator {
 
             case RETURN:
                 processReturn((ReturnASTNode) astNode);
+                break;
+
+            case SIZEOF: {
+                // load value into the temp variable
+
+                SizeofASTNode sizeofASTNode = (SizeofASTNode) astNode;
+                String typeToProcess = sizeofASTNode.sizeOfType;
+
+                int size = TackyDataType.sizeOf(typeToProcess);
+
+                ASTNode child0 = astNode.children.get(0);
+                String targetVariableName = child0.value;
+
+                // write the 'size' value into the local variable 'targetVariableName'
+                // addToStackFram
+
+                RISCVStackEntry riscvStackEntry = stackFrame.stackEntryMap.get(targetVariableName);
+
+                System.out.println("");
+
+                stringBuilder.append(indent).append("# ").append("<sizeof " + typeToProcess + ">").append("\n");
+                // @formatter:off
+                int address = riscvStackEntry.address;
+                int offset = address - stackPointer;
+
+                String tempRegister = "t0";
+                
+                stringBuilder.append(indent)
+                    .append("li      ").append(tempRegister).append(", ")
+                    .append(size)
+                    .append("\n");
+
+                stringBuilder.append(indent)
+                    .append("sw      ").append(tempRegister).append(", ")
+                    .append(offset).append("(sp)")
+                    .append("\n");
+                // @formatter:on
+            }
+                break;
+
+            case GET_ADDRESS: {
+
+                // GetAddress(temp_array, temp_array.ptr)
+
+                // load address of variable 'temp_array' into variable 'temp_array.ptr'
+
+                System.out.println("");
+
+                ASTNode child0 = astNode.children.get(0);
+                ASTNode child1 = astNode.children.get(1);
+
+                RISCVStackEntry sourceRISCVStackEntry = stackFrame.stackEntryMap.get(child0.value);
+                RISCVStackEntry targetRISCVStackEntry = stackFrame.stackEntryMap.get(child1.value);
+
+                // @formatter:off
+                int sourceAddress = sourceRISCVStackEntry.address;
+                int targetAddress = targetRISCVStackEntry.address;
+                int offset = targetAddress - stackPointer;
+
+                stringBuilder.append(indent).append("# GetAddress(").append(child0.value)
+                    .append(", ").append(child1.value).append("\n");
+
+                String tempRegister = "t0";
+                
+                stringBuilder.append(indent)
+                    .append("li      ").append(tempRegister).append(", ")
+                    .append(sourceAddress)
+                    .append("\n");
+
+                stringBuilder.append(indent)
+                    .append("sw      ").append(tempRegister).append(", ")
+                    .append(offset).append("(sp)")
+                    .append("\n");
+                // @formatter:on
+
+            }
                 break;
 
             case UNKNOWN:
@@ -234,7 +310,7 @@ public class RISCVCodeGenerator implements Generator {
                     .append("\n");
                 // @formatter:on
 
-                }
+            }
                 break;
 
             default:
@@ -287,6 +363,7 @@ public class RISCVCodeGenerator implements Generator {
                     .append("\n");
                 // @formatter:on
 
+                // store register containing the result of the add operation
                 value = "a5";
                 valueIsRegister = true;
             }
@@ -326,6 +403,10 @@ public class RISCVCodeGenerator implements Generator {
             // break;
         }
 
+        //
+        // Store result of the add operation into the destination (= Assignment)
+        //
+
         RISCVStackEntry riscvStackEntry = stackFrame.stackEntryMap.get(variableName);
 
         int address = riscvStackEntry.address;
@@ -354,19 +435,29 @@ public class RISCVCodeGenerator implements Generator {
 
         }
 
-        stringBuilder.append(indent).append("sw      ").append(tempRegister).append(", ").append(offset).append("(sp)")
-                .append("\n");
+        // @formatter:off
+        stringBuilder.append(indent)
+            .append("sw      ").append(tempRegister).append(", ")
+            .append(offset).append("(sp)")
+            .append("\n");
+        // @formatter:on
+
     }
 
-    private void loadIntoTempRegisters(ExpressionASTNode expressionASTNode, String tempRegister0, String tempRegister1) {
-        ASTNode child0 = expressionASTNode.children.get(0);
-        // String literalLhs = retrieveLiteralFromExpression(child0);
+    /**
+     * load first child of expressionASTNode into tempRegister0 and load second
+     * child expressionASTNode into tempRegister1
+     * 
+     * @param expressionASTNode
+     * @param tempRegister0
+     * @param tempRegister1
+     */
+    private void loadIntoTempRegisters(ExpressionASTNode expressionASTNode,
+            String tempRegister0, String tempRegister1) {
 
+        ASTNode child0 = expressionASTNode.children.get(0);
         ASTNode child1 = expressionASTNode.children.get(1);
-        // String literalRhs = retrieveLiteralFromExpression(child1);
-        
-        // loadVariableIntoTempRegister(tempRegister, literalLhs);
-        
+
         if (child0 instanceof ValueASTNode) {
             loadVariableIntoTempRegister(tempRegister0, child0.value);
         } else if (child0 instanceof ExpressionASTNode) {
@@ -415,7 +506,7 @@ public class RISCVCodeGenerator implements Generator {
 
         return register;
     }
-    
+
     private String loadValueIntoTempRegister(String register, String value) {
 
         // load
@@ -473,7 +564,8 @@ public class RISCVCodeGenerator implements Generator {
         // parameter a0 is the format string's address
 
         // lui a5, %hi(.LC3)
-        stringBuilder.append(indent).append("lui     a5, ").append("%hi(").append(printLabelName).append(")").append("\n");
+        stringBuilder.append(indent).append("lui     a5, ").append("%hi(").append(printLabelName).append(")")
+                .append("\n");
         // addi a0, a5, %lo(.LC3)
         stringBuilder.append(indent).append("addi    a0, a5, ").append("%lo(").append(printLabelName).append(")")
                 .append("\n");

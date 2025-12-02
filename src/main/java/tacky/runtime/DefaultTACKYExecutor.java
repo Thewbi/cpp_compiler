@@ -231,7 +231,7 @@ public class DefaultTACKYExecutor implements TACKYExecutor {
                     SizeofASTNode sizeof = (SizeofASTNode) statement;
 
                     // find data type
-                    String type = sizeof.type;
+                    String type = sizeof.sizeOfType;
                     int varValue = TackyDataType.sizeOf(type);
 
                     // store value into target variable

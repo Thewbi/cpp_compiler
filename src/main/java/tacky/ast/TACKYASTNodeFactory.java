@@ -7,24 +7,28 @@ public class TACKYASTNodeFactory {
     public ProgramASTNode createProgramASTNode() {
         ProgramASTNode node = new ProgramASTNode();
         node.nodeType = NodeType.Program;
+        node.astNodeType = ASTNodeType.PROGRAM;
         return node;
     }
 
     public FunctionDefinitionASTNode createFunctionDefinitionASTNode() {
         FunctionDefinitionASTNode node = new FunctionDefinitionASTNode();
         node.nodeType = NodeType.FunctionDefinition;
+        node.astNodeType = ASTNodeType.FUNCTION_DEFINITION;
         return node;
     }
 
     public VariableDeclarationASTNode createVariableDeclarationASTNode() {
         VariableDeclarationASTNode node = new VariableDeclarationASTNode();
         node.nodeType = NodeType.VariableDeclaration;
+        node.astNodeType = ASTNodeType.VARIABLE_DECLARATION;
         return node;
     }
 
     public ConstantDeclarationASTNode createConstantDeclarationASTNode() {
         ConstantDeclarationASTNode node = new ConstantDeclarationASTNode();
         node.nodeType = NodeType.ConstantDeclaration;
+        node.astNodeType = ASTNodeType.CONSTANT_DECLARATION;
         return node;
     }
 
@@ -38,12 +42,14 @@ public class TACKYASTNodeFactory {
     public PrintfASTNode createPrintfASTNode() {
         PrintfASTNode node = new PrintfASTNode();
         node.nodeType = NodeType.Printf;
+        node.astNodeType = ASTNodeType.PRINTF;
         return node;
     }
 
     public ExitASTNode createExitASTNode() {
         ExitASTNode node = new ExitASTNode();
         node.nodeType = NodeType.Exit;
+        node.astNodeType = ASTNodeType.EXIT;
         return node;
     }
 
@@ -71,42 +77,49 @@ public class TACKYASTNodeFactory {
     public GetAddressASTNode createGetAddressASTNode() {
         GetAddressASTNode node = new GetAddressASTNode();
         node.nodeType = NodeType.GetAddress;
+        node.astNodeType = ASTNodeType.GET_ADDRESS;
         return node;
     }
 
     public LoadFromAddressASTNode createLoadFromAddressASTNode() {
         LoadFromAddressASTNode node = new LoadFromAddressASTNode();
         node.nodeType = NodeType.LoadFromAddress;
+        node.astNodeType = ASTNodeType.LOAD_FROM_ADDRESS;
         return node;
     }
 
     public StoreToAddressASTNode createStoreToAddressASTNode() {
         StoreToAddressASTNode node = new StoreToAddressASTNode();
         node.nodeType = NodeType.StoreToAddress;
+        node.astNodeType = ASTNodeType.STORE_TO_ADDRESS;
         return node;
     }
 
     public FunctionCallASTNode createFunctionCallASTNode() {
         FunctionCallASTNode node = new FunctionCallASTNode();
         node.nodeType = NodeType.FunctionCall;
+        node.astNodeType = ASTNodeType.FUNCTION_CALL;
         return node;
     }
 
     public ValueASTNode createValueASTNode() {
         ValueASTNode node = new ValueASTNode();
         node.nodeType = NodeType.Value;
+        node.astNodeType = ASTNodeType.VALUE;
         return node;
     }
 
     public DataType createDataTypeASTNode() {
         DataType node = new DataType();
         node.nodeType = NodeType.DataType;
+        node.astNodeType = ASTNodeType.DATA_TYPE;
         return node;
     }
 
     public SizeofASTNode createSizeofASTNode() {
         SizeofASTNode node = new SizeofASTNode();
         node.nodeType = NodeType.Sizeof;
+        node.astNodeType = ASTNodeType.SIZEOF;
         return node;
     }
 

@@ -10,7 +10,8 @@ public class RISCVStackFrame {
     public RISCVStackEntry addVariable(String variableName) {
 
         if (stackEntryMap.containsKey(variableName)) {
-            throw new RuntimeException();
+            // throw new RuntimeException();
+            return stackEntryMap.get(variableName);
         }
 
         RISCVStackEntry stackEntry = new RISCVStackEntry();

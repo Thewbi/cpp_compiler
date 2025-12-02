@@ -24,6 +24,30 @@ public enum ASTNodeType {
     
     LABEL,
     
-    RETURN;
+    RETURN,
+    
+    PROGRAM,
+    
+    FUNCTION_DEFINITION,
+    
+    VARIABLE_DECLARATION,
+    
+    CONSTANT_DECLARATION,
+    
+    PRINTF,
+    
+    EXIT,
+    
+    GET_ADDRESS,
+    
+    LOAD_FROM_ADDRESS,
+    
+    STORE_TO_ADDRESS,
+    
+    VALUE,
+    
+    DATA_TYPE,
+    
+    SIZEOF;
 
 }

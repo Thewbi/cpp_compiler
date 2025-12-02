@@ -2,7 +2,7 @@ package tacky.ast;
 
 public class SizeofASTNode extends TACKYASTNode {
 
-    public String type;
+    public String sizeOfType;
 
     public String targetVariableName;
 

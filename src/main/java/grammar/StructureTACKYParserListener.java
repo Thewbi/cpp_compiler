@@ -231,11 +231,12 @@ public class StructureTACKYParserListener extends TACKYParserBaseListener {
 
     @Override
     public void enterSizeof_call(TACKYParser.Sizeof_callContext ctx) {
+
         String type = ctx.getChild(2).getText();
         String targetVariableName = ctx.getChild(4).getText();
 
         SizeofASTNode sizeofASTNode = tackyASTNodeFactory.createSizeofASTNode();
-        sizeofASTNode.type = type;
+        sizeofASTNode.sizeOfType = type;
         sizeofASTNode.targetVariableName = targetVariableName;
 
         connectToParent(currentNode, sizeofASTNode);
