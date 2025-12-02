@@ -1029,7 +1029,10 @@ public class TackyGenerator {
                     String rhs = evaluate((ExpressionASTNode) expressionASTNode.children.get(1)).toString();
 
                     stringBuilder.append(indentString);
-                    stringBuilder.append("JumpGreaterThanOrEqual(").append(rhs).append(", ").append(lhs).append(", ").append(breakLabelName).append(")").append("\n");
+                    stringBuilder.append("JumpGreaterThanOrEqual").append("(")
+                        .append(lhs).append(", ")
+                        .append(rhs).append(", ")
+                        .append(breakLabelName).append(")").append("\n");
                 }
                     break;
 

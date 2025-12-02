@@ -524,6 +524,7 @@ public class StructureTACKYParserListener extends TACKYParserBaseListener {
 
         JumpASTNode jumpASTNode = tackyASTNodeFactory.createJumpASTNode();
         jumpASTNode.jumpType = JumpType.fromString(ctx.getChild(0).getText());
+        
         // this is the label to jump to
         jumpASTNode.value = ctx.getChild(6).getText();
 

@@ -825,6 +825,8 @@ public class Main {
         System.out.println(riscvCodeGenerator.stringBuilder.toString());
         System.out.println("```");
 
+        Files.writeString(Paths.get("generated_riscv_assembly.s"), riscvCodeGenerator.stringBuilder);
+
         System.out.println("----------------------------------------------------------\n");
 
         System.out.println("Application is done!");
@@ -1206,6 +1208,7 @@ public class Main {
 
         // final String filename = "src/test/resources/examples/matrix_tester.cpp";
         // final String filename = "src/test/resources/examples/matrix_tester_scratchpad.cpp";
+       final String filename = "src/test/resources/examples/matrix_tester_2.cpp";
 
         // final String filename = "src/test/resources/printf.cpp";
         // final String filename = "src/test/resources/printf_2.cpp";
@@ -1220,11 +1223,11 @@ public class Main {
         // final String filename = "src/test/resources/function_call_3.cpp";
         // final String filename = "src/test/resources/function_call_4.cpp"; // <--- test
         // final String filename = "src/test/resources/function_call_5.cpp";
-        // final String filename = "src/test/resources/function_call_6.cpp";
+        // final String filename = "src/test/resources/function_call_6.cpp"; // <--- this is the full matrix mult!
         // final String filename = "src/test/resources/function_call_7.cpp";
 
         // final String filename = "src/test/resources/for_loop.cpp";
-        final String filename = "src/test/resources/for_loop_2.cpp";
+        // final String filename = "src/test/resources/for_loop_2.cpp";
         // final String filename = "src/test/resources/for_loop_over_array.cpp";
 
         ASTNode dummyASTNode = new ASTNode();

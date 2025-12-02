@@ -1,7 +1,6 @@
 package tacky.ast;
 
 import ast.ASTNodeType;
-import ast.ValASTNode;
 
 public class TACKYASTNodeFactory {
 

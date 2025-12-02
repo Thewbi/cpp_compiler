@@ -1,6 +1,7 @@
 package tacky.generation.riscv;
 
 import ast.ASTNode;
+import ast.ASTNodeType;
 import ast.ExpressionASTNode;
 import tacky.ast.AssignmentASTNode;
 import tacky.ast.ConstIntASTNode;
@@ -10,6 +11,7 @@ import tacky.ast.JumpASTNode;
 import tacky.ast.LabelASTNode;
 import tacky.ast.PrintfASTNode;
 import tacky.ast.ReturnASTNode;
+import tacky.ast.ValueASTNode;
 import tacky.generation.Generator;
 
 public class RISCVCodeGenerator implements Generator {
@@ -27,9 +29,7 @@ public class RISCVCodeGenerator implements Generator {
     @Override
     public void start() {
 
-        //
         // DATA SEGMENT
-        //
 
         // stringBuilder.append(indent).append(".data").append("\n").append("\n");
 
@@ -38,9 +38,7 @@ public class RISCVCodeGenerator implements Generator {
         stringBuilder.append(printLabelName).append(": ").append("\n");
         stringBuilder.append(indent).append(".string ").append("\"test_string_test\\n\"").append("\n");
 
-        //
         // CODE SEGMENT
-        //
 
         // stringBuilder.append("\n").append(indent).append(".text").append("\n").append("\n");
 
@@ -210,21 +208,33 @@ public class RISCVCodeGenerator implements Generator {
                 // @formatter:on
                 break;
 
-            case JumpGreaterThanOrEqual:
+            case JumpGreaterThanOrEqual: {
 
-                loadVariableIntoTempRegister("t0", astNode.children.get(0).value);
-                loadVariableIntoTempRegister("t1", astNode.children.get(1).value);
+                ASTNode child0 = astNode.children.get(0);
+                ASTNode child1 = astNode.children.get(1);
+
+                if (child0 instanceof ValueASTNode) {
+                    loadVariableIntoTempRegister("t0", child0.value);
+                } else if (child0 instanceof ExpressionASTNode) {
+                    loadValueIntoTempRegister("t0", child0.value);
+                }
+
+                if (child1 instanceof ValueASTNode) {
+                    loadVariableIntoTempRegister("t1", child1.value);
+                } else if (child1 instanceof ExpressionASTNode) {
+                    loadValueIntoTempRegister("t1", child1.value);
+                }
 
                 // @formatter:off
                 stringBuilder.append(indent)
                     .append("ble     ")
-                    //.append(astNode.children.get(0).value).append(", ")
-                    //.append(astNode.children.get(1).value).append(", ")
-                    .append("t0").append(", ")
                     .append("t1").append(", ")
+                    .append("t0").append(", ")
                     .append(astNode.value)
                     .append("\n");
                 // @formatter:on
+
+                }
                 break;
 
             default:
@@ -342,6 +352,22 @@ public class RISCVCodeGenerator implements Generator {
         stringBuilder.append(indent)
                 .append("lw      ").append(register).append(", ")
                 .append(offset).append("(sp)")
+                .append("\n");
+
+        return register;
+    }
+    
+    private String loadValueIntoTempRegister(String register, String value) {
+
+        // RISCVStackEntry riscvStackEntry = stackFrame.stackEntryMap.get(varName);
+
+        // int address = riscvStackEntry.address;
+        // int offset = address - stackPointer;
+
+        // load
+        stringBuilder.append(indent)
+                .append("li      ").append(register).append(", ")
+                .append(value)
                 .append("\n");
 
         return register;

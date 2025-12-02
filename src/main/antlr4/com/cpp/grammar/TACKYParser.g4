@@ -246,7 +246,11 @@ jump_if_not_zero :
     ;
 
 jump_greater_than_or_equal :
-    JUMPGREATERTHANOREQUAL LEFT_PAREN val COMMA val COMMA ( Identifier | StringLiteral ) RIGHT_PAREN
+    JUMPGREATERTHANOREQUAL LEFT_PAREN 
+    ( val | expr ) COMMA          // first parameter
+    ( val | expr ) COMMA          // second parameter 
+    ( Identifier | StringLiteral )          // third parameter 
+    RIGHT_PAREN
     ;
 
 // Label is used with Identifier and with StringLiteral

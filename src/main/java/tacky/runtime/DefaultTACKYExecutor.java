@@ -467,9 +467,13 @@ public class DefaultTACKYExecutor implements TACKYExecutor {
     }
 
     private int retrieveValueFromASTNode(TACKYStackFrame tackyStackFrame, ASTNode astNode) {
+
         int value = 0;
+
         if (astNode instanceof ConstantDeclarationASTNode) {
+
             value = retrieveConstantValue((ConstantDeclarationASTNode) astNode);
+
         } else if (astNode instanceof ValueASTNode) {
 
             if (!tackyStackFrame.variables.containsKey(astNode.value)) {
@@ -478,7 +482,13 @@ public class DefaultTACKYExecutor implements TACKYExecutor {
 
             TACKYStackFrameVariableDescriptor varDesc = tackyStackFrame.variables.get(astNode.value);
             value = memory[varDesc.address / 4];
+
+        } else if (astNode instanceof ExpressionASTNode) {
+
+            value = evaluateExpression(tackyStackFrame, (ExpressionASTNode) astNode);
+
         }
+
         return value;
     }
 
