@@ -303,12 +303,11 @@ public class TackyGenerator {
                                 // tmp.1.ptr,
                                 // tmp.0
                                 // )
-                                stringBuilder/*.append(indentString) */.append(", tmp." + i + ".ptr");
+                                stringBuilder.append(", tmp." + i + ".ptr");
 
                             } else {
                                 // throw new RuntimeException();
-                                stringBuilder/*.append(indentString) */
-                                        .append(", " + tackyStackFrameVariableDescriptor.name);
+                                stringBuilder.append(", " + tackyStackFrameVariableDescriptor.name);
                             }
 
                             break;
@@ -611,7 +610,7 @@ public class TackyGenerator {
                         break;
 
                     default:
-                        throw new RuntimeException("");
+                        throw new RuntimeException("Unhandeled expressionType: '" + expressionASTNode.expressionType + "'");
                 }
 
                 String arrayName = child0ASTNode.value;
@@ -664,7 +663,7 @@ public class TackyGenerator {
                 String expr = evaluateToString(indent + 1, child1expressionASTNode);
 
                 stringBuilder.append(indentString).append(child0ExpressionASTNode.value).append(" = ");
-                stringBuilder/* .append(indentString) */.append(expr).append("\n");
+                stringBuilder.append(expr).append("\n");
 
                 // // @formatter:off
                 // stringBuilder.append(child0ExpressionASTNode.value)
@@ -716,27 +715,41 @@ public class TackyGenerator {
 
         stringBuilder.append(indentString).append("// " + arrayElementIndex).append("\n");
 
-        // advance the pointer forward to the requested n-th element
-        // to point to element #n, move the pointer four times
-        //
-        // array1d.ptr = array1d.ptr + (n-1) * sizeof_int
-        // @formatter:off
-        defineVariable(indent, arrayPtrName + ".ptr.tmp", null);
+        
 
         // determine the size of the array element type and store it into a variable for
         // later use
         stringBuilder.append(indentString).append("sizeof_array_type = Var(\"sizeof_array_type\")")
                 .append("\n");
+
         stringBuilder.append(indentString)
                 .append("sizeof(" + TackyDataType.toString(TackyDataType.INT_32) + ", sizeof_array_type)")
                 .append("\n");
+
+        
+        // advance the pointer forward to the requested n-th element
+        // to point to element #n, move the pointer four times
+        //
+        // array1d.ptr = array1d.ptr + (n-1) * sizeof_int
+
+        // @formatter:off
+
+        defineVariable(indent, arrayPtrName + ".ptr.tmp.1", null);
+
+        stringBuilder.append(indentString)
+            .append(arrayPtrName + ".ptr.tmp.1").append(" = ")
+            .append(wrapInConstant(arrayElementIndex)).append(" * ").append("sizeof_array_type")
+            .append("\n");
+
+        defineVariable(indent, arrayPtrName + ".ptr.tmp", null);
 
         // compute the correct address for the index used
         stringBuilder.append(indentString)
             .append(arrayPtrName + ".ptr.tmp").append(" = ")
             .append(arrayPtrName).append(" + ")
-            .append(arrayElementIndex).append(" * sizeof_array_type")
+            .append(arrayPtrName + ".ptr.tmp.1")
             .append("\n");
+
         // @formatter:on
 
         // temp variable for loading data into the array
@@ -744,17 +757,27 @@ public class TackyGenerator {
         defineVariable(indent, arrayPtrName + ".tmp.0", TackyDataType.INT_32);
 
         // write data into the array element
+        
         // tmp.0 = 18
-        stringBuilder.append(indentString).append(arrayPtrName + ".tmp.0").append(" = ").append(value).append("\n");
+        stringBuilder.append(indentString)
+            .append(arrayPtrName + ".tmp.0").append(" = ")
+            // .append(value)
+            .append(wrapInConstant(value))
+            .append("\n");
 
         // write data into the array element
         // Store(tmp.0, array1d.ptr)
+        
         // @formatter:off
         stringBuilder.append(indentString)
             .append("Store(").append(arrayPtrName + ".tmp.0").append(", ")
             .append(arrayPtrName + ".ptr.tmp").append(")")
             .append("\n");
         // @formatter:on
+    }
+
+    private String wrapInConstant(String constant) {
+         return "Constant(ConstInt(" + constant + "))";
     }
 
     private void retrieveValueFromArrayElement(int indent, DeclaratorASTNode declaratorASTNode,
@@ -789,16 +812,20 @@ public class TackyGenerator {
                 .append("sizeof(" + TackyDataType.toString(TackyDataType.INT_32) + ", sizeof_array_type)")
                 .append("\n");
 
+        defineVariable(indent, arrayPtrName + ".ptr.tmp.1", null);
+        stringBuilder.append(indentString)
+                .append(arrayPtrName + ".ptr.tmp.1").append(" = ")
+                .append(arrayPtrName).append(" * ").append("sizeof_array_type")
+                .append("\n");
+
         // advance the pointer forward to the requested fifth element
         // to point to element #5, move the pointer four times
         // array1d.ptr = array1d.ptr + 4 * sizeof_int
         defineVariable(indent, arrayPtrName + ".ptr.tmp", null);
         stringBuilder.append(indentString)
                 .append(arrayPtrName + ".ptr.tmp").append(" = ")
-                // .append(arrayName + ".ptr").append(" + ")
                 .append(arrayPtrName).append(" + ")
-                // .append(arrayElementIndex).append(" * sizeof_array_type")
-                .append(arrayElementIndex).append(" * sizeof_array_type")
+                .append(arrayPtrName + ".ptr.tmp.1")
                 .append("\n");
 
         // write data into the array element
@@ -1090,7 +1117,7 @@ public class TackyGenerator {
         expressionASTNode = (ExpressionASTNode) astNode2;
 
         String expr = outputExpression(expressionASTNode);
-        stringBuilder./* append(indentString). */append(expr).append("\n");
+        stringBuilder.append(expr).append("\n");
 
         // i = tmp.1
         String iteratorVariable = expressionASTNode.children.get(0).value;
@@ -1281,6 +1308,11 @@ public class TackyGenerator {
                 break;
             case Div:
                 operator = " / ";
+                break;
+
+            default:
+                // throw new RuntimeException();
+                // do not select an operator
                 break;
         }
 

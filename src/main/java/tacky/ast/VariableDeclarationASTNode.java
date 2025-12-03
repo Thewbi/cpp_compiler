@@ -12,8 +12,13 @@ public class VariableDeclarationASTNode extends TACKYASTNode {
 
     public RISCVStackEntry stackEntry;
 
-    public void addToStackFrame(RISCVStackFrame stackFrame) {
-        stackEntry = stackFrame.addVariable(variableName);
+    public boolean isArray;
+
+    public int arraySize;
+
+    public RISCVStackEntry addToStackFrame(RISCVStackFrame stackFrame) {
+        stackEntry = stackFrame.addVariable(variableName, isArray, arraySize);
+        return stackEntry;
     }
 
     public void printRecursive(final StringBuilder stringBuilder, final int indent) {

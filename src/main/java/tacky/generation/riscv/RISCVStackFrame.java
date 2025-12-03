@@ -7,7 +7,7 @@ public class RISCVStackFrame {
 
     public Map<String, RISCVStackEntry> stackEntryMap = new HashMap<String, RISCVStackEntry>();
 
-    public RISCVStackEntry addVariable(String variableName) {
+    public RISCVStackEntry addVariable(String variableName, boolean isArray, int arraySize) {
 
         if (stackEntryMap.containsKey(variableName)) {
             // throw new RuntimeException();
@@ -16,6 +16,8 @@ public class RISCVStackFrame {
 
         RISCVStackEntry stackEntry = new RISCVStackEntry();
         stackEntry.variableName = variableName;
+        stackEntry.isArray = isArray;
+        stackEntry.arraySize = arraySize;
 
         stackEntryMap.put(variableName, stackEntry);
 
@@ -27,9 +29,17 @@ public class RISCVStackFrame {
         int address = stackPointer;
 
         for (Map.Entry<String, RISCVStackEntry> entry : stackEntryMap.entrySet()) {
-            entry.getValue().address = address;
 
-            address -= 4;
+            RISCVStackEntry stackEntry = entry.getValue();
+            
+
+            if (stackEntry.isArray) {
+                address -= (4 * stackEntry.arraySize);
+                stackEntry.address = address + 4;
+            } else {
+                stackEntry.address = address;
+                address -= 4;
+            }
         }
 
         return stackPointer - address;

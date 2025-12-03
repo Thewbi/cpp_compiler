@@ -1,5 +1,7 @@
 package tacky.generation.riscv;
 
+import java.util.Map;
+
 import ast.ASTNode;
 import ast.ASTNodeType;
 import ast.ExpressionASTNode;
@@ -26,7 +28,7 @@ public class RISCVCodeGenerator implements Generator {
 
     public String indent = "        ";
 
-    String printLabelName = ".LABEL_0";
+    public String printLabelName = ".LABEL_0";
 
     @Override
     public void start() {
@@ -86,12 +88,19 @@ public class RISCVCodeGenerator implements Generator {
         // 1. for each local variable declaration used in this function,
         // reserve space on the stack
         for (ASTNode astNode : functionAstNode.children) {
-            astNode.addToStackFrame(stackFrame);
+            RISCVStackEntry stackEntry = astNode.addToStackFrame(stackFrame);
+            // if (stackEntry != null) {
+            //     System.out.println(stackEntry.toString());
+            // }
         }
 
         // advance stack pointer
 
         int stackSizeUsed = stackFrame.computeAddresses(stackPointer);
+
+        for (Map.Entry<String, RISCVStackEntry> entry : stackFrame.stackEntryMap.entrySet()) {
+            System.out.println(entry.getValue().toString());
+        }
 
         // @formatter:off
         stringBuilder.append(indent)
@@ -112,8 +121,8 @@ public class RISCVCodeGenerator implements Generator {
     private void execute(ASTNode astNode) {
 
         // DEBUG print node
-        boolean printAST = true;
-        // boolean printAST = false;
+        // boolean printAST = true;
+        boolean printAST = false;
         if (printAST) {
             StringBuilder tempStringBuilder = new StringBuilder();
             astNode.printRecursive(tempStringBuilder, 0, true);
@@ -122,47 +131,58 @@ public class RISCVCodeGenerator implements Generator {
 
         switch (astNode.astNodeType) {
 
-            case ROOT:
+            case ROOT: {
+            }
                 break;
 
-            case FUNCTION_DECLARATION:
+            case FUNCTION_DECLARATION: {
+            }
                 break;
 
-            case FUNCTION_CALL:
+            case FUNCTION_CALL: {
                 processFunctionCall(astNode);
+            }
                 break;
 
-            case INIT_DECLARATION:
+            case INIT_DECLARATION: {
                 // e.g. length = Var("length")
                 // No output takes place. The only change is that the stack pointer is
                 // decremented to makes room for the local variable on teh stack.
+            }
                 break;
 
-            case ITERATION_STATEMENT:
+            case ITERATION_STATEMENT: {
+            }
                 break;
 
-            case JUMP_STATEMENT:
+            case JUMP_STATEMENT: {
                 processJump((JumpASTNode) astNode);
+            }
                 break;
 
-            case SIMPLE_DECLARATION:
+            case SIMPLE_DECLARATION: {
                 // nop
+            }
                 break;
 
-            case EXPRESSION:
+            case EXPRESSION: {
                 // nop
+            }
                 break;
 
-            case ASSIGNMENT:
+            case ASSIGNMENT: {
                 processAssignment((AssignmentASTNode) astNode);
+            }
                 break;
 
-            case LABEL:
+            case LABEL: {
                 processLabel((LabelASTNode) astNode);
+            }
                 break;
 
-            case RETURN:
+            case RETURN: {
                 processReturn((ReturnASTNode) astNode);
+            }
                 break;
 
             case SIZEOF: {
@@ -181,7 +201,7 @@ public class RISCVCodeGenerator implements Generator {
 
                 RISCVStackEntry riscvStackEntry = stackFrame.stackEntryMap.get(targetVariableName);
 
-                System.out.println("");
+                // System.out.println("");
 
                 stringBuilder.append(indent).append("# ").append("<sizeof " + typeToProcess + ">").append("\n");
                 // @formatter:off
@@ -206,10 +226,7 @@ public class RISCVCodeGenerator implements Generator {
             case GET_ADDRESS: {
 
                 // GetAddress(temp_array, temp_array.ptr)
-
                 // load address of variable 'temp_array' into variable 'temp_array.ptr'
-
-                System.out.println("");
 
                 ASTNode child0 = astNode.children.get(0);
                 ASTNode child1 = astNode.children.get(1);
@@ -222,11 +239,14 @@ public class RISCVCodeGenerator implements Generator {
                 int targetAddress = targetRISCVStackEntry.address;
                 int offset = targetAddress - stackPointer;
 
-                stringBuilder.append(indent).append("# GetAddress(").append(child0.value)
-                    .append(", ").append(child1.value).append("\n");
+                stringBuilder.append(indent)
+                    .append("# GetAddress(").append(child0.value).append(", ")
+                    .append(child1.value).append(")")
+                    .append("\n");
 
                 String tempRegister = "t0";
                 
+                // li dest, src
                 stringBuilder.append(indent)
                     .append("li      ").append(tempRegister).append(", ")
                     .append(sourceAddress)
@@ -240,6 +260,49 @@ public class RISCVCodeGenerator implements Generator {
 
             }
                 break;
+
+            case STORE_TO_ADDRESS: {
+
+                // Store(src, ptr)
+                //
+                // Store the value contained in the variable 'src' into
+                // the memory cell having the address stored in ptr
+
+                // Generated risc
+                // sw 
+
+                //throw new RuntimeException("Not yet implemented ! STORE_TO_ADDRESS");
+
+                ValueASTNode child0 = (ValueASTNode) astNode.children.get(0);
+                ValueASTNode child1 = (ValueASTNode) astNode.children.get(1);
+
+                String valueVariableName = child0.value;
+                String ptrVariableName = child1.value;
+
+                // RISCVStackEntry riscvStackEntry = stackFrame.stackEntryMap.get(ptrVariableName);
+                // int address = riscvStackEntry.address;
+
+                stringBuilder.append(indent).append("# StoreToAddress()").append("\n");
+                
+                String tempRegister = "t2";
+                loadLocalVariableIntoTempRegister(tempRegister, valueVariableName);
+
+                String addressRegister = "t3";
+                loadLocalVariableIntoTempRegister(addressRegister, ptrVariableName);
+
+                // @formatter:off
+                int offset = 0;
+                stringBuilder.append(indent)
+                    .append("sw      ").append(tempRegister).append(", ")
+                    .append(offset).append("(").append(addressRegister).append(")")
+                    .append("\n");
+                // @formatter:on
+
+                stringBuilder.append(indent).append("nop").append("\n");
+
+                // System.out.println();
+            }
+            break;
 
             case UNKNOWN:
             default:
@@ -290,13 +353,13 @@ public class RISCVCodeGenerator implements Generator {
                 ASTNode child1 = astNode.children.get(1);
 
                 if (child0 instanceof ValueASTNode) {
-                    loadVariableIntoTempRegister("t0", child0.value);
+                    loadLocalVariableIntoTempRegister("t0", child0.value);
                 } else if (child0 instanceof ExpressionASTNode) {
                     loadValueIntoTempRegister("t0", child0.value);
                 }
 
                 if (child1 instanceof ValueASTNode) {
-                    loadVariableIntoTempRegister("t1", child1.value);
+                    loadLocalVariableIntoTempRegister("t1", child1.value);
                 } else if (child1 instanceof ExpressionASTNode) {
                     loadValueIntoTempRegister("t1", child1.value);
                 }
@@ -334,6 +397,11 @@ public class RISCVCodeGenerator implements Generator {
         ExpressionASTNode expressionASTNode = assignmentASTNode.expression;
         switch (expressionASTNode.expressionType) {
 
+            case IntegerLiteral: {
+                value = expressionASTNode.value;
+            }
+                break;
+
             case Constant: {
                 ConstantDeclarationASTNode constantDeclarationASTNode = (ConstantDeclarationASTNode) expressionASTNode.children
                         .get(0);
@@ -343,7 +411,7 @@ public class RISCVCodeGenerator implements Generator {
                 break;
 
             case LessThen: {
-                System.out.println("test");
+                // System.out.println("test");
                 value = "??";
                 throw new RuntimeException("Implement this!");
             }
@@ -393,7 +461,7 @@ public class RISCVCodeGenerator implements Generator {
                 value = "a5";
                 valueIsRegister = true;
 
-                loadVariableIntoTempRegister(value, expressionASTNode.value);
+                loadLocalVariableIntoTempRegister(value, expressionASTNode.value);
             }
                 break;
 
@@ -413,7 +481,9 @@ public class RISCVCodeGenerator implements Generator {
         int offset = address - stackPointer;
 
         String tempRegister = "t0";
-        stringBuilder.append(indent).append("# variable '").append(variableName).append("'").append("\n");
+        stringBuilder.append(indent)
+            .append("# variable '").append(variableName).append("'")
+            .append("\n");
 
         if (valueIsRegister) {
 
@@ -459,12 +529,12 @@ public class RISCVCodeGenerator implements Generator {
         ASTNode child1 = expressionASTNode.children.get(1);
 
         if (child0 instanceof ValueASTNode) {
-            loadVariableIntoTempRegister(tempRegister0, child0.value);
+            loadLocalVariableIntoTempRegister(tempRegister0, child0.value);
         } else if (child0 instanceof ExpressionASTNode) {
             ExpressionASTNode child0ExpressionASTNode = (ExpressionASTNode) child0;
             switch (child0ExpressionASTNode.expressionType) {
                 case Identifier:
-                    loadVariableIntoTempRegister(tempRegister0, child0.value);
+                    loadLocalVariableIntoTempRegister(tempRegister0, child0.value);
                     break;
                 case Constant:
                     loadValueIntoTempRegister(tempRegister0, unwrapConstant(child0).value);
@@ -475,12 +545,12 @@ public class RISCVCodeGenerator implements Generator {
         }
 
         if (child1 instanceof ValueASTNode) {
-            loadVariableIntoTempRegister(tempRegister1, child1.value);
+            loadLocalVariableIntoTempRegister(tempRegister1, child1.value);
         } else if (child1 instanceof ExpressionASTNode) {
             ExpressionASTNode child1ExpressionASTNode = (ExpressionASTNode) child1;
             switch (child1ExpressionASTNode.expressionType) {
                 case Identifier:
-                    loadVariableIntoTempRegister(tempRegister1, child1.value);
+                    loadLocalVariableIntoTempRegister(tempRegister1, child1.value);
                     break;
                 case Constant:
                     loadValueIntoTempRegister(tempRegister1, unwrapConstant(child1).value);
@@ -491,14 +561,22 @@ public class RISCVCodeGenerator implements Generator {
         }
     }
 
-    private String loadVariableIntoTempRegister(String register, String varName) {
+    /**
+     * Find the variable in the current stack frame (= local variable), 
+     * retrieves the value by emitting a lw instruction into the 'register'.
+     * 
+     * @param register
+     * @param varName
+     * @return
+     */
+    private String loadLocalVariableIntoTempRegister(String register, String varName) {
 
         RISCVStackEntry riscvStackEntry = stackFrame.stackEntryMap.get(varName);
 
         int address = riscvStackEntry.address;
         int offset = address - stackPointer;
 
-        // load
+        // load word
         stringBuilder.append(indent)
                 .append("lw      ").append(register).append(", ")
                 .append(offset).append("(sp)")

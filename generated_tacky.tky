@@ -1,38 +1,187 @@
 Program("main")
 
 Function("main", true, [
-    temp_array = Var("temp_array", Array(int32, 3))
+    matrixA = Var("matrixA", Array(int32, 16))
     sizeof_array_type = Var("sizeof_array_type")
     sizeof(int32, sizeof_array_type)
-    temp_array.ptr = Var("temp_array.ptr")
-    GetAddress(temp_array, temp_array.ptr)
+    matrixA.ptr = Var("matrixA.ptr")
+    GetAddress(matrixA, matrixA.ptr)
     // assign to array-element
     // 0
-    temp_array.ptr.ptr.tmp = Var("temp_array.ptr.ptr.tmp")
     sizeof_array_type = Var("sizeof_array_type")
     sizeof(int32, sizeof_array_type)
-    temp_array.ptr.ptr.tmp = temp_array.ptr + 0 * sizeof_array_type
-    temp_array.ptr.tmp.0 = Var("temp_array.ptr.tmp.0")
-    temp_array.ptr.tmp.0 = 1
-    Store(temp_array.ptr.tmp.0, temp_array.ptr.ptr.tmp)
+    matrixA.ptr.ptr.tmp.1 = Var("matrixA.ptr.ptr.tmp.1")
+    matrixA.ptr.ptr.tmp.1 = Constant(ConstInt(0)) * sizeof_array_type
+    matrixA.ptr.ptr.tmp = Var("matrixA.ptr.ptr.tmp")
+    matrixA.ptr.ptr.tmp = matrixA.ptr + matrixA.ptr.ptr.tmp.1
+    matrixA.ptr.tmp.0 = Var("matrixA.ptr.tmp.0")
+    matrixA.ptr.tmp.0 = Constant(ConstInt(1))
+    Store(matrixA.ptr.tmp.0, matrixA.ptr.ptr.tmp)
     // assign to array-element
     // 1
-    temp_array.ptr.ptr.tmp = Var("temp_array.ptr.ptr.tmp")
     sizeof_array_type = Var("sizeof_array_type")
     sizeof(int32, sizeof_array_type)
-    temp_array.ptr.ptr.tmp = temp_array.ptr + 1 * sizeof_array_type
-    temp_array.ptr.tmp.0 = Var("temp_array.ptr.tmp.0")
-    temp_array.ptr.tmp.0 = 2
-    Store(temp_array.ptr.tmp.0, temp_array.ptr.ptr.tmp)
+    matrixA.ptr.ptr.tmp.1 = Var("matrixA.ptr.ptr.tmp.1")
+    matrixA.ptr.ptr.tmp.1 = Constant(ConstInt(1)) * sizeof_array_type
+    matrixA.ptr.ptr.tmp = Var("matrixA.ptr.ptr.tmp")
+    matrixA.ptr.ptr.tmp = matrixA.ptr + matrixA.ptr.ptr.tmp.1
+    matrixA.ptr.tmp.0 = Var("matrixA.ptr.tmp.0")
+    matrixA.ptr.tmp.0 = Constant(ConstInt(2))
+    Store(matrixA.ptr.tmp.0, matrixA.ptr.ptr.tmp)
     // assign to array-element
     // 2
-    temp_array.ptr.ptr.tmp = Var("temp_array.ptr.ptr.tmp")
     sizeof_array_type = Var("sizeof_array_type")
     sizeof(int32, sizeof_array_type)
-    temp_array.ptr.ptr.tmp = temp_array.ptr + 2 * sizeof_array_type
-    temp_array.ptr.tmp.0 = Var("temp_array.ptr.tmp.0")
-    temp_array.ptr.tmp.0 = 3
-    Store(temp_array.ptr.tmp.0, temp_array.ptr.ptr.tmp)
+    matrixA.ptr.ptr.tmp.1 = Var("matrixA.ptr.ptr.tmp.1")
+    matrixA.ptr.ptr.tmp.1 = Constant(ConstInt(2)) * sizeof_array_type
+    matrixA.ptr.ptr.tmp = Var("matrixA.ptr.ptr.tmp")
+    matrixA.ptr.ptr.tmp = matrixA.ptr + matrixA.ptr.ptr.tmp.1
+    matrixA.ptr.tmp.0 = Var("matrixA.ptr.tmp.0")
+    matrixA.ptr.tmp.0 = Constant(ConstInt(3))
+    Store(matrixA.ptr.tmp.0, matrixA.ptr.ptr.tmp)
+    // assign to array-element
+    // 3
+    sizeof_array_type = Var("sizeof_array_type")
+    sizeof(int32, sizeof_array_type)
+    matrixA.ptr.ptr.tmp.1 = Var("matrixA.ptr.ptr.tmp.1")
+    matrixA.ptr.ptr.tmp.1 = Constant(ConstInt(3)) * sizeof_array_type
+    matrixA.ptr.ptr.tmp = Var("matrixA.ptr.ptr.tmp")
+    matrixA.ptr.ptr.tmp = matrixA.ptr + matrixA.ptr.ptr.tmp.1
+    matrixA.ptr.tmp.0 = Var("matrixA.ptr.tmp.0")
+    matrixA.ptr.tmp.0 = Constant(ConstInt(4))
+    Store(matrixA.ptr.tmp.0, matrixA.ptr.ptr.tmp)
+    // assign to array-element
+    // 4
+    sizeof_array_type = Var("sizeof_array_type")
+    sizeof(int32, sizeof_array_type)
+    matrixA.ptr.ptr.tmp.1 = Var("matrixA.ptr.ptr.tmp.1")
+    matrixA.ptr.ptr.tmp.1 = Constant(ConstInt(4)) * sizeof_array_type
+    matrixA.ptr.ptr.tmp = Var("matrixA.ptr.ptr.tmp")
+    matrixA.ptr.ptr.tmp = matrixA.ptr + matrixA.ptr.ptr.tmp.1
+    matrixA.ptr.tmp.0 = Var("matrixA.ptr.tmp.0")
+    matrixA.ptr.tmp.0 = Constant(ConstInt(5))
+    Store(matrixA.ptr.tmp.0, matrixA.ptr.ptr.tmp)
+    // assign to array-element
+    // 5
+    sizeof_array_type = Var("sizeof_array_type")
+    sizeof(int32, sizeof_array_type)
+    matrixA.ptr.ptr.tmp.1 = Var("matrixA.ptr.ptr.tmp.1")
+    matrixA.ptr.ptr.tmp.1 = Constant(ConstInt(5)) * sizeof_array_type
+    matrixA.ptr.ptr.tmp = Var("matrixA.ptr.ptr.tmp")
+    matrixA.ptr.ptr.tmp = matrixA.ptr + matrixA.ptr.ptr.tmp.1
+    matrixA.ptr.tmp.0 = Var("matrixA.ptr.tmp.0")
+    matrixA.ptr.tmp.0 = Constant(ConstInt(6))
+    Store(matrixA.ptr.tmp.0, matrixA.ptr.ptr.tmp)
+    // assign to array-element
+    // 6
+    sizeof_array_type = Var("sizeof_array_type")
+    sizeof(int32, sizeof_array_type)
+    matrixA.ptr.ptr.tmp.1 = Var("matrixA.ptr.ptr.tmp.1")
+    matrixA.ptr.ptr.tmp.1 = Constant(ConstInt(6)) * sizeof_array_type
+    matrixA.ptr.ptr.tmp = Var("matrixA.ptr.ptr.tmp")
+    matrixA.ptr.ptr.tmp = matrixA.ptr + matrixA.ptr.ptr.tmp.1
+    matrixA.ptr.tmp.0 = Var("matrixA.ptr.tmp.0")
+    matrixA.ptr.tmp.0 = Constant(ConstInt(7))
+    Store(matrixA.ptr.tmp.0, matrixA.ptr.ptr.tmp)
+    // assign to array-element
+    // 7
+    sizeof_array_type = Var("sizeof_array_type")
+    sizeof(int32, sizeof_array_type)
+    matrixA.ptr.ptr.tmp.1 = Var("matrixA.ptr.ptr.tmp.1")
+    matrixA.ptr.ptr.tmp.1 = Constant(ConstInt(7)) * sizeof_array_type
+    matrixA.ptr.ptr.tmp = Var("matrixA.ptr.ptr.tmp")
+    matrixA.ptr.ptr.tmp = matrixA.ptr + matrixA.ptr.ptr.tmp.1
+    matrixA.ptr.tmp.0 = Var("matrixA.ptr.tmp.0")
+    matrixA.ptr.tmp.0 = Constant(ConstInt(8))
+    Store(matrixA.ptr.tmp.0, matrixA.ptr.ptr.tmp)
+    // assign to array-element
+    // 8
+    sizeof_array_type = Var("sizeof_array_type")
+    sizeof(int32, sizeof_array_type)
+    matrixA.ptr.ptr.tmp.1 = Var("matrixA.ptr.ptr.tmp.1")
+    matrixA.ptr.ptr.tmp.1 = Constant(ConstInt(8)) * sizeof_array_type
+    matrixA.ptr.ptr.tmp = Var("matrixA.ptr.ptr.tmp")
+    matrixA.ptr.ptr.tmp = matrixA.ptr + matrixA.ptr.ptr.tmp.1
+    matrixA.ptr.tmp.0 = Var("matrixA.ptr.tmp.0")
+    matrixA.ptr.tmp.0 = Constant(ConstInt(9))
+    Store(matrixA.ptr.tmp.0, matrixA.ptr.ptr.tmp)
+    // assign to array-element
+    // 9
+    sizeof_array_type = Var("sizeof_array_type")
+    sizeof(int32, sizeof_array_type)
+    matrixA.ptr.ptr.tmp.1 = Var("matrixA.ptr.ptr.tmp.1")
+    matrixA.ptr.ptr.tmp.1 = Constant(ConstInt(9)) * sizeof_array_type
+    matrixA.ptr.ptr.tmp = Var("matrixA.ptr.ptr.tmp")
+    matrixA.ptr.ptr.tmp = matrixA.ptr + matrixA.ptr.ptr.tmp.1
+    matrixA.ptr.tmp.0 = Var("matrixA.ptr.tmp.0")
+    matrixA.ptr.tmp.0 = Constant(ConstInt(10))
+    Store(matrixA.ptr.tmp.0, matrixA.ptr.ptr.tmp)
+    // assign to array-element
+    // 10
+    sizeof_array_type = Var("sizeof_array_type")
+    sizeof(int32, sizeof_array_type)
+    matrixA.ptr.ptr.tmp.1 = Var("matrixA.ptr.ptr.tmp.1")
+    matrixA.ptr.ptr.tmp.1 = Constant(ConstInt(10)) * sizeof_array_type
+    matrixA.ptr.ptr.tmp = Var("matrixA.ptr.ptr.tmp")
+    matrixA.ptr.ptr.tmp = matrixA.ptr + matrixA.ptr.ptr.tmp.1
+    matrixA.ptr.tmp.0 = Var("matrixA.ptr.tmp.0")
+    matrixA.ptr.tmp.0 = Constant(ConstInt(11))
+    Store(matrixA.ptr.tmp.0, matrixA.ptr.ptr.tmp)
+    // assign to array-element
+    // 11
+    sizeof_array_type = Var("sizeof_array_type")
+    sizeof(int32, sizeof_array_type)
+    matrixA.ptr.ptr.tmp.1 = Var("matrixA.ptr.ptr.tmp.1")
+    matrixA.ptr.ptr.tmp.1 = Constant(ConstInt(11)) * sizeof_array_type
+    matrixA.ptr.ptr.tmp = Var("matrixA.ptr.ptr.tmp")
+    matrixA.ptr.ptr.tmp = matrixA.ptr + matrixA.ptr.ptr.tmp.1
+    matrixA.ptr.tmp.0 = Var("matrixA.ptr.tmp.0")
+    matrixA.ptr.tmp.0 = Constant(ConstInt(12))
+    Store(matrixA.ptr.tmp.0, matrixA.ptr.ptr.tmp)
+    // assign to array-element
+    // 12
+    sizeof_array_type = Var("sizeof_array_type")
+    sizeof(int32, sizeof_array_type)
+    matrixA.ptr.ptr.tmp.1 = Var("matrixA.ptr.ptr.tmp.1")
+    matrixA.ptr.ptr.tmp.1 = Constant(ConstInt(12)) * sizeof_array_type
+    matrixA.ptr.ptr.tmp = Var("matrixA.ptr.ptr.tmp")
+    matrixA.ptr.ptr.tmp = matrixA.ptr + matrixA.ptr.ptr.tmp.1
+    matrixA.ptr.tmp.0 = Var("matrixA.ptr.tmp.0")
+    matrixA.ptr.tmp.0 = Constant(ConstInt(13))
+    Store(matrixA.ptr.tmp.0, matrixA.ptr.ptr.tmp)
+    // assign to array-element
+    // 13
+    sizeof_array_type = Var("sizeof_array_type")
+    sizeof(int32, sizeof_array_type)
+    matrixA.ptr.ptr.tmp.1 = Var("matrixA.ptr.ptr.tmp.1")
+    matrixA.ptr.ptr.tmp.1 = Constant(ConstInt(13)) * sizeof_array_type
+    matrixA.ptr.ptr.tmp = Var("matrixA.ptr.ptr.tmp")
+    matrixA.ptr.ptr.tmp = matrixA.ptr + matrixA.ptr.ptr.tmp.1
+    matrixA.ptr.tmp.0 = Var("matrixA.ptr.tmp.0")
+    matrixA.ptr.tmp.0 = Constant(ConstInt(14))
+    Store(matrixA.ptr.tmp.0, matrixA.ptr.ptr.tmp)
+    // assign to array-element
+    // 14
+    sizeof_array_type = Var("sizeof_array_type")
+    sizeof(int32, sizeof_array_type)
+    matrixA.ptr.ptr.tmp.1 = Var("matrixA.ptr.ptr.tmp.1")
+    matrixA.ptr.ptr.tmp.1 = Constant(ConstInt(14)) * sizeof_array_type
+    matrixA.ptr.ptr.tmp = Var("matrixA.ptr.ptr.tmp")
+    matrixA.ptr.ptr.tmp = matrixA.ptr + matrixA.ptr.ptr.tmp.1
+    matrixA.ptr.tmp.0 = Var("matrixA.ptr.tmp.0")
+    matrixA.ptr.tmp.0 = Constant(ConstInt(15))
+    Store(matrixA.ptr.tmp.0, matrixA.ptr.ptr.tmp)
+    // assign to array-element
+    // 15
+    sizeof_array_type = Var("sizeof_array_type")
+    sizeof(int32, sizeof_array_type)
+    matrixA.ptr.ptr.tmp.1 = Var("matrixA.ptr.ptr.tmp.1")
+    matrixA.ptr.ptr.tmp.1 = Constant(ConstInt(15)) * sizeof_array_type
+    matrixA.ptr.ptr.tmp = Var("matrixA.ptr.ptr.tmp")
+    matrixA.ptr.ptr.tmp = matrixA.ptr + matrixA.ptr.ptr.tmp.1
+    matrixA.ptr.tmp.0 = Var("matrixA.ptr.tmp.0")
+    matrixA.ptr.tmp.0 = Constant(ConstInt(16))
+    Store(matrixA.ptr.tmp.0, matrixA.ptr.ptr.tmp)
     exit()
     return(Constant(ConstInt(0)))
 ])

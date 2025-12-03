@@ -9,6 +9,7 @@ import org.antlr.v4.runtime.tree.TerminalNodeImpl;
 
 import com.cpp.grammar.TACKYParser;
 import com.cpp.grammar.TACKYParser.Arg_listContext;
+import com.cpp.grammar.TACKYParser.Array_typeContext;
 import com.cpp.grammar.TACKYParser.ConstContext;
 import com.cpp.grammar.TACKYParser.Constant_declContext;
 import com.cpp.grammar.TACKYParser.ValContext;
@@ -129,17 +130,31 @@ public class StructureTACKYParserListener extends TACKYParserBaseListener {
 
     @Override
     public void exitVar_declaration_statement(TACKYParser.Var_declaration_statementContext ctx) {
+
         // System.out.println("[" + ctx.hashCode() + "] " + ctx.getText());
 
+        VariableDeclarationASTNode variableDeclarationASTNode = (VariableDeclarationASTNode) currentNode;
+
         String variableSymbolName = ctx.getChild(0).getText();
+        variableDeclarationASTNode.variableSymbolName = variableSymbolName;
+        
         String variableName = StringUtil.unwrap(ctx.getChild(4).getText());
+        variableDeclarationASTNode.variableName = variableName;
+
+        // temp_array = Var ( "temp_array" , Array ( int32 , 3 ))
+
+        if (ctx.children.size() > 6) {
+
+            ParseTree parseTree = ctx.getChild(6);
+            Array_typeContext array_typeContext = (Array_typeContext) parseTree;
+            variableDeclarationASTNode.isArray = true;
+
+            String arraySizeAsString = array_typeContext.IntegerLiteral().getText();
+            variableDeclarationASTNode.arraySize = Integer.parseInt(arraySizeAsString);
+        }
 
         // System.out.println("variableSymbolName=\"" + variableSymbolName + "\",
         // variableName=\"" + variableName + "\"");
-
-        VariableDeclarationASTNode variableDeclarationASTNode = (VariableDeclarationASTNode) currentNode;
-        variableDeclarationASTNode.variableSymbolName = variableSymbolName;
-        variableDeclarationASTNode.variableName = variableName;
 
         FunctionDefinitionASTNode functionDefinitionASTNode = (FunctionDefinitionASTNode) currentNode.parent;
 
@@ -635,7 +650,7 @@ public class StructureTACKYParserListener extends TACKYParserBaseListener {
 
     @Override
     public void enterVal(ValContext ctx) {
-        System.out.println("[" + ctx.hashCode() + "] " + ctx.getText());
+        // System.out.println("[" + ctx.hashCode() + "] " + ctx.getText());
 
         // in the return() statement, if a variable name is used instead of a constant
         // this branch stores the variable name into a ValueASTNode

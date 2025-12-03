@@ -14,7 +14,18 @@ int main()
     //     6, 9, 7, 1 
     // };
 
-    int temp_array[3] = { 1, 2, 3 };
+    //int temp_array[3] = { 10, 11, 12 };
+
+    int matrixA[ELEMENTS] = {
+        1, 2, 3, 4,
+        5, 6, 7, 8,
+        9, 10, 11, 12,
+        13, 14, 15, 16 
+    };
+
+    matrixA[0] = 77;
+
+
 
 /*
     for (int i = 0; i < DIMENSION; i++)
