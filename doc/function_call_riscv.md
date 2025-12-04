@@ -37,37 +37,41 @@ sp'      	[ 0] - not_used
 
 main:
 		; create stack frame
-        addi    sp,sp,-32			; move stack pointer, make space for new stackframe (8 elements) (I think GCC always builds stack frames with a multiple of 16 byte sizes! Not all elements are used!)
-        sw      ra,28(sp)           ; store address to return to (stored in ra) onto the stack (SHOULD WE CALL MORE FUNCTIONS WITHIN THE BODY OF THIS FUNCTION)
-        sw      s0,24(sp)           ; store old s0/fp (frame pointer) on the stack so it can be restored later because it will be used within this function
-        
-		addi    s0,sp,32			; set new s0/fp (frame pointer) to the start of our new stackframe. 
-									; Now offseting (with negative offsets) from new s0/fp grants access to all elements of the new stack frame
-									
-		; throughout the code, a5 is used as a temporary, working, scratch register
-		; a5 is caller saved, so we need not save it on the stack
-		
-		; int temp_array[3] = { 1, 2, 3 };
+        addi    sp,sp,-32           ; move stack pointer, make space for new stackframe (8 elements) 
+                                    ; (I think GCC always builds stack frames with a multiple of 
+                                    ; 16 byte sizes! Not all elements are used!)
+        sw      ra,28(sp)           ; store address to return to (stored in ra) onto the stack 
+                                    ; (SHOULD WE CALL MORE FUNCTIONS WITHIN THE BODY OF THIS FUNCTION)
+        sw      s0,24(sp)           ; store old s0/fp (frame pointer) on the stack so it can be 
+                                    ; restored later because it will be used within this function
+        addi    s0,sp,32            ; set new s0/fp (frame pointer) to the start of our new stackframe. 
+                                    ; Now offseting (with negative offsets) from new s0/fp grants 
+                                    ; access to all elements of the new stack frame
+
+        ; throughout the code, a5 is used as a temporary, working, scratch register
+        ; a5 is caller saved, so we need not save it on the stack
+
+        ; int temp_array[3] = { 1, 2, 3 };
         li      a5,1
         sw      a5,-28(s0)
         li      a5,2
         sw      a5,-24(s0)
         li      a5,3
         sw      a5,-20(s0)
-		
-		; temp_array[1] = 17;
+
+        ; temp_array[1] = 17;
         li      a5,17
         sw      a5,-24(s0)
-		
-		; prepare return value (here: 0)
-		; the return value goes into register a0 (and a1)
+
+        ; prepare return value (here: 0)
+        ; the return value goes into register a0 (and a1)
         li      a5,0
-		mv      a0,a5
-		
-		; delete stack frame (inverse operation to create stack frame)
-        lw      ra,28(sp)			; restore address to return to
+        mv      a0,a5
+
+        ; delete stack frame (inverse operation to create stack frame)
+        lw      ra,28(sp)           ; restore address to return to
         lw      s0,24(sp)           ; restore s0/fp (frame pointer)
         addi    sp,sp,32            ; remove stack pointer, return space for new stackframe, 8 elements
-		
-		; return
-        jr      ra					; jump to return address
+
+        ; return
+        jr      ra                  ; jump to return address

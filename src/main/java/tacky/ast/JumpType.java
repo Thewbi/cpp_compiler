@@ -28,7 +28,7 @@ public enum JumpType {
         } else if (tempData.equalsIgnoreCase("Break")) {
             return Break;
         } else {
-            throw new RuntimeException("Unknown type: " + data);
+            throw new RuntimeException("Unknown Jump-Type: " + data);
         }
     }
 

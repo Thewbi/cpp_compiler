@@ -357,7 +357,7 @@ public class DefaultTACKYExecutor implements TACKYExecutor {
                     break;
 
                 default:
-                    throw new RuntimeException("Unknown type: " + expressionASTNode.expressionType);
+                    throw new RuntimeException("PRINTF Unknown Expression-type: " + expressionASTNode.expressionType);
             }
         }
 

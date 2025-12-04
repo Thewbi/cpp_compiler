@@ -616,7 +616,7 @@ public class StructureTACKYParserListener extends TACKYParserBaseListener {
                         expressionASTNode.expressionType = ExpressionType.IntegerLiteral;
                         break;
                     default:
-                        throw new RuntimeException("Unknown type: " + type);
+                        throw new RuntimeException("Unknown enterExpr-type: " + type);
                 }
 
             } else if (parseTree instanceof Constant_declContext) {

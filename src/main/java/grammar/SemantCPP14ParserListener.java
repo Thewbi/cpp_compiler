@@ -367,7 +367,7 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
             Type targetType = typeMap.get(targetTypeName);
 
             if (targetType == null) {
-                throw new RuntimeException("Unknown type:  \"" + targetType + "\"");
+                throw new RuntimeException("Unknown Variable-Type:  \"" + targetType + "\"");
             }
 
             // type of the assigned value

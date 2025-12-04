@@ -1,57 +1,19 @@
 Program("main")
 
+Function("func_void", true, [
+
+    # -- Function -- printf
+    printf("This comes from func_void()!\n")
+    return(Constant(ConstInt(0)))
+])
+
 Function("main", true, [
-    temp_array = Var("temp_array", Array(int32, 3))
-    sizeof_array_type = Var("sizeof_array_type")
-    sizeof(int32, sizeof_array_type)
-    temp_array.ptr = Var("temp_array.ptr")
-    GetAddress(temp_array, temp_array.ptr)
-    // assign to array-element
-    // 0
-    sizeof_array_type = Var("sizeof_array_type")
-    sizeof(int32, sizeof_array_type)
-    temp_array.ptr.ptr.tmp.1 = Var("temp_array.ptr.ptr.tmp.1")
-    temp_array.ptr.ptr.tmp.1 = Constant(ConstInt(0)) * sizeof_array_type
-    temp_array.ptr.ptr.tmp = Var("temp_array.ptr.ptr.tmp")
-    temp_array.ptr.ptr.tmp = temp_array.ptr + temp_array.ptr.ptr.tmp.1
-    temp_array.ptr.tmp.0 = Var("temp_array.ptr.tmp.0")
-    temp_array.ptr.tmp.0 = Constant(ConstInt(10))
-    Store(temp_array.ptr.tmp.0, temp_array.ptr.ptr.tmp)
-    // assign to array-element
-    // 1
-    sizeof_array_type = Var("sizeof_array_type")
-    sizeof(int32, sizeof_array_type)
-    temp_array.ptr.ptr.tmp.1 = Var("temp_array.ptr.ptr.tmp.1")
-    temp_array.ptr.ptr.tmp.1 = Constant(ConstInt(1)) * sizeof_array_type
-    temp_array.ptr.ptr.tmp = Var("temp_array.ptr.ptr.tmp")
-    temp_array.ptr.ptr.tmp = temp_array.ptr + temp_array.ptr.ptr.tmp.1
-    temp_array.ptr.tmp.0 = Var("temp_array.ptr.tmp.0")
-    temp_array.ptr.tmp.0 = Constant(ConstInt(11))
-    Store(temp_array.ptr.tmp.0, temp_array.ptr.ptr.tmp)
-    // assign to array-element
-    // 2
-    sizeof_array_type = Var("sizeof_array_type")
-    sizeof(int32, sizeof_array_type)
-    temp_array.ptr.ptr.tmp.1 = Var("temp_array.ptr.ptr.tmp.1")
-    temp_array.ptr.ptr.tmp.1 = Constant(ConstInt(2)) * sizeof_array_type
-    temp_array.ptr.ptr.tmp = Var("temp_array.ptr.ptr.tmp")
-    temp_array.ptr.ptr.tmp = temp_array.ptr + temp_array.ptr.ptr.tmp.1
-    temp_array.ptr.tmp.0 = Var("temp_array.ptr.tmp.0")
-    temp_array.ptr.tmp.0 = Constant(ConstInt(12))
-    Store(temp_array.ptr.tmp.0, temp_array.ptr.ptr.tmp)
-    temp_array.addr.ptr = Var("temp_array.addr.ptr")
-    GetAddress(temp_array, temp_array.addr.ptr)
-    // assign to array-element
-    // 0
-    sizeof_array_type = Var("sizeof_array_type")
-    sizeof(int32, sizeof_array_type)
-    temp_array.addr.ptr.ptr.tmp.1 = Var("temp_array.addr.ptr.ptr.tmp.1")
-    temp_array.addr.ptr.ptr.tmp.1 = Constant(ConstInt(0)) * sizeof_array_type
-    temp_array.addr.ptr.ptr.tmp = Var("temp_array.addr.ptr.ptr.tmp")
-    temp_array.addr.ptr.ptr.tmp = temp_array.addr.ptr + temp_array.addr.ptr.ptr.tmp.1
-    temp_array.addr.ptr.tmp.0 = Var("temp_array.addr.ptr.tmp.0")
-    temp_array.addr.ptr.tmp.0 = Constant(ConstInt(15))
-    Store(temp_array.addr.ptr.tmp.0, temp_array.addr.ptr.ptr.tmp)
+
+    # -- Function -- func_void
+    tmp.func_void = Var("tmp.func_void")
+    funccall(func_void, false, tmp.func_void)
+
+    # -- Function -- exit
     exit()
     return(Constant(ConstInt(0)))
 ])

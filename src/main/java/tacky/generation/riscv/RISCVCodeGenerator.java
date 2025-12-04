@@ -9,8 +9,11 @@ import tacky.ast.AssignmentASTNode;
 import tacky.ast.ConstIntASTNode;
 import tacky.ast.ConstantDeclarationASTNode;
 import tacky.ast.ExitASTNode;
+import tacky.ast.FunctionCallASTNode;
+import tacky.ast.FunctionDefinitionASTNode;
 import tacky.ast.JumpASTNode;
 import tacky.ast.LabelASTNode;
+import tacky.ast.LoadFromAddressASTNode;
 import tacky.ast.PrintfASTNode;
 import tacky.ast.ReturnASTNode;
 import tacky.ast.SizeofASTNode;
@@ -46,9 +49,9 @@ public class RISCVCodeGenerator implements Generator {
 
         // stringBuilder.append("\n").append(indent).append(".text").append("\n").append("\n");
 
-        // start symbol
-        stringBuilder.append("main:").append("\n");
-        stringBuilder.append("_start:").append("\n");
+        // // start symbol
+        // stringBuilder.append("main:").append("\n");
+        // stringBuilder.append("_start:").append("\n");
 
     }
 
@@ -79,46 +82,7 @@ public class RISCVCodeGenerator implements Generator {
     }
 
     @Override
-    public int executeFunction(ASTNode functionAstNode) {
-
-        // build StackFrame for this function call
-
-        stackFrame = new RISCVStackFrame();
-
-        // 1. for each local variable declaration used in this function,
-        // reserve space on the stack
-        for (ASTNode astNode : functionAstNode.children) {
-            RISCVStackEntry stackEntry = astNode.addToStackFrame(stackFrame);
-            // if (stackEntry != null) {
-            //     System.out.println(stackEntry.toString());
-            // }
-        }
-
-        // advance stack pointer
-
-        int stackSizeUsed = stackFrame.computeAddresses(stackPointer);
-
-        for (Map.Entry<String, RISCVStackEntry> entry : stackFrame.stackEntryMap.entrySet()) {
-            System.out.println(entry.getValue().toString());
-        }
-
-        // @formatter:off
-        stringBuilder.append(indent)
-            .append("addi    sp, sp, ").append((-1) * stackSizeUsed)
-            .append("\n");
-        // @formatter:on
-
-        stackPointer -= stackSizeUsed;
-
-        // generate code for all children
-        for (ASTNode astNode : functionAstNode.children) {
-            execute(astNode);
-        }
-
-        return 0;
-    }
-
-    private void execute(ASTNode astNode) {
+    public void execute(ASTNode astNode) {
 
         // DEBUG print node
         // boolean printAST = true;
@@ -135,12 +99,25 @@ public class RISCVCodeGenerator implements Generator {
             }
                 break;
 
+            case PROGRAM: {
+            }
+                break;
+
+            case FUNCTION_DEFINITION: {
+                executeFunction((FunctionDefinitionASTNode) astNode);
+            }
+                break;
+
             case FUNCTION_DECLARATION: {
+                // System.out.println(astNode.toString());
+
             }
                 break;
 
             case FUNCTION_CALL: {
-                processFunctionCall(astNode);
+                // the delegator inserts special code for built-in print(), exit() functions
+                // and also handles calls to normal code-declared functions
+                processFunctionCallDelegator(astNode);
             }
                 break;
 
@@ -148,10 +125,12 @@ public class RISCVCodeGenerator implements Generator {
                 // e.g. length = Var("length")
                 // No output takes place. The only change is that the stack pointer is
                 // decremented to makes room for the local variable on teh stack.
+                // System.out.println(astNode.toString());
             }
                 break;
 
             case ITERATION_STATEMENT: {
+                // System.out.println(astNode.toString());
             }
                 break;
 
@@ -162,11 +141,13 @@ public class RISCVCodeGenerator implements Generator {
 
             case SIMPLE_DECLARATION: {
                 // nop
+                // System.out.println(astNode.toString());
             }
                 break;
 
             case EXPRESSION: {
                 // nop
+                // System.out.println(astNode.toString());
             }
                 break;
 
@@ -269,9 +250,9 @@ public class RISCVCodeGenerator implements Generator {
                 // the memory cell having the address stored in ptr
 
                 // Generated risc
-                // sw 
+                // sw
 
-                //throw new RuntimeException("Not yet implemented ! STORE_TO_ADDRESS");
+                // throw new RuntimeException("Not yet implemented ! STORE_TO_ADDRESS");
 
                 ValueASTNode child0 = (ValueASTNode) astNode.children.get(0);
                 ValueASTNode child1 = (ValueASTNode) astNode.children.get(1);
@@ -279,11 +260,12 @@ public class RISCVCodeGenerator implements Generator {
                 String valueVariableName = child0.value;
                 String ptrVariableName = child1.value;
 
-                // RISCVStackEntry riscvStackEntry = stackFrame.stackEntryMap.get(ptrVariableName);
+                // RISCVStackEntry riscvStackEntry =
+                // stackFrame.stackEntryMap.get(ptrVariableName);
                 // int address = riscvStackEntry.address;
 
                 stringBuilder.append(indent).append("# StoreToAddress()").append("\n");
-                
+
                 String tempRegister = "t2";
                 loadLocalVariableIntoTempRegister(tempRegister, valueVariableName);
 
@@ -302,14 +284,88 @@ public class RISCVCodeGenerator implements Generator {
 
                 // System.out.println();
             }
-            break;
+                break;
+
+            case LOAD_FROM_ADDRESS: {
+
+                // Load(numbers.addr.ptr.ptr.tmp, idxResult)
+
+                // lw ra,28(sp)
+
+                LoadFromAddressASTNode loadFromAddressASTNode = (LoadFromAddressASTNode) astNode;
+
+                // retrieve local variable from stack and store it's value into a temp register
+                String tempRegister = "t0";
+                loadLocalVariableIntoTempRegister(tempRegister, loadFromAddressASTNode.ptrVariableName);
+
+                // store word into target local variable
+                RISCVStackEntry riscvStackEntry = stackFrame.stackEntryMap.get(loadFromAddressASTNode.variableName);
+
+                int address = riscvStackEntry.address;
+                int offset = address - stackPointer;
+
+                // @formatter:off
+                // int offset = 0;
+                stringBuilder.append(indent)
+                    .append("sw      ").append(tempRegister).append(", ")
+                    .append(offset).append("(").append("sp").append(")")
+                    .append("\n");
+                // @formatter:on
+
+            }
+                break;
 
             case UNKNOWN:
             default:
                 // System.out.println("Unknown type: " + astNode.astNodeType);
                 // return;
-                throw new RuntimeException("Unknown type: " + astNode.astNodeType);
+                throw new RuntimeException("Unknown AST-Node type: " + astNode.astNodeType);
         }
+    }
+
+    private void executeFunction(FunctionDefinitionASTNode functionAstNode) {
+
+        // build StackFrame for this function call
+
+        stackFrame = new RISCVStackFrame();
+
+        // 1. for each local variable declaration used in this function,
+        // reserve space on the stack
+        for (ASTNode astNode : functionAstNode.children) {
+            RISCVStackEntry stackEntry = astNode.addToStackFrame(stackFrame);
+        }
+
+        // advance stack pointer
+
+        int stackSizeUsed = stackFrame.computeAddresses(stackPointer);
+
+        for (Map.Entry<String, RISCVStackEntry> entry : stackFrame.stackEntryMap.entrySet()) {
+            System.out.println(entry.getValue().toString());
+        }
+
+        // start symbol
+
+        stringBuilder.append(functionAstNode.value).append(":").append("\n");
+        if (functionAstNode.value.equalsIgnoreCase("main")) {
+            stringBuilder.append("_start:").append("\n");
+        }
+
+        // @formatter:off
+        stringBuilder.append(indent)
+            .append("addi    sp, sp, ").append((-1) * stackSizeUsed)
+            .append("\n");
+        // @formatter:on
+
+        stackPointer -= stackSizeUsed;
+
+        // generate code for all children
+        for (ASTNode astNode : functionAstNode.children) {
+            execute(astNode);
+        }
+
+        // no ret command or jr ra is added since these types
+        // of return statements are handled by the code generation for
+        // the return-statement. See processReturn()
     }
 
     /**
@@ -482,8 +538,8 @@ public class RISCVCodeGenerator implements Generator {
 
         String tempRegister = "t0";
         stringBuilder.append(indent)
-            .append("# variable '").append(variableName).append("'")
-            .append("\n");
+                .append("# variable '").append(variableName).append("'")
+                .append("\n");
 
         if (valueIsRegister) {
 
@@ -533,14 +589,22 @@ public class RISCVCodeGenerator implements Generator {
         } else if (child0 instanceof ExpressionASTNode) {
             ExpressionASTNode child0ExpressionASTNode = (ExpressionASTNode) child0;
             switch (child0ExpressionASTNode.expressionType) {
+
                 case Identifier:
                     loadLocalVariableIntoTempRegister(tempRegister0, child0.value);
                     break;
+
+                case IntegerLiteral:
+                    loadValueIntoTempRegister(tempRegister0, child0.value);
+                    break;
+
                 case Constant:
                     loadValueIntoTempRegister(tempRegister0, unwrapConstant(child0).value);
                     break;
+
                 default:
-                    throw new RuntimeException();
+                    throw new RuntimeException(
+                            "Unknown loadIntoTempRegisters type: " + child0ExpressionASTNode.expressionType);
             }
         }
 
@@ -562,7 +626,7 @@ public class RISCVCodeGenerator implements Generator {
     }
 
     /**
-     * Find the variable in the current stack frame (= local variable), 
+     * Find the variable in the current stack frame (= local variable),
      * retrieves the value by emitting a lw instruction into the 'register'.
      * 
      * @param register
@@ -622,14 +686,27 @@ public class RISCVCodeGenerator implements Generator {
         return temp2;
     }
 
-    private void processFunctionCall(ASTNode astNode) {
+    private void processFunctionCallDelegator(ASTNode astNode) {
+
+        // special treatment for built-in printf() and exit()
         if (astNode instanceof PrintfASTNode) {
             processPrintfFunctionCall((PrintfASTNode) astNode);
         } else if (astNode instanceof ExitASTNode) {
             processExitFunctionCall((ExitASTNode) astNode);
+        } else if (astNode instanceof FunctionCallASTNode) {
+            // generate code for function call to code-declared functions (not built-in)
+            processFunctionCall((FunctionCallASTNode) astNode);
         } else {
             throw new RuntimeException();
         }
+    }
+
+    private void processFunctionCall(FunctionCallASTNode functionCallASTNode) {
+
+        String calledFunctionName = functionCallASTNode.value;
+
+        // call puts
+        stringBuilder.append(indent).append("call    ").append(calledFunctionName).append("\n");
     }
 
     private void processPrintfFunctionCall(PrintfASTNode astNode) {

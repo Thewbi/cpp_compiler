@@ -18,12 +18,14 @@ public class DefaultStructureCallback implements StructureCallback {
 
     @Override
     public void startScope() {
-        System.out.println("[STR-CB] startScope()");
+        // DEBUG
+        // System.out.println("[STR-CB] startScope()");
     }
 
     @Override
     public void endScope() {
-        System.out.println("[STR-CB] endScope()");
+        // DEBUG
+        // System.out.println("[STR-CB] endScope()");
     }
 
     @Override
@@ -57,29 +59,29 @@ public class DefaultStructureCallback implements StructureCallback {
 
     @Override
     public void functionDeclaration(FuncDecl funcDecl) {
-        System.out.println("[STR-CB] functionDeclaration() " + funcDecl);
+        // System.out.println("[STR-CB] functionDeclaration() " + funcDecl);
         clearExpressions();
-        System.out.println("");
+        // System.out.println("");
     }
 
     @Override
     public void variableDeclaration(String name, Type type) {
-        System.out.println("[STR-CB] variableDeclaration() Name: \"" + name + "\" Type: " + type);
-        System.out.println("");
+        // System.out.println("[STR-CB] variableDeclaration() Name: \"" + name + "\" Type: " + type);
+        // System.out.println("");
     }
 
     @Override
     public void variableAssignment(String name) {
-        System.out.println("[STR-CB] variableAssignment() Name: \"" + name + "\" \nExpressions: " + expressions);
+        // System.out.println("[STR-CB] variableAssignment() Name: \"" + name + "\" \nExpressions: " + expressions);
         clearExpressions();
-        System.out.println("");
+        // System.out.println("");
     }
 
     @Override
     public void returnStatement() {
-        System.out.println("[STR-CB] returnStatement() \nExpressions: " + expressions);
+        // System.out.println("[STR-CB] returnStatement() \nExpressions: " + expressions);
         clearExpressions();
-        System.out.println("");
+        // System.out.println("");
     }
 
     @Override

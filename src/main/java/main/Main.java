@@ -560,10 +560,15 @@ public class Main {
         RISCVCodeGenerator riscvCodeGenerator = new RISCVCodeGenerator();
         riscvCodeGenerator.stackPointer = 0x00020000;
 
-        //riscvCodeGenerator.executeFunction(newTackyStackFrameGen, rootNode, 0, mainFunctionGen);
-
         riscvCodeGenerator.start();
-        riscvCodeGenerator.executeFunction(rootNode.getChildren().get(1));
+
+        //riscvCodeGenerator.executeFunction(mainFunctionGen);
+        //riscvCodeGenerator.executeFunction(rootNode.getChildren().get(1));
+
+        for (ASTNode child : rootNode.children) {
+            riscvCodeGenerator.execute(child);
+        }
+
         riscvCodeGenerator.end();
 
         System.out.println("```");
@@ -579,12 +584,12 @@ public class Main {
 
     private static FunctionDefinitionASTNode getMainFunction(ASTNode rootNode,
             StructureTACKYParserListener structureTACKYParserListener) {
+
         // find the 'program' statement
         ProgramASTNode program = (ProgramASTNode) rootNode.children.stream().filter(e -> e instanceof ProgramASTNode)
                 .findFirst().get();
         String mainEntryPointName = program.value;
 
-        
         FunctionDefinitionASTNode mainFunction = structureTACKYParserListener.functionDefinitionMap
                 .get(mainEntryPointName);
 
@@ -603,7 +608,8 @@ public class Main {
      */
     private static ASTNode translationUnit() throws IOException {
 
-        System.out.println("translationUnit");
+        // DEBUG
+        // System.out.println("translationUnit");
 
         // final String filename =
         // "src/test/resources/WritingACCompilerNoraSandler/simplest.c";
@@ -951,27 +957,28 @@ public class Main {
         // final String filename = "src/test/resources/expressions_5.cpp";
         // final String filename = "src/test/resources/expressions_6.cpp";
 
-        // final String filename = "src/test/resources/examples/matrix_tester.cpp";
+        // final String filename = "src/test/resources/examples/matrix_tester.cpp"; // <--- this has function prototypes in it!
         // final String filename = "src/test/resources/examples/matrix_tester_scratchpad.cpp";
-       final String filename = "src/test/resources/examples/matrix_tester_2.cpp";
+        // final String filename = "src/test/resources/examples/matrix_tester_2.cpp";
+        // final String filename = "src/test/resources/examples/matrix_tester_3.cpp";
 
         // final String filename = "src/test/resources/printf.cpp";
         // final String filename = "src/test/resources/printf_2.cpp";
 
-        // final String filename = "src/test/resources/array_example.c";
+        // final String filename = "src/test/resources/array_example.c"; // <--- Language Test 2
         // final String filename = "src/test/resources/array_indexing.cpp";
         // final String filename = "src/test/resources/array_indexing_2.cpp";
         // final String filename = "src/test/resources/array_indexing_3.cpp"; // <------
 
         // final String filename = "src/test/resources/function_call.cpp";
-        // final String filename = "src/test/resources/function_call_2.cpp";
-        // final String filename = "src/test/resources/function_call_3.cpp";
+        final String filename = "src/test/resources/function_call_2.cpp"; // <--- Language Test 3
+        // final String filename = "src/test/resources/function_call_3.cpp"; // <--- Language Test 4
         // final String filename = "src/test/resources/function_call_4.cpp"; // <--- test
         // final String filename = "src/test/resources/function_call_5.cpp";
-        // final String filename = "src/test/resources/function_call_6.cpp"; // <--- this is the full matrix mult!
+        // final String filename = "src/test/resources/function_call_6.cpp"; // <--- THIS HAS TO WORK! this is the full matrix mult!
         // final String filename = "src/test/resources/function_call_7.cpp";
 
-        // final String filename = "src/test/resources/for_loop.cpp";
+        // final String filename = "src/test/resources/for_loop.cpp"; // <--- Language Test 1
         // final String filename = "src/test/resources/for_loop_2.cpp";
         // final String filename = "src/test/resources/for_loop_over_array.cpp";
 
@@ -1489,5 +1496,5 @@ public class Main {
             System.out.println("---------------------------------------------------");
         }
     }
-    
+
 }

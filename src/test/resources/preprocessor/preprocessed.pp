@@ -1,31 +1,13 @@
 
 
-
-
+ void func_void ( )
+ {
+      printf ( "This comes from func_void()!\n" ) ;
+ }
 
  int main ( )
  {
-     
-
-     
-     
-     
-     
-     
-     
-
-      int temp_array [ 3 ] = { 10 , 11 , 12 } ;
-      temp_array [ 0 ] = 15 ;
-
-     
-     
-     
-     
-     
-     
-
-     
-
+      func_void ( ) ;
 
       exit ( ) ;
       return 0 ;

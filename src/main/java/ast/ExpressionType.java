@@ -103,7 +103,7 @@ public enum ExpressionType {
         } else if (tempData.equalsIgnoreCase("%")) {
             return Modulo;
         } else {
-            throw new RuntimeException("Unknown type: " + data);
+            throw new RuntimeException("Unknown Expression-Type: " + data);
         }
     }
 

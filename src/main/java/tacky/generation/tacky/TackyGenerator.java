@@ -104,7 +104,7 @@ public class TackyGenerator {
                 break;
 
             default:
-                System.out.println("Unknown type: \"" + astNode.astNodeType + "\" ");
+                System.out.println("Unknown Tacky-Generator type: \"" + astNode.astNodeType + "\" ");
                 enterUnknown(astNode);
                 for (ASTNode child : astNode.children) {
                     process(indent, child);
@@ -145,17 +145,20 @@ public class TackyGenerator {
 
     private void enterFunctionCall(int indent, DeclaratorASTNode astNode) {
 
-        // -- add new line for improved readability --
-
-        // stringBuilder.append("\n");
-
         // -- build indent string --
 
         String indentString = buildIndentString(indent);
 
+        // -- add new line for improved readability --
+
+        String calledFunctionName = astNode.children.get(0).value;
+
+        stringBuilder.append("\n");
+        stringBuilder.append(indentString).append("# -- Function -- ").append(calledFunctionName).append("\n");
+
         // -- function return value + actual parameters --
 
-        String calledFunctionName = astNode.value.substring(0, astNode.value.indexOf("("));
+        // String calledFunctionName = astNode.value.substring(0, astNode.value.indexOf("("));
 
         // // DEBUG
         // System.out.println("Processing function: \"" + calledFunctionName + "\"");
@@ -172,71 +175,99 @@ public class TackyGenerator {
 
         } else {
 
-            // Create a variable to store the functions return value
+            // create a variable to store the functions return value
             // tmp.0 = Var("tmp.0")
             String returnValueVariableName = "tmp." + calledFunctionName;
             defineVariable(indent, returnValueVariableName, TackyDataType.INT_8);
 
-            // determine if a parameter requires a pointer variable
+            ASTNode parameters = astNode.children.get(1);
 
-            // actual parameters
-            for (int i = 1; i < astNode.children.size(); i++) {
+            // sadly because the grammar is wierd, function calls without parameters
+            // and function calls with parameters lead to different AST nodes!
+            // Maybe unify the AST generation if you have a very large brain!
+            if (parameters instanceof ParametersAndQualifiersASTNode) {
 
-                ASTNode param = astNode.children.get(i);
+                // do nothing, empty parameter list
 
-                // DEBUG
-                // System.out.println(param);
+                // // unwrap parameter decl list ASTNode
+                // ParametersAndQualifiersASTNode parametersAndQualifiersASTNode = (ParametersAndQualifiersASTNode) 
 
-                if (param instanceof ExpressionASTNode) {
+                // //  if the function has any formal parameters prepare code for pointer parameters
+                // if (parametersAndQualifiersASTNode.children.size() > 0) {
+                //     ParameterDeclarationListASTNode parameterDeclarationListASTNode = (ParameterDeclarationListASTNode) parametersAndQualifiersASTNode.children.get(0);
+                    
+                    // // formal parameters
+                    // for (int i = 0; i < parameterDeclarationListASTNode.children.size(); i++) {
 
-                    ExpressionASTNode expr = (ExpressionASTNode) param;
-                    switch (expr.expressionType) {
+                    // }
 
-                        case Primary:
-                            // ignored: Just pass the number as is without wrapping it in const
-                            // stringBuilder.append(",
-                            // Constant(ConstInt(").append(param.value).append("))");
-                            break;
+                // }
 
-                        case Identifier:
+            } else {
+            
+                // determine if a parameter requires a pointer variable
 
-                            // // DEBUG
-                            // if (param.value.equalsIgnoreCase("subMatrixB")) {
-                            // System.out.println("subMatrixB");
-                            // }
+                // formal parameters
+                for (int i = 1; i < astNode.children.size(); i++) {
 
-                            TACKYStackFrameVariableDescriptor tackyStackFrameVariableDescriptor = findVariableDescriptorInStack(
-                                    param.value);
+                    ASTNode param = astNode.children.get(i);
 
-                            // CHECK
-                            if (tackyStackFrameVariableDescriptor == null) {
-                                throw new RuntimeException("Parameter cannot be identified: \"" + param.value + "\"");
-                            }
+                    // DEBUG
+                    
+                    // System.out.println(param);
 
-                            // check if the identifier is an array
-                            if (tackyStackFrameVariableDescriptor.isArray) {
+                    if (param instanceof ExpressionASTNode) {
 
-                                stringBuilder.append(indentString);
-                                stringBuilder.append("// parameter " + i + " for function call").append("\n");
+                        ExpressionASTNode expr = (ExpressionASTNode) param;
+                        switch (expr.expressionType) {
 
-                                // tmp.1.ptr = Var("tmp.1.ptr") // address: 8
-                                String varName = "tmp." + i + ".ptr";
-                                defineVariable(indent, varName, TackyDataType.INT_32);
-                                addVariableToScope(varName, TackyDataType.INT_32, false, false);
+                            case Primary:
+                                // ignored: Just pass the number as is without wrapping it in const
+                                // stringBuilder.append(",
+                                // Constant(ConstInt(").append(param.value).append("))");
+                                break;
 
-                                // store an address into the pointer
-                                // GetAddress(tmp.1, tmp.1.ptr)
-                                stringBuilder.append(indentString).append("GetAddress(")
-                                        .append(param.value).append(", ").append(varName).append(")");
-                                stringBuilder.append("\n");
+                            case Identifier:
 
-                            }
-                            break;
+                                // // DEBUG
+                                // if (param.value.equalsIgnoreCase("subMatrixB")) {
+                                // System.out.println("subMatrixB");
+                                // }
 
-                        default:
-                            throw new RuntimeException("Case not treated! type=" + expr.expressionType);
+                                TACKYStackFrameVariableDescriptor tackyStackFrameVariableDescriptor = findVariableDescriptorInStack(
+                                        param.value);
+
+                                // CHECK
+                                if (tackyStackFrameVariableDescriptor == null) {
+                                    throw new RuntimeException("Parameter cannot be identified: \"" + param.value + "\"");
+                                }
+
+                                // check if the identifier is an array
+                                if (tackyStackFrameVariableDescriptor.isArray) {
+
+                                    stringBuilder.append(indentString);
+                                    stringBuilder.append("// parameter " + i + " for function call").append("\n");
+
+                                    // tmp.1.ptr = Var("tmp.1.ptr") // address: 8
+                                    String varName = "tmp." + i + ".ptr";
+                                    defineVariable(indent, varName, TackyDataType.INT_32);
+                                    addVariableToScope(varName, TackyDataType.INT_32, false, false);
+
+                                    // store an address into the pointer
+                                    // GetAddress(tmp.1, tmp.1.ptr)
+                                    stringBuilder.append(indentString).append("GetAddress(")
+                                            .append(param.value).append(", ").append(varName).append(")");
+                                    stringBuilder.append("\n");
+
+                                }
+                                break;
+
+                            default:
+                                throw new RuntimeException("Case not treated! type=" + expr.expressionType);
+                        }
                     }
                 }
+
             }
 
             // // Function Call
@@ -247,77 +278,103 @@ public class TackyGenerator {
 
             // @formatter:off
 
-            stringBuilder.append(indentString).
-                append("funccall(")
+            stringBuilder.append(indentString)
+                .append("funccall(")
                 .append(calledFunctionName)
                 .append(", false");
 
             // @formatter:on
 
             // actual parameters
-            for (int i = 1; i < astNode.children.size(); i++) {
 
-                ASTNode param = astNode.children.get(i);
-                // System.out.println(param);
+            if (parameters instanceof ParametersAndQualifiersASTNode) {
+                
+                // do nothing, empty parameter list
 
-                if (param instanceof ExpressionASTNode) {
+                // ParametersAndQualifiersASTNode parametersAndQualifiersASTNode = (ParametersAndQualifiersASTNode) astNode.children.get(1);
+                // ParameterDeclarationListASTNode parameterDeclarationListASTNode = (ParameterDeclarationListASTNode) parametersAndQualifiersASTNode.children.get(0);
+                // if the function has any formal parameters prepare code for pointer parameters
+                //if (parametersAndQualifiersASTNode.children.size() > 0) {
 
-                    ExpressionASTNode expr = (ExpressionASTNode) param;
-                    switch (expr.expressionType) {
+                    // ParameterDeclarationListASTNode parameterDeclarationListASTNode = (ParameterDeclarationListASTNode) parametersAndQualifiersASTNode.children.get(0);
+                    // for (int i = 0; i < parameterDeclarationListASTNode.children.size(); i++) {
+                    //     ASTNode param = parameterDeclarationListASTNode.children.get(i);
 
-                        case Primary:
-                            stringBuilder.append(", Constant(ConstInt(").append(param.value).append("))");
-                            break;
+                    // }
 
-                        case StringLiteral:
-                            stringBuilder.append(", Constant(ConstString(").append(param.value).append("))");
-                            break;
+                // }
 
-                        case Identifier:
+            } else { 
+            
+                for (int i = 1; i < astNode.children.size(); i++) {
 
-                            // TACKYStackFrameVariableDescriptor tackyStackFrameVariableDescriptor =
-                            // tackyStackFrame.variables
-                            // .get(param.value);
+                     ASTNode param = astNode.children.get(i);
 
-                            TACKYStackFrameVariableDescriptor tackyStackFrameVariableDescriptor = findVariableDescriptorInStack(
-                                    param.value);
+                    // System.out.println(param);
 
-                            // System.out.println("test");
+                    if (param instanceof ExpressionASTNode) {
 
-                            // check if the identifier is an array
-                            if (tackyStackFrameVariableDescriptor.isArray) {
+                        ExpressionASTNode expr = (ExpressionASTNode) param;
+                        switch (expr.expressionType) {
 
-                                // // tmp.1.ptr = Var("tmp.1.ptr") // address: 8
-                                // defineVariable(0, "tmp.1.ptr", TackyDataType.INT_32);
-                                // addVariableToScope("tmp.1.ptr", TackyDataType.INT_32, false);
+                            case Primary:
+                                //stringBuilder.append(", Constant(ConstInt(").append(param.value).append("))");
+                                stringBuilder.append(", ").append(wrapInConstant(param.value));
+                                break;
 
-                                // // store an address into the pointer
-                                // // GetAddress(tmp.1, tmp.1.ptr)
-                                // stringBuilder.append(indentString).append("GetAddress(")
-                                // .append(param.value).append(", ").append("tmp.1.ptr").append(")");
+                            case StringLiteral:
+                                stringBuilder.append(", Constant(ConstString(").append(param.value).append("))");
+                                break;
 
-                                // // Function Call
-                                // // provide actual parameters for both arguments
-                                // // provide a parameter for the return value
-                                // funccall(test_function, false,
-                                // tmp.1.ptr,
-                                // tmp.0
-                                // )
-                                stringBuilder.append(", tmp." + i + ".ptr");
+                            case Identifier:
 
-                            } else {
-                                // throw new RuntimeException();
-                                stringBuilder.append(", " + tackyStackFrameVariableDescriptor.name);
-                            }
+                                // TACKYStackFrameVariableDescriptor tackyStackFrameVariableDescriptor =
+                                // tackyStackFrame.variables
+                                // .get(param.value);
 
-                            break;
+                                TACKYStackFrameVariableDescriptor tackyStackFrameVariableDescriptor = findVariableDescriptorInStack(
+                                        param.value);
 
-                        default:
-                            throw new RuntimeException();
+                                // System.out.println("test");
+
+                                // check if the identifier is an array
+                                if (tackyStackFrameVariableDescriptor.isArray) {
+
+                                    // // tmp.1.ptr = Var("tmp.1.ptr") // address: 8
+                                    // defineVariable(0, "tmp.1.ptr", TackyDataType.INT_32);
+                                    // addVariableToScope("tmp.1.ptr", TackyDataType.INT_32, false);
+
+                                    // // store an address into the pointer
+                                    // // GetAddress(tmp.1, tmp.1.ptr)
+                                    // stringBuilder.append(indentString).append("GetAddress(")
+                                    // .append(param.value).append(", ").append("tmp.1.ptr").append(")");
+
+                                    // // Function Call
+                                    // // provide actual parameters for both arguments
+                                    // // provide a parameter for the return value
+                                    // funccall(test_function, false,
+                                    // tmp.1.ptr,
+                                    // tmp.0
+                                    // )
+                                    stringBuilder.append(", tmp." + i + ".ptr");
+
+                                } else {
+                                    // throw new RuntimeException();
+                                    stringBuilder.append(", " + tackyStackFrameVariableDescriptor.name);
+                                }
+
+                                break;
+
+                            default:
+                                throw new RuntimeException("Unhandeled expression type: " + expr.expressionType);
+                        }
+
+                    } else {
+
+                        throw new RuntimeException("Unhandeled Parameter Type: " + param);
+
                     }
 
-                } else {
-                    throw new RuntimeException();
                 }
 
             }
@@ -588,14 +645,12 @@ public class TackyGenerator {
 
             // existing variable is initialized
 
-            // boolean isArray = false;
             String index = "0";
 
             ASTNode child0ASTNode = declaratorASTNode.children.get(0);
             if (child0ASTNode instanceof DeclaratorASTNode) {
 
                 DeclaratorASTNode child0 = (DeclaratorASTNode) child0ASTNode;
-                // isArray = child0.isArray;
 
                 ExpressionASTNode expressionASTNode = child0.indexExpression;
 
@@ -606,7 +661,7 @@ public class TackyGenerator {
                         break;
 
                     case IntegerLiteral:
-                        index = evaluate(expressionASTNode).toString();
+                        index = wrapInConstant(evaluate(expressionASTNode).toString());
                         break;
 
                     case Primary:
@@ -654,8 +709,13 @@ public class TackyGenerator {
 
                 }
 
-                assignValueToArrayElement(indent, declaratorASTNode, arrayPointerName, index,
-                        assignedValue.toString());
+                // @formatter:off
+                assignValueToArrayElement(indent, 
+                    declaratorASTNode, 
+                    arrayPointerName, 
+                    index,
+                    assignedValue.toString());
+                // @formatter:on
 
             } else if (child0ASTNode instanceof ExpressionASTNode) {
 
@@ -743,7 +803,9 @@ public class TackyGenerator {
 
         stringBuilder.append(indentString)
             .append(arrayPtrName + ".ptr.tmp.1").append(" = ")
-            .append(wrapInConstant(arrayElementIndex)).append(" * ").append("sizeof_array_type")
+            //.append(wrapInConstant(arrayElementIndex))
+            .append(arrayElementIndex)
+            .append(" * ").append("sizeof_array_type")
             .append("\n");
 
         defineVariable(indent, arrayPtrName + ".ptr.tmp", null);
@@ -766,8 +828,8 @@ public class TackyGenerator {
         // tmp.0 = 18
         stringBuilder.append(indentString)
             .append(arrayPtrName + ".tmp.0").append(" = ")
-            // .append(value)
-            .append(wrapInConstant(value))
+            .append(value)
+            // .append(wrapInConstant(value))
             .append("\n");
 
         // write data into the array element
@@ -787,7 +849,11 @@ public class TackyGenerator {
 
     private void retrieveValueFromArrayElement(int indent, DeclaratorASTNode declaratorASTNode,
             String arrayPtrName, int arrayElementIndex, String destinationVariableName) {
-        generateArrayAccessIndexer(indent, arrayPtrName, "" + arrayElementIndex, destinationVariableName);
+
+        generateArrayAccessIndexer(indent, 
+            arrayPtrName, 
+            wrapInConstant("" + arrayElementIndex), 
+            destinationVariableName);
     }
 
     private void retrieveValueFromArrayElementByVariable(int indent, DeclaratorASTNode declaratorASTNode,
@@ -820,7 +886,7 @@ public class TackyGenerator {
         defineVariable(indent, arrayPtrName + ".ptr.tmp.1", null);
         stringBuilder.append(indentString)
                 .append(arrayPtrName + ".ptr.tmp.1").append(" = ")
-                .append(arrayPtrName).append(" * ").append("sizeof_array_type")
+                .append(arrayElementIndex).append(" * ").append("sizeof_array_type")
                 .append("\n");
 
         // advance the pointer forward to the requested fifth element
@@ -928,7 +994,7 @@ public class TackyGenerator {
         stringBuilder.append(indentString);
 
         // TODO: implement correct return code
-        stringBuilder.append("return(Constant(ConstInt(0)))").append("\n");
+        stringBuilder.append("return(").append(wrapInConstant("0")).append(")").append("\n");
 
         stringBuilder.append("])");
 
@@ -1359,4 +1425,5 @@ public class TackyGenerator {
         }
         return indentString;
     }
+
 }

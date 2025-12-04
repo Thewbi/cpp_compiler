@@ -416,7 +416,9 @@ public class SimpleCPP14ParserBaseListener extends CPP14ParserBaseListener {
             if (startSymbol.equalsIgnoreCase("[")
                     && endSymbol.equalsIgnoreCase("]")) {
 
-                System.out.print("array-indexing");
+                // DEBUG
+                // System.out.println("array-indexing");
+
                 PostFixExpressionASTNode postFixExpressionASTNode = new PostFixExpressionASTNode();
                 postFixExpressionASTNode.expressionType = ExpressionType.ArrayIndexing;
                 postFixExpressionASTNode.type = "UNARY";
@@ -579,7 +581,7 @@ public class SimpleCPP14ParserBaseListener extends CPP14ParserBaseListener {
                 break;
 
             default:
-                throw new RuntimeException("Unknown type: " + ctx.getStart().getType() + "! Lookup: CPP14Parser.java!");
+                throw new RuntimeException("Unknown Jump-Statement Type: " + ctx.getStart().getType() + "! Lookup: CPP14Parser.java!");
         }
 
         // if (ctx.children.size() == 1) {
