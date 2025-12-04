@@ -4,29 +4,52 @@
 #define ELEMENTS DIMENSION * DIMENSION
 
 /**/
-void prettyPrintFormatMatrix(int* matrix, int dim) {
+int prettyPrintFormatMatrix(int* matrix, int dim) {
+
+    int count = 1;
+
     for (int i = 0; i < dim; i++) {
         for (int j = 0; j < dim; j++) {
-            int idx = dim * i + j;
+            
+            //int idx = dim * i + j;
+            int idx_temp = dim * i;
+            int idx = idx_temp + j;
+
             int temp = matrix[idx];
-            printf("%d", temp);
+
+            printf("%d\n", temp);
+
+            // printf("test\n");
         }
     }
+
+    // for (int i = 0; i < dim; i++) {
+    //     printf("test\n");
+    // }
+
+    return 0;
 }
 
-void upCountingMatrix(int* matrix, int dim) {
+/**/
+int upCountingMatrix(int* matrix, int dim) {
+
     int count = 1;
     for (int i = 0; i < dim; i++) {
         for (int j = 0; j < dim; j++) {
-            int idx = dim * i + j;
+
+            // printf("a\n");
+
+            //int idx = dim * i + j;
+            int temp = dim * i;
+            int idx = temp + j;
             matrix[idx] = count;
 
+            //count++;
             int jj = count;
             count = jj + 1;
-            //count++;
-            //count = count + 1;
         }
     }
+    return 0;
 }
 
 
@@ -44,7 +67,7 @@ int main()
     */
 
     /**/
-    printf("Matrix\n");
+    //printf("Matrix\n");
 
     int matrixA[ELEMENTS] = {
         9, 0, 9, 4,
@@ -52,10 +75,11 @@ int main()
         9, 3, 8, 1,
         6, 9, 7, 1 };
 
-    upCountingMatrix(matrixA, DIMENSION);
-    prettyPrintFormatMatrix(matrixA, DIMENSION);
+    int result1 = upCountingMatrix(matrixA, DIMENSION);
+    int result2 = prettyPrintFormatMatrix(matrixA, DIMENSION);
 
-    printf("END");
+    //printf("END\n");
 
+    exit();
     return 0;
 }

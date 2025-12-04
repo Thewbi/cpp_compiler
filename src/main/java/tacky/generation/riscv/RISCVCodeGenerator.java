@@ -835,8 +835,18 @@ public class RISCVCodeGenerator implements Generator {
 
             String argumentRegisterName = "a" + index;
 
-            stringBuilder.append(indent).append("# load argument register ").append(argumentRegisterName).append(" with parameter '").append(actualParameter.name).append("'\n");
-            loadLocalVariableIntoTempRegister(argumentRegisterName, actualParameter.name);
+            String label = actualParameter.name;
+            if (label == null) {
+                label = "" + actualParameter.intValue;
+            }
+
+            stringBuilder.append(indent).append("# load argument register ").append(argumentRegisterName).append(" with parameter '").append(label).append("'\n");
+            
+            if (actualParameter.name != null) {
+                loadLocalVariableIntoTempRegister(argumentRegisterName, actualParameter.name);
+            } else {
+                loadValueIntoTempRegister(argumentRegisterName, "" + actualParameter.intValue);
+            }
 
             index++;
         }
@@ -849,26 +859,37 @@ public class RISCVCodeGenerator implements Generator {
 
         // System.out.println(astNode);
 
+        // save a0 because it is used
+        stringBuilder.append(indent).append("mv      t6, a0").append("\n");
+
+
         // a7 describes the service that is called by the ecall
         // a0 is a parameter register. a0 contains the address of the data
 
         // parameter a0 is the format string's address
 
+        String tempRegister1 = "t0";
+        // has to be a0 because this is where the ecall expects to find the string-data to print!
+        String tempRegister2 = "a0";
+
         // lui a5, %hi(.LC3)
-        stringBuilder.append(indent).append("lui     a5, ").append("%hi(").append(printLabelName).append(")")
+        stringBuilder.append(indent).append("lui     ").append(tempRegister1).append(", ").append("%hi(").append(printLabelName).append(")")
                 .append("\n");
         // addi a0, a5, %lo(.LC3)
-        stringBuilder.append(indent).append("addi    a0, a5, ").append("%lo(").append(printLabelName).append(")")
+        stringBuilder.append(indent).append("addi    ").append(tempRegister2).append(", ").append(tempRegister1).append(", ").append("%lo(").append(printLabelName).append(")")
                 .append("\n");
 
-        // parameter a1
-        stringBuilder.append(indent).append("lw      a5, 20(sp)").append("\n");
-        stringBuilder.append(indent).append("mv      a1, a5").append("\n");
+        // // parameter a1
+        // stringBuilder.append(indent).append("lw      a5, 20(sp)").append("\n");
+        // stringBuilder.append(indent).append("mv      a1, a5").append("\n");
 
         // call puts
         stringBuilder.append(indent).append("call    puts").append("\n");
 
         // stringBuilder.append(indent).append("ret").append("\n");
+
+        // restore a0
+        stringBuilder.append(indent).append("mv      a0, t6").append("\n");
 
     }
 

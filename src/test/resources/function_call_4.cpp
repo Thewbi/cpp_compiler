@@ -3,7 +3,7 @@
 #define DIMENSION 4
 #define ELEMENTS DIMENSION *DIMENSION
 
-void prettyPrintFormatMatrix(int* matrix, int dim) {
+int prettyPrintFormatMatrix(int* matrix, int dim) {
     for (int i = 0; i < dim; i++) {
         for (int j = 0; j < dim; j++) {
 
@@ -13,6 +13,8 @@ void prettyPrintFormatMatrix(int* matrix, int dim) {
             printf("%d", temp);
         }
     }
+
+    return 0;
 }
 
 int main()
