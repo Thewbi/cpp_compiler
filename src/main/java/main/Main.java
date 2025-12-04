@@ -571,9 +571,10 @@ public class Main {
 
         riscvCodeGenerator.end();
 
-        System.out.println("```");
-        System.out.println(riscvCodeGenerator.stringBuilder.toString());
-        System.out.println("```");
+        // // DEBUG - output the assembly
+        // System.out.println("```");
+        // System.out.println(riscvCodeGenerator.stringBuilder.toString());
+        // System.out.println("```");
 
         Files.writeString(Paths.get("generated_riscv_assembly.s"), riscvCodeGenerator.stringBuilder);
 
@@ -974,8 +975,8 @@ public class Main {
         // final String filename = "src/test/resources/function_call_2.cpp"; // <--- Language Test 3
         // final String filename = "src/test/resources/function_call_3.cpp"; // <--- Language Test 4
         // final String filename = "src/test/resources/function_call_4.cpp"; // <--- test
-        final String filename = "src/test/resources/function_call_5.cpp"; // <--- Language Test 7
-        // final String filename = "src/test/resources/function_call_6.cpp"; // <--- THIS HAS TO WORK! this is the full matrix mult!
+        // final String filename = "src/test/resources/function_call_5.cpp"; // <--- Language Test 7
+        final String filename = "src/test/resources/function_call_6.cpp"; // <--- THIS HAS TO WORK! this is the full matrix mult!
         // final String filename = "src/test/resources/function_call_7.cpp";
         // final String filename = "src/test/resources/function_call_8.cpp"; // <--- Language Test 5
         // final String filename = "src/test/resources/function_call_9.cpp"; // <--- Language Test 6

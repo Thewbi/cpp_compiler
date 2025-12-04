@@ -51,17 +51,7 @@ public class RISCVCodeGenerator implements Generator {
         stringBuilder.append(indent).append(".string ").append("\"test_string_test\\n\"").append("\n");
 
         // CODE SEGMENT
-
         // stringBuilder.append("\n").append(indent).append(".text").append("\n").append("\n");
-
-        // // start symbol
-        // stringBuilder.append("main:").append("\n");
-        // stringBuilder.append("_start:").append("\n");
-
-    }
-
-    @Override
-    public void end() {
 
         // add definition of "exit" function
 
@@ -84,6 +74,13 @@ public class RISCVCodeGenerator implements Generator {
         stringBuilder.append(indent).append("ecall").append("\n");
         // jr ra
         stringBuilder.append(indent).append("jr      ra").append("\n");
+
+    }
+
+    @Override
+    public void end() {
+
+        
     }
 
     @Override
@@ -287,7 +284,7 @@ public class RISCVCodeGenerator implements Generator {
                     .append("\n");
                 // @formatter:on
 
-                stringBuilder.append(indent).append("nop").append("\n");
+                // stringBuilder.append(indent).append("nop").append("\n");
 
                 // System.out.println();
             }
@@ -303,20 +300,40 @@ public class RISCVCodeGenerator implements Generator {
 
                 // retrieve local variable from stack and store it's value into a temp register
                 String tempRegister = "t0";
+
+                stringBuilder.append(indent).append("# >> dereference into temp register: " + tempRegister).append("\n");
+                
                 loadLocalVariableIntoTempRegister(tempRegister, loadFromAddressASTNode.ptrVariableName);
 
+                
+
+                // load data from address the pointer points to
+                // lw t0, 0(t0)
+                stringBuilder.append(indent).append("lw ").append(tempRegister).append(", 0(").append(tempRegister).append(")").append("\n");
+
+                stringBuilder.append(indent).append("# << dereference into temp register: " + tempRegister).append("\n");
+
+
+
+
                 // store word into target local variable
+
+                // retrieve address of variable to load into from the stack
                 RISCVStackEntry riscvStackEntry = stackFrame.stackEntryMap.get(loadFromAddressASTNode.variableName);
 
+                // build offset to destination variable 
                 int address = riscvStackEntry.address;
                 int offset = address - stackPointer;
 
+                // store value into variable
+
                 // @formatter:off
-                // int offset = 0;
+                stringBuilder.append(indent).append("# >> store to stack").append("\n");
                 stringBuilder.append(indent)
                     .append("sw      ").append(tempRegister).append(", ")
                     .append(offset).append("(").append("sp").append(")")
                     .append("\n");
+                stringBuilder.append(indent).append("# << store to stack").append("\n");
                 // @formatter:on
 
             }
@@ -578,6 +595,26 @@ public class RISCVCodeGenerator implements Generator {
                 // @formatter:off
                 stringBuilder.append(indent)
                     .append("mul     a5, ")
+                    .append(tempRegister0).append(", ")
+                    .append(tempRegister1)
+                    .append("\n");
+                // @formatter:on
+
+                value = "a5";
+                valueIsRegister = true;
+            }
+                break;
+
+            case Div: {
+
+                String tempRegister0 = "t0";
+                String tempRegister1 = "t1";
+
+                loadIntoTempRegisters(expressionASTNode, tempRegister0, tempRegister1);
+
+                // @formatter:off
+                stringBuilder.append(indent)
+                    .append("div     a5, ")
                     .append(tempRegister0).append(", ")
                     .append(tempRegister1)
                     .append("\n");

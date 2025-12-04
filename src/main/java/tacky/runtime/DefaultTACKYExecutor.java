@@ -40,7 +40,7 @@ public class DefaultTACKYExecutor implements TACKYExecutor {
 
     public int stackPointer = 0;
 
-    public int memory[] = new int[8000];
+    public int memory[] = new int[10000];
 
     public Stack<TACKYStackFrame> executionStack = new Stack<>();
 
@@ -153,7 +153,7 @@ public class DefaultTACKYExecutor implements TACKYExecutor {
                         case JumpIfNotZero:
                             index = jumpIfNotZero(tackyStackFrame, jumpASTNode, index);
                             break;
-                            
+
                         case JumpGreaterThanOrEqual:
                             index = jumpGreaterThanOrEqual(tackyStackFrame, jumpASTNode, index);
                             break;
