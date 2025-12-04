@@ -212,262 +212,7 @@ public class Main {
         System.out.println("The End");
     }
 
-    private static void manualExpressionParsing2() {
-
-        List<String> tokens = new ArrayList<>();
-
-        // // a.b == c.d || e.f == g.h
-        // tokens.add("a");
-        // tokens.add(".");
-        // tokens.add("b");
-        // tokens.add("==");
-        // tokens.add("c");
-        // tokens.add(".");
-        // tokens.add("d");
-        // tokens.add("||");
-        // tokens.add("e");
-        // tokens.add(".");
-        // tokens.add("f");
-        // tokens.add("==");
-        // tokens.add("g");
-        // tokens.add(".");
-        // tokens.add("h");
-
-        // // a > b == c < d
-        // tokens.add("a");
-        // tokens.add(">");
-        // tokens.add("b");
-        // tokens.add("==");
-        // tokens.add("c");
-        // tokens.add("<");
-        // tokens.add("d");
-
-        // // a > b > c
-        // tokens.add("a");
-        // tokens.add(">");
-        // tokens.add("b");
-        // tokens.add(">");
-        // tokens.add("c");
-
-        // // a + b * c
-        // tokens.add("a");
-        // tokens.add("+");
-        // tokens.add("b");
-        // tokens.add("*");
-        // tokens.add("c");
-
-        // // ( a + b ) * c
-        // tokens.add("(");
-        // tokens.add("a");
-        // tokens.add("+");
-        // tokens.add("b");
-        // tokens.add(")");
-        // tokens.add("*");
-        // tokens.add("c");
-
-        // // n <= 20 && n >= 10
-        // tokens.add("n");
-        // tokens.add("<=");
-        // tokens.add("20");
-        // tokens.add("&&");
-        // tokens.add("n");
-        // tokens.add(">=");
-        // tokens.add("10");
-
-        // // n % 2 == 0
-        // tokens.add("n");
-        // tokens.add("%");
-        // tokens.add("2");
-        // tokens.add("==");
-        // tokens.add("0");
-
-        // // prsvec_1.prscon <= 1
-        // tokens.add("prsvec_1");
-        // tokens.add(".");
-        // tokens.add("prscon");
-        // tokens.add("<=");
-        // tokens.add("1");
-
-        // // prsvec_1.prso == oindex_1.valua || prsvec_1.prso == oindex_1.every
-        // tokens.add("prsvec_1");
-        // tokens.add(".");
-        // tokens.add("prso");
-        // tokens.add("==");
-        // tokens.add("oindex_1");
-        // tokens.add(".");
-        // tokens.add("valua");
-        // tokens.add("||");
-        // tokens.add("prsvec_1");
-        // tokens.add(".");
-        // tokens.add("prso");
-        // tokens.add("==");
-        // tokens.add("oindex_1");
-        // tokens.add(".");
-        // tokens.add("every");
-
-        // // ! a
-        // tokens.add("!");
-        // tokens.add("a");
-
-        // // ! prsvec_1.prswon
-        // tokens.add("!");
-        // tokens.add("prsvec_1");
-        // tokens.add(".");
-        // tokens.add("prswon");
-
-        // // ! prsvec_1.prswon || prsvec_1.prsa != vindex_1.walkw
-        // tokens.add("!");
-        // tokens.add("prsvec_1");
-        // tokens.add(".");
-        // tokens.add("prswon");
-        // tokens.add("||");
-        // tokens.add("prsvec_1");
-        // tokens.add(".");
-        // tokens.add("prsa");
-        // tokens.add("!=");
-        // tokens.add("vindex_1");
-        // tokens.add(".");
-        // tokens.add("walkw");
-
-        // // ! findex_1.echof && play_1.here == rindex_1.echor
-        // tokens.add("!");
-        // tokens.add("findex_1");
-        // tokens.add(".");
-        // tokens.add("echof");
-        // tokens.add("&&");
-        // tokens.add("play_1");
-        // tokens.add(".");
-        // tokens.add("here");
-        // tokens.add("==");
-        // tokens.add("rindex_1");
-        // tokens.add(".");
-        // tokens.add("echor");
-
-        // // strcmp(input_1.inbuf, "ECHO") != 0
-        // tokens.add("strcmp");
-        // tokens.add("(");
-        // tokens.add("input_1");
-        // tokens.add(".");
-        // tokens.add("inbuf");
-        // tokens.add(",");
-        // tokens.add("\"ECHO\"");
-        // tokens.add(")");
-        // tokens.add("!=");
-        // tokens.add("0");
-
-        // // strcmp(a)
-        // tokens.add("strcmp");
-        // tokens.add("(");
-        // tokens.add("a");
-        // tokens.add(")");
-
-        // // strcmp(a, b)
-        // tokens.add("strcmp");
-        // tokens.add("(");
-        // tokens.add("a");
-        // tokens.add(",");
-        // tokens.add("b");
-        // tokens.add(")");
-
-        // // strcmp(a, b, c)
-        // tokens.add("strcmp");
-        // tokens.add("(");
-        // tokens.add("a");
-        // tokens.add(",");
-        // tokens.add("b");
-        // tokens.add(",");
-        // tokens.add("c");
-        // tokens.add(")");
-
-        // // strcmp(a, b, c, d)
-        // tokens.add("strcmp");
-        // tokens.add("(");
-        // tokens.add("a");
-        // tokens.add(",");
-        // tokens.add("b");
-        // tokens.add(",");
-        // tokens.add("c");
-        // tokens.add(",");
-        // tokens.add("d");
-        // tokens.add(")");
-
-        // // strcmp(input_1.inbuf, "ECHO")
-        // tokens.add("strcmp");
-        // tokens.add("(");
-        // tokens.add("input_1");
-        // tokens.add(".");
-        // tokens.add("inbuf");
-        // tokens.add(",");
-        // tokens.add("\"ECHO\"");
-        // tokens.add(")");
-
-        // // defined(_DEBUG) || defined(_UNIT_TEST)
-        // tokens.add("defined");
-        // tokens.add("(");
-        // tokens.add("_DEBUG");
-        // tokens.add(")");
-        // tokens.add("||");
-        // tokens.add("defined");
-        // tokens.add("(");
-        // tokens.add("_UNIT_TEST");
-        // tokens.add(")");
-
-        tokens.add("(");
-        tokens.add("(");
-        tokens.add("x");
-        tokens.add(")");
-        tokens.add("*");
-        tokens.add("(");
-        tokens.add("x");
-        tokens.add(")");
-        tokens.add(")");
-
-        System.out.println("--------------------------------------");
-
-        int customWeight = 0;
-
-        TreeNode rootNode = null;
-
-        boolean identifier = false;
-        String lastIdentifier = null;
-
-        for (int i = 0; i < tokens.size(); i++) {
-
-            String currentToken = tokens.get(i);
-
-            if (currentToken.equalsIgnoreCase("(")) {
-
-                if (identifier) {
-
-                    // DEBUG
-                    // System.out.println("function call detected: " + lastIdentifier);
-
-                    rootNode.functionCall = true;
-                }
-
-                customWeight += 1000;
-                continue;
-
-            }
-            if (currentToken.equalsIgnoreCase(")")) {
-                customWeight -= 1000;
-                continue;
-            }
-
-            identifier = AbstractFileStackFrame.isIdentifier(currentToken);
-            lastIdentifier = currentToken;
-
-            rootNode = insertTokenIntoTree(rootNode, currentToken, customWeight,
-                    rootNode != null ? rootNode.functionCall : false);
-
-            // DEBUG
-            StringBuilder stringBuilder = new StringBuilder();
-            rootNode.printRecursive(stringBuilder, 0);
-            System.out.println(stringBuilder.toString());
-
-            System.out.println("---------------------------------------------------");
-        }
-    }
+    
 
     /**
      * This function contains the basic idea of the algorithm. The purpose of the
@@ -1488,4 +1233,261 @@ public class Main {
         // System.out.println(stringBuilder.toString());
     }
 
+    private static void manualExpressionParsing2() {
+
+        List<String> tokens = new ArrayList<>();
+
+        // // a.b == c.d || e.f == g.h
+        // tokens.add("a");
+        // tokens.add(".");
+        // tokens.add("b");
+        // tokens.add("==");
+        // tokens.add("c");
+        // tokens.add(".");
+        // tokens.add("d");
+        // tokens.add("||");
+        // tokens.add("e");
+        // tokens.add(".");
+        // tokens.add("f");
+        // tokens.add("==");
+        // tokens.add("g");
+        // tokens.add(".");
+        // tokens.add("h");
+
+        // // a > b == c < d
+        // tokens.add("a");
+        // tokens.add(">");
+        // tokens.add("b");
+        // tokens.add("==");
+        // tokens.add("c");
+        // tokens.add("<");
+        // tokens.add("d");
+
+        // // a > b > c
+        // tokens.add("a");
+        // tokens.add(">");
+        // tokens.add("b");
+        // tokens.add(">");
+        // tokens.add("c");
+
+        // // a + b * c
+        // tokens.add("a");
+        // tokens.add("+");
+        // tokens.add("b");
+        // tokens.add("*");
+        // tokens.add("c");
+
+        // // ( a + b ) * c
+        // tokens.add("(");
+        // tokens.add("a");
+        // tokens.add("+");
+        // tokens.add("b");
+        // tokens.add(")");
+        // tokens.add("*");
+        // tokens.add("c");
+
+        // // n <= 20 && n >= 10
+        // tokens.add("n");
+        // tokens.add("<=");
+        // tokens.add("20");
+        // tokens.add("&&");
+        // tokens.add("n");
+        // tokens.add(">=");
+        // tokens.add("10");
+
+        // // n % 2 == 0
+        // tokens.add("n");
+        // tokens.add("%");
+        // tokens.add("2");
+        // tokens.add("==");
+        // tokens.add("0");
+
+        // // prsvec_1.prscon <= 1
+        // tokens.add("prsvec_1");
+        // tokens.add(".");
+        // tokens.add("prscon");
+        // tokens.add("<=");
+        // tokens.add("1");
+
+        // // prsvec_1.prso == oindex_1.valua || prsvec_1.prso == oindex_1.every
+        // tokens.add("prsvec_1");
+        // tokens.add(".");
+        // tokens.add("prso");
+        // tokens.add("==");
+        // tokens.add("oindex_1");
+        // tokens.add(".");
+        // tokens.add("valua");
+        // tokens.add("||");
+        // tokens.add("prsvec_1");
+        // tokens.add(".");
+        // tokens.add("prso");
+        // tokens.add("==");
+        // tokens.add("oindex_1");
+        // tokens.add(".");
+        // tokens.add("every");
+
+        // // ! a
+        // tokens.add("!");
+        // tokens.add("a");
+
+        // // ! prsvec_1.prswon
+        // tokens.add("!");
+        // tokens.add("prsvec_1");
+        // tokens.add(".");
+        // tokens.add("prswon");
+
+        // // ! prsvec_1.prswon || prsvec_1.prsa != vindex_1.walkw
+        // tokens.add("!");
+        // tokens.add("prsvec_1");
+        // tokens.add(".");
+        // tokens.add("prswon");
+        // tokens.add("||");
+        // tokens.add("prsvec_1");
+        // tokens.add(".");
+        // tokens.add("prsa");
+        // tokens.add("!=");
+        // tokens.add("vindex_1");
+        // tokens.add(".");
+        // tokens.add("walkw");
+
+        // // ! findex_1.echof && play_1.here == rindex_1.echor
+        // tokens.add("!");
+        // tokens.add("findex_1");
+        // tokens.add(".");
+        // tokens.add("echof");
+        // tokens.add("&&");
+        // tokens.add("play_1");
+        // tokens.add(".");
+        // tokens.add("here");
+        // tokens.add("==");
+        // tokens.add("rindex_1");
+        // tokens.add(".");
+        // tokens.add("echor");
+
+        // // strcmp(input_1.inbuf, "ECHO") != 0
+        // tokens.add("strcmp");
+        // tokens.add("(");
+        // tokens.add("input_1");
+        // tokens.add(".");
+        // tokens.add("inbuf");
+        // tokens.add(",");
+        // tokens.add("\"ECHO\"");
+        // tokens.add(")");
+        // tokens.add("!=");
+        // tokens.add("0");
+
+        // // strcmp(a)
+        // tokens.add("strcmp");
+        // tokens.add("(");
+        // tokens.add("a");
+        // tokens.add(")");
+
+        // // strcmp(a, b)
+        // tokens.add("strcmp");
+        // tokens.add("(");
+        // tokens.add("a");
+        // tokens.add(",");
+        // tokens.add("b");
+        // tokens.add(")");
+
+        // // strcmp(a, b, c)
+        // tokens.add("strcmp");
+        // tokens.add("(");
+        // tokens.add("a");
+        // tokens.add(",");
+        // tokens.add("b");
+        // tokens.add(",");
+        // tokens.add("c");
+        // tokens.add(")");
+
+        // // strcmp(a, b, c, d)
+        // tokens.add("strcmp");
+        // tokens.add("(");
+        // tokens.add("a");
+        // tokens.add(",");
+        // tokens.add("b");
+        // tokens.add(",");
+        // tokens.add("c");
+        // tokens.add(",");
+        // tokens.add("d");
+        // tokens.add(")");
+
+        // // strcmp(input_1.inbuf, "ECHO")
+        // tokens.add("strcmp");
+        // tokens.add("(");
+        // tokens.add("input_1");
+        // tokens.add(".");
+        // tokens.add("inbuf");
+        // tokens.add(",");
+        // tokens.add("\"ECHO\"");
+        // tokens.add(")");
+
+        // // defined(_DEBUG) || defined(_UNIT_TEST)
+        // tokens.add("defined");
+        // tokens.add("(");
+        // tokens.add("_DEBUG");
+        // tokens.add(")");
+        // tokens.add("||");
+        // tokens.add("defined");
+        // tokens.add("(");
+        // tokens.add("_UNIT_TEST");
+        // tokens.add(")");
+
+        tokens.add("(");
+        tokens.add("(");
+        tokens.add("x");
+        tokens.add(")");
+        tokens.add("*");
+        tokens.add("(");
+        tokens.add("x");
+        tokens.add(")");
+        tokens.add(")");
+
+        System.out.println("--------------------------------------");
+
+        int customWeight = 0;
+
+        TreeNode rootNode = null;
+
+        boolean identifier = false;
+        String lastIdentifier = null;
+
+        for (int i = 0; i < tokens.size(); i++) {
+
+            String currentToken = tokens.get(i);
+
+            if (currentToken.equalsIgnoreCase("(")) {
+
+                if (identifier) {
+
+                    // DEBUG
+                    // System.out.println("function call detected: " + lastIdentifier);
+
+                    rootNode.functionCall = true;
+                }
+
+                customWeight += 1000;
+                continue;
+
+            }
+            if (currentToken.equalsIgnoreCase(")")) {
+                customWeight -= 1000;
+                continue;
+            }
+
+            identifier = AbstractFileStackFrame.isIdentifier(currentToken);
+            lastIdentifier = currentToken;
+
+            rootNode = insertTokenIntoTree(rootNode, currentToken, customWeight,
+                    rootNode != null ? rootNode.functionCall : false);
+
+            // DEBUG
+            StringBuilder stringBuilder = new StringBuilder();
+            rootNode.printRecursive(stringBuilder, 0);
+            System.out.println(stringBuilder.toString());
+
+            System.out.println("---------------------------------------------------");
+        }
+    }
+    
 }

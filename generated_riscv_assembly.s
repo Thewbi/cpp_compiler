@@ -2,379 +2,106 @@
         .string "test_string_test\n"
 main:
 _start:
-        addi    sp, sp, -84
+        addi    sp, sp, -48
         # <sizeof int32>
         li      t0, 4
-        sw      t0, 84(sp)
-        # GetAddress(matrixA, matrixA.ptr)
-        li      t0, 131008
-        sw      t0, 8(sp)
+        sw      t0, 48(sp)
+        # GetAddress(temp_array, temp_array.ptr)
+        li      t0, 131052
+        sw      t0, 12(sp)
         # <sizeof int32>
         li      t0, 4
-        sw      t0, 84(sp)
+        sw      t0, 48(sp)
         li      t0, 0
-        lw      t1, 84(sp)
+        lw      t1, 48(sp)
         mul     a5, t0, t1
-        # variable 'matrixA.ptr.ptr.tmp.1'
+        # variable 'temp_array.ptr.ptr.tmp.1'
         mv      t0, a5
-        sw      t0, 16(sp)
-        lw      t0, 8(sp)
-        lw      t1, 16(sp)
+        sw      t0, 40(sp)
+        lw      t0, 12(sp)
+        lw      t1, 40(sp)
         add     a5, t0, t1
-        # variable 'matrixA.ptr.ptr.tmp'
+        # variable 'temp_array.ptr.ptr.tmp'
         mv      t0, a5
-        sw      t0, 4(sp)
-        # variable 'matrixA.ptr.tmp.0'
-        li      t0, 1
-        sw      t0, 12(sp)
-        # StoreToAddress()
-        lw      t2, 12(sp)
-        lw      t3, 4(sp)
-        sw      t2, 0(t3)
-        nop
-        # <sizeof int32>
-        li      t0, 4
-        sw      t0, 84(sp)
-        li      t0, 1
-        lw      t1, 84(sp)
-        mul     a5, t0, t1
-        # variable 'matrixA.ptr.ptr.tmp.1'
-        mv      t0, a5
-        sw      t0, 16(sp)
-        lw      t0, 8(sp)
-        lw      t1, 16(sp)
-        add     a5, t0, t1
-        # variable 'matrixA.ptr.ptr.tmp'
-        mv      t0, a5
-        sw      t0, 4(sp)
-        # variable 'matrixA.ptr.tmp.0'
-        li      t0, 2
-        sw      t0, 12(sp)
-        # StoreToAddress()
-        lw      t2, 12(sp)
-        lw      t3, 4(sp)
-        sw      t2, 0(t3)
-        nop
-        # <sizeof int32>
-        li      t0, 4
-        sw      t0, 84(sp)
-        li      t0, 2
-        lw      t1, 84(sp)
-        mul     a5, t0, t1
-        # variable 'matrixA.ptr.ptr.tmp.1'
-        mv      t0, a5
-        sw      t0, 16(sp)
-        lw      t0, 8(sp)
-        lw      t1, 16(sp)
-        add     a5, t0, t1
-        # variable 'matrixA.ptr.ptr.tmp'
-        mv      t0, a5
-        sw      t0, 4(sp)
-        # variable 'matrixA.ptr.tmp.0'
-        li      t0, 3
-        sw      t0, 12(sp)
-        # StoreToAddress()
-        lw      t2, 12(sp)
-        lw      t3, 4(sp)
-        sw      t2, 0(t3)
-        nop
-        # <sizeof int32>
-        li      t0, 4
-        sw      t0, 84(sp)
-        li      t0, 3
-        lw      t1, 84(sp)
-        mul     a5, t0, t1
-        # variable 'matrixA.ptr.ptr.tmp.1'
-        mv      t0, a5
-        sw      t0, 16(sp)
-        lw      t0, 8(sp)
-        lw      t1, 16(sp)
-        add     a5, t0, t1
-        # variable 'matrixA.ptr.ptr.tmp'
-        mv      t0, a5
-        sw      t0, 4(sp)
-        # variable 'matrixA.ptr.tmp.0'
-        li      t0, 4
-        sw      t0, 12(sp)
-        # StoreToAddress()
-        lw      t2, 12(sp)
-        lw      t3, 4(sp)
-        sw      t2, 0(t3)
-        nop
-        # <sizeof int32>
-        li      t0, 4
-        sw      t0, 84(sp)
-        li      t0, 4
-        lw      t1, 84(sp)
-        mul     a5, t0, t1
-        # variable 'matrixA.ptr.ptr.tmp.1'
-        mv      t0, a5
-        sw      t0, 16(sp)
-        lw      t0, 8(sp)
-        lw      t1, 16(sp)
-        add     a5, t0, t1
-        # variable 'matrixA.ptr.ptr.tmp'
-        mv      t0, a5
-        sw      t0, 4(sp)
-        # variable 'matrixA.ptr.tmp.0'
-        li      t0, 5
-        sw      t0, 12(sp)
-        # StoreToAddress()
-        lw      t2, 12(sp)
-        lw      t3, 4(sp)
-        sw      t2, 0(t3)
-        nop
-        # <sizeof int32>
-        li      t0, 4
-        sw      t0, 84(sp)
-        li      t0, 5
-        lw      t1, 84(sp)
-        mul     a5, t0, t1
-        # variable 'matrixA.ptr.ptr.tmp.1'
-        mv      t0, a5
-        sw      t0, 16(sp)
-        lw      t0, 8(sp)
-        lw      t1, 16(sp)
-        add     a5, t0, t1
-        # variable 'matrixA.ptr.ptr.tmp'
-        mv      t0, a5
-        sw      t0, 4(sp)
-        # variable 'matrixA.ptr.tmp.0'
-        li      t0, 6
-        sw      t0, 12(sp)
-        # StoreToAddress()
-        lw      t2, 12(sp)
-        lw      t3, 4(sp)
-        sw      t2, 0(t3)
-        nop
-        # <sizeof int32>
-        li      t0, 4
-        sw      t0, 84(sp)
-        li      t0, 6
-        lw      t1, 84(sp)
-        mul     a5, t0, t1
-        # variable 'matrixA.ptr.ptr.tmp.1'
-        mv      t0, a5
-        sw      t0, 16(sp)
-        lw      t0, 8(sp)
-        lw      t1, 16(sp)
-        add     a5, t0, t1
-        # variable 'matrixA.ptr.ptr.tmp'
-        mv      t0, a5
-        sw      t0, 4(sp)
-        # variable 'matrixA.ptr.tmp.0'
-        li      t0, 7
-        sw      t0, 12(sp)
-        # StoreToAddress()
-        lw      t2, 12(sp)
-        lw      t3, 4(sp)
-        sw      t2, 0(t3)
-        nop
-        # <sizeof int32>
-        li      t0, 4
-        sw      t0, 84(sp)
-        li      t0, 7
-        lw      t1, 84(sp)
-        mul     a5, t0, t1
-        # variable 'matrixA.ptr.ptr.tmp.1'
-        mv      t0, a5
-        sw      t0, 16(sp)
-        lw      t0, 8(sp)
-        lw      t1, 16(sp)
-        add     a5, t0, t1
-        # variable 'matrixA.ptr.ptr.tmp'
-        mv      t0, a5
-        sw      t0, 4(sp)
-        # variable 'matrixA.ptr.tmp.0'
-        li      t0, 8
-        sw      t0, 12(sp)
-        # StoreToAddress()
-        lw      t2, 12(sp)
-        lw      t3, 4(sp)
-        sw      t2, 0(t3)
-        nop
-        # <sizeof int32>
-        li      t0, 4
-        sw      t0, 84(sp)
-        li      t0, 8
-        lw      t1, 84(sp)
-        mul     a5, t0, t1
-        # variable 'matrixA.ptr.ptr.tmp.1'
-        mv      t0, a5
-        sw      t0, 16(sp)
-        lw      t0, 8(sp)
-        lw      t1, 16(sp)
-        add     a5, t0, t1
-        # variable 'matrixA.ptr.ptr.tmp'
-        mv      t0, a5
-        sw      t0, 4(sp)
-        # variable 'matrixA.ptr.tmp.0'
-        li      t0, 9
-        sw      t0, 12(sp)
-        # StoreToAddress()
-        lw      t2, 12(sp)
-        lw      t3, 4(sp)
-        sw      t2, 0(t3)
-        nop
-        # <sizeof int32>
-        li      t0, 4
-        sw      t0, 84(sp)
-        li      t0, 9
-        lw      t1, 84(sp)
-        mul     a5, t0, t1
-        # variable 'matrixA.ptr.ptr.tmp.1'
-        mv      t0, a5
-        sw      t0, 16(sp)
-        lw      t0, 8(sp)
-        lw      t1, 16(sp)
-        add     a5, t0, t1
-        # variable 'matrixA.ptr.ptr.tmp'
-        mv      t0, a5
-        sw      t0, 4(sp)
-        # variable 'matrixA.ptr.tmp.0'
+        sw      t0, 24(sp)
+        # variable 'temp_array.ptr.tmp.0'
         li      t0, 10
-        sw      t0, 12(sp)
+        sw      t0, 44(sp)
         # StoreToAddress()
-        lw      t2, 12(sp)
-        lw      t3, 4(sp)
+        lw      t2, 44(sp)
+        lw      t3, 24(sp)
         sw      t2, 0(t3)
         nop
         # <sizeof int32>
         li      t0, 4
-        sw      t0, 84(sp)
-        li      t0, 10
-        lw      t1, 84(sp)
+        sw      t0, 48(sp)
+        li      t0, 1
+        lw      t1, 48(sp)
         mul     a5, t0, t1
-        # variable 'matrixA.ptr.ptr.tmp.1'
+        # variable 'temp_array.ptr.ptr.tmp.1'
         mv      t0, a5
-        sw      t0, 16(sp)
-        lw      t0, 8(sp)
-        lw      t1, 16(sp)
+        sw      t0, 40(sp)
+        lw      t0, 12(sp)
+        lw      t1, 40(sp)
         add     a5, t0, t1
-        # variable 'matrixA.ptr.ptr.tmp'
+        # variable 'temp_array.ptr.ptr.tmp'
         mv      t0, a5
-        sw      t0, 4(sp)
-        # variable 'matrixA.ptr.tmp.0'
+        sw      t0, 24(sp)
+        # variable 'temp_array.ptr.tmp.0'
         li      t0, 11
-        sw      t0, 12(sp)
+        sw      t0, 44(sp)
         # StoreToAddress()
-        lw      t2, 12(sp)
-        lw      t3, 4(sp)
+        lw      t2, 44(sp)
+        lw      t3, 24(sp)
         sw      t2, 0(t3)
         nop
         # <sizeof int32>
         li      t0, 4
-        sw      t0, 84(sp)
-        li      t0, 11
-        lw      t1, 84(sp)
+        sw      t0, 48(sp)
+        li      t0, 2
+        lw      t1, 48(sp)
         mul     a5, t0, t1
-        # variable 'matrixA.ptr.ptr.tmp.1'
+        # variable 'temp_array.ptr.ptr.tmp.1'
         mv      t0, a5
-        sw      t0, 16(sp)
-        lw      t0, 8(sp)
-        lw      t1, 16(sp)
+        sw      t0, 40(sp)
+        lw      t0, 12(sp)
+        lw      t1, 40(sp)
         add     a5, t0, t1
-        # variable 'matrixA.ptr.ptr.tmp'
+        # variable 'temp_array.ptr.ptr.tmp'
         mv      t0, a5
-        sw      t0, 4(sp)
-        # variable 'matrixA.ptr.tmp.0'
+        sw      t0, 24(sp)
+        # variable 'temp_array.ptr.tmp.0'
         li      t0, 12
-        sw      t0, 12(sp)
+        sw      t0, 44(sp)
         # StoreToAddress()
-        lw      t2, 12(sp)
-        lw      t3, 4(sp)
+        lw      t2, 44(sp)
+        lw      t3, 24(sp)
         sw      t2, 0(t3)
         nop
+        # GetAddress(temp_array, temp_array.addr.ptr)
+        li      t0, 131052
+        sw      t0, 4(sp)
         # <sizeof int32>
         li      t0, 4
-        sw      t0, 84(sp)
-        li      t0, 12
-        lw      t1, 84(sp)
+        sw      t0, 48(sp)
+        li      t0, 0
+        lw      t1, 48(sp)
         mul     a5, t0, t1
-        # variable 'matrixA.ptr.ptr.tmp.1'
+        # variable 'temp_array.addr.ptr.ptr.tmp.1'
         mv      t0, a5
         sw      t0, 16(sp)
-        lw      t0, 8(sp)
+        lw      t0, 4(sp)
         lw      t1, 16(sp)
         add     a5, t0, t1
-        # variable 'matrixA.ptr.ptr.tmp'
+        # variable 'temp_array.addr.ptr.ptr.tmp'
         mv      t0, a5
-        sw      t0, 4(sp)
-        # variable 'matrixA.ptr.tmp.0'
-        li      t0, 13
-        sw      t0, 12(sp)
-        # StoreToAddress()
-        lw      t2, 12(sp)
-        lw      t3, 4(sp)
-        sw      t2, 0(t3)
-        nop
-        # <sizeof int32>
-        li      t0, 4
-        sw      t0, 84(sp)
-        li      t0, 13
-        lw      t1, 84(sp)
-        mul     a5, t0, t1
-        # variable 'matrixA.ptr.ptr.tmp.1'
-        mv      t0, a5
-        sw      t0, 16(sp)
-        lw      t0, 8(sp)
-        lw      t1, 16(sp)
-        add     a5, t0, t1
-        # variable 'matrixA.ptr.ptr.tmp'
-        mv      t0, a5
-        sw      t0, 4(sp)
-        # variable 'matrixA.ptr.tmp.0'
-        li      t0, 14
-        sw      t0, 12(sp)
-        # StoreToAddress()
-        lw      t2, 12(sp)
-        lw      t3, 4(sp)
-        sw      t2, 0(t3)
-        nop
-        # <sizeof int32>
-        li      t0, 4
-        sw      t0, 84(sp)
-        li      t0, 14
-        lw      t1, 84(sp)
-        mul     a5, t0, t1
-        # variable 'matrixA.ptr.ptr.tmp.1'
-        mv      t0, a5
-        sw      t0, 16(sp)
-        lw      t0, 8(sp)
-        lw      t1, 16(sp)
-        add     a5, t0, t1
-        # variable 'matrixA.ptr.ptr.tmp'
-        mv      t0, a5
-        sw      t0, 4(sp)
-        # variable 'matrixA.ptr.tmp.0'
+        sw      t0, 20(sp)
+        # variable 'temp_array.addr.ptr.tmp.0'
         li      t0, 15
-        sw      t0, 12(sp)
+        sw      t0, 8(sp)
         # StoreToAddress()
-        lw      t2, 12(sp)
-        lw      t3, 4(sp)
-        sw      t2, 0(t3)
-        nop
-        # <sizeof int32>
-        li      t0, 4
-        sw      t0, 84(sp)
-        li      t0, 15
-        lw      t1, 84(sp)
-        mul     a5, t0, t1
-        # variable 'matrixA.ptr.ptr.tmp.1'
-        mv      t0, a5
-        sw      t0, 16(sp)
-        lw      t0, 8(sp)
-        lw      t1, 16(sp)
-        add     a5, t0, t1
-        # variable 'matrixA.ptr.ptr.tmp'
-        mv      t0, a5
-        sw      t0, 4(sp)
-        # variable 'matrixA.ptr.tmp.0'
-        li      t0, 16
-        sw      t0, 12(sp)
-        # StoreToAddress()
-        lw      t2, 12(sp)
-        lw      t3, 4(sp)
+        lw      t2, 8(sp)
+        lw      t3, 20(sp)
         sw      t2, 0(t3)
         nop
         call    exit

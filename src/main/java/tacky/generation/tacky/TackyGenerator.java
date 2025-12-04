@@ -609,6 +609,11 @@ public class TackyGenerator {
                         index = evaluate(expressionASTNode).toString();
                         break;
 
+                    case Primary:
+                        // System.out.println(expressionASTNode);
+                        index = evaluate(expressionASTNode).toString();
+                        break;
+
                     default:
                         throw new RuntimeException("Unhandeled expressionType: '" + expressionASTNode.expressionType + "'");
                 }
