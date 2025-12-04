@@ -1,5 +1,6 @@
 package grammar;
 
+import org.antlr.v4.runtime.tree.ParseTree;
 import org.apache.commons.lang3.math.NumberUtils;
 
 import com.cpp.grammar.CPP14Parser;
@@ -22,6 +23,7 @@ import ast.ParametersAndQualifiersASTNode;
 import ast.PostFixExpressionASTNode;
 import ast.SimpleDeclarationASTNode;
 import ast.StatementType;
+import tacky.ast.FunctionCallASTNode;
 
 public class SimpleCPP14ParserBaseListener extends CPP14ParserBaseListener {
 
@@ -388,7 +390,7 @@ public class SimpleCPP14ParserBaseListener extends CPP14ParserBaseListener {
     @Override
     public void enterPostfixExpression(CPP14Parser.PostfixExpressionContext ctx) {
 
-        // System.out.println("[" + ctx.hashCode() + "] " + ctx.getText());
+        System.out.println("[" + ctx.hashCode() + "] " + ctx.getText());
 
         if (ctx.children.size() == 1) {
             return;
@@ -427,9 +429,31 @@ public class SimpleCPP14ParserBaseListener extends CPP14ParserBaseListener {
                 connectToParent(currentNode, postFixExpressionASTNode);
                 descend(postFixExpressionASTNode);
 
-            } else {
+            } else if (startSymbol.equalsIgnoreCase("(")
+                    && endSymbol.equalsIgnoreCase(")")) {
+
+                String functionName = ctx.children.get(0).getText();
+
+                DeclaratorASTNode functionCallASTNode = new DeclaratorASTNode();
+                // FunctionCallASTNode functionCallASTNode = new FunctionCallASTNode();
+                functionCallASTNode.value = functionName;
+
+                // DEBUG
+                ParseTree bodyParseTree = ctx.children.get(2);
+                for (int i = 0; i < bodyParseTree.getChildCount(); i++) {
+                    ParseTree child = bodyParseTree.getChild(i);
+                    System.out.println(child);
+                }
+
+                connectToParent(currentNode, functionCallASTNode);
+                descend(functionCallASTNode);
+
+            }else {
+
                 throw new RuntimeException();
+
             }
+
         } else {
             throw new RuntimeException();
         }
@@ -450,15 +474,29 @@ public class SimpleCPP14ParserBaseListener extends CPP14ParserBaseListener {
         }
 
         if (ctx.children.size() == 4) {
+
             String startSymbol = ctx.children.get(1).getText();
             String endSymbol = ctx.children.get(3).getText();
+
             if (startSymbol.equalsIgnoreCase("[")
                     && endSymbol.equalsIgnoreCase("]")) {
 
                 if (!(currentNode instanceof PostFixExpressionASTNode)) {
                     throw new RuntimeException("Node Hierarchy is broken! Expected PostFixExpressionASTNode");
                 }
+
                 ascend();
+
+            } else if (startSymbol.equalsIgnoreCase("(")
+                    && endSymbol.equalsIgnoreCase(")")) {
+
+                if (!(currentNode instanceof DeclaratorASTNode)) {
+                // if (!(currentNode instanceof FunctionCallASTNode)) {
+                    throw new RuntimeException("Node Hierarchy is broken! Expected PostFixExpressionASTNode");
+                }
+
+                ascend();
+
             }
         }
     }
@@ -571,26 +609,31 @@ public class SimpleCPP14ParserBaseListener extends CPP14ParserBaseListener {
                 breakASTNode.astNodeType = ASTNodeType.JUMP_STATEMENT;
 
                 connectToParent(currentNode, breakASTNode);
-                // descend(breakASTNode);
+                descend(breakASTNode);
             }
                 break;
 
             case CPP14Parser.Return: {
-                ;
+
+                JumpStatementASTNode returnASTNode = new JumpStatementASTNode();
+                returnASTNode.ctx = ctx;
+                returnASTNode.value = ctx.getText();
+                returnASTNode.statementType = StatementType.valueOf(ctx.getChild(0).getText().toUpperCase());
+                returnASTNode.astNodeType = ASTNodeType.RETURN;
+
+                connectToParent(currentNode, returnASTNode);
+                descend(returnASTNode);
             }
                 break;
 
             default:
                 throw new RuntimeException("Unknown Jump-Statement Type: " + ctx.getStart().getType() + "! Lookup: CPP14Parser.java!");
         }
-
-        // if (ctx.children.size() == 1) {
-        // return;
-        // }
     }
 
     @Override
     public void exitJumpStatement(CPP14Parser.JumpStatementContext ctx) {
+        ascend();
     }
 
     // utility

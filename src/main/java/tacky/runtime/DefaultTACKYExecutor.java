@@ -153,6 +153,7 @@ public class DefaultTACKYExecutor implements TACKYExecutor {
                         case JumpIfNotZero:
                             index = jumpIfNotZero(tackyStackFrame, jumpASTNode, index);
                             break;
+                            
                         case JumpGreaterThanOrEqual:
                             index = jumpGreaterThanOrEqual(tackyStackFrame, jumpASTNode, index);
                             break;
@@ -400,18 +401,21 @@ public class DefaultTACKYExecutor implements TACKYExecutor {
     }
 
     private ReturnResult returnStatement(TACKYStackFrame tackyStackFrame, ReturnASTNode returnASTNode) {
+
         ReturnResult returnResult = new ReturnResult();
 
         ASTNode astNode = returnASTNode.getChildren().get(0);
 
         if (astNode instanceof ConstantDeclarationASTNode) {
+
             returnResult.returnValue = retrieveConstantValue(
                     (ConstantDeclarationASTNode) returnASTNode.getChildren().get(0));
+
         } else if (astNode instanceof ValueASTNode) {
 
             // remove Var(" prefix and ") suffix
             String data = astNode.value;
-            data = data.substring(5, data.length() - 2);
+            // data = data.substring(5, data.length() - 2);
 
             TACKYStackFrameVariableDescriptor varDesc = tackyStackFrame.variables.get(data);
             returnResult.returnValue = memory[varDesc.address / 4];

@@ -1,20 +1,87 @@
 Program("main")
 
-Function("func_void", true, [
+Function("func_assign", true, numbers, [
+    // assign to array-element
+    // 0
+    sizeof_array_type = Var("sizeof_array_type")
+    sizeof(int32, sizeof_array_type)
+    numbers.ptr.tmp.1 = Var("numbers.ptr.tmp.1")
+    numbers.ptr.tmp.1 = 0 * sizeof_array_type
+    numbers.ptr.tmp = Var("numbers.ptr.tmp")
+    numbers.ptr.tmp = numbers + numbers.ptr.tmp.1
+    numbers.tmp.0 = Var("numbers.tmp.0")
+    numbers.tmp.0 = 255
+    Store(numbers.tmp.0, numbers.ptr.tmp)
 
-    # -- Function -- printf
-    printf("This comes from func_void()!\n")
     return(Constant(ConstInt(0)))
 ])
 
 Function("main", true, [
+    numbers = Var("numbers", Array(int32, 3))
+    sizeof_array_type = Var("sizeof_array_type")
+    sizeof(int32, sizeof_array_type)
+    numbers.ptr = Var("numbers.ptr")
+    GetAddress(numbers, numbers.ptr)
+    // assign to array-element
+    // 0
+    sizeof_array_type = Var("sizeof_array_type")
+    sizeof(int32, sizeof_array_type)
+    numbers.ptr.ptr.tmp.1 = Var("numbers.ptr.ptr.tmp.1")
+    numbers.ptr.ptr.tmp.1 = 0 * sizeof_array_type
+    numbers.ptr.ptr.tmp = Var("numbers.ptr.ptr.tmp")
+    numbers.ptr.ptr.tmp = numbers.ptr + numbers.ptr.ptr.tmp.1
+    numbers.ptr.tmp.0 = Var("numbers.ptr.tmp.0")
+    numbers.ptr.tmp.0 = 16
+    Store(numbers.ptr.tmp.0, numbers.ptr.ptr.tmp)
+    // assign to array-element
+    // 1
+    sizeof_array_type = Var("sizeof_array_type")
+    sizeof(int32, sizeof_array_type)
+    numbers.ptr.ptr.tmp.1 = Var("numbers.ptr.ptr.tmp.1")
+    numbers.ptr.ptr.tmp.1 = 1 * sizeof_array_type
+    numbers.ptr.ptr.tmp = Var("numbers.ptr.ptr.tmp")
+    numbers.ptr.ptr.tmp = numbers.ptr + numbers.ptr.ptr.tmp.1
+    numbers.ptr.tmp.0 = Var("numbers.ptr.tmp.0")
+    numbers.ptr.tmp.0 = 32
+    Store(numbers.ptr.tmp.0, numbers.ptr.ptr.tmp)
+    // assign to array-element
+    // 2
+    sizeof_array_type = Var("sizeof_array_type")
+    sizeof(int32, sizeof_array_type)
+    numbers.ptr.ptr.tmp.1 = Var("numbers.ptr.ptr.tmp.1")
+    numbers.ptr.ptr.tmp.1 = 2 * sizeof_array_type
+    numbers.ptr.ptr.tmp = Var("numbers.ptr.ptr.tmp")
+    numbers.ptr.ptr.tmp = numbers.ptr + numbers.ptr.ptr.tmp.1
+    numbers.ptr.tmp.0 = Var("numbers.ptr.tmp.0")
+    numbers.ptr.tmp.0 = 48
+    Store(numbers.ptr.tmp.0, numbers.ptr.ptr.tmp)
 
-    # -- Function -- func_void
-    tmp.func_void = Var("tmp.func_void")
-    funccall(func_void, false, tmp.func_void)
+    # -- Function -- func_assign
+    tmp.func_assign = Var("tmp.func_assign")
+    // parameter 1 for function call
+    tmp.1.ptr = Var("tmp.1.ptr")
+    GetAddress(numbers, tmp.1.ptr)
+    funccall(func_assign, false, tmp.1.ptr, tmp.func_assign)
+    y = Var("y")
+    y = tmp.func_assign
+    c = Var("c")
+    numbers.addr.ptr = Var("numbers.addr.ptr")
+    GetAddress(numbers, numbers.addr.ptr)
+    // retrieve from array-element
+    sizeof_array_type = Var("sizeof_array_type")
+    sizeof(int32, sizeof_array_type)
+    numbers.addr.ptr.ptr.tmp.1 = Var("numbers.addr.ptr.ptr.tmp.1")
+    numbers.addr.ptr.ptr.tmp.1 = Constant(ConstInt(0)) * sizeof_array_type
+    numbers.addr.ptr.ptr.tmp = Var("numbers.addr.ptr.ptr.tmp")
+    numbers.addr.ptr.ptr.tmp = numbers.addr.ptr + numbers.addr.ptr.ptr.tmp.1
+    Load(numbers.addr.ptr.ptr.tmp, c)
+
+    # -- Function -- printf
+    printf("func_assign() c = %d\n",c)
 
     # -- Function -- exit
     exit()
+
     return(Constant(ConstInt(0)))
 ])
 

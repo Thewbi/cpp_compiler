@@ -6,6 +6,7 @@ import java.util.Map;
 public class RISCVStackFrame {
 
     public Map<String, RISCVStackEntry> stackEntryMap = new HashMap<String, RISCVStackEntry>();
+    public int stackSizeUsed;
 
     public RISCVStackEntry addVariable(String variableName, boolean isArray, int arraySize) {
 

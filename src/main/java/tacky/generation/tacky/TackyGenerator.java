@@ -12,8 +12,10 @@ import ast.JumpStatementASTNode;
 import ast.ParameterDeclarationASTNode;
 import ast.ParameterDeclarationListASTNode;
 import ast.ParametersAndQualifiersASTNode;
+import ast.PostFixExpressionASTNode;
 import ast.SimpleDeclarationASTNode;
 import ast.StatementASTNode;
+import tacky.ast.FunctionCallASTNode;
 import tacky.runtime.TACKYStackFrame;
 import tacky.runtime.TACKYStackFrameVariableDescriptor;
 
@@ -103,6 +105,20 @@ public class TackyGenerator {
                 }
                 break;
 
+            case  RETURN: {
+                System.out.println("return");
+                JumpStatementASTNode returnStatementASTNode = (JumpStatementASTNode) astNode;
+                switch (returnStatementASTNode.statementType) {
+                    case RETURN:
+                        enterReturn(indent, returnStatementASTNode);
+                        exitReturn(indent, returnStatementASTNode);
+                        break;
+                    default:
+                        throw new RuntimeException();
+                }
+            }
+                break;
+
             default:
                 System.out.println("Unknown Tacky-Generator type: \"" + astNode.astNodeType + "\" ");
                 enterUnknown(astNode);
@@ -143,7 +159,9 @@ public class TackyGenerator {
 
     // Declarations
 
-    private void enterFunctionCall(int indent, DeclaratorASTNode astNode) {
+    private String enterFunctionCall(int indent, DeclaratorASTNode astNode) {
+
+        String returnValueVariableName = null;
 
         // -- build indent string --
 
@@ -177,7 +195,7 @@ public class TackyGenerator {
 
             // create a variable to store the functions return value
             // tmp.0 = Var("tmp.0")
-            String returnValueVariableName = "tmp." + calledFunctionName;
+            returnValueVariableName = "tmp." + calledFunctionName;
             defineVariable(indent, returnValueVariableName, TackyDataType.INT_8);
 
             ASTNode parameters = astNode.children.get(1);
@@ -382,6 +400,8 @@ public class TackyGenerator {
             // return variable
             stringBuilder.append(", ").append(returnValueVariableName).append(")").append("\n");
         }
+
+        return returnValueVariableName;
     }
 
     private void exitFunctionCall(int indent, DeclaratorASTNode astNode) {
@@ -488,21 +508,45 @@ public class TackyGenerator {
 
             ASTNode child0ASTNode = declaratorASTNode.children.get(0);
             if (child0ASTNode instanceof DeclaratorASTNode) {
+
                 DeclaratorASTNode child0 = (DeclaratorASTNode) child0ASTNode;
                 isArray = child0.isArray;
                 isFunctionCall = child0.isFunctionCall;
                 arraySize = (Integer) evaluate((ExpressionASTNode) child0.indexExpression);
+
             } else if (child0ASTNode instanceof ExpressionASTNode) {
-                ExpressionASTNode child0ExpressionASTNode = (ExpressionASTNode) child0ASTNode;
+
+                if (declaratorASTNode.children.get(1) instanceof PostFixExpressionASTNode) {
+                    // nop
+                } else if (declaratorASTNode.children.get(1) instanceof ExpressionASTNode) {
+
+                    ExpressionASTNode child0ExpressionASTNode = (ExpressionASTNode) child0ASTNode;
+                    ExpressionASTNode child1ExpressionASTNode = (ExpressionASTNode) declaratorASTNode.children.get(1);
+
+                    String variableName = child0ExpressionASTNode.value;
+
+                    System.out.println(variableName);
+
+                    String expr = evaluateToString(indent, child1ExpressionASTNode);
+
+                    System.out.println(expr);
+
+                    defineVariable(indent, variableName, null);
+
+                    stringBuilder.append(indentString).append(variableName).append(" = ").append(expr).append("\n");
+                }
+
             } else {
+
                 throw new RuntimeException("type");
+
             }
 
             ASTNode child1ASTNode = declaratorASTNode.children.get(1);
 
             String name = child0ASTNode.value;
 
-            ExpressionASTNode assignedValueExpression = (ExpressionASTNode) declaratorASTNode.children.get(1);
+            ASTNode valueASTNode = declaratorASTNode.children.get(1);
 
             if (isArray) {
 
@@ -545,68 +589,88 @@ public class TackyGenerator {
 
                 }
 
-            } else if (isFunctionCall) {
+            //} else if (valueASTNode instanceof FunctionCallASTNode) {
+            } else if (valueASTNode instanceof DeclaratorASTNode) {
 
-                throw new RuntimeException();
+                String returnVariableName = enterFunctionCall(indent, (DeclaratorASTNode) valueASTNode);
+                exitFunctionCall(indent, (DeclaratorASTNode) valueASTNode);
 
-            } else if (assignedValueExpression.expressionType == ExpressionType.ArrayIndexing) {
+                // declare assigned variable
+                String destinationVarname = ((ExpressionASTNode) child0ASTNode).value;
+                defineVariable(indent, destinationVarname, null);
 
-                // System.out.println("ArrayIndexing");
+                stringBuilder.append(indentString)
+                    .append(destinationVarname).append(" = ").append(returnVariableName)
+                    .append("\n");
 
-                // stringBuilder.append("\n");
+            } else if (valueASTNode instanceof ExpressionASTNode) {
 
-                ASTNode c1 = assignedValueExpression.children.get(1);
+                ExpressionASTNode expressionASTNode = (ExpressionASTNode) valueASTNode;
 
-                // // DEBUG
-                // System.out.println(tackyStackFrame.variables.size());
+                if (expressionASTNode.expressionType == ExpressionType.ArrayIndexing) {
 
-                String arrayName = child1ASTNode.value;
-                TACKYStackFrameVariableDescriptor tackyStackFrameVariableDescriptor = findVariableDescriptorInStack(
-                        arrayName);
+                    // System.out.println("ArrayIndexing");
 
-                String destinationVariableName = child0ASTNode.value;
-                defineVariable(indent, destinationVariableName, null);
+                    // stringBuilder.append("\n");
 
-                String arrayPointerName = null;
-                if (tackyStackFrameVariableDescriptor.isPointer) {
+                    ExpressionASTNode assignedValueExpression = (ExpressionASTNode) valueASTNode;
 
-                    // if a pointer is available already, use it
-                    arrayPointerName = tackyStackFrameVariableDescriptor.name;
+                    ASTNode c1 = assignedValueExpression.children.get(1);
 
-                } else {
+                    // // DEBUG
+                    // System.out.println(tackyStackFrame.variables.size());
 
-                    // if no pointer is available, create a pointer first
+                    String arrayName = child1ASTNode.value;
+                    TACKYStackFrameVariableDescriptor tackyStackFrameVariableDescriptor = findVariableDescriptorInStack(
+                            arrayName);
 
-                    String tempVarName = arrayName + ".addr.ptr";
+                    String destinationVariableName = child0ASTNode.value;
+                    defineVariable(indent, destinationVariableName, null);
 
-                    defineVariable(indent, tempVarName, null);
+                    String arrayPointerName = null;
+                    if (tackyStackFrameVariableDescriptor.isPointer) {
 
-                    // store an address into the pointer
-                    // GetAddress(tmp.1, tmp.1.ptr)
-                    stringBuilder.append(indentString).append("GetAddress(")
-                            .append(arrayName).append(", ").append(tempVarName).append(")");
-                    stringBuilder.append("\n");
+                        // if a pointer is available already, use it
+                        arrayPointerName = tackyStackFrameVariableDescriptor.name;
 
-                    arrayPointerName = tempVarName;
+                    } else {
 
-                }
+                        // if no pointer is available, create a pointer first
 
-                if (NumberUtils.isParsable(c1.value)) {
+                        String tempVarName = arrayName + ".addr.ptr";
 
-                    int arrayIndex = (int) evaluate((ExpressionASTNode) c1);
-                    retrieveValueFromArrayElement(indent, declaratorASTNode, arrayPointerName, arrayIndex,
-                            destinationVariableName);
+                        defineVariable(indent, tempVarName, null);
 
-                } else {
+                        // store an address into the pointer
+                        // GetAddress(tmp.1, tmp.1.ptr)
+                        stringBuilder.append(indentString).append("GetAddress(")
+                                .append(arrayName).append(", ").append(tempVarName).append(")");
+                        stringBuilder.append("\n");
 
-                    retrieveValueFromArrayElementByVariable(indent, declaratorASTNode, arrayPointerName, c1.value,
-                            destinationVariableName);
+                        arrayPointerName = tempVarName;
+
+                    }
+
+                    if (NumberUtils.isParsable(c1.value)) {
+
+                        int arrayIndex = (int) evaluate((ExpressionASTNode) c1);
+                        retrieveValueFromArrayElement(indent, declaratorASTNode, arrayPointerName, arrayIndex,
+                                destinationVariableName);
+
+                    } else {
+
+                        retrieveValueFromArrayElementByVariable(indent, declaratorASTNode, arrayPointerName, c1.value,
+                                destinationVariableName);
+
+                    }
 
                 }
 
             } else {
 
                 addVariableToScope(name, TackyDataType.fromString(type), isArray, false);
+
+                ExpressionASTNode assignedValueExpression = (ExpressionASTNode) valueASTNode;
 
                 String exprAsString = evaluateToString(indent, assignedValueExpression);
 
@@ -727,7 +791,10 @@ public class TackyGenerator {
                 // String expr = outputExpression(child1expressionASTNode);
                 String expr = evaluateToString(indent + 1, child1expressionASTNode);
 
-                stringBuilder.append(indentString).append(child0ExpressionASTNode.value).append(" = ");
+                // defineVariable(indent, child0ExpressionASTNode.value, null);
+
+                stringBuilder.append(indentString)
+                .append(child0ExpressionASTNode.value).append(" = ");
                 stringBuilder.append(expr).append("\n");
 
                 // // @formatter:off
@@ -987,18 +1054,7 @@ public class TackyGenerator {
      */
     private void exitFunctionDeclaration(int indent, ASTNode astNode) {
 
-        String indentString = buildIndentString(indent + 1);
-
-        // stringBuilder.append("\n");
-
-        stringBuilder.append(indentString);
-
-        // TODO: implement correct return code
-        stringBuilder.append("return(").append(wrapInConstant("0")).append(")").append("\n");
-
-        stringBuilder.append("])");
-
-        stringBuilder.append("\n\n");
+        stringBuilder.append("\n");
 
         removeScope();
     }
@@ -1032,6 +1088,38 @@ public class TackyGenerator {
 
     private void exitBreak(int indent, JumpStatementASTNode jumpStatementASTNode) {
         ;
+    }
+
+    private void enterReturn(int indent, JumpStatementASTNode returnStatementASTNode) {
+        // TODO Auto-generated method stub
+        // throw new UnsupportedOperationException("Unimplemented method 'enterReturn'");
+
+        stringBuilder.append("\n");
+
+        String indentString = buildIndentString(indent);
+        stringBuilder.append(indentString);
+
+        ExpressionASTNode returnExpression = (ExpressionASTNode) returnStatementASTNode.children.get(0);
+        Object returnValue = evaluate(returnExpression);
+
+        // TODO: implement correct return code 33
+        stringBuilder.append("return(");
+        if (returnValue instanceof Integer) {
+            stringBuilder.append(wrapInConstant(returnValue.toString()));
+        } else {
+            stringBuilder.append(returnValue);
+        }
+        stringBuilder.append(")").append("\n");
+
+        stringBuilder.append("])");
+        stringBuilder.append("\n");
+
+        // stringBuilder.append("\n");
+    }
+
+    private void exitReturn(int indent, JumpStatementASTNode returnStatementASTNode) {
+        // TODO Auto-generated method stub
+        // throw new UnsupportedOperationException("Unimplemented method 'exitReturn'");
     }
 
     // Unknown
@@ -1293,12 +1381,18 @@ public class TackyGenerator {
     private Object evaluate(ExpressionASTNode expr) {
 
         if (expr.children.size() == 0) {
+
             if (NumberUtils.isParsable(expr.value)) {
+
                 return Integer.parseInt(expr.value);
+                //return wrapInConstant(expr.value);
+
             } else {
+
                 // retrieve local variable
                 return expr.value;
             }
+
         } else if (expr.children.size() == 2) {
 
             ExpressionASTNode exprA = (ExpressionASTNode) expr.children.get(0);

@@ -41,7 +41,8 @@ main:
                                     ; (I think GCC always builds stack frames with a multiple of 
                                     ; 16 byte sizes! Not all elements are used!)
         sw      ra,28(sp)           ; store address to return to (stored in ra) onto the stack 
-                                    ; (SHOULD WE CALL MORE FUNCTIONS WITHIN THE BODY OF THIS FUNCTION)
+                                    ; (SHOULD WE WANT TO CALL MORE FUNCTIONS WITHIN THE BODY OF 
+                                    ; THIS FUNCTION)
         sw      s0,24(sp)           ; store old s0/fp (frame pointer) on the stack so it can be 
                                     ; restored later because it will be used within this function
         addi    s0,sp,32            ; set new s0/fp (frame pointer) to the start of our new stackframe. 

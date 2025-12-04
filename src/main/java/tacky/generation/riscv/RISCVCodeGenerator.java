@@ -18,6 +18,7 @@ import tacky.ast.PrintfASTNode;
 import tacky.ast.ReturnASTNode;
 import tacky.ast.SizeofASTNode;
 import tacky.ast.ValueASTNode;
+import tacky.ast.VariableDeclarationASTNode;
 import tacky.generation.Generator;
 import tacky.generation.tacky.TackyDataType;
 
@@ -329,26 +330,48 @@ public class RISCVCodeGenerator implements Generator {
 
         stackFrame = new RISCVStackFrame();
 
+        // reserve space on the stack for the 'ra' (return address register)
+        VariableDeclarationASTNode ra = new VariableDeclarationASTNode();
+        ra.variableName = "_____ra_____";
+        ra.isArray = false;
+        ra.arraySize = 0;
+        RISCVStackEntry raStackEntry = ra.addToStackFrame(stackFrame);
+
+        // reserve space on the stack for the 's0'/'fp' (frame pointer)
+        VariableDeclarationASTNode spfp = new VariableDeclarationASTNode();
+        spfp.variableName = "_____spfp_____";
+        spfp.isArray = false;
+        spfp.arraySize = 0;
+        RISCVStackEntry spfpStackEntry = spfp.addToStackFrame(stackFrame);
+
         // 1. for each local variable declaration used in this function,
         // reserve space on the stack
         for (ASTNode astNode : functionAstNode.children) {
             RISCVStackEntry stackEntry = astNode.addToStackFrame(stackFrame);
         }
 
-        // advance stack pointer
-
         int stackSizeUsed = stackFrame.computeAddresses(stackPointer);
 
+        stackFrame.stackSizeUsed = stackSizeUsed;
+
+        // DEBUG - output the stack frame and it's details
         for (Map.Entry<String, RISCVStackEntry> entry : stackFrame.stackEntryMap.entrySet()) {
             System.out.println(entry.getValue().toString());
         }
 
-        // start symbol
-
+        // insert function label for the function
         stringBuilder.append(functionAstNode.value).append(":").append("\n");
         if (functionAstNode.value.equalsIgnoreCase("main")) {
+            // insert start symbol for the function called main
             stringBuilder.append("_start:").append("\n");
         }
+
+        stringBuilder.append(indent).append("# -- stack frame create --").append("\n");
+
+        // advance stack pointer
+        // move stack pointer, make space for new stackframe (8 elements) 
+        // (I think GCC always builds stack frames with a multiple of 
+        // 16 byte sizes! Not all elements are used!)
 
         // @formatter:off
         stringBuilder.append(indent)
@@ -356,7 +379,31 @@ public class RISCVCodeGenerator implements Generator {
             .append("\n");
         // @formatter:on
 
+        // sw      ra,28(sp)           // store address to return to (stored in ra) onto the stack 
+                                    // (SHOULD WE WANT TO CALL MORE FUNCTIONS WITHIN THE BODY OF THIS FUNCTION)
+        stringBuilder.append(indent)
+            .append("sw      ra, " + (stackSizeUsed-4) + "(sp), ")
+            .append("\n");
+
+        
+
+        // sw      s0,24(sp)           // store old s0/fp (frame pointer) on the stack so it can be 
+                                    // restored later because it will be used within this function
+        stringBuilder.append(indent)
+            .append("sw      s0, " + (stackSizeUsed-8) + "(sp), ")
+            .append("\n");
+
+        // addi    s0,sp,32            // set new s0/fp (frame pointer) to the start of our new stackframe. 
+                                    // Now offseting (with negative offsets) from new s0/fp grants 
+                                    // access to all elements of the new stack frame
+
+        stringBuilder.append(indent)
+            .append("addi    s0, sp, ").append(stackSizeUsed)
+            .append("\n");
+
         stackPointer -= stackSizeUsed;
+
+        stringBuilder.append(indent).append("# -- stack frame create --").append("\n");
 
         // generate code for all children
         for (ASTNode astNode : functionAstNode.children) {
@@ -383,10 +430,29 @@ public class RISCVCodeGenerator implements Generator {
      */
     private void processReturn(ReturnASTNode astNode) {
 
-        // throw new UnsupportedOperationException("Unimplemented method
-        // 'processReturn'");
+        int stackSizeUsed = stackFrame.stackSizeUsed;
 
-        // <processReturn()>
+        stringBuilder.append(indent).append("# -- stack frame remove --").append("\n");
+
+        // ; delete stack frame (inverse operation to create stack frame)
+        // lw      ra,28(sp)           ; restore address to return to
+        stringBuilder.append(indent)
+            .append("lw      ra, " + (stackSizeUsed-4) + "(sp), ")
+            .append("\n");
+
+        // lw      s0,24(sp)           ; restore s0/fp (frame pointer)
+        stringBuilder.append(indent)
+            .append("lw      s0, " + (stackSizeUsed-8) + "(sp), ")
+            .append("\n");
+
+        // addi    sp,sp,32            ; remove stack pointer, return space for new stackframe, 8 elements
+        stringBuilder.append(indent)
+            .append("addi    sp, sp, ").append(stackSizeUsed)
+            .append("\n");
+
+        stringBuilder.append(indent).append("# -- stack frame remove --").append("\n");
+
+        // jump to return address
         stringBuilder.append(indent).append("# ").append("<processReturn()>").append("\n");
         stringBuilder.append(indent).append("ret").append("\n");
     }
@@ -704,6 +770,8 @@ public class RISCVCodeGenerator implements Generator {
     private void processFunctionCall(FunctionCallASTNode functionCallASTNode) {
 
         String calledFunctionName = functionCallASTNode.value;
+
+        // TODO: setup parameters into a0, a1, a2, ...
 
         // call puts
         stringBuilder.append(indent).append("call    ").append(calledFunctionName).append("\n");

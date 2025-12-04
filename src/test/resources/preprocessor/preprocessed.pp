@@ -1,13 +1,26 @@
 
 
- void func_void ( )
+ int func_assign ( int * numbers )
  {
-      printf ( "This comes from func_void()!\n" ) ;
+     
+
+     
+     
+
+      numbers [ 0 ] = 255 ;
+
+      return 0 ;
  }
 
  int main ( )
  {
-      func_void ( ) ;
+      int numbers [ 3 ] = { 16 , 32 , 48 } ;
+
+      int y = func_assign ( numbers ) ;
+
+      int c = numbers [ 0 ] ;
+
+      printf ( "func_assign() c = %d\n" , c ) ;
 
       exit ( ) ;
       return 0 ;
