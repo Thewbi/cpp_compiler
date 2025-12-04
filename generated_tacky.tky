@@ -2,11 +2,11 @@ Program("main")
 
 Function("func_assign", true, numbers, [
     // assign to array-element
-    // 0
+    // 1
     sizeof_array_type = Var("sizeof_array_type")
     sizeof(int32, sizeof_array_type)
     numbers.ptr.tmp.1 = Var("numbers.ptr.tmp.1")
-    numbers.ptr.tmp.1 = 0 * sizeof_array_type
+    numbers.ptr.tmp.1 = 1 * sizeof_array_type
     numbers.ptr.tmp = Var("numbers.ptr.tmp")
     numbers.ptr.tmp = numbers + numbers.ptr.tmp.1
     numbers.tmp.0 = Var("numbers.tmp.0")
@@ -64,20 +64,6 @@ Function("main", true, [
     funccall(func_assign, false, tmp.1.ptr, tmp.func_assign)
     y = Var("y")
     y = tmp.func_assign
-    c = Var("c")
-    numbers.addr.ptr = Var("numbers.addr.ptr")
-    GetAddress(numbers, numbers.addr.ptr)
-    // retrieve from array-element
-    sizeof_array_type = Var("sizeof_array_type")
-    sizeof(int32, sizeof_array_type)
-    numbers.addr.ptr.ptr.tmp.1 = Var("numbers.addr.ptr.ptr.tmp.1")
-    numbers.addr.ptr.ptr.tmp.1 = Constant(ConstInt(0)) * sizeof_array_type
-    numbers.addr.ptr.ptr.tmp = Var("numbers.addr.ptr.ptr.tmp")
-    numbers.addr.ptr.ptr.tmp = numbers.addr.ptr + numbers.addr.ptr.ptr.tmp.1
-    Load(numbers.addr.ptr.ptr.tmp, c)
-
-    # -- Function -- printf
-    printf("func_assign() c = %d\n",c)
 
     # -- Function -- exit
     exit()

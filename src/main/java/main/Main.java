@@ -558,7 +558,7 @@ public class Main {
         FunctionDefinitionASTNode mainFunctionGen = getMainFunction(rootNode, structureTACKYParserListener);
 
         RISCVCodeGenerator riscvCodeGenerator = new RISCVCodeGenerator();
-        riscvCodeGenerator.stackPointer = 0x00020000;
+        // riscvCodeGenerator.stackPointer = 0x00020000;
 
         riscvCodeGenerator.start();
 

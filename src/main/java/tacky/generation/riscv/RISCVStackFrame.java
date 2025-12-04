@@ -1,17 +1,21 @@
 package tacky.generation.riscv;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class RISCVStackFrame {
 
     public Map<String, RISCVStackEntry> stackEntryMap = new HashMap<String, RISCVStackEntry>();
+
+    public List<RISCVStackEntry> stackEntryList = new ArrayList<>();
+
     public int stackSizeUsed;
 
     public RISCVStackEntry addVariable(String variableName, boolean isArray, int arraySize) {
 
         if (stackEntryMap.containsKey(variableName)) {
-            // throw new RuntimeException();
             return stackEntryMap.get(variableName);
         }
 
@@ -21,6 +25,7 @@ public class RISCVStackFrame {
         stackEntry.arraySize = arraySize;
 
         stackEntryMap.put(variableName, stackEntry);
+        stackEntryList.add(stackEntry);
 
         return stackEntry;
     }
@@ -29,17 +34,22 @@ public class RISCVStackFrame {
 
         int address = stackPointer;
 
-        for (Map.Entry<String, RISCVStackEntry> entry : stackEntryMap.entrySet()) {
+        //for (Map.Entry<String, RISCVStackEntry> entry : stackEntryMap.entrySet()) {
 
-            RISCVStackEntry stackEntry = entry.getValue();
+            //RISCVStackEntry stackEntry = entry.getValue();
+
+        for (RISCVStackEntry stackEntry : stackEntryList) {
             
-
             if (stackEntry.isArray) {
+
                 address -= (4 * stackEntry.arraySize);
                 stackEntry.address = address + 4;
+
             } else {
+
                 stackEntry.address = address;
                 address -= 4;
+
             }
         }
 

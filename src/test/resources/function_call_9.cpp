@@ -3,7 +3,7 @@
 int func_assign(int* numbers)
 {
     // numbers[0] = 64; // 0x40
-    numbers[0] = 255; // 0xFF
+    numbers[1] = 255; // 0xFF
 
     return 0;
 }
@@ -14,9 +14,9 @@ int main()
 
     int y = func_assign(numbers);
 
-    int c = numbers[0];
+    //int c = numbers[0];
 
-    printf("func_assign() c = %d\n", c);
+    //printf("func_assign() c = %d\n", c);
 
     exit();
     return 0;

@@ -5,6 +5,7 @@ import java.util.Map;
 import ast.ASTNode;
 import ast.ASTNodeType;
 import ast.ExpressionASTNode;
+import grammar.ActualParameter;
 import tacky.ast.AssignmentASTNode;
 import tacky.ast.ConstIntASTNode;
 import tacky.ast.ConstantDeclarationASTNode;
@@ -21,18 +22,21 @@ import tacky.ast.ValueASTNode;
 import tacky.ast.VariableDeclarationASTNode;
 import tacky.generation.Generator;
 import tacky.generation.tacky.TackyDataType;
+import types.FormalParameter;
 
 public class RISCVCodeGenerator implements Generator {
 
     public StringBuilder stringBuilder = new StringBuilder();
 
-    public int stackPointer;
+    private int stackPointer = 0x20000;
 
     public RISCVStackFrame stackFrame;
 
     public String indent = "        ";
 
     public String printLabelName = ".LABEL_0";
+
+    public FunctionDefinitionASTNode prototype;
 
     @Override
     public void start() {
@@ -105,12 +109,14 @@ public class RISCVCodeGenerator implements Generator {
                 break;
 
             case FUNCTION_DEFINITION: {
+                prototype = (FunctionDefinitionASTNode) astNode;
                 executeFunction((FunctionDefinitionASTNode) astNode);
+                
             }
                 break;
 
             case FUNCTION_DECLARATION: {
-                // System.out.println(astNode.toString());
+                System.out.println(astNode.toString());
 
             }
                 break;
@@ -328,6 +334,7 @@ public class RISCVCodeGenerator implements Generator {
 
         // build StackFrame for this function call
 
+        stackPointer = 0x20000;
         stackFrame = new RISCVStackFrame();
 
         // reserve space on the stack for the 'ra' (return address register)
@@ -355,9 +362,11 @@ public class RISCVCodeGenerator implements Generator {
         stackFrame.stackSizeUsed = stackSizeUsed;
 
         // DEBUG - output the stack frame and it's details
-        for (Map.Entry<String, RISCVStackEntry> entry : stackFrame.stackEntryMap.entrySet()) {
-            System.out.println(entry.getValue().toString());
+        System.out.println("\n°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°");
+        for (RISCVStackEntry entry : stackFrame.stackEntryList) {
+            System.out.println(entry.toString());
         }
+        System.out.println("000000000000000000000000000000000000000\n");
 
         // insert function label for the function
         stringBuilder.append(functionAstNode.value).append(":").append("\n");
@@ -651,8 +660,11 @@ public class RISCVCodeGenerator implements Generator {
         ASTNode child1 = expressionASTNode.children.get(1);
 
         if (child0 instanceof ValueASTNode) {
+
             loadLocalVariableIntoTempRegister(tempRegister0, child0.value);
+
         } else if (child0 instanceof ExpressionASTNode) {
+
             ExpressionASTNode child0ExpressionASTNode = (ExpressionASTNode) child0;
             switch (child0ExpressionASTNode.expressionType) {
 
@@ -703,16 +715,48 @@ public class RISCVCodeGenerator implements Generator {
 
         RISCVStackEntry riscvStackEntry = stackFrame.stackEntryMap.get(varName);
 
-        int address = riscvStackEntry.address;
-        int offset = address - stackPointer;
+        // a local variable can also be a parameter to the current function call.
+        // If the local variable is not on the stack, look it up in the functions
+        // prototype and according to the location, read it from the matching
+        // argument register
+        if (riscvStackEntry == null) {
 
-        // load word
-        stringBuilder.append(indent)
-                .append("lw      ").append(register).append(", ")
-                .append(offset).append("(sp)")
-                .append("\n");
+            int formalParameterIndex = 0;
+            for (FormalParameter formalParameter : prototype.formalParameters) {
+                if (formalParameter.getName().equalsIgnoreCase(varName)) {
+                    break;
+                }
+                formalParameterIndex++;
+            }
 
-        return register;
+            String formalParameterRegister = "a" + formalParameterIndex;
+
+            // move
+            stringBuilder.append(indent)
+                    .append("mv      ").append(register).append(", ")
+                    .append(formalParameterRegister)
+                    .append("\n");
+            
+            return formalParameterRegister;
+
+        } else {
+
+            // the variable is local on the stack and not a function parameter.
+            // Load it into a register and return the register used.
+
+            int address = riscvStackEntry.address;
+            int offset = address - stackPointer;
+
+            // load word
+            stringBuilder.append(indent)
+                    .append("lw      ").append(register).append(", ")
+                    .append(offset).append("(sp)")
+                    .append("\n");
+
+            return register;
+
+        }
+
     }
 
     private String loadValueIntoTempRegister(String register, String value) {
@@ -753,17 +797,26 @@ public class RISCVCodeGenerator implements Generator {
     }
 
     private void processFunctionCallDelegator(ASTNode astNode) {
-
-        // special treatment for built-in printf() and exit()
+        
         if (astNode instanceof PrintfASTNode) {
+
+            // special treatment for built-in printf()
             processPrintfFunctionCall((PrintfASTNode) astNode);
+
         } else if (astNode instanceof ExitASTNode) {
+
+            // special treatment for built-in exit()
             processExitFunctionCall((ExitASTNode) astNode);
+
         } else if (astNode instanceof FunctionCallASTNode) {
+
             // generate code for function call to code-declared functions (not built-in)
             processFunctionCall((FunctionCallASTNode) astNode);
+
         } else {
+
             throw new RuntimeException();
+
         }
     }
 
@@ -772,8 +825,23 @@ public class RISCVCodeGenerator implements Generator {
         String calledFunctionName = functionCallASTNode.value;
 
         // TODO: setup parameters into a0, a1, a2, ...
+        System.out.println("setup parameters into a0, a1, a2, ...");
+        
+        //stringBuilder.append(indent).append("mv      a0, a5").append("\n");
 
-        // call puts
+        int index = 0;
+
+        for (ActualParameter actualParameter : functionCallASTNode.actualParameters) {
+
+            String argumentRegisterName = "a" + index;
+
+            stringBuilder.append(indent).append("# load argument register ").append(argumentRegisterName).append(" with parameter '").append(actualParameter.name).append("'\n");
+            loadLocalVariableIntoTempRegister(argumentRegisterName, actualParameter.name);
+
+            index++;
+        }
+
+        // call function
         stringBuilder.append(indent).append("call    ").append(calledFunctionName).append("\n");
     }
 

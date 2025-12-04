@@ -3,11 +3,7 @@
  int func_assign ( int * numbers )
  {
      
-
-     
-     
-
-      numbers [ 0 ] = 255 ;
+      numbers [ 1 ] = 255 ;
 
       return 0 ;
  }
@@ -18,9 +14,9 @@
 
       int y = func_assign ( numbers ) ;
 
-      int c = numbers [ 0 ] ;
+     
 
-      printf ( "func_assign() c = %d\n" , c ) ;
+     
 
       exit ( ) ;
       return 0 ;
