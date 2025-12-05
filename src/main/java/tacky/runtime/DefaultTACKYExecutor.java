@@ -592,7 +592,12 @@ public class DefaultTACKYExecutor implements TACKYExecutor {
     }
 
     private int retrieveConstantValue(ConstantDeclarationASTNode constantDeclarationASTNode) {
-        ConstIntASTNode constIntASTNode = (ConstIntASTNode) constantDeclarationASTNode.getChildren().get(0);
+
+        ASTNode astNode = constantDeclarationASTNode.getChildren().get(0);
+
+        
+
+        ConstIntASTNode constIntASTNode = (ConstIntASTNode) astNode;
         return Integer.parseInt(constIntASTNode.value);
     }
 

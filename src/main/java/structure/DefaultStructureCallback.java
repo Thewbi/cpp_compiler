@@ -51,7 +51,7 @@ public class DefaultStructureCallback implements StructureCallback {
         expression.setExpressionType(ExpressionType.RETURN_VALUE_PREVIOUS_CALL);
         expressions.add(expression);
 
-        System.out.println("[STR-CB] functionCall() Name: \"" + name + "\" Params: " + expressionList);
+        // System.out.println("[STR-CB] functionCall() Name: \"" + name + "\" Params: " + expressionList);
 
         startScope();
         System.out.println("");

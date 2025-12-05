@@ -321,11 +321,21 @@ public class SimpleCPP14ParserBaseListener extends CPP14ParserBaseListener {
         expressionASTNode.value = rawValue;
 
         if (NumberUtils.isParsable(rawValue)) {
+
             expressionASTNode.expressionType = ExpressionType.Primary;
+
         } else if (rawValue.startsWith("\"") && rawValue.endsWith("\"")) {
+
             expressionASTNode.expressionType = ExpressionType.StringLiteral;
+
+        } else if (rawValue.startsWith("\'") && rawValue.endsWith("\'")) {
+
+            expressionASTNode.expressionType = ExpressionType.CharacterLiteral;
+
         } else {
+
             throw new RuntimeException();
+
         }
 
         expressionASTNode.astNodeType = ASTNodeType.EXPRESSION;
@@ -390,7 +400,7 @@ public class SimpleCPP14ParserBaseListener extends CPP14ParserBaseListener {
     @Override
     public void enterPostfixExpression(CPP14Parser.PostfixExpressionContext ctx) {
 
-        System.out.println("[" + ctx.hashCode() + "] " + ctx.getText());
+        // System.out.println("[" + ctx.hashCode() + "] " + ctx.getText());
 
         if (ctx.children.size() == 1) {
             return;

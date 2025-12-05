@@ -51,6 +51,8 @@ public enum ExpressionType {
 
     StringLiteral,
 
+    CharacterLiteral,
+
     IntegerLiteral,
 
     Identifier,

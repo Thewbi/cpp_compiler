@@ -139,8 +139,8 @@ IntegerLiteral
 	| BinaryLiteral Integersuffix?
     ;
 
-FloatingLiteral:
-	Fractionalconstant Exponentpart? Floatingsuffix?
+FloatingLiteral
+	: Fractionalconstant Exponentpart? Floatingsuffix?
 	| Digitsequence Exponentpart Floatingsuffix?;
 
 // fix according to https://stackoverflow.com/questions/64108151/how-to-resolve-parsing-error-in-antlr-cpp14-grammar
@@ -148,6 +148,11 @@ StringLiteral
     : Encodingprefix? '"' Schar* '"'
     | Encodingprefix? '"' Schar* '" GST_TIME_FORMAT'
     | Encodingprefix? 'R' Rawstring
+    ;
+
+CharLiteral
+    : Encodingprefix? '\'' Schar '\''
+//    : '\'' [a-z] '\''
     ;
 
 fragment Schar
@@ -166,21 +171,20 @@ fragment Universalcharactername
     ;
 
 Identifier
-    :
-	Identifiernondigit ( DOT | Identifiernondigit | DIGIT )*
+    : Identifiernondigit ( DOT | Identifiernondigit | DIGIT )*
     ;
 
-fragment Identifiernondigit: NONDIGIT | Universalcharactername;
+fragment Identifiernondigit : NONDIGIT | Universalcharactername;
 
-fragment NONDIGIT: [a-zA-Z_];
+fragment NONDIGIT : [a-zA-Z_];
 
-fragment DIGIT: [0-9];
+fragment DIGIT : [0-9];
 
-DecimalLiteral: NONZERODIGIT ('\''? DIGIT)*;
+DecimalLiteral : NONZERODIGIT ('\''? DIGIT)*;
 
-OctalLiteral: '0' ('\''? OCTALDIGIT)*;
+OctalLiteral : '0' ('\''? OCTALDIGIT)*;
 
-HexadecimalLiteral: ('0x' | '0X') HEXADECIMALDIGIT (
+HexadecimalLiteral : ('0x' | '0X') HEXADECIMALDIGIT (
 		'\''? HEXADECIMALDIGIT
 	)*;
 
@@ -191,23 +195,23 @@ Integersuffix
 	| Longlongsuffix Unsignedsuffix?
     ;
 
-fragment Unsignedsuffix: [uU];
+fragment Unsignedsuffix : [uU] ;
 
-fragment Longsuffix: [lL];
+fragment Longsuffix : [lL] ;
 
-fragment Longlongsuffix: 'll' | 'LL';
+fragment Longlongsuffix : 'll' | 'LL' ;
 
-BinaryLiteral: ('0b' | '0B') BINARYDIGIT ('\''? BINARYDIGIT)*;
+BinaryLiteral : ('0b' | '0B') BINARYDIGIT ('\''? BINARYDIGIT)* ;
 
-fragment NONZERODIGIT: [1-9];
+fragment NONZERODIGIT : [1-9] ;
 
-fragment OCTALDIGIT: [0-7];
+fragment OCTALDIGIT : [0-7] ;
 
-fragment HEXADECIMALDIGIT: [0-9a-fA-F];
+fragment HEXADECIMALDIGIT : [0-9a-fA-F] ;
 
-fragment BINARYDIGIT: [01];
+fragment BINARYDIGIT : [01] ;
 
-fragment Encodingprefix: 'u8' | 'u' | 'U' | 'L';
+fragment Encodingprefix : 'u8' | 'u' | 'U' | 'L' ;
 
 fragment Escapesequence
     : Simpleescapesequence
@@ -240,19 +244,21 @@ fragment Hexadecimalescapesequence
     : '\\x' HEXADECIMALDIGIT+
     ;
 
-fragment Fractionalconstant:
-	Digitsequence? '.' Digitsequence
-	| Digitsequence '.';
+fragment Fractionalconstant
+	: Digitsequence? '.' Digitsequence
+	| Digitsequence '.'
+    ;
 
-fragment Exponentpart:
-	'e' SIGN? Digitsequence
-	| 'E' SIGN? Digitsequence;
+fragment Exponentpart
+	: 'e' SIGN? Digitsequence
+	| 'E' SIGN? Digitsequence
+    ;
 
-fragment SIGN: [+-];
+fragment SIGN : [+-];
 
-fragment Digitsequence: DIGIT ('\''? DIGIT)*;
+fragment Digitsequence : DIGIT ('\''? DIGIT)*;
 
-fragment Floatingsuffix: [flFL];
+fragment Floatingsuffix : [flFL];
 
 ASTERISK : '*' ;
 AMPERSAND_DOUBLE : '&&' ;
@@ -386,7 +392,7 @@ fragment D_CHAR_SEQ     // Should be limited to 16 characters
     : D_CHAR+
     ;
 
- fragment D_CHAR
+fragment D_CHAR
       /*  Any member of the basic source character set except
           space, the left parenthesis (, the right parenthesis ),
           the backslash \, and the control characters representing

@@ -1,8 +1,18 @@
 Program("main")
 
-Function("standardMatrixMult", true, matrixA, matrixB, matrixC, rows, columns, [
+Function("getSubMatrix", true, matrixDest, matrixSrc, dim, xPos, yPos, width, height, [
+    exprTemp_0 = Var("exprTemp_0")
+    exprTemp_0 = xPos + width
+    xEnd = Var("xEnd")
+    xEnd = exprTemp_0
+    exprTemp_1 = Var("exprTemp_1")
+    exprTemp_1 = yPos + height
+    yEnd = Var("yEnd")
+    yEnd = exprTemp_1
     counter = Var("counter")
     counter = Constant(ConstInt(0))
+    innerI = Var("innerI")
+    innerI = Constant(ConstInt(0))
     //
     // Loop 0
     //
@@ -10,11 +20,13 @@ Function("standardMatrixMult", true, matrixA, matrixB, matrixC, rows, columns, [
     tmp.1.0 = Var("tmp.1.0")
     // <instructions for init>
     i = Var("i")
-    i = Constant(ConstInt(0))
+    i = xPos
     Label(start_0)
     // <instructions for condition>
-    JumpGreaterThanOrEqual(i, rows, break_label_0)
+    JumpGreaterThanOrEqual(i, xEnd, break_label_0)
         // <start body statements>
+        innerJ = Var("innerJ")
+        innerJ = Constant(ConstInt(0))
         //
         // Loop 1
         //
@@ -22,101 +34,57 @@ Function("standardMatrixMult", true, matrixA, matrixB, matrixC, rows, columns, [
         tmp.1.1 = Var("tmp.1.1")
         // <instructions for init>
         j = Var("j")
-        j = Constant(ConstInt(0))
+        j = yPos
         Label(start_1)
         // <instructions for condition>
-        JumpGreaterThanOrEqual(j, columns, break_label_1)
+        JumpGreaterThanOrEqual(j, yEnd, break_label_1)
             // <start body statements>
-            //
-            // Loop 2
-            //
-            tmp.0.2 = Var("tmp.0.2")
-            tmp.1.2 = Var("tmp.1.2")
-            // <instructions for init>
-            k = Var("k")
-            k = Constant(ConstInt(0))
-            Label(start_2)
-            // <instructions for condition>
-            JumpGreaterThanOrEqual(k, columns, break_label_2)
-                // <start body statements>
-                exprTemp_0 = Var("exprTemp_0")
-                exprTemp_0 = i * columns
-                temp_aIdx = Var("temp_aIdx")
-                temp_aIdx = exprTemp_0
-                exprTemp_1 = Var("exprTemp_1")
-                exprTemp_1 = temp_aIdx + k
-                aIdx = Var("aIdx")
-                aIdx = exprTemp_1
-                exprTemp_2 = Var("exprTemp_2")
-                exprTemp_2 = k * columns
-                temp_bIdx = Var("temp_bIdx")
-                temp_bIdx = exprTemp_2
-                exprTemp_3 = Var("exprTemp_3")
-                exprTemp_3 = temp_bIdx + j
-                bIdx = Var("bIdx")
-                bIdx = exprTemp_3
-                exprTemp_4 = Var("exprTemp_4")
-                exprTemp_4 = i * rows
-                temp_cIdx = Var("temp_cIdx")
-                temp_cIdx = exprTemp_4
-                exprTemp_5 = Var("exprTemp_5")
-                exprTemp_5 = temp_cIdx + j
-                cIdx = Var("cIdx")
-                cIdx = exprTemp_5
-                aVal = Var("aVal")
-                // retrieve from array-element
-                sizeof_array_type = Var("sizeof_array_type")
-                sizeof(int32, sizeof_array_type)
-                matrixA.ptr.tmp.1 = Var("matrixA.ptr.tmp.1")
-                matrixA.ptr.tmp.1 = aIdx * sizeof_array_type
-                matrixA.ptr.tmp = Var("matrixA.ptr.tmp")
-                matrixA.ptr.tmp = matrixA + matrixA.ptr.tmp.1
-                Load(matrixA.ptr.tmp, aVal)
-                bVal = Var("bVal")
-                // retrieve from array-element
-                sizeof_array_type = Var("sizeof_array_type")
-                sizeof(int32, sizeof_array_type)
-                matrixB.ptr.tmp.1 = Var("matrixB.ptr.tmp.1")
-                matrixB.ptr.tmp.1 = bIdx * sizeof_array_type
-                matrixB.ptr.tmp = Var("matrixB.ptr.tmp")
-                matrixB.ptr.tmp = matrixB + matrixB.ptr.tmp.1
-                Load(matrixB.ptr.tmp, bVal)
-                exprTemp_6 = Var("exprTemp_6")
-                exprTemp_6 = aVal * bVal
-                mult_temp = Var("mult_temp")
-                mult_temp = exprTemp_6
-                abc = Var("abc")
-                // retrieve from array-element
-                sizeof_array_type = Var("sizeof_array_type")
-                sizeof(int32, sizeof_array_type)
-                matrixC.ptr.tmp.1 = Var("matrixC.ptr.tmp.1")
-                matrixC.ptr.tmp.1 = cIdx * sizeof_array_type
-                matrixC.ptr.tmp = Var("matrixC.ptr.tmp")
-                matrixC.ptr.tmp = matrixC + matrixC.ptr.tmp.1
-                Load(matrixC.ptr.tmp, abc)
-                exprTemp_7 = Var("exprTemp_7")
-                exprTemp_7 = abc + mult_temp
-                cde = Var("cde")
-                cde = exprTemp_7
-                // assign to array-element
-                // cIdx
-                sizeof_array_type = Var("sizeof_array_type")
-                sizeof(int32, sizeof_array_type)
-                matrixC.ptr.tmp.1 = Var("matrixC.ptr.tmp.1")
-                matrixC.ptr.tmp.1 = cIdx * sizeof_array_type
-                matrixC.ptr.tmp = Var("matrixC.ptr.tmp")
-                matrixC.ptr.tmp = matrixC + matrixC.ptr.tmp.1
-                matrixC.tmp.0 = Var("matrixC.tmp.0")
-                matrixC.tmp.0 = cde
-                Store(matrixC.tmp.0, matrixC.ptr.tmp)
-                // <end body statements>
-            // <continue label> 
-            Label(continue_label_2)
-            // <instructions for post>
-            tmp.1.2 = k + Constant(ConstInt(1))
-            k = tmp.1.2
-            Jump(start_2)
-            Label(break_label_2)
+            exprTemp_2 = Var("exprTemp_2")
+            exprTemp_2 = i * dim
+            tempIdx = Var("tempIdx")
+            tempIdx = exprTemp_2
+            exprTemp_3 = Var("exprTemp_3")
+            exprTemp_3 = tempIdx + j
+            idx = Var("idx")
+            idx = exprTemp_3
+            exprTemp_4 = Var("exprTemp_4")
+            exprTemp_4 = innerI * width
+            tempIdxC = Var("tempIdxC")
+            tempIdxC = exprTemp_4
+            exprTemp_5 = Var("exprTemp_5")
+            exprTemp_5 = tempIdxC + innerJ
+            idxC = Var("idxC")
+            idxC = exprTemp_5
+            transfer = Var("transfer")
+            // retrieve from array-element
+            sizeof_array_type = Var("sizeof_array_type")
+            sizeof(int32, sizeof_array_type)
+            matrixSrc.ptr.tmp.1 = Var("matrixSrc.ptr.tmp.1")
+            matrixSrc.ptr.tmp.1 = idx * sizeof_array_type
+            matrixSrc.ptr.tmp = Var("matrixSrc.ptr.tmp")
+            matrixSrc.ptr.tmp = matrixSrc + matrixSrc.ptr.tmp.1
+            Load(matrixSrc.ptr.tmp, transfer)
+            // assign to array-element
+            // idxC
+            sizeof_array_type = Var("sizeof_array_type")
+            sizeof(int32, sizeof_array_type)
+            matrixDest.ptr.tmp.1 = Var("matrixDest.ptr.tmp.1")
+            matrixDest.ptr.tmp.1 = idxC * sizeof_array_type
+            matrixDest.ptr.tmp = Var("matrixDest.ptr.tmp")
+            matrixDest.ptr.tmp = matrixDest + matrixDest.ptr.tmp.1
+            matrixDest.tmp.0 = Var("matrixDest.tmp.0")
+            matrixDest.tmp.0 = transfer
+            Store(matrixDest.tmp.0, matrixDest.ptr.tmp)
+            exprTemp_6 = Var("exprTemp_6")
+            exprTemp_6 = innerJ + Constant(ConstInt(1))
+            t = Var("t")
+            t = exprTemp_6
+            innerJ = t
+            exprTemp_7 = Var("exprTemp_7")
+            exprTemp_7 = counter + Constant(ConstInt(1))
+            tempCounter = Var("tempCounter")
+            tempCounter = exprTemp_7
+            counter = tempCounter
             // <end body statements>
         // <continue label> 
         Label(continue_label_1)
@@ -125,6 +93,11 @@ Function("standardMatrixMult", true, matrixA, matrixB, matrixC, rows, columns, [
         j = tmp.1.1
         Jump(start_1)
         Label(break_label_1)
+        exprTemp_8 = Var("exprTemp_8")
+        exprTemp_8 = innerI + Constant(ConstInt(1))
+        u = Var("u")
+        u = exprTemp_8
+        innerI = u
         // <end body statements>
     // <continue label> 
     Label(continue_label_0)
@@ -133,77 +106,6 @@ Function("standardMatrixMult", true, matrixA, matrixB, matrixC, rows, columns, [
     i = tmp.1.0
     Jump(start_0)
     Label(break_label_0)
-
-    return(Constant(ConstInt(0)))
-])
-
-Function("upCountingMatrix", true, matrix, dim, [
-    count = Var("count")
-    count = Constant(ConstInt(1))
-    //
-    // Loop 3
-    //
-    tmp.0.3 = Var("tmp.0.3")
-    tmp.1.3 = Var("tmp.1.3")
-    // <instructions for init>
-    i = Var("i")
-    i = Constant(ConstInt(0))
-    Label(start_3)
-    // <instructions for condition>
-    JumpGreaterThanOrEqual(i, dim, break_label_3)
-        // <start body statements>
-        //
-        // Loop 4
-        //
-        tmp.0.4 = Var("tmp.0.4")
-        tmp.1.4 = Var("tmp.1.4")
-        // <instructions for init>
-        j = Var("j")
-        j = Constant(ConstInt(0))
-        Label(start_4)
-        // <instructions for condition>
-        JumpGreaterThanOrEqual(j, dim, break_label_4)
-            // <start body statements>
-            exprTemp_8 = Var("exprTemp_8")
-            exprTemp_8 = dim * i
-            temp = Var("temp")
-            temp = exprTemp_8
-            exprTemp_9 = Var("exprTemp_9")
-            exprTemp_9 = temp + j
-            idx = Var("idx")
-            idx = exprTemp_9
-            // assign to array-element
-            // idx
-            sizeof_array_type = Var("sizeof_array_type")
-            sizeof(int32, sizeof_array_type)
-            matrix.ptr.tmp.1 = Var("matrix.ptr.tmp.1")
-            matrix.ptr.tmp.1 = idx * sizeof_array_type
-            matrix.ptr.tmp = Var("matrix.ptr.tmp")
-            matrix.ptr.tmp = matrix + matrix.ptr.tmp.1
-            matrix.tmp.0 = Var("matrix.tmp.0")
-            matrix.tmp.0 = count
-            Store(matrix.tmp.0, matrix.ptr.tmp)
-            exprTemp_10 = Var("exprTemp_10")
-            exprTemp_10 = count + Constant(ConstInt(1))
-            t = Var("t")
-            t = exprTemp_10
-            count = t
-            // <end body statements>
-        // <continue label> 
-        Label(continue_label_4)
-        // <instructions for post>
-        tmp.1.4 = j + Constant(ConstInt(1))
-        j = tmp.1.4
-        Jump(start_4)
-        Label(break_label_4)
-        // <end body statements>
-    // <continue label> 
-    Label(continue_label_3)
-    // <instructions for post>
-    tmp.1.3 = i + Constant(ConstInt(1))
-    i = tmp.1.3
-    Jump(start_3)
-    Label(break_label_3)
 
     return(Constant(ConstInt(0)))
 ])
@@ -752,21 +654,67 @@ Function("main", true, [
     matrixB.ptr.tmp.0 = Var("matrixB.ptr.tmp.0")
     matrixB.ptr.tmp.0 = 5
     Store(matrixB.ptr.tmp.0, matrixB.ptr.ptr.tmp)
+    subMatrixB = Var("subMatrixB", Array(int32, 4))
+    sizeof_array_type = Var("sizeof_array_type")
+    sizeof(int32, sizeof_array_type)
+    subMatrixB.ptr = Var("subMatrixB.ptr")
+    GetAddress(subMatrixB, subMatrixB.ptr)
+    // assign to array-element
+    // 0
+    sizeof_array_type = Var("sizeof_array_type")
+    sizeof(int32, sizeof_array_type)
+    subMatrixB.ptr.ptr.tmp.1 = Var("subMatrixB.ptr.ptr.tmp.1")
+    subMatrixB.ptr.ptr.tmp.1 = 0 * sizeof_array_type
+    subMatrixB.ptr.ptr.tmp = Var("subMatrixB.ptr.ptr.tmp")
+    subMatrixB.ptr.ptr.tmp = subMatrixB.ptr + subMatrixB.ptr.ptr.tmp.1
+    subMatrixB.ptr.tmp.0 = Var("subMatrixB.ptr.tmp.0")
+    subMatrixB.ptr.tmp.0 = 255
+    Store(subMatrixB.ptr.tmp.0, subMatrixB.ptr.ptr.tmp)
+    // assign to array-element
+    // 1
+    sizeof_array_type = Var("sizeof_array_type")
+    sizeof(int32, sizeof_array_type)
+    subMatrixB.ptr.ptr.tmp.1 = Var("subMatrixB.ptr.ptr.tmp.1")
+    subMatrixB.ptr.ptr.tmp.1 = 1 * sizeof_array_type
+    subMatrixB.ptr.ptr.tmp = Var("subMatrixB.ptr.ptr.tmp")
+    subMatrixB.ptr.ptr.tmp = subMatrixB.ptr + subMatrixB.ptr.ptr.tmp.1
+    subMatrixB.ptr.tmp.0 = Var("subMatrixB.ptr.tmp.0")
+    subMatrixB.ptr.tmp.0 = 255
+    Store(subMatrixB.ptr.tmp.0, subMatrixB.ptr.ptr.tmp)
+    // assign to array-element
+    // 2
+    sizeof_array_type = Var("sizeof_array_type")
+    sizeof(int32, sizeof_array_type)
+    subMatrixB.ptr.ptr.tmp.1 = Var("subMatrixB.ptr.ptr.tmp.1")
+    subMatrixB.ptr.ptr.tmp.1 = 2 * sizeof_array_type
+    subMatrixB.ptr.ptr.tmp = Var("subMatrixB.ptr.ptr.tmp")
+    subMatrixB.ptr.ptr.tmp = subMatrixB.ptr + subMatrixB.ptr.ptr.tmp.1
+    subMatrixB.ptr.tmp.0 = Var("subMatrixB.ptr.tmp.0")
+    subMatrixB.ptr.tmp.0 = 255
+    Store(subMatrixB.ptr.tmp.0, subMatrixB.ptr.ptr.tmp)
+    // assign to array-element
+    // 3
+    sizeof_array_type = Var("sizeof_array_type")
+    sizeof(int32, sizeof_array_type)
+    subMatrixB.ptr.ptr.tmp.1 = Var("subMatrixB.ptr.ptr.tmp.1")
+    subMatrixB.ptr.ptr.tmp.1 = 3 * sizeof_array_type
+    subMatrixB.ptr.ptr.tmp = Var("subMatrixB.ptr.ptr.tmp")
+    subMatrixB.ptr.ptr.tmp = subMatrixB.ptr + subMatrixB.ptr.ptr.tmp.1
+    subMatrixB.ptr.tmp.0 = Var("subMatrixB.ptr.tmp.0")
+    subMatrixB.ptr.tmp.0 = 255
+    Store(subMatrixB.ptr.tmp.0, subMatrixB.ptr.ptr.tmp)
 
-    # -- Function -- standardMatrixMult
-    tmp.standardMatrixMult = Var("tmp.standardMatrixMult")
+    # -- Function -- getSubMatrix
+    tmp.getSubMatrix = Var("tmp.getSubMatrix")
     // parameter 1 for function call
     tmp.1.ptr = Var("tmp.1.ptr")
-    GetAddress(matrixA, tmp.1.ptr)
+    GetAddress(subMatrixB, tmp.1.ptr)
     // parameter 2 for function call
     tmp.2.ptr = Var("tmp.2.ptr")
     GetAddress(matrixB, tmp.2.ptr)
-    // parameter 3 for function call
-    tmp.3.ptr = Var("tmp.3.ptr")
-    GetAddress(matrixC, tmp.3.ptr)
-    funccall(standardMatrixMult, false, tmp.1.ptr, tmp.2.ptr, tmp.3.ptr, Constant(ConstInt(4)), Constant(ConstInt(4)), tmp.standardMatrixMult)
-    pp3 = Var("pp3")
-    pp3 = tmp.standardMatrixMult
+    funccall(getSubMatrix, false, tmp.1.ptr, tmp.2.ptr, Constant(ConstInt(4)), Constant(ConstInt(0)), Constant(ConstInt(0)), Constant(ConstInt(2)), Constant(ConstInt(2)), tmp.getSubMatrix)
+    getResult = Var("getResult")
+    getResult = tmp.getSubMatrix
 
     # -- Function -- exit
     exit()

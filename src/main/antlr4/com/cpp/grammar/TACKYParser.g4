@@ -281,6 +281,7 @@ expr :
     | Identifier
     | IntegerLiteral
     | StringLiteral
+    | CharLiteral
     | constant_decl
     ;
 
@@ -320,18 +321,10 @@ val :
 
 constant_decl : 
       CONSTANT LEFT_PAREN const RIGHT_PAREN
-    /*    
-    | CONSTANT LEFT_PAREN const RIGHT_PAREN
-    | CONSTANT LEFT_PAREN const RIGHT_PAREN
-    | CONSTANT LEFT_PAREN const RIGHT_PAREN
-    | CONSTANT LEFT_PAREN const RIGHT_PAREN
-    | CONSTANT LEFT_PAREN const RIGHT_PAREN
-    | CONSTANT LEFT_PAREN const RIGHT_PAREN
-    */
     ;
 
 const : 
-      CONSTCHAR LEFT_PAREN IntegerLiteral RIGHT_PAREN
+      CONSTCHAR LEFT_PAREN CharLiteral RIGHT_PAREN
     | CONSTUCHAR LEFT_PAREN IntegerLiteral RIGHT_PAREN
     | CONSTINT LEFT_PAREN IntegerLiteral RIGHT_PAREN
     | CONSTUINT LEFT_PAREN IntegerLiteral RIGHT_PAREN

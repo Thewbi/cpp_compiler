@@ -25,123 +25,83 @@
 
 
 
+ int getSubMatrix ( int * matrixDest , int * matrixSrc , int dim , int xPos , int yPos , int width , int height ) {
 
-
-
-
-
- int standardMatrixMult ( int * matrixA , int * matrixB , int * matrixC , int rows , int columns ) {
      
      
-                 
      
      
 
      
-
+     
+     
      
 
+      int xEnd = xPos + width ;
+      int yEnd = yPos + height ;
+
+     
      
 
       int counter = 0 ;
 
-     
-     
-      for ( int i = 0 ; i < rows ; i ++ ) {
+      int innerI = 0 ;
+      for ( int i = xPos ; i < xEnd ; i ++ ) {
+
+          int innerJ = 0 ;
+          for ( int j = yPos ; j < yEnd ; j ++ ) {
+
+             
+
+             
+              int tempIdx = i * dim ;
+             
+
+             
+
+              int idx = tempIdx + j ;
+             
+
+             
 
          
 
-         
-         
-          for ( int j = 0 ; j < columns ; j ++ ) {
-
-             
              
              
 
              
+              int tempIdxC = innerI * width ;
+             
 
              
-              for ( int k = 0 ; k < columns ; k ++ ) {
 
-                 
-
-                 
-                 
-                 
-
-                 
-                 
-                 
-
-                 
-
-                 
-
-                 
-
-                 
-                  int temp_aIdx = i * columns ;
-                  int aIdx = temp_aIdx + k ;
-
-                 
-
-                 
-                  int temp_bIdx = k * columns ;
-                  int bIdx = temp_bIdx + j ;
-
-                 
-
-                 
-                  int temp_cIdx = i * rows ;
-                  int cIdx = temp_cIdx + j ;
-
-                 
-
-                  int aVal = matrixA [ aIdx ] ;
-                 
-                 
-
-                  int bVal = matrixB [ bIdx ] ;
-                 
-
-                  int mult_temp = aVal * bVal ;
-
-                 
-
-                 
-
-                 
-                 
-                 
-                 
-                 
-                 
-                 
-                 
-
-                 
-                  int abc = matrixC [ cIdx ] ;
-                 
-                  int cde = abc + mult_temp ;
-                 
-                  matrixC [ cIdx ] = cde ;
-
-                 
-
-                 
-
-                 
-
-                 
-              }
+              int idxC = tempIdxC + innerJ ;
+             
 
              
+
+             
+             
+              int transfer = matrixSrc [ idx ] ;
+              matrixDest [ idxC ] = transfer ;
+
+             
+             
+
+             
+              int t = innerJ + 1 ;
+              innerJ = t ;
+
+              int tempCounter = counter + 1 ;
+              counter = tempCounter ;
+
           }
 
          
+          int u = innerI + 1 ;
+          innerI = u ;
       }
-         
+
       return 0 ;
  }
 
@@ -177,23 +137,13 @@
 
 
 
- int upCountingMatrix ( int * matrix , int dim ) {
-      int count = 1 ;
-      for ( int i = 0 ; i < dim ; i ++ ) {
-          for ( int j = 0 ; j < dim ; j ++ ) {
 
-             
-              int temp = dim * i ;
-              int idx = temp + j ;
 
-              matrix [ idx ] = count ;
 
-              int t = count + 1 ;
-              count = t ;
-          }
-      }
-      return 0 ;
- }
+
+
+
+
 
 
 
@@ -216,14 +166,12 @@
      
      
      
-
       int matrixC [ 16 ] = {
           0 , 0 , 0 , 0 ,
           0 , 0 , 0 , 0 ,
           0 , 0 , 0 , 0 ,
           0 , 0 , 0 , 0
       } ;
-
 
      
       int matrixB [ 16 ] = {
@@ -232,7 +180,6 @@
           7 , 6 , 8 , 5 ,
           8 , 4 , 7 , 5
       } ;
-     
 
      
      
@@ -245,11 +192,18 @@
 
 
      
+      int subMatrixB [ 4 ] = { 255 , 255 , 255 , 255 } ;
+
+      int getResult = getSubMatrix ( subMatrixB , matrixB , 4 , 0 , 0 , 2 , 2 ) ;
+     
+
      
      
      
 
- int pp3 = standardMatrixMult ( matrixA , matrixB , matrixC , 4 , 4 ) ;
+
+
+
 
 
 

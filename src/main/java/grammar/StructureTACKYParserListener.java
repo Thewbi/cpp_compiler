@@ -3,10 +3,12 @@ package grammar;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.antlr.v4.runtime.tree.TerminalNodeImpl;
 
+import com.cpp.grammar.TACKYLexer;
 import com.cpp.grammar.TACKYParser;
 import com.cpp.grammar.TACKYParser.Arg_listContext;
 import com.cpp.grammar.TACKYParser.Array_typeContext;
@@ -21,6 +23,7 @@ import ast.ExpressionASTNode;
 import ast.ExpressionType;
 import common.StringUtil;
 import tacky.ast.AssignmentASTNode;
+import tacky.ast.ConstCharASTNode;
 import tacky.ast.ConstIntASTNode;
 import tacky.ast.ConstantDeclarationASTNode;
 import tacky.ast.FunctionCallASTNode;
@@ -47,7 +50,7 @@ public class StructureTACKYParserListener extends TACKYParserBaseListener {
 
     public ASTNode currentNode;
 
-    public ASTNode constVal;
+    // public ASTNode constVal;
 
     public TACKYASTNodeFactory tackyASTNodeFactory = new TACKYASTNodeFactory();
 
@@ -272,8 +275,30 @@ public class StructureTACKYParserListener extends TACKYParserBaseListener {
     public void exitConst(TACKYParser.ConstContext ctx) {
         // System.out.println("[" + ctx.hashCode() + "] " + ctx.getText());
 
-        constVal = new ConstIntASTNode();
-        constVal.value = ctx.getChild(2).getText();
+        ASTNode constVal = null;
+
+        TerminalNodeImpl terminalNodeImpl = (TerminalNodeImpl) ctx.children.get(0);
+        Token token = terminalNodeImpl.getSymbol();
+
+        switch (token.getType()) {
+
+            case TACKYLexer.CONSTCHAR:
+                constVal = new ConstCharASTNode();
+                constVal.astNodeType = ASTNodeType.CONSTANT_DECLARATION;
+                constVal.value = ctx.getChild(2).getText();
+                break;
+
+            case TACKYLexer.CONSTINT:
+                constVal = new ConstIntASTNode();
+                constVal.astNodeType = ASTNodeType.CONSTANT_DECLARATION;
+                constVal.value = ctx.getChild(2).getText();
+                break;
+
+            default:
+                System.out.println("test");
+                break;
+
+        }
 
         connectToParent(currentNode, constVal);
     }

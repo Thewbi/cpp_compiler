@@ -2,7 +2,7 @@ package tacky.ast;
 
 import ast.ASTNode;
 
-public class ConstIntASTNode extends TACKYASTNode {
+public class ConstCharASTNode extends TACKYASTNode {
 
     public void printRecursive(final StringBuilder stringBuilder, final int indent) {
         printRecursive(stringBuilder, indent, true);
@@ -14,7 +14,7 @@ public class ConstIntASTNode extends TACKYASTNode {
         for (int i = 0; i < indent; i++) {
             stringBuilder.append("  ");
         }
-        stringBuilder.append("[constant-int] ").append(value);
+        stringBuilder.append("[constant-char] ").append(value);
 
         if (addLineBreak) {
             stringBuilder.append("\n");
@@ -25,5 +25,5 @@ public class ConstIntASTNode extends TACKYASTNode {
             child.printRecursive(stringBuilder, indent + 1, true);
         }
     }
-
+    
 }

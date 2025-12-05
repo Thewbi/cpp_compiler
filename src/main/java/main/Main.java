@@ -212,8 +212,6 @@ public class Main {
         System.out.println("The End");
     }
 
-    
-
     /**
      * This function contains the basic idea of the algorithm. The purpose of the
      * algorithm is to parse expressions without a parse, using a lexer and token
@@ -452,7 +450,7 @@ public class Main {
 
         // @formatter:on
 
-        System.out.println("-- 1 - Parsing TACKY Input -------------------------------");
+        System.out.println("-- 2 - Parsing TACKY Input -------------------------------");
 
         final String filename = "generated_tacky.tky";
         final CharStream charStream = CharStreams
@@ -481,7 +479,7 @@ public class Main {
 
         System.out.println("----------------------------------------------------------\n");
 
-        System.out.println("-- 2 - Parsing Tree ---> TACKY Abstract Syntax Tree ------");
+        System.out.println("-- 3 - Parsing Tree ---> TACKY Abstract Syntax Tree ------");
 
         ASTNode rootNode = new ASTNode();
         rootNode.value = "[tacky_file] root";
@@ -496,7 +494,7 @@ public class Main {
 
         System.out.println("----------------------------------------------------------\n");
 
-        System.out.println("-- 3 - DEBUG OUTPUT TACKY Abstract Syntax Tree -----------");
+        System.out.println("-- 4 - DEBUG OUTPUT TACKY Abstract Syntax Tree -----------");
 
         // DEBUG print AST
         // boolean printAST = true;
@@ -507,9 +505,9 @@ public class Main {
             System.out.print(stringBuilder.toString());
         }
 
-        System.out.println("------------------------------------------------------------\n");
+        System.out.println("----------------------------------------------------------\n");
 
-        System.out.println("-- 4 - Run the TACKY code ----------------------------------");
+        System.out.println("-- 5 - Run the TACKY code --------------------------------");
 
         //
         // run the TACKY code
@@ -533,7 +531,7 @@ public class Main {
                     + "! Unit Test failed!\n[ERROR]");
         }
 
-        System.out.println("----------------------------------------------------------------\n");
+        System.out.println("----------------------------------------------------------\n");
 /*
         System.out.println("-- 5 - Generate x86 assembly code ------------------------------");
 
@@ -551,7 +549,7 @@ public class Main {
         System.out.println("----------------------------------------------------------\n");
 */
 
-        System.out.println("-- 5 - Generate RISC-V assembly code ----------------------");
+        System.out.println("-- 6 - Generate RISC-V assembly code ---------------------");
 
         TACKYStackFrame newTackyStackFrameGen = new TACKYStackFrame();
 
@@ -785,7 +783,7 @@ public class Main {
 
         // System.out.println(typeMap);
 
-        System.out.println("-- 1 - Print C AST Input -------------------------------\n");
+        System.out.println("-- 1 - Print C AST Input ---------------------------------");
 
         // boolean printAST = true;
         boolean printAST = false;
@@ -795,7 +793,7 @@ public class Main {
             System.out.println(stringBuilder.toString());
         }
 
-        System.out.println("--------------------------------------------------------\n");
+        System.out.println("----------------------------------------------------------\n");
 
         // check if expression stack is empty
         if (listener instanceof StructureCPP14ParserListener) {
@@ -985,6 +983,8 @@ public class Main {
         // final String filename = "src/test/resources/for_loop.cpp"; // <--- Language Test 1
         // final String filename = "src/test/resources/for_loop_2.cpp";
         // final String filename = "src/test/resources/for_loop_over_array.cpp";
+
+        // final String filename = "src/test/resources/char_test.cpp";
 
         ASTNode dummyASTNode = new ASTNode();
         dummyASTNode.value = "__DUMMY___11223344__";

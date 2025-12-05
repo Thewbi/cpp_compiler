@@ -20,6 +20,8 @@
 #define DIMENSION 4
 #define ELEMENTS DIMENSION*DIMENSION
 
+#define SUB_DIMENSION 2
+
 /*
 int matrixAddInto(int* matrixA, int* matrixB, int rows, int columns) {
     for (int i = 0; i < rows; i++) {
@@ -40,18 +42,36 @@ int matrixAddInto(int* matrixA, int* matrixB, int rows, int columns) {
 }
 */
 
-/*
-int getSubMatrix(int* matrix, int dim, int xPos, int yPos, int width, int height, int* matrixC) {
-//void getSubMatrix(int* matrix, int dim, int xPos, int yPos, int width, int height) {
-//void getSubMatrix(int* matrix, int dim) {
+/**
+ * Copies a subfield into matrixDest.
+ * 
+ * matrixDest - destination to copy data into
+ * matrixSrc - source to copy data from
+ * dim - dimension of source (NOT TARGET!!!!!)
+ * xPos - xPos of field to copy
+ * yPos - xPos of field to copy
+ * width - xPos of field to copy
+ * height - xPos of field to copy
+ */
+int getSubMatrix(int* matrixDest, int* matrixSrc, int dim, int xPos, int yPos, int width, int height) {
 
-    // int xPos = 0;
-    // int yPos = 0;
-    // int width = 2;
-    // int height = 2;
+    // matrixDest[0] = xPos;
+    // matrixDest[1] = yPos;
+    // matrixDest[2] = width;
+    // matrixDest[3] = height;
+
+    // matrixDest[0] = 16;
+    // matrixDest[1] = 32;
+    // matrixDest[2] = 48;
+    // matrixDest[3] = 64;
 
     int xEnd = xPos + width;
     int yEnd = yPos + height;
+
+    // matrixDest[0] = xEnd;
+    // matrixDest[1] = yEnd;
+
+    int counter = 0;
 
     int innerI = 0;
     for (int i = xPos; i < xEnd; i++) {
@@ -60,17 +80,48 @@ int getSubMatrix(int* matrix, int dim, int xPos, int yPos, int width, int height
         for (int j = yPos; j < yEnd; j++) {
 
             // matrixC[innerI * width + innerJ] = matrix[i * dim + j];
-            int idx = i * dim + j;
-            int idxC = innerI * width + innerJ;
+
+            // int idx = i * dim + j;
+            int tempIdx = i * dim;
+            //matrixDest[counter] = tempIdx; // 0,0,2,2  OK
+
+            //matrixDest[counter] = j; // 0,1,0,1  OK
+
+            int idx = tempIdx + j;
+            //matrixDest[counter] = idx; // 0,1,2,3  OK
+
             
-            int gaga = matrix[idx];
-            matrixC[idxC] = gaga;
+
+        
+
+            //matrixDest[counter] = width; // 2,2,2,2 OK
+            //matrixDest[counter] = innerI; // 0,0,1,1 OK
+
+            // // int idxC = innerI * width + innerJ;
+            int tempIdxC = innerI * width;
+            //matrixDest[counter] = tempIdxC; // 0,0,2,2 OK
+
+            //matrixDest[counter] = innerJ; // 0,1,0,1 OK
+
+            int idxC = tempIdxC + innerJ;
+            //matrixDest[counter] = idxC; // 0,1,2,3
+
+            //matrixDest[counter] = idxC; // 0,1,2,3 INCORRECT: 0,1,4,5
+
+            //matrixDest[counter] = idx; // 0,1,2,3  OK
+            
+            int transfer = matrixSrc[idx];
+            matrixDest[idxC] = transfer;
+
+            // copy the src index into dest for debugging. Should be: 0,1,4,5 but is 0,1,3,4
+            //matrixDest[idxC] = idx;
 
             // innerJ++;
             int t = innerJ + 1;
             innerJ = t;
-            
-            //printf("test");
+
+            int tempCounter = counter + 1;
+            counter = tempCounter;
 
         }
 
@@ -81,34 +132,24 @@ int getSubMatrix(int* matrix, int dim, int xPos, int yPos, int width, int height
 
     return 0;
 }
-*/
-
-/*
-int setSubMatrix(int* matrix, int dim, int xPos, int yPos, int width, int height, int* matrixC) {
-    for (int i = 0; i < height; i++) {
-        for (int j = 0; j < width; j++) {
-
-            int temp = i * width + j;
-            int tempData = matrixC[temp];
-
-            int temp2 = (yPos + i) * dim + (xPos + j);
-            matrix[temp2] = tempData;
-        }
-    }
-
-    return 0;
-}*/
 
 /*
 int setSubMatrix(int* matrix_dest, int* matrix_src, int dim, int xPos, int yPos, int width, int height) {
     for (int i = 0; i < height; i++) {
         for (int j = 0; j < width; j++) {
 
-            int temp = i * width + j;
-            int tempData = matrix_src[temp];
+            // int temp = i * width + j;
+            int temp1 = i * width;
+            int temp2 = temp1 + j;
+            int tempData = matrix_src[temp2];
 
-            int temp2 = (yPos + i) * dim + (xPos + j);
-            matrix_dest[temp2] = tempData;
+            // int temp2 = (yPos + i) * dim + (xPos + j);
+            int temp3 = (yPos + i);
+            int temp4 = temp3 * dim;
+            int temp5 = (xPos + j);
+            int destIndex = temp4 + temp5;
+
+            matrix_dest[destIndex] = tempData;
         }
     }
     return 0;
@@ -230,7 +271,8 @@ int segmentedMatrixMult(int* matrixA, int* matrixB, int* matrixC, int rows, int 
     return 0;
 }
 */
-/**/
+
+/*
 int standardMatrixMult(int* matrixA, int* matrixB, int* matrixC, int rows, int columns) {
     
     //int t1 = matrixA[2];
@@ -345,6 +387,7 @@ int standardMatrixMult(int* matrixA, int* matrixB, int* matrixC, int rows, int c
         
     return 0;
 }
+*/
 
 // int printMatrix(int* matrix, int dim) {
 //     for (int i = 0; i < dim; i++) {
@@ -401,7 +444,7 @@ int prettyPrintFormatMatrix(int* matrix, int dim) {
 //     return 0;
 // }
 
-/**/
+/*
 int upCountingMatrix(int* matrix, int dim) {
     int count = 1;
     for (int i = 0; i < dim; i++) {
@@ -419,7 +462,21 @@ int upCountingMatrix(int* matrix, int dim) {
     }
     return 0;
 }
+*/
 
+/*
+int zeroMatrix(int* matrix, int dim) {
+    for (int i = 0; i < dim; i++) {
+        for (int j = 0; j < dim; j++) {
+            //int idx = dim * i + j;
+            int temp = dim * i;
+            int idx = temp + j;
+            matrix[idx] = 0;
+        }
+    }
+    return 0;
+}
+*/
 
 /*
 //void multiParamTest(int* matrixA, int* matrixB, int* matrixC, int rows, int columns) {
@@ -479,14 +536,12 @@ int main()
     //     255, 255, 255, 255,
     //     255, 255, 255, 254
     // };
-
     int matrixC[ELEMENTS] = {
         0, 0, 0, 0,
         0, 0, 0, 0,
         0, 0, 0, 0,
         0, 0, 0, 0
     };
-
 
     /*
     1 2 4 2
@@ -500,7 +555,6 @@ int main()
         7, 6, 8, 5,
         8, 4, 7, 5
     };
-    
 
     //int upResult = upCountingMatrix(matrixA, DIMENSION);
     //int upResult = upCountingMatrix(matrixB, DIMENSION);
@@ -512,12 +566,19 @@ int main()
 //    printf("B\n");
 //    int pp2 = prettyPrintFormatMatrix(matrixB, DIMENSION);
 
-    // int subMatrixB[4] = { 0, 0, 0, 0 };
-    // getSubMatrix(matrixB, DIMENSION, 1, 1, 2, 2, subMatrixB);
+    //int subMatrixB[4] = { 16, 32, 48, 64 };
+    int subMatrixB[4] = { 255, 255, 255, 255 };
+
+    int getResult = getSubMatrix(subMatrixB, matrixB, DIMENSION, 0, 0, SUB_DIMENSION, SUB_DIMENSION);
+    // int getResult = getSubMatrix(subMatrixB, matrixB, DIMENSION, 1, 2, 3, 4);
+//    int setResult = setSubMatrix(matrixC, subMatrixB, DIMENSION, 0, 0, 2, 2);
+    
     // printf("subMatrixB\n");
     // prettyPrintFormatMatrix(subMatrixB, 2);
 
-int pp3 = standardMatrixMult(matrixA, matrixB, matrixC, DIMENSION, DIMENSION);
+//    int pp2 = zeroMatrix(matrixC, DIMENSION);
+
+//    int pp3 = standardMatrixMult(matrixA, matrixB, matrixC, DIMENSION, DIMENSION);
 
 //    int result_1 = segmentedMatrixMult(matrixA, matrixB, matrixC, DIMENSION, DIMENSION);
 

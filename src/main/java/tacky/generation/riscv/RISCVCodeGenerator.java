@@ -26,6 +26,8 @@ import types.FormalParameter;
 
 public class RISCVCodeGenerator implements Generator {
 
+    private static final boolean PRINT_STACK_FRAME_LAYOUT = false;
+
     public StringBuilder stringBuilder = new StringBuilder();
 
     private int stackPointer = 0x20000;
@@ -79,8 +81,6 @@ public class RISCVCodeGenerator implements Generator {
 
     @Override
     public void end() {
-
-        
     }
 
     @Override
@@ -379,11 +379,13 @@ public class RISCVCodeGenerator implements Generator {
         stackFrame.stackSizeUsed = stackSizeUsed;
 
         // DEBUG - output the stack frame and it's details
-        System.out.println("\n°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°");
-        for (RISCVStackEntry entry : stackFrame.stackEntryList) {
-            System.out.println(entry.toString());
+        if (PRINT_STACK_FRAME_LAYOUT) {
+            System.out.println("\n°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°");
+            for (RISCVStackEntry entry : stackFrame.stackEntryList) {
+                System.out.println(entry.toString());
+            }
+            System.out.println("000000000000000000000000000000000000000\n");
         }
-        System.out.println("000000000000000000000000000000000000000\n");
 
         // insert function label for the function
         stringBuilder.append(functionAstNode.value).append(":").append("\n");
@@ -408,7 +410,7 @@ public class RISCVCodeGenerator implements Generator {
         // sw      ra,28(sp)           // store address to return to (stored in ra) onto the stack 
                                     // (SHOULD WE WANT TO CALL MORE FUNCTIONS WITHIN THE BODY OF THIS FUNCTION)
         stringBuilder.append(indent)
-            .append("sw      ra, " + (stackSizeUsed-4) + "(sp), ")
+            .append("sw      ra, " + (stackSizeUsed-4) + "(sp)")
             .append("\n");
 
         
@@ -416,7 +418,7 @@ public class RISCVCodeGenerator implements Generator {
         // sw      s0,24(sp)           // store old s0/fp (frame pointer) on the stack so it can be 
                                     // restored later because it will be used within this function
         stringBuilder.append(indent)
-            .append("sw      s0, " + (stackSizeUsed-8) + "(sp), ")
+            .append("sw      s0, " + (stackSizeUsed-8) + "(sp)")
             .append("\n");
 
         // addi    s0,sp,32            // set new s0/fp (frame pointer) to the start of our new stackframe. 
@@ -571,16 +573,41 @@ public class RISCVCodeGenerator implements Generator {
 
                 loadIntoTempRegisters(expressionASTNode, tempRegister0, tempRegister1);
 
+                String tempRegister = "t0";
+
                 // @formatter:off
                 stringBuilder.append(indent)
-                    .append("add     a5, ")
+                    .append("add     ").append(tempRegister).append(", ")
                     .append(tempRegister0).append(", ")
                     .append(tempRegister1)
                     .append("\n");
                 // @formatter:on
 
                 // store register containing the result of the add operation
-                value = "a5";
+                value = tempRegister;
+                valueIsRegister = true;
+            }
+                break;
+
+            case Subtract: {
+
+                String tempRegister0 = "t0";
+                String tempRegister1 = "t1";
+
+                loadIntoTempRegisters(expressionASTNode, tempRegister0, tempRegister1);
+
+                String tempRegister = "t0";
+
+                // @formatter:off
+                stringBuilder.append(indent)
+                    .append("sub     ").append(tempRegister).append(", ")
+                    .append(tempRegister0).append(", ")
+                    .append(tempRegister1)
+                    .append("\n");
+                // @formatter:on
+
+                // store register containing the result of the add operation
+                value = tempRegister;
                 valueIsRegister = true;
             }
                 break;
@@ -592,15 +619,17 @@ public class RISCVCodeGenerator implements Generator {
 
                 loadIntoTempRegisters(expressionASTNode, tempRegister0, tempRegister1);
 
+                String tempRegister = "t0";
+
                 // @formatter:off
                 stringBuilder.append(indent)
-                    .append("mul     a5, ")
+                    .append("mul     ").append(tempRegister).append(", ")
                     .append(tempRegister0).append(", ")
                     .append(tempRegister1)
                     .append("\n");
                 // @formatter:on
 
-                value = "a5";
+                value = tempRegister;
                 valueIsRegister = true;
             }
                 break;
@@ -612,21 +641,23 @@ public class RISCVCodeGenerator implements Generator {
 
                 loadIntoTempRegisters(expressionASTNode, tempRegister0, tempRegister1);
 
+                String tempRegister = "t0";
+
                 // @formatter:off
                 stringBuilder.append(indent)
-                    .append("div     a5, ")
+                    .append("div     ").append(tempRegister).append(", ")
                     .append(tempRegister0).append(", ")
                     .append(tempRegister1)
                     .append("\n");
                 // @formatter:on
 
-                value = "a5";
+                value = tempRegister;
                 valueIsRegister = true;
             }
                 break;
 
             case Identifier: {
-                value = "a5";
+                value = "t0";
                 valueIsRegister = true;
 
                 loadLocalVariableIntoTempRegister(value, expressionASTNode.value);
@@ -649,9 +680,12 @@ public class RISCVCodeGenerator implements Generator {
         int offset = address - stackPointer;
 
         String tempRegister = "t0";
+
+        // @formatter:off
         stringBuilder.append(indent)
                 .append("# variable '").append(variableName).append("'")
                 .append("\n");
+        // @formatter:on
 
         if (valueIsRegister) {
 
@@ -862,10 +896,8 @@ public class RISCVCodeGenerator implements Generator {
         String calledFunctionName = functionCallASTNode.value;
 
         // TODO: setup parameters into a0, a1, a2, ...
-        System.out.println("setup parameters into a0, a1, a2, ...");
+        // System.out.println("setup parameters into a0, a1, a2, ...");
         
-        //stringBuilder.append(indent).append("mv      a0, a5").append("\n");
-
         int index = 0;
 
         for (ActualParameter actualParameter : functionCallASTNode.actualParameters) {

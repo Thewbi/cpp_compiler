@@ -2,6 +2,7 @@ package tacky.generation.tacky;
 
 import java.util.Stack;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 
 import ast.ASTNode;
@@ -106,7 +107,7 @@ public class TackyGenerator {
                 break;
 
             case  RETURN: {
-                System.out.println("return");
+                // System.out.println("return");
                 JumpStatementASTNode returnStatementASTNode = (JumpStatementASTNode) astNode;
                 switch (returnStatementASTNode.statementType) {
                     case RETURN:
@@ -120,7 +121,7 @@ public class TackyGenerator {
                 break;
 
             default:
-                System.out.println("Unknown Tacky-Generator type: \"" + astNode.astNodeType + "\" ");
+                // System.out.println("Unknown Tacky-Generator type: \"" + astNode.astNodeType + "\" ");
                 enterUnknown(astNode);
                 for (ASTNode child : astNode.children) {
                     process(indent, child);
@@ -525,11 +526,11 @@ public class TackyGenerator {
 
                     String variableName = child0ExpressionASTNode.value;
 
-                    System.out.println(variableName);
+                    // System.out.println(variableName);
 
                     String expr = evaluateToString(indent, child1ExpressionASTNode);
 
-                    System.out.println(expr);
+                    // System.out.println(expr);
 
                     defineVariable(indent, variableName, null);
 
@@ -1000,6 +1001,7 @@ public class TackyGenerator {
                 .getChildren().get(1);
 
         // DEBUG - print all parameters
+        // boolean printAllParameters = true;
         boolean printAllParameters = false;
         if (printAllParameters) {
             StringBuilder debugStringBuilder = new StringBuilder();
@@ -1301,9 +1303,10 @@ public class TackyGenerator {
         String indentString = buildIndentString(indent);
         stringBuilder.append(indentString);
 
-        if (indentString == "") {
-            System.out.println("temp");
-        }
+        // DEBUG
+        // if (indentString == "") {
+        //     System.out.println("temp");
+        // }
 
         if (isArray) {
 
@@ -1354,7 +1357,7 @@ public class TackyGenerator {
 
         } else if (expressionASTNode.type.equalsIgnoreCase("UNARY")) {
 
-            System.out.println("");
+            // System.out.println("");
 
             tempStringBuilder.append(expressionASTNode.children.get(0).value);
             switch (expressionASTNode.expressionType) {
@@ -1487,11 +1490,15 @@ public class TackyGenerator {
                 exprStringBuilder.append("Constant(").append("ConstInt(").append(expressionASTNode.value).append("))");
                 return exprStringBuilder.toString();
 
+            case CharacterLiteral:
+                //exprStringBuilder.append("Constant(").append("ConstChar(").append(StringUtils.unwrap(expressionASTNode.value, '\'')).append("))");
+                exprStringBuilder.append("Constant(").append("ConstChar(").append(expressionASTNode.value).append("))");
+                return exprStringBuilder.toString();
+
             case Add:
             case Subtract:
             case Mul:
             case Div:
-
                 lhs = evaluateToString(indent, (ExpressionASTNode) expressionASTNode.children.get(0));
                 rhs = evaluateToString(indent, (ExpressionASTNode) expressionASTNode.children.get(1));
 
