@@ -8,36 +8,20 @@
  int matrixAddInto ( int * matrixA , int * matrixB , int rows , int columns ) {
       return 0 ;
  }
-
- int standardMatrixMult ( int * matrixA , int * matrixB , int * matrixC , int rows , int columns ) {
-      return 0 ;
- }
-
- int getSubMatrix ( int * matrixDest , int * matrixSrc , int dim , int xPos , int yPos , int width , int height ) {
-      return 0 ;
- }
-
-
  int segmentedMatrixMult ( int * matrixA , int * matrixB , int * matrixC , int rows , int columns ) {
 
       int nc = 2 ;
       int rowSteps = rows / nc ;
-     
 
       int kc = 2 ;
       int columnsSteps = columns / kc ;
-     
 
       int mc = 2 ;
       int innerSteps = rows / nc ;
-     
 
      
      
      
-
-     
-      int iterationCounter = 0 ;
 
       int subMatrixA [ 4 ] = { 0 , 0 , 0 , 0 } ;
       int subMatrixB [ 4 ] = { 0 , 0 , 0 , 0 } ;
@@ -47,18 +31,32 @@
           for ( int pc = 0 ; pc < columnsSteps ; pc ++ ) {
               int xPos_b = pc * kc ;
               int yPos_b = jc * nc ;
-              int sub_matrix_1 = getSubMatrix ( subMatrixB , matrixC , 4 , 1 , 2 , 3 , 4 ) ;
               for ( int ic = 0 ; ic < innerSteps ; ic ++ ) {
+
                   int xPos_a = ic * mc ;
                   int yPos_a = pc * kc ;
-                  int sub_matrix_2 = getSubMatrix ( subMatrixA , matrixC , 4 , 1 , 2 , 3 , 4 ) ;
-                  int transfer = iterationCounter + 1 ;
-                  iterationCounter = transfer ;
-                  int a22 = standardMatrixMult ( subMatrixA , subMatrixB , tempMult , 1 , 2 ) ;
+                  int xPos_c = ic * kc ;
+                  int yPos_c = jc * nc ;
+                  int xPos_d = ic * kc ;
+                  int xPos_e = ic * kc ;
+                  int xPos_f = ic * kc ;
+                  int xPos_g = ic * kc ;
+                  int xPos_h = ic * kc ;
+                  int xPos_i = ic * kc ;
+                  int xPos_j = ic * kc ;
+                  int xPos_k = ic * kc ;
+                  int xPos_l = ic * kc ;
+                  int xPos_m = ic * kc ;
+                  int xPos_n = ic * kc ;
+                  int xPos_o = ic * kc ;
+                  int xPos_p = ic * kc ;
+                  int xPos_q = ic * kc ;
+                  int xPos_d2 = ic * kc ;
+                  int xPos_e2 = ic * kc ;
                  
-                 
-                  int a33423 = getSubMatrix ( tempAccum , matrixC , 4 , 1 , 2 , 3 , 4 ) ;
+
                   int a239 = matrixAddInto ( tempAccum , tempMult , 2 , 2 ) ;
+
               }
           }
       }

@@ -5,16 +5,6 @@ Function("matrixAddInto", true, matrixA, matrixB, rows, columns, [
     return(Constant(ConstInt(0)))
 ])
 
-Function("standardMatrixMult", true, matrixA, matrixB, matrixC, rows, columns, [
-
-    return(Constant(ConstInt(0)))
-])
-
-Function("getSubMatrix", true, matrixDest, matrixSrc, dim, xPos, yPos, width, height, [
-
-    return(Constant(ConstInt(0)))
-])
-
 Function("segmentedMatrixMult", true, matrixA, matrixB, matrixC, rows, columns, [
     nc = Var("nc")
     nc = Constant(ConstInt(2))
@@ -34,8 +24,6 @@ Function("segmentedMatrixMult", true, matrixA, matrixB, matrixC, rows, columns, 
     exprTemp_2 = rows / nc
     innerSteps = Var("innerSteps")
     innerSteps = exprTemp_2
-    iterationCounter = Var("iterationCounter")
-    iterationCounter = Constant(ConstInt(0))
     subMatrixA = Var("subMatrixA", Array(int32, 4))
     sizeof_array_type = Var("sizeof_array_type")
     sizeof(int32, sizeof_array_type)
@@ -264,16 +252,6 @@ Function("segmentedMatrixMult", true, matrixA, matrixB, matrixC, rows, columns, 
             exprTemp_4 = jc * nc
             yPos_b = Var("yPos_b")
             yPos_b = exprTemp_4
-
-            # -- Function -- getSubMatrix
-            tmp.getSubMatrix = Var("tmp.getSubMatrix")
-            // parameter 1 for function call
-            tmp.1.ptr = Var("tmp.1.ptr")
-            GetAddress(subMatrixB, tmp.1.ptr)
-            funccall(getSubMatrix, false, tmp.1.ptr, matrixC, Constant(ConstInt(4)), Constant(ConstInt(1)), Constant(ConstInt(2)), Constant(ConstInt(3)), Constant(ConstInt(4)), tmp.getSubMatrix)
-
-            sub_matrix_1 = Var("sub_matrix_1")
-            sub_matrix_1 = tmp.getSubMatrix
             //
             // Loop 2
             //
@@ -294,47 +272,78 @@ Function("segmentedMatrixMult", true, matrixA, matrixB, matrixC, rows, columns, 
                 exprTemp_6 = pc * kc
                 yPos_a = Var("yPos_a")
                 yPos_a = exprTemp_6
-
-                # -- Function -- getSubMatrix
-                tmp.getSubMatrix = Var("tmp.getSubMatrix")
-                // parameter 1 for function call
-                tmp.1.ptr = Var("tmp.1.ptr")
-                GetAddress(subMatrixA, tmp.1.ptr)
-                funccall(getSubMatrix, false, tmp.1.ptr, matrixC, Constant(ConstInt(4)), Constant(ConstInt(1)), Constant(ConstInt(2)), Constant(ConstInt(3)), Constant(ConstInt(4)), tmp.getSubMatrix)
-
-                sub_matrix_2 = Var("sub_matrix_2")
-                sub_matrix_2 = tmp.getSubMatrix
                 exprTemp_7 = Var("exprTemp_7")
-                exprTemp_7 = iterationCounter + Constant(ConstInt(1))
-                transfer = Var("transfer")
-                transfer = exprTemp_7
-                iterationCounter = transfer
-
-                # -- Function -- standardMatrixMult
-                tmp.standardMatrixMult = Var("tmp.standardMatrixMult")
-                // parameter 1 for function call
-                tmp.1.ptr = Var("tmp.1.ptr")
-                GetAddress(subMatrixA, tmp.1.ptr)
-                // parameter 2 for function call
-                tmp.2.ptr = Var("tmp.2.ptr")
-                GetAddress(subMatrixB, tmp.2.ptr)
-                // parameter 3 for function call
-                tmp.3.ptr = Var("tmp.3.ptr")
-                GetAddress(tempMult, tmp.3.ptr)
-                funccall(standardMatrixMult, false, tmp.1.ptr, tmp.2.ptr, tmp.3.ptr, Constant(ConstInt(1)), Constant(ConstInt(2)), tmp.standardMatrixMult)
-
-                a22 = Var("a22")
-                a22 = tmp.standardMatrixMult
-
-                # -- Function -- getSubMatrix
-                tmp.getSubMatrix = Var("tmp.getSubMatrix")
-                // parameter 1 for function call
-                tmp.1.ptr = Var("tmp.1.ptr")
-                GetAddress(tempAccum, tmp.1.ptr)
-                funccall(getSubMatrix, false, tmp.1.ptr, matrixC, Constant(ConstInt(4)), Constant(ConstInt(1)), Constant(ConstInt(2)), Constant(ConstInt(3)), Constant(ConstInt(4)), tmp.getSubMatrix)
-
-                a33423 = Var("a33423")
-                a33423 = tmp.getSubMatrix
+                exprTemp_7 = ic * kc
+                xPos_c = Var("xPos_c")
+                xPos_c = exprTemp_7
+                exprTemp_8 = Var("exprTemp_8")
+                exprTemp_8 = jc * nc
+                yPos_c = Var("yPos_c")
+                yPos_c = exprTemp_8
+                exprTemp_9 = Var("exprTemp_9")
+                exprTemp_9 = ic * kc
+                xPos_d = Var("xPos_d")
+                xPos_d = exprTemp_9
+                exprTemp_10 = Var("exprTemp_10")
+                exprTemp_10 = ic * kc
+                xPos_e = Var("xPos_e")
+                xPos_e = exprTemp_10
+                exprTemp_11 = Var("exprTemp_11")
+                exprTemp_11 = ic * kc
+                xPos_f = Var("xPos_f")
+                xPos_f = exprTemp_11
+                exprTemp_12 = Var("exprTemp_12")
+                exprTemp_12 = ic * kc
+                xPos_g = Var("xPos_g")
+                xPos_g = exprTemp_12
+                exprTemp_13 = Var("exprTemp_13")
+                exprTemp_13 = ic * kc
+                xPos_h = Var("xPos_h")
+                xPos_h = exprTemp_13
+                exprTemp_14 = Var("exprTemp_14")
+                exprTemp_14 = ic * kc
+                xPos_i = Var("xPos_i")
+                xPos_i = exprTemp_14
+                exprTemp_15 = Var("exprTemp_15")
+                exprTemp_15 = ic * kc
+                xPos_j = Var("xPos_j")
+                xPos_j = exprTemp_15
+                exprTemp_16 = Var("exprTemp_16")
+                exprTemp_16 = ic * kc
+                xPos_k = Var("xPos_k")
+                xPos_k = exprTemp_16
+                exprTemp_17 = Var("exprTemp_17")
+                exprTemp_17 = ic * kc
+                xPos_l = Var("xPos_l")
+                xPos_l = exprTemp_17
+                exprTemp_18 = Var("exprTemp_18")
+                exprTemp_18 = ic * kc
+                xPos_m = Var("xPos_m")
+                xPos_m = exprTemp_18
+                exprTemp_19 = Var("exprTemp_19")
+                exprTemp_19 = ic * kc
+                xPos_n = Var("xPos_n")
+                xPos_n = exprTemp_19
+                exprTemp_20 = Var("exprTemp_20")
+                exprTemp_20 = ic * kc
+                xPos_o = Var("xPos_o")
+                xPos_o = exprTemp_20
+                exprTemp_21 = Var("exprTemp_21")
+                exprTemp_21 = ic * kc
+                xPos_p = Var("xPos_p")
+                xPos_p = exprTemp_21
+                exprTemp_22 = Var("exprTemp_22")
+                exprTemp_22 = ic * kc
+                xPos_q = Var("xPos_q")
+                xPos_q = exprTemp_22
+                exprTemp_23 = Var("exprTemp_23")
+                exprTemp_23 = ic * kc
+                xPos_d2 = Var("xPos_d2")
+                xPos_d2 = exprTemp_23
+                exprTemp_24 = Var("exprTemp_24")
+                exprTemp_24 = ic * kc
+                xPos_e2 = Var("xPos_e2")
+                xPos_e2 = exprTemp_24
 
                 # -- Function -- matrixAddInto
                 tmp.matrixAddInto = Var("tmp.matrixAddInto")
