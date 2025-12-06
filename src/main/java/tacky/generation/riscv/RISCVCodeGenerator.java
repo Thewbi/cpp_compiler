@@ -1,6 +1,11 @@
 package tacky.generation.riscv;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.Stack;
+
+import org.apache.commons.lang3.StringUtils;
 
 import ast.ASTNode;
 import ast.ASTNodeType;
@@ -36,9 +41,13 @@ public class RISCVCodeGenerator implements Generator {
 
     public String indent = "        ";
 
-    public String printLabelName = ".LABEL_0";
+    // public String printLabelName = ".LABEL_0";
 
     public FunctionDefinitionASTNode prototype;
+
+    public int literalStringRecordIndex;
+
+    public List<LiteralStringRecord> literalStringRecordList = new ArrayList<>();
 
     @Override
     public void start() {
@@ -46,11 +55,6 @@ public class RISCVCodeGenerator implements Generator {
         // DATA SEGMENT
 
         // stringBuilder.append(indent).append(".data").append("\n").append("\n");
-
-        // define data to print inside printf
-
-        stringBuilder.append(printLabelName).append(": ").append("\n");
-        stringBuilder.append(indent).append(".string ").append("\"test_string_test\\n\"").append("\n");
 
         // CODE SEGMENT
         // stringBuilder.append("\n").append(indent).append(".text").append("\n").append("\n");
@@ -81,6 +85,17 @@ public class RISCVCodeGenerator implements Generator {
 
     @Override
     public void end() {
+
+        // define data to print inside printf
+
+        for (LiteralStringRecord literalStringRecord : literalStringRecordList) {
+            stringBuilder.append(literalStringRecord.getLabel()).append(": ").append("\n");
+            stringBuilder.append(indent).append(".string ").append("\"")
+                    .append(StringUtils.unwrap(literalStringRecord.value, "\""))
+                    // .append("\\n")
+                    .append("\"")
+                    .append("\n");
+        }
     }
 
     @Override
@@ -108,7 +123,7 @@ public class RISCVCodeGenerator implements Generator {
             case FUNCTION_DEFINITION: {
                 prototype = (FunctionDefinitionASTNode) astNode;
                 executeFunction((FunctionDefinitionASTNode) astNode);
-                
+
             }
                 break;
 
@@ -167,6 +182,8 @@ public class RISCVCodeGenerator implements Generator {
 
             case RETURN: {
                 processReturn((ReturnASTNode) astNode);
+                // remove the callee function from the stack and make the caller current again
+                // functionCallStack.pop();
             }
                 break;
 
@@ -194,7 +211,7 @@ public class RISCVCodeGenerator implements Generator {
                 int offset = address - stackPointer;
 
                 String tempRegister = "t0";
-                
+
                 stringBuilder.append(indent)
                     .append("li      ").append(tempRegister).append(", ")
                     .append(size)
@@ -230,7 +247,7 @@ public class RISCVCodeGenerator implements Generator {
                     .append("\n");
 
                 String tempRegister = "t0";
-                
+
                 // li dest, src
                 stringBuilder.append(indent)
                     .append("li      ").append(tempRegister).append(", ")
@@ -301,27 +318,25 @@ public class RISCVCodeGenerator implements Generator {
                 // retrieve local variable from stack and store it's value into a temp register
                 String tempRegister = "t0";
 
-                stringBuilder.append(indent).append("# >> dereference into temp register: " + tempRegister).append("\n");
-                
-                loadLocalVariableIntoTempRegister(tempRegister, loadFromAddressASTNode.ptrVariableName);
+                stringBuilder.append(indent).append("# >> dereference into temp register: " + tempRegister)
+                        .append("\n");
 
-                
+                loadLocalVariableIntoTempRegister(tempRegister, loadFromAddressASTNode.ptrVariableName);
 
                 // load data from address the pointer points to
                 // lw t0, 0(t0)
-                stringBuilder.append(indent).append("lw ").append(tempRegister).append(", 0(").append(tempRegister).append(")").append("\n");
+                stringBuilder.append(indent).append("lw      ").append(tempRegister).append(", 0(").append(tempRegister)
+                        .append(")").append("\n");
 
-                stringBuilder.append(indent).append("# << dereference into temp register: " + tempRegister).append("\n");
-
-
-
+                stringBuilder.append(indent).append("# << dereference into temp register: " + tempRegister)
+                        .append("\n");
 
                 // store word into target local variable
 
                 // retrieve address of variable to load into from the stack
                 RISCVStackEntry riscvStackEntry = stackFrame.stackEntryMap.get(loadFromAddressASTNode.variableName);
 
-                // build offset to destination variable 
+                // build offset to destination variable
                 int address = riscvStackEntry.address;
                 int offset = address - stackPointer;
 
@@ -344,6 +359,7 @@ public class RISCVCodeGenerator implements Generator {
                 // System.out.println("Unknown type: " + astNode.astNodeType);
                 // return;
                 throw new RuntimeException("Unknown AST-Node type: " + astNode.astNodeType);
+
         }
     }
 
@@ -397,8 +413,8 @@ public class RISCVCodeGenerator implements Generator {
         stringBuilder.append(indent).append("# -- stack frame create --").append("\n");
 
         // advance stack pointer
-        // move stack pointer, make space for new stackframe (8 elements) 
-        // (I think GCC always builds stack frames with a multiple of 
+        // move stack pointer, make space for new stackframe (8 elements)
+        // (I think GCC always builds stack frames with a multiple of
         // 16 byte sizes! Not all elements are used!)
 
         // @formatter:off
@@ -407,27 +423,26 @@ public class RISCVCodeGenerator implements Generator {
             .append("\n");
         // @formatter:on
 
-        // sw      ra,28(sp)           // store address to return to (stored in ra) onto the stack 
-                                    // (SHOULD WE WANT TO CALL MORE FUNCTIONS WITHIN THE BODY OF THIS FUNCTION)
+        // sw ra,28(sp) // store address to return to (stored in ra) onto the stack
+        // (SHOULD WE WANT TO CALL MORE FUNCTIONS WITHIN THE BODY OF THIS FUNCTION)
         stringBuilder.append(indent)
-            .append("sw      ra, " + (stackSizeUsed-4) + "(sp)")
-            .append("\n");
+                .append("sw      ra, " + (stackSizeUsed - 4) + "(sp)")
+                .append("\n");
 
-        
-
-        // sw      s0,24(sp)           // store old s0/fp (frame pointer) on the stack so it can be 
-                                    // restored later because it will be used within this function
+        // sw s0,24(sp) // store old s0/fp (frame pointer) on the stack so it can be
+        // restored later because it will be used within this function
         stringBuilder.append(indent)
-            .append("sw      s0, " + (stackSizeUsed-8) + "(sp)")
-            .append("\n");
+                .append("sw      s0, " + (stackSizeUsed - 8) + "(sp)")
+                .append("\n");
 
-        // addi    s0,sp,32            // set new s0/fp (frame pointer) to the start of our new stackframe. 
-                                    // Now offseting (with negative offsets) from new s0/fp grants 
-                                    // access to all elements of the new stack frame
+        // addi s0,sp,32 // set new s0/fp (frame pointer) to the start of our new
+        // stackframe.
+        // Now offseting (with negative offsets) from new s0/fp grants
+        // access to all elements of the new stack frame
 
         stringBuilder.append(indent)
-            .append("addi    s0, sp, ").append(stackSizeUsed)
-            .append("\n");
+                .append("addi    s0, sp, ").append(stackSizeUsed)
+                .append("\n");
 
         stackPointer -= stackSizeUsed;
 
@@ -453,7 +468,7 @@ public class RISCVCodeGenerator implements Generator {
      *    ; return
      *    jr      ra                  ; jump to return address
      * </pre>
-     * 
+     *
      * @param astNode
      */
     private void processReturn(ReturnASTNode astNode) {
@@ -463,20 +478,21 @@ public class RISCVCodeGenerator implements Generator {
         stringBuilder.append(indent).append("# -- stack frame remove --").append("\n");
 
         // ; delete stack frame (inverse operation to create stack frame)
-        // lw      ra,28(sp)           ; restore address to return to
+        // lw ra,28(sp) ; restore address to return to
         stringBuilder.append(indent)
-            .append("lw      ra, " + (stackSizeUsed-4) + "(sp), ")
-            .append("\n");
+                .append("lw      ra, " + (stackSizeUsed - 4) + "(sp)")
+                .append("\n");
 
-        // lw      s0,24(sp)           ; restore s0/fp (frame pointer)
+        // lw s0,24(sp) ; restore s0/fp (frame pointer)
         stringBuilder.append(indent)
-            .append("lw      s0, " + (stackSizeUsed-8) + "(sp), ")
-            .append("\n");
+                .append("lw      s0, " + (stackSizeUsed - 8) + "(sp)")
+                .append("\n");
 
-        // addi    sp,sp,32            ; remove stack pointer, return space for new stackframe, 8 elements
+        // addi sp,sp,32 ; remove stack pointer, return space for new stackframe, 8
+        // elements
         stringBuilder.append(indent)
-            .append("addi    sp, sp, ").append(stackSizeUsed)
-            .append("\n");
+                .append("addi    sp, sp, ").append(stackSizeUsed)
+                .append("\n");
 
         stringBuilder.append(indent).append("# -- stack frame remove --").append("\n");
 
@@ -489,12 +505,37 @@ public class RISCVCodeGenerator implements Generator {
 
         switch (astNode.jumpType) {
 
-            case Jump:
+            case Jump: {
                 // @formatter:off
                 stringBuilder.append(indent)
                     .append("j       ").append(astNode.value)
                     .append("\n");
                 // @formatter:on
+            }
+                break;
+
+            case JumpIfZero: {
+
+                // beq x5, x0, not_zero_block
+
+                ASTNode child0 = astNode.children.get(0);
+
+                if (child0 instanceof ValueASTNode) {
+                    loadLocalVariableIntoTempRegister("t0", child0.value);
+                } else if (child0 instanceof ExpressionASTNode) {
+                    loadValueIntoTempRegister("t0", child0.value);
+                }
+
+                // @formatter:off
+                // this produces code like: beq zero, ... which reads very nicely as "branch equal zero"!
+                stringBuilder.append(indent)
+                    .append("beq     ")
+                    .append("zero").append(", ")
+                    .append("t0").append(", ")
+                    .append(astNode.value)
+                    .append("\n");
+                // @formatter:on
+            }
                 break;
 
             case JumpGreaterThanOrEqual: {
@@ -719,7 +760,7 @@ public class RISCVCodeGenerator implements Generator {
     /**
      * load first child of expressionASTNode into tempRegister0 and load second
      * child expressionASTNode into tempRegister1
-     * 
+     *
      * @param expressionASTNode
      * @param tempRegister0
      * @param tempRegister1
@@ -777,7 +818,7 @@ public class RISCVCodeGenerator implements Generator {
     /**
      * Find the variable in the current stack frame (= local variable),
      * retrieves the value by emitting a lw instruction into the 'register'.
-     * 
+     *
      * @param register
      * @param varName
      * @return
@@ -807,7 +848,7 @@ public class RISCVCodeGenerator implements Generator {
                     .append("mv      ").append(register).append(", ")
                     .append(formalParameterRegister)
                     .append("\n");
-            
+
             return formalParameterRegister;
 
         } else {
@@ -868,7 +909,7 @@ public class RISCVCodeGenerator implements Generator {
     }
 
     private void processFunctionCallDelegator(ASTNode astNode) {
-        
+
         if (astNode instanceof PrintfASTNode) {
 
             // special treatment for built-in printf()
@@ -881,8 +922,12 @@ public class RISCVCodeGenerator implements Generator {
 
         } else if (astNode instanceof FunctionCallASTNode) {
 
+            FunctionDefinitionASTNode currentFunction = (FunctionDefinitionASTNode) astNode.parent;
+
+            FunctionCallASTNode newFunction = (FunctionCallASTNode) astNode;
+
             // generate code for function call to code-declared functions (not built-in)
-            processFunctionCall((FunctionCallASTNode) astNode);
+            processFunctionCall(currentFunction, newFunction);
 
         } else {
 
@@ -891,16 +936,32 @@ public class RISCVCodeGenerator implements Generator {
         }
     }
 
-    private void processFunctionCall(FunctionCallASTNode functionCallASTNode) {
+    private void processFunctionCall(FunctionDefinitionASTNode callerFunctionCallASTNode,
+            FunctionCallASTNode calleeFunctionCallASTNode) {
 
-        String calledFunctionName = functionCallASTNode.value;
+        String callerFunctionName = callerFunctionCallASTNode.value;
+        String calleeFunctionName = calleeFunctionCallASTNode.value;
 
-        // TODO: setup parameters into a0, a1, a2, ...
-        // System.out.println("setup parameters into a0, a1, a2, ...");
-        
+        // System.out.println(callerFunctionName + "() -> " + calleeFunctionName +
+        // "()");
+        stringBuilder.append(indent).append("# ").append(callerFunctionName + "() -> " + calleeFunctionName + "()")
+                .append("\n");
+
+        // save caller actual parameter registers a0 - a7 since they are caller saved
+        // and hence could be overridden by the callee at any time
+
+        int formalParmeterCounter = 0;
+        for (FormalParameter formalParameter : callerFunctionCallASTNode.formalParameters) {
+            String parameterRegister = "a" + formalParmeterCounter;
+            stackPushRegister(parameterRegister);
+            formalParmeterCounter++;
+        }
+
+        // setup parameters to the called function into a0, a1, a2, ...
+
         int index = 0;
 
-        for (ActualParameter actualParameter : functionCallASTNode.actualParameters) {
+        for (ActualParameter actualParameter : calleeFunctionCallASTNode.actualParameters) {
 
             String argumentRegisterName = "a" + index;
 
@@ -909,8 +970,9 @@ public class RISCVCodeGenerator implements Generator {
                 label = "" + actualParameter.intValue;
             }
 
-            stringBuilder.append(indent).append("# load argument register ").append(argumentRegisterName).append(" with parameter '").append(label).append("'\n");
-            
+            stringBuilder.append(indent).append("# load argument register ").append(argumentRegisterName)
+                    .append(" with parameter '").append(label).append("'\n");
+
             if (actualParameter.name != null) {
                 loadLocalVariableIntoTempRegister(argumentRegisterName, actualParameter.name);
             } else {
@@ -921,16 +983,67 @@ public class RISCVCodeGenerator implements Generator {
         }
 
         // call function
-        stringBuilder.append(indent).append("call    ").append(calledFunctionName).append("\n");
+        stringBuilder.append(indent).append("call    ").append(calleeFunctionName).append("\n");
+
+        // get actual parameters back
+        for (FormalParameter formalParameter : callerFunctionCallASTNode.formalParameters) {
+            formalParmeterCounter--;
+            String parameterRegister = "a" + formalParmeterCounter;
+            stackPopRegister(parameterRegister);
+        }
+    }
+
+    private void stackPushRegister(String register) {
+
+        stringBuilder.append(indent).append("# ++ push parameter").append("\n");
+
+        // b - byte - 8 bits
+        // h - half word - 16 bits (2 bytes)
+        // w - word - 32 bits (4 bytes)
+        // d - double word - 64 bits (8 bytes)
+
+        int offset = 0;
+
+        // addi sp, sp, -4
+        stringBuilder.append(indent).append("addi    sp, sp, -4").append("\n");
+        // sw <register>, 24(sp)
+        stringBuilder.append(indent)
+                .append("sw      ").append(register).append(", ")
+                .append(offset).append("(sp)").append("\n");
+
+        stringBuilder.append(indent).append("# ++ push parameter").append("\n");
+    }
+
+    private void stackPopRegister(String register) {
+
+        int offset = 0;
+
+        stringBuilder.append(indent).append("# -- pop parameter").append("\n");
+
+        // lw <register>, 24(sp)
+        stringBuilder.append(indent)
+                .append("lw      ").append(register).append(", ")
+                .append(offset).append("(sp)").append("\n");
+        // addi sp, sp, 4
+        stringBuilder.append(indent).append("addi    sp, sp, 4").append("\n");
+
+        stringBuilder.append(indent).append("# -- pop parameter").append("\n");
     }
 
     private void processPrintfFunctionCall(PrintfASTNode astNode) {
 
         // System.out.println(astNode);
 
+        LiteralStringRecord literalStringRecord = new LiteralStringRecord();
+        literalStringRecordList.add(literalStringRecord);
+
+        literalStringRecord.index = literalStringRecordIndex;
+        literalStringRecordIndex++;
+
+        literalStringRecord.value = astNode.value;
+
         // save a0 because it is used
         stringBuilder.append(indent).append("mv      t6, a0").append("\n");
-
 
         // a7 describes the service that is called by the ecall
         // a0 is a parameter register. a0 contains the address of the data
@@ -938,24 +1051,21 @@ public class RISCVCodeGenerator implements Generator {
         // parameter a0 is the format string's address
 
         String tempRegister1 = "t0";
-        // has to be a0 because this is where the ecall expects to find the string-data to print!
+        // has to be a0 because this is where the ecall expects to find the string-data
+        // to print!
         String tempRegister2 = "a0";
 
         // lui a5, %hi(.LC3)
-        stringBuilder.append(indent).append("lui     ").append(tempRegister1).append(", ").append("%hi(").append(printLabelName).append(")")
+        stringBuilder.append(indent).append("lui     ").append(tempRegister1).append(", ").append("%hi(")
+                .append(literalStringRecord.getLabel()).append(")")
                 .append("\n");
         // addi a0, a5, %lo(.LC3)
-        stringBuilder.append(indent).append("addi    ").append(tempRegister2).append(", ").append(tempRegister1).append(", ").append("%lo(").append(printLabelName).append(")")
+        stringBuilder.append(indent).append("addi    ").append(tempRegister2).append(", ").append(tempRegister1)
+                .append(", ").append("%lo(").append(literalStringRecord.getLabel()).append(")")
                 .append("\n");
-
-        // // parameter a1
-        // stringBuilder.append(indent).append("lw      a5, 20(sp)").append("\n");
-        // stringBuilder.append(indent).append("mv      a1, a5").append("\n");
 
         // call puts
         stringBuilder.append(indent).append("call    puts").append("\n");
-
-        // stringBuilder.append(indent).append("ret").append("\n");
 
         // restore a0
         stringBuilder.append(indent).append("mv      a0, t6").append("\n");

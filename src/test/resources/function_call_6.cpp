@@ -22,7 +22,7 @@
 
 #define SUB_DIMENSION 2
 
-/*
+/**/
 int matrixAddInto(int* matrixA, int* matrixB, int rows, int columns) {
     for (int i = 0; i < rows; i++) {
         for (int j = 0; j < columns; j++) {
@@ -40,7 +40,6 @@ int matrixAddInto(int* matrixA, int* matrixB, int rows, int columns) {
 
     return 0;
 }
-*/
 
 /**
  * Copies a subfield into matrixDest.
@@ -133,7 +132,17 @@ int getSubMatrix(int* matrixDest, int* matrixSrc, int dim, int xPos, int yPos, i
     return 0;
 }
 
-/*
+/**
+ * Copies a subfield into matrixDest.
+ * 
+ * matrixDest - destination to copy data into
+ * matrixSrc - source to copy data from
+ * dim - dimension of destination (NOT SOURCE!!!!!)
+ * xPos - xPos of field to copy
+ * yPos - xPos of field to copy
+ * width - xPos of field to copy
+ * height - xPos of field to copy
+ */
 int setSubMatrix(int* matrix_dest, int* matrix_src, int dim, int xPos, int yPos, int width, int height) {
     for (int i = 0; i < height; i++) {
         for (int j = 0; j < width; j++) {
@@ -154,9 +163,9 @@ int setSubMatrix(int* matrix_dest, int* matrix_src, int dim, int xPos, int yPos,
     }
     return 0;
 }
-*/
 
-/*
+
+/**/
 int segmentedMatrixMult(int* matrixA, int* matrixB, int* matrixC, int rows, int columns) {
     
     int nc = 2; // subset size
@@ -187,7 +196,7 @@ int segmentedMatrixMult(int* matrixA, int* matrixB, int* matrixC, int rows, int 
             int subMatrixB[4] = { 0, 0, 0, 0 };
             int xPos_b = pc * kc;
             int yPos_b = jc * nc;
-            int sub_matrix_1 = getSubMatrix(matrixB, DIMENSION, xPos_b, yPos_b, kc, nc, subMatrixB);
+            int sub_matrix_1 = getSubMatrix(subMatrixB, matrixB, DIMENSION, xPos_b, yPos_b, kc, nc);
 
             //prettyPrintFormatMatrix(subMatrixB, 2);
 
@@ -195,9 +204,9 @@ int segmentedMatrixMult(int* matrixA, int* matrixB, int* matrixC, int rows, int 
             // Loop 3
             for (int ic = 0; ic < innerSteps; ic++) {
 
-                printf("//\n");
-                printf("// Iteration: %d\n", iterationCounter);
-                printf("//\n");
+                //printf("//\n");
+                //printf("// Iteration: %d\n", iterationCounter);
+                //printf("//\n");
 
                 //Matrix subMatrixA = matrixA.getSubMatrix(ic * mc, pc * kc, mc, kc);
                 int subMatrixA[4] = { 0, 0, 0, 0 };
@@ -205,33 +214,33 @@ int segmentedMatrixMult(int* matrixA, int* matrixB, int* matrixC, int rows, int 
                 int yPos_a = pc * kc;
                 int sub_matrix_2 = getSubMatrix(matrixA, DIMENSION, xPos_a, yPos_a, mc, kc, subMatrixA);
 
-                printf("[\n");
-                //prettyPrintFormatMatrix(subMatrixA, 2, "%6d");
-                int aba = prettyPrintFormatMatrix(subMatrixA, 2);
-                printf("------------------------\n");
-                //prettyPrintFormatMatrix(subMatrixB, 2, "%6d");
-                int cbc = prettyPrintFormatMatrix(subMatrixB, 2);
-                printf("]\n");
+                // printf("[\n");
+                // //prettyPrintFormatMatrix(subMatrixA, 2, "%6d");
+                // int aba = prettyPrintFormatMatrix(subMatrixA, 2);
+                // printf("------------------------\n");
+                // //prettyPrintFormatMatrix(subMatrixB, 2, "%6d");
+                // int cbc = prettyPrintFormatMatrix(subMatrixB, 2);
+                // printf("]\n");
 
-                int huhuh = iterationCounter + 1;
-                iterationCounter = huhuh;
+                int transfer = iterationCounter + 1;
+                iterationCounter = transfer;
 
                 // perform a matrix mult of the sub matrices
                 //Matrix temp = subMatrixA.mult(subMatrixB);
                 int tempMult[4] = { 0, 0, 0, 0 };
                 int a22 = standardMatrixMult(subMatrixA, subMatrixB, tempMult, 2, 2);
 
-                printf("+++++++++++++++++++++++++++++\n");
-                //prettyPrintFormatMatrix(tempMult, 2, "%6d");
-                int a3322 = prettyPrintFormatMatrix(tempMult, 2);
-                printf("+++++++++++++++++++++++++++++\n");
+                // printf("+++++++++++++++++++++++++++++\n");
+                // //prettyPrintFormatMatrix(tempMult, 2, "%6d");
+                // int a3322 = prettyPrintFormatMatrix(tempMult, 2);
+                // printf("+++++++++++++++++++++++++++++\n");
 
                 // // retrieve sub matrix to accumulate into
                 // Matrix accumulatorSubMatrixC = matrixC.getSubMatrix(ic * kc, jc * nc, nc, kc);
                 int tempAccum[4] = { 0, 0, 0, 0 };
                 int xPos_c = ic * kc;
                 int yPos_c = jc * nc;
-                int a33423 = getSubMatrix(matrixC, DIMENSION, xPos_c, yPos_c, nc, kc, tempAccum);
+                int a33423 = getSubMatrix(tempAccum, matrixC, DIMENSION, xPos_c, yPos_c, nc, kc);
 
                 //prettyPrintFormatMatrix(tempAccum, 2);
 
@@ -250,9 +259,9 @@ int segmentedMatrixMult(int* matrixA, int* matrixB, int* matrixC, int rows, int 
 
                 //prettyPrintFormatMatrix(matrixC, DIMENSION);
 
-                printf("-----------------------------\n");
-                int a999 = prettyPrintFormatMatrix(matrixC, DIMENSION);
-                printf("-----------------------------\n");
+                // printf("-----------------------------\n");
+                // int a999 = prettyPrintFormatMatrix(matrixC, DIMENSION);
+                // printf("-----------------------------\n");
 
                 //break;
 
@@ -270,13 +279,13 @@ int segmentedMatrixMult(int* matrixA, int* matrixB, int* matrixC, int rows, int 
 
     return 0;
 }
-*/
 
-/*
+
+/**/
 int standardMatrixMult(int* matrixA, int* matrixB, int* matrixC, int rows, int columns) {
     
     //int t1 = matrixA[2];
-                // printf("test: %d\n", t1);
+    // printf("test: %d\n", t1);
     //matrixC[3] = t1;
     // matrixC[3] = 32;
 
@@ -387,7 +396,7 @@ int standardMatrixMult(int* matrixA, int* matrixB, int* matrixC, int rows, int c
         
     return 0;
 }
-*/
+
 
 // int printMatrix(int* matrix, int dim) {
 //     for (int i = 0; i < dim; i++) {
@@ -567,11 +576,9 @@ int main()
 //    int pp2 = prettyPrintFormatMatrix(matrixB, DIMENSION);
 
     //int subMatrixB[4] = { 16, 32, 48, 64 };
-    int subMatrixB[4] = { 255, 255, 255, 255 };
-
-    int getResult = getSubMatrix(subMatrixB, matrixB, DIMENSION, 0, 0, SUB_DIMENSION, SUB_DIMENSION);
-    // int getResult = getSubMatrix(subMatrixB, matrixB, DIMENSION, 1, 2, 3, 4);
-//    int setResult = setSubMatrix(matrixC, subMatrixB, DIMENSION, 0, 0, 2, 2);
+    // int subMatrixB[4] = { 255, 255, 255, 255 };
+    // int getResult = getSubMatrix(subMatrixB, matrixB, DIMENSION, 0, 0, SUB_DIMENSION, SUB_DIMENSION);
+    // int setResult = setSubMatrix(matrixC, subMatrixB, DIMENSION, 0, 0, 2, 2);
     
     // printf("subMatrixB\n");
     // prettyPrintFormatMatrix(subMatrixB, 2);
@@ -580,7 +587,7 @@ int main()
 
 //    int pp3 = standardMatrixMult(matrixA, matrixB, matrixC, DIMENSION, DIMENSION);
 
-//    int result_1 = segmentedMatrixMult(matrixA, matrixB, matrixC, DIMENSION, DIMENSION);
+    int result_1 = segmentedMatrixMult(matrixA, matrixB, matrixC, DIMENSION, DIMENSION);
 
     //multiParamTest(matrixA, matrixB, matrixC, DIMENSION, DIMENSION);
     //multiParamTest(matrixA, matrixB, 4, 5);

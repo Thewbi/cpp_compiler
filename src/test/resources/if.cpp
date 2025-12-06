@@ -24,5 +24,6 @@ int main()
         return 1;
     }
 
+    exit();
     return 0;
 }

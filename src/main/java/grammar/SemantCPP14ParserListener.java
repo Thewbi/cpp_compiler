@@ -245,7 +245,7 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
         FormalParameter formalParameter = new FormalParameter();
         funcDecl.getParams().add(formalParameter);
 
-      
+
     }
 
     @Override
@@ -729,7 +729,7 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
     /**
      * With the AST that the grammar produces, it is hard to tell where a function
      * call occurs!
-     * 
+     *
      * The strategy here is to check every identifier versus known declared function
      * names.
      * If the identifier is a function name, then assume a function call.
@@ -827,10 +827,6 @@ public class SemantCPP14ParserListener extends CPP14ParserBaseListener {
     public void setTypeMap(Map<String, Type> typeMap) {
         this.typeMap = typeMap;
     }
-
-    // public Map<String, Type> getVarTypeMap() {
-    //     return varTypeMap;
-    // }
 
     public Map<String, FuncDecl> getFuncDeclMap() {
         return funcDeclMap;

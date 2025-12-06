@@ -21,6 +21,7 @@ import ast.ParameterDeclarationASTNode;
 import ast.ParameterDeclarationListASTNode;
 import ast.ParametersAndQualifiersASTNode;
 import ast.PostFixExpressionASTNode;
+import ast.SelectionStatementASTNode;
 import ast.SimpleDeclarationASTNode;
 import ast.StatementType;
 import tacky.ast.FunctionCallASTNode;
@@ -458,7 +459,7 @@ public class SimpleCPP14ParserBaseListener extends CPP14ParserBaseListener {
                 connectToParent(currentNode, functionCallASTNode);
                 descend(functionCallASTNode);
 
-            }else {
+            } else {
 
                 throw new RuntimeException();
 
@@ -501,7 +502,7 @@ public class SimpleCPP14ParserBaseListener extends CPP14ParserBaseListener {
                     && endSymbol.equalsIgnoreCase(")")) {
 
                 if (!(currentNode instanceof DeclaratorASTNode)) {
-                // if (!(currentNode instanceof FunctionCallASTNode)) {
+                    // if (!(currentNode instanceof FunctionCallASTNode)) {
                     throw new RuntimeException("Node Hierarchy is broken! Expected PostFixExpressionASTNode");
                 }
 
@@ -610,6 +611,7 @@ public class SimpleCPP14ParserBaseListener extends CPP14ParserBaseListener {
         // }
 
         switch (ctx.getStart().getType()) {
+
             case CPP14Parser.Break: {
 
                 JumpStatementASTNode breakASTNode = new JumpStatementASTNode();
@@ -637,7 +639,8 @@ public class SimpleCPP14ParserBaseListener extends CPP14ParserBaseListener {
                 break;
 
             default:
-                throw new RuntimeException("Unknown Jump-Statement Type: " + ctx.getStart().getType() + "! Lookup: CPP14Parser.java!");
+                throw new RuntimeException(
+                        "Unknown Jump-Statement Type: " + ctx.getStart().getType() + "! Lookup: CPP14Parser.java!");
         }
     }
 
@@ -646,11 +649,43 @@ public class SimpleCPP14ParserBaseListener extends CPP14ParserBaseListener {
         ascend();
     }
 
+    // selection statements (if)
+
+    @Override
+    public void enterSelectionStatement(CPP14Parser.SelectionStatementContext ctx) {
+
+        System.out.println("[" + ctx.hashCode() + "] " + ctx.getText());
+
+        switch (ctx.getStart().getType()) {
+
+            case CPP14Parser.If: {
+                SelectionStatementASTNode selectionStatementASTNode = new SelectionStatementASTNode();
+                selectionStatementASTNode.ctx = ctx;
+                selectionStatementASTNode.value = ctx.getText();
+                selectionStatementASTNode.statementType = StatementType.valueOf(ctx.getChild(0).getText().toUpperCase());
+                selectionStatementASTNode.astNodeType = ASTNodeType.SELECTION_STATEMENT;
+
+                connectToParent(currentNode, selectionStatementASTNode);
+                descend(selectionStatementASTNode);
+            }
+                break;
+
+            default:
+                throw new RuntimeException(
+                        "Unknown Selection-Statement Type: " + ctx.getStart().getType() + "! Lookup: CPP14Parser.java!");
+        }
+    }
+
+    @Override
+    public void exitSelectionStatement(CPP14Parser.SelectionStatementContext ctx) {
+        ascend();
+    }
+
     // utility
 
     /**
      * connect parent and child
-     * 
+     *
      * @param parent
      * @param child
      */

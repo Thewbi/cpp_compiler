@@ -81,6 +81,9 @@ import types.FuncDecl;
  */
 public class Main {
 
+    private static final boolean RUN_TACKY_CODE = true;
+    // private static final boolean RUN_TACKY_CODE = false;
+
     public static void main(String[] args) throws IOException {
 
         System.out.println("Start");
@@ -107,310 +110,6 @@ public class Main {
         // ide();
 
         System.out.println("End");
-    }
-
-    private static void manualExpressionParsing3() {
-
-        String data = "";
-
-        // data = "\"identifier\"";
-
-        // data = "a";
-        // data = "a + b";
-        // data = "a * b";
-        // data = "a * b + c";
-        // data = "a + b * c";
-        // data = "a + b + c";
-        // data = "a * b * c";
-
-        // data = "(x)";
-        // data = "a + (x)";
-        // data = "(x) + a";
-        // data = "(x) + (y)";
-        // data = "((x) + (y))";
-        // data = "a * (x + y)";
-        // data = "(x + y) * a";
-
-        // data = "SQUARE(x)";
-        // data = "defined(_DEBUG)";
-        // data = "SQUARE(a + b)"; // OK
-        // data = "SQUARE(a * b)"; // OK
-        // data = "SQUARE(a * b + c)";
-        // data = "SQUARE(a * (b + c))";
-        // data = "P()";
-        // data = "P(x)";
-        // data = "P(a, b)";
-        // data = "P(a, b, c)";
-        // data = "P(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v,
-        // w, x, y, z)";
-        // data = "P(void)";
-        // data = "P((void))";
-
-        // data = "1";
-        // data = "1 + 2";
-        // data = "1 + a";
-        // data = "a * 1";
-        // data = "SQUARE(a * (b + 1))";
-
-        // data = "printf(\"File: %s\n\", __FILE__)"; // TODO
-
-        // data = "a || b";
-        // data = "a || 1 + b";
-
-        // data = "a && b";
-        // data = "a && 1 + b";
-
-        // data = "!a";
-        // data = "!defined(_DEBUG) && defined(_UNIT_TEST)";
-        // data = "!defined _DEBUG && defined _UNIT_TEST"; // does not work with the
-        // grammar!
-
-        // data = "a.b";
-        // data = "a.b.c";
-
-        // data = "prsvec_1 == oindex_1";
-        // data = "(prsvec_1 == oindex_1 || prso == every)";
-        // data = "(prsvec_1.prso == oindex_1.valua || prsvec_1.prso ==
-        // oindex_1.every)";
-
-        // data = "&orphs_1";
-        // data = "(integer *)"; // this will not parse on it's own based on the grammar
-        // data = "((integer *)&orphs_1)";
-
-        ExpressionBuilderExecutor expressionBuilderExecutor = new ExpressionBuilderExecutor();
-        ASTNode astNode = expressionBuilderExecutor.execute(data);
-
-        // DEBUG output ParserTree
-        StringBuilder stringBuilder = new StringBuilder();
-        astNode.printRecursive(stringBuilder, 0);
-        System.out.println(stringBuilder);
-
-        // rebuild parse tree into expression tree
-        //
-        // the process starts at the leaves
-        // every child that is not a grammar node is move up one level
-        //
-        // For the rule_start_symbol, drop the <EOF> node
-        //
-        // For rule_parenthesis, add opening, central node and closing braces
-        // into parent
-        //
-        // depth first search, while decending up again
-        //
-        // On the way down into the children.
-        // - if a bracket ( or ) is discovered, create a new ASTNode with value "()"
-        // and insert it in places of the "(" node, delete the ")" Node
-        //
-        // arriving at a node:
-        // - is the node a grammar node AND does the node have only
-        // leaves (NON-Grammar nodes) as children?
-        // if yes, remove the node from the parent
-        // reparent children to remaining child of parent
-        //
-        // - if the node is NOT a grammar node, do nothing
-
-        System.out.println("The End");
-    }
-
-    /**
-     * This function contains the basic idea of the algorithm. The purpose of the
-     * algorithm is to parse expressions without a parse, using a lexer and token
-     * only.
-     * The expression is expressed using a binary tree.
-     * To build the tree, all token types are identified and if the token is a C/C++
-     * operator, the precedence of that operator is used as a weight. The heavier
-     * the node (higher precedence) the deeper the token will sink into the tree.
-     * Literals have the highest weight and will sink down and act as the leafs of
-     * the tree (Leaf == no children).
-     */
-    private static TreeNode insertTokenIntoTree(TreeNode node, String token, int customWeight, boolean functionCall) {
-
-        if (node == null) {
-            TreeNode newTreeNode = new TreeNode();
-            newTreeNode.value = token;
-            newTreeNode.unaryOperator = AbstractFileStackFrame.isUnaryOperator(token);
-            newTreeNode.customWeight = customWeight;
-
-            return newTreeNode;
-        }
-
-        if (comparePriority(functionCall, node.customWeight, node.value, token) < 0) {
-
-            System.out.println("existing node is heavier");
-
-            TreeNode newNode = new TreeNode();
-            newNode.value = token;
-            newNode.customWeight = customWeight;
-
-            newNode.reparent(node);
-
-            return newNode;
-
-        } else {
-
-            System.out.println("existing node is lighter");
-
-            if ((node.lhs != null) && (node.rhs != null)) {
-                insertTokenIntoTree(node.rhs, token, customWeight, false);
-                return node;
-            }
-
-            TreeNode newNode = new TreeNode();
-            newNode.value = token;
-            newNode.customWeight = customWeight;
-            node.addChild(newNode);
-
-            return node;
-
-        }
-
-    }
-
-    private static void manualExpressionParsing() {
-
-        List<String> tokens = new ArrayList<>();
-        tokens.add("a");
-        tokens.add(".");
-        tokens.add("b");
-        tokens.add("==");
-        tokens.add("c");
-        tokens.add(".");
-        tokens.add("d");
-        tokens.add("||");
-        tokens.add("e");
-        tokens.add(".");
-        tokens.add("f");
-        tokens.add("==");
-        tokens.add("g");
-        tokens.add(".");
-        tokens.add("h");
-
-        TreeNode rootNode = null;
-
-        TreeNode currentNode = null;
-        TreeNode currentOperator = null;
-
-        boolean done = false;
-        int i = 0;
-        while (!done) {
-
-            System.out.println("--------------------------------------");
-            if (rootNode != null) {
-                // DEBUG
-                StringBuilder stringBuilder = new StringBuilder();
-                rootNode.printRecursive(stringBuilder, 0);
-                System.out.println(stringBuilder.toString());
-            }
-
-            String currentToken = tokens.get(i);
-            String lookaheadToken = (i + 1) < tokens.size() ? tokens.get(i + 1) : null;
-
-            System.out.println("CurrToken: " + currentToken);
-            System.out.println("LookaheadToken: " + lookaheadToken);
-            System.out.println("--------------------------------------");
-
-            if (AbstractFileStackFrame.isBinaryOperator(currentToken)) {
-
-                TreeNode newNode = new TreeNode();
-                newNode.value = currentToken;
-
-                newNode.addChild(currentNode);
-
-                currentNode = newNode;
-
-                currentOperator = currentNode;
-
-                rootNode = currentOperator;
-
-            } else {
-
-                TreeNode newNode = null;
-                if (currentNode == null) {
-                    currentNode = new TreeNode();
-                    currentNode.value = currentToken;
-                } else {
-                    newNode = new TreeNode();
-                    newNode.value = currentToken;
-
-                    currentNode.addChild(newNode);
-                }
-
-                boolean shifted = false;
-                if ((lookaheadToken != null) && (AbstractFileStackFrame.isBinaryOperator(lookaheadToken))
-                        && (currentOperator != null)) {
-                    if (comparePriority(false, 0, currentOperator.value, lookaheadToken) < 0) {
-                        System.out.println("SHIFT");
-
-                        TreeNode newOperatorNode = new TreeNode();
-                        newOperatorNode.value = lookaheadToken;
-                        currentOperator = newOperatorNode;
-
-                        newOperatorNode.reparent(newNode);
-                        currentNode = newOperatorNode;
-
-                        // DEBUG
-                        StringBuilder stringBuilder = new StringBuilder();
-                        rootNode.printRecursive(stringBuilder, 0);
-                        System.out.println(stringBuilder.toString());
-
-                        i++;
-                        shifted = true;
-                    }
-                }
-
-                if (!shifted) {
-                    System.out.println("REDUCE");
-
-                    while (AbstractFileStackFrame.isBinaryOperator(currentNode.value)) {
-                        if (currentNode.parent == null) {
-                            break;
-                        }
-
-                        currentNode = (TreeNode) currentNode.parent;
-                        currentOperator = currentNode;
-
-                    }
-
-                }
-
-            }
-
-            i++;
-
-            if (i >= tokens.size()) {
-                done = true;
-                continue;
-            }
-
-        }
-
-        // DEBUG
-        StringBuilder stringBuilder = new StringBuilder();
-        rootNode.printRecursive(stringBuilder, 0);
-        System.out.println(stringBuilder.toString());
-
-        System.out.println("end");
-    }
-
-    private static int comparePriority(boolean functionCall, int customWeight, String lhs, String rhs) {
-
-        int priorityLHS = 0;
-        int priorityRHS = 0;
-
-        if (functionCall) {
-
-            priorityLHS = 1000 - 2;
-            priorityRHS = AbstractFileStackFrame.getPriority(rhs);
-
-        } else {
-
-            priorityLHS = customWeight + AbstractFileStackFrame.getPriority(lhs);
-            priorityRHS = AbstractFileStackFrame.getPriority(rhs);
-
-        }
-
-        return priorityRHS - priorityLHS;
-
     }
 
     private static void tacky() throws IOException {
@@ -507,31 +206,34 @@ public class Main {
 
         System.out.println("----------------------------------------------------------\n");
 
-        System.out.println("-- 5 - Run the TACKY code --------------------------------");
+        if (RUN_TACKY_CODE) {
+            System.out.println("-- 5 - Run the TACKY code --------------------------------");
 
-        //
-        // run the TACKY code
-        //
+            //
+            // run the TACKY code
+            //
 
-        FunctionDefinitionASTNode mainFunction = getMainFunction(rootNode, structureTACKYParserListener);
+            FunctionDefinitionASTNode mainFunction = getMainFunction(rootNode, structureTACKYParserListener);
 
-        TACKYStackFrame newTackyStackFrame = new TACKYStackFrame();
+            TACKYStackFrame newTackyStackFrame = new TACKYStackFrame();
 
-        DefaultTACKYExecutor tackyExecutor = new DefaultTACKYExecutor();
-        tackyExecutor.functionDefinitionMap = structureTACKYParserListener.functionDefinitionMap;
+            DefaultTACKYExecutor tackyExecutor = new DefaultTACKYExecutor();
+            tackyExecutor.functionDefinitionMap = structureTACKYParserListener.functionDefinitionMap;
 
-        // start execution with the main function
-        int returnValue = tackyExecutor.executeFunction(newTackyStackFrame, rootNode, 0, mainFunction);
-        if (returnValue == 0) {
-            System.out.println("[OK]");
-            System.out.println("[OK]");
-            System.out.println("[OK]");
-        } else {
-            throw new RuntimeException("\n[ERROR]\n[ERROR] Script did not return zero but " + returnValue
-                    + "! Unit Test failed!\n[ERROR]");
+            // start execution with the main function
+            int returnValue = tackyExecutor.executeFunction(newTackyStackFrame, rootNode, 0, mainFunction);
+            if (returnValue == 0) {
+                System.out.println("[OK]");
+                System.out.println("[OK]");
+                System.out.println("[OK]");
+            } else {
+                throw new RuntimeException("\n[ERROR]\n[ERROR] Script did not return zero but " + returnValue
+                        + "! Unit Test failed!\n[ERROR]");
+            }
+
+            System.out.println("----------------------------------------------------------\n");
         }
 
-        System.out.println("----------------------------------------------------------\n");
 /*
         System.out.println("-- 5 - Generate x86 assembly code ------------------------------");
 
@@ -960,6 +662,7 @@ public class Main {
         // final String filename = "src/test/resources/examples/matrix_tester_scratchpad.cpp";
         // final String filename = "src/test/resources/examples/matrix_tester_2.cpp";
         // final String filename = "src/test/resources/examples/matrix_tester_3.cpp";
+        // final String filename = "src/test/resources/examples/printf.cpp";
 
         // final String filename = "src/test/resources/printf.cpp";
         // final String filename = "src/test/resources/printf_2.cpp";
@@ -974,7 +677,7 @@ public class Main {
         // final String filename = "src/test/resources/function_call_3.cpp"; // <--- Language Test 4
         // final String filename = "src/test/resources/function_call_4.cpp"; // <--- test
         // final String filename = "src/test/resources/function_call_5.cpp"; // <--- Language Test 7
-        final String filename = "src/test/resources/function_call_6.cpp"; // <--- THIS HAS TO WORK! this is the full matrix mult!
+        // final String filename = "src/test/resources/function_call_6.cpp"; // <--- THIS HAS TO WORK! this is the full matrix mult!
         // final String filename = "src/test/resources/function_call_7.cpp";
         // final String filename = "src/test/resources/function_call_8.cpp"; // <--- Language Test 5
         // final String filename = "src/test/resources/function_call_9.cpp"; // <--- Language Test 6
@@ -985,6 +688,8 @@ public class Main {
         // final String filename = "src/test/resources/for_loop_over_array.cpp";
 
         // final String filename = "src/test/resources/char_test.cpp";
+
+        final String filename = "src/test/resources/if_2.cpp"; // <-- work here
 
         ASTNode dummyASTNode = new ASTNode();
         dummyASTNode.value = "__DUMMY___11223344__";
@@ -1501,4 +1206,307 @@ public class Main {
         }
     }
 
+    /**
+     * This function contains the basic idea of the algorithm. The purpose of the
+     * algorithm is to parse expressions without a parse, using a lexer and token
+     * only.
+     * The expression is expressed using a binary tree.
+     * To build the tree, all token types are identified and if the token is a C/C++
+     * operator, the precedence of that operator is used as a weight. The heavier
+     * the node (higher precedence) the deeper the token will sink into the tree.
+     * Literals have the highest weight and will sink down and act as the leafs of
+     * the tree (Leaf == no children).
+     */
+    private static TreeNode insertTokenIntoTree(TreeNode node, String token, int customWeight, boolean functionCall) {
+
+        if (node == null) {
+            TreeNode newTreeNode = new TreeNode();
+            newTreeNode.value = token;
+            newTreeNode.unaryOperator = AbstractFileStackFrame.isUnaryOperator(token);
+            newTreeNode.customWeight = customWeight;
+
+            return newTreeNode;
+        }
+
+        if (comparePriority(functionCall, node.customWeight, node.value, token) < 0) {
+
+            System.out.println("existing node is heavier");
+
+            TreeNode newNode = new TreeNode();
+            newNode.value = token;
+            newNode.customWeight = customWeight;
+
+            newNode.reparent(node);
+
+            return newNode;
+
+        } else {
+
+            System.out.println("existing node is lighter");
+
+            if ((node.lhs != null) && (node.rhs != null)) {
+                insertTokenIntoTree(node.rhs, token, customWeight, false);
+                return node;
+            }
+
+            TreeNode newNode = new TreeNode();
+            newNode.value = token;
+            newNode.customWeight = customWeight;
+            node.addChild(newNode);
+
+            return node;
+
+        }
+
+    }
+
+    private static void manualExpressionParsing() {
+
+        List<String> tokens = new ArrayList<>();
+        tokens.add("a");
+        tokens.add(".");
+        tokens.add("b");
+        tokens.add("==");
+        tokens.add("c");
+        tokens.add(".");
+        tokens.add("d");
+        tokens.add("||");
+        tokens.add("e");
+        tokens.add(".");
+        tokens.add("f");
+        tokens.add("==");
+        tokens.add("g");
+        tokens.add(".");
+        tokens.add("h");
+
+        TreeNode rootNode = null;
+
+        TreeNode currentNode = null;
+        TreeNode currentOperator = null;
+
+        boolean done = false;
+        int i = 0;
+        while (!done) {
+
+            System.out.println("--------------------------------------");
+            if (rootNode != null) {
+                // DEBUG
+                StringBuilder stringBuilder = new StringBuilder();
+                rootNode.printRecursive(stringBuilder, 0);
+                System.out.println(stringBuilder.toString());
+            }
+
+            String currentToken = tokens.get(i);
+            String lookaheadToken = (i + 1) < tokens.size() ? tokens.get(i + 1) : null;
+
+            System.out.println("CurrToken: " + currentToken);
+            System.out.println("LookaheadToken: " + lookaheadToken);
+            System.out.println("--------------------------------------");
+
+            if (AbstractFileStackFrame.isBinaryOperator(currentToken)) {
+
+                TreeNode newNode = new TreeNode();
+                newNode.value = currentToken;
+
+                newNode.addChild(currentNode);
+
+                currentNode = newNode;
+
+                currentOperator = currentNode;
+
+                rootNode = currentOperator;
+
+            } else {
+
+                TreeNode newNode = null;
+                if (currentNode == null) {
+                    currentNode = new TreeNode();
+                    currentNode.value = currentToken;
+                } else {
+                    newNode = new TreeNode();
+                    newNode.value = currentToken;
+
+                    currentNode.addChild(newNode);
+                }
+
+                boolean shifted = false;
+                if ((lookaheadToken != null) && (AbstractFileStackFrame.isBinaryOperator(lookaheadToken))
+                        && (currentOperator != null)) {
+                    if (comparePriority(false, 0, currentOperator.value, lookaheadToken) < 0) {
+                        System.out.println("SHIFT");
+
+                        TreeNode newOperatorNode = new TreeNode();
+                        newOperatorNode.value = lookaheadToken;
+                        currentOperator = newOperatorNode;
+
+                        newOperatorNode.reparent(newNode);
+                        currentNode = newOperatorNode;
+
+                        // DEBUG
+                        StringBuilder stringBuilder = new StringBuilder();
+                        rootNode.printRecursive(stringBuilder, 0);
+                        System.out.println(stringBuilder.toString());
+
+                        i++;
+                        shifted = true;
+                    }
+                }
+
+                if (!shifted) {
+                    System.out.println("REDUCE");
+
+                    while (AbstractFileStackFrame.isBinaryOperator(currentNode.value)) {
+                        if (currentNode.parent == null) {
+                            break;
+                        }
+
+                        currentNode = (TreeNode) currentNode.parent;
+                        currentOperator = currentNode;
+
+                    }
+
+                }
+
+            }
+
+            i++;
+
+            if (i >= tokens.size()) {
+                done = true;
+                continue;
+            }
+
+        }
+
+        // DEBUG
+        StringBuilder stringBuilder = new StringBuilder();
+        rootNode.printRecursive(stringBuilder, 0);
+        System.out.println(stringBuilder.toString());
+
+        System.out.println("end");
+    }
+
+    private static int comparePriority(boolean functionCall, int customWeight, String lhs, String rhs) {
+
+        int priorityLHS = 0;
+        int priorityRHS = 0;
+
+        if (functionCall) {
+
+            priorityLHS = 1000 - 2;
+            priorityRHS = AbstractFileStackFrame.getPriority(rhs);
+
+        } else {
+
+            priorityLHS = customWeight + AbstractFileStackFrame.getPriority(lhs);
+            priorityRHS = AbstractFileStackFrame.getPriority(rhs);
+
+        }
+
+        return priorityRHS - priorityLHS;
+
+    }
+
+    private static void manualExpressionParsing3() {
+
+        String data = "";
+
+        // data = "\"identifier\"";
+
+        // data = "a";
+        // data = "a + b";
+        // data = "a * b";
+        // data = "a * b + c";
+        // data = "a + b * c";
+        // data = "a + b + c";
+        // data = "a * b * c";
+
+        // data = "(x)";
+        // data = "a + (x)";
+        // data = "(x) + a";
+        // data = "(x) + (y)";
+        // data = "((x) + (y))";
+        // data = "a * (x + y)";
+        // data = "(x + y) * a";
+
+        // data = "SQUARE(x)";
+        // data = "defined(_DEBUG)";
+        // data = "SQUARE(a + b)"; // OK
+        // data = "SQUARE(a * b)"; // OK
+        // data = "SQUARE(a * b + c)";
+        // data = "SQUARE(a * (b + c))";
+        // data = "P()";
+        // data = "P(x)";
+        // data = "P(a, b)";
+        // data = "P(a, b, c)";
+        // data = "P(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v,
+        // w, x, y, z)";
+        // data = "P(void)";
+        // data = "P((void))";
+
+        // data = "1";
+        // data = "1 + 2";
+        // data = "1 + a";
+        // data = "a * 1";
+        // data = "SQUARE(a * (b + 1))";
+
+        // data = "printf(\"File: %s\n\", __FILE__)"; // TODO
+
+        // data = "a || b";
+        // data = "a || 1 + b";
+
+        // data = "a && b";
+        // data = "a && 1 + b";
+
+        // data = "!a";
+        // data = "!defined(_DEBUG) && defined(_UNIT_TEST)";
+        // data = "!defined _DEBUG && defined _UNIT_TEST"; // does not work with the
+        // grammar!
+
+        // data = "a.b";
+        // data = "a.b.c";
+
+        // data = "prsvec_1 == oindex_1";
+        // data = "(prsvec_1 == oindex_1 || prso == every)";
+        // data = "(prsvec_1.prso == oindex_1.valua || prsvec_1.prso ==
+        // oindex_1.every)";
+
+        // data = "&orphs_1";
+        // data = "(integer *)"; // this will not parse on it's own based on the grammar
+        // data = "((integer *)&orphs_1)";
+
+        ExpressionBuilderExecutor expressionBuilderExecutor = new ExpressionBuilderExecutor();
+        ASTNode astNode = expressionBuilderExecutor.execute(data);
+
+        // DEBUG output ParserTree
+        StringBuilder stringBuilder = new StringBuilder();
+        astNode.printRecursive(stringBuilder, 0);
+        System.out.println(stringBuilder);
+
+        // rebuild parse tree into expression tree
+        //
+        // the process starts at the leaves
+        // every child that is not a grammar node is move up one level
+        //
+        // For the rule_start_symbol, drop the <EOF> node
+        //
+        // For rule_parenthesis, add opening, central node and closing braces
+        // into parent
+        //
+        // depth first search, while decending up again
+        //
+        // On the way down into the children.
+        // - if a bracket ( or ) is discovered, create a new ASTNode with value "()"
+        // and insert it in places of the "(" node, delete the ")" Node
+        //
+        // arriving at a node:
+        // - is the node a grammar node AND does the node have only
+        // leaves (NON-Grammar nodes) as children?
+        // if yes, remove the node from the parent
+        // reparent children to remaining child of parent
+        //
+        // - if the node is NOT a grammar node, do nothing
+
+        System.out.println("The End");
+    }
 }
