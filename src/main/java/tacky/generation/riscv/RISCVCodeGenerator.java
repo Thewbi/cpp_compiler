@@ -2,13 +2,10 @@ package tacky.generation.riscv;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Stack;
 
 import org.apache.commons.lang3.StringUtils;
 
 import ast.ASTNode;
-import ast.ASTNodeType;
 import ast.ExpressionASTNode;
 import grammar.ActualParameter;
 import tacky.ast.AssignmentASTNode;
@@ -31,7 +28,12 @@ import types.FormalParameter;
 
 public class RISCVCodeGenerator implements Generator {
 
-    private static final boolean PRINT_STACK_FRAME_LAYOUT = false;
+    private static final String STACK_POINTER = "sp";
+
+    private static final String FRAME_POINTER = "fp";
+
+    private static final boolean PRINT_STACK_FRAME_LAYOUT = true;
+    // private static final boolean PRINT_STACK_FRAME_LAYOUT = false;
 
     public StringBuilder stringBuilder = new StringBuilder();
 
@@ -92,7 +94,6 @@ public class RISCVCodeGenerator implements Generator {
             stringBuilder.append(literalStringRecord.getLabel()).append(": ").append("\n");
             stringBuilder.append(indent).append(".string ").append("\"")
                     .append(StringUtils.unwrap(literalStringRecord.value, "\""))
-                    // .append("\\n")
                     .append("\"")
                     .append("\n");
         }
@@ -200,25 +201,37 @@ public class RISCVCodeGenerator implements Generator {
                 // addToStackFram
 
                 RISCVStackEntry riscvStackEntry = stackFrame.stackEntryMap.get(targetVariableName);
-
-                // System.out.println("");
-
-                stringBuilder.append(indent).append("# ").append("<sizeof " + typeToProcess + ">").append("\n");
-                // @formatter:off
                 int address = riscvStackEntry.address;
-                int offset = address - stackPointer;
 
+                // compute offset from stack_pointer (positive value)
+                int stackPointerOffset = address - stackPointer;
+
+                // compute offset from frame_pointer (negative value)
+                int framePointerOffset = stackPointer - address;
+
+                // @formatter:off
                 String tempRegister = "t0";
+
+                // comment
+                stringBuilder.append(indent).append("# ").append("<sizeof " + typeToProcess + ">").append("\n");
 
                 stringBuilder.append(indent)
                     .append("li      ").append(tempRegister).append(", ")
                     .append(size)
                     .append("\n");
 
+                // relative to stack pointer
+                // stringBuilder.append(indent)
+                //     .append("sw      ").append(tempRegister).append(", ")
+                //     .append(stackPointerOffset).append("(").append(STACK_POINTER).append(")")
+                //     .append("\n");
+
+                // relative to frame pointer
                 stringBuilder.append(indent)
                     .append("sw      ").append(tempRegister).append(", ")
-                    .append(offset).append("(sp)")
+                    .append(framePointerOffset).append("(").append(FRAME_POINTER).append(")")
                     .append("\n");
+
                 // @formatter:on
             }
                 break;
@@ -234,11 +247,13 @@ public class RISCVCodeGenerator implements Generator {
                 RISCVStackEntry sourceRISCVStackEntry = stackFrame.stackEntryMap.get(child0.value);
                 RISCVStackEntry targetRISCVStackEntry = stackFrame.stackEntryMap.get(child1.value);
 
-                // @formatter:off
                 int sourceAddress = sourceRISCVStackEntry.address;
                 int targetAddress = targetRISCVStackEntry.address;
                 int offset = targetAddress - stackPointer;
 
+                // @formatter:off
+
+                // comment
                 stringBuilder.append(indent)
                     .append("# GetAddress(").append(child0.value).append(", ")
                     .append(child1.value).append(")")
@@ -252,6 +267,7 @@ public class RISCVCodeGenerator implements Generator {
                     .append(sourceAddress)
                     .append("\n");
 
+                // sw
                 stringBuilder.append(indent)
                     .append("sw      ").append(tempRegister).append(", ")
                     .append(offset).append("(sp)")
@@ -323,7 +339,8 @@ public class RISCVCodeGenerator implements Generator {
 
                 // load data from address the pointer points to
                 // lw t0, 0(t0)
-                stringBuilder.append(indent).append("lw      ").append(tempRegister).append(", 0(").append(tempRegister)
+                stringBuilder.append(indent).append("lw      ")
+                        .append(tempRegister).append(", 0(").append(tempRegister)
                         .append(")").append("\n");
 
                 stringBuilder.append(indent).append("# << dereference into temp register: " + tempRegister)
@@ -336,16 +353,32 @@ public class RISCVCodeGenerator implements Generator {
 
                 // build offset to destination variable
                 int address = riscvStackEntry.address;
-                int offset = address - stackPointer;
+
+                // compute offset from stack_pointer (positive value)
+                int stackPointerOffset = address - stackPointer;
+
+                // compute offset from frame_pointer (negative value)
+                int framePointerOffset = stackPointer - address;
 
                 // store value into variable
 
                 // @formatter:off
+
+                // comment
                 stringBuilder.append(indent).append("# >> store to stack").append("\n");
+
+                // // relative to stack pointer
+                // stringBuilder.append(indent)
+                //     .append("sw      ").append(tempRegister).append(", ")
+                //     .append(stackPointerOffset).append("(").append(STACK_POINTER).append(")")
+                //     .append("\n");
+
+                // relative to frame pointer
                 stringBuilder.append(indent)
                     .append("sw      ").append(tempRegister).append(", ")
-                    .append(offset).append("(").append("sp").append(")")
+                    .append(framePointerOffset).append("(").append(FRAME_POINTER).append(")")
                     .append("\n");
+
                 stringBuilder.append(indent).append("# << store to stack").append("\n");
                 // @formatter:on
 
@@ -373,6 +406,7 @@ public class RISCVCodeGenerator implements Generator {
         ra.variableName = "_____ra_____";
         ra.isArray = false;
         ra.arraySize = 0;
+        @SuppressWarnings("unused")
         RISCVStackEntry raStackEntry = ra.addToStackFrame(stackFrame);
 
         // reserve space on the stack for the 's0'/'fp' (frame pointer)
@@ -380,11 +414,13 @@ public class RISCVCodeGenerator implements Generator {
         spfp.variableName = "_____spfp_____";
         spfp.isArray = false;
         spfp.arraySize = 0;
+        @SuppressWarnings("unused")
         RISCVStackEntry spfpStackEntry = spfp.addToStackFrame(stackFrame);
 
         // 1. for each local variable declaration used in this function,
         // reserve space on the stack
         for (ASTNode astNode : functionAstNode.children) {
+            @SuppressWarnings("unused")
             RISCVStackEntry stackEntry = astNode.addToStackFrame(stackFrame);
         }
 
@@ -404,6 +440,7 @@ public class RISCVCodeGenerator implements Generator {
         // insert function label for the function
         stringBuilder.append(functionAstNode.value).append(":").append("\n");
         if (functionAstNode.value.equalsIgnoreCase("main")) {
+
             // insert start symbol for the function called main
             stringBuilder.append("_start:").append("\n");
         }
@@ -433,11 +470,12 @@ public class RISCVCodeGenerator implements Generator {
                 .append("sw      s0, " + (stackSizeUsed - 8) + "(sp)")
                 .append("\n");
 
-        // addi s0,sp,32 // set new s0/fp (frame pointer) to the start of our new
+        // set new s0/fp (frame pointer) to the start of our new
         // stackframe.
         // Now offseting (with negative offsets) from new s0/fp grants
         // access to all elements of the new stack frame
 
+        // addi s0, sp, 32
         stringBuilder.append(indent)
                 .append("addi    s0, sp, ").append(stackSizeUsed)
                 .append("\n");
@@ -569,7 +607,7 @@ public class RISCVCodeGenerator implements Generator {
                     .append("\n");
                 // @formatter:on
             }
-            break;
+                break;
 
             case JumpIfNotEqual: {
                 ASTNode child0 = astNode.children.get(0);
@@ -604,7 +642,7 @@ public class RISCVCodeGenerator implements Generator {
                     .append("\n");
                 // @formatter:on
             }
-            break;
+                break;
 
             case JumpGreaterThanOrEqual: {
 
@@ -648,8 +686,6 @@ public class RISCVCodeGenerator implements Generator {
 
         String variableName = assignmentASTNode.lhs;
 
-        // TODO: figure out if the value is a constant or not
-        // int value = 22;
         String value = "?";
         boolean valueIsRegister = false;
 
@@ -775,8 +811,6 @@ public class RISCVCodeGenerator implements Generator {
 
             default:
                 throw new RuntimeException(expressionASTNode.expressionType.toString() + " " + expressionASTNode.value);
-            // System.out.println("Default: " + expressionASTNode.expressionType);
-            // break;
         }
 
         //
@@ -786,7 +820,12 @@ public class RISCVCodeGenerator implements Generator {
         RISCVStackEntry riscvStackEntry = stackFrame.stackEntryMap.get(variableName);
 
         int address = riscvStackEntry.address;
-        int offset = address - stackPointer;
+
+        // compute offset from stack_pointer (positive value)
+        int stackPointerOffset = address - stackPointer;
+
+        // compute offset from frame_pointer (negative value)
+        int framePointerOffset = stackPointer - address;
 
         String tempRegister = "t0";
 
@@ -816,10 +855,17 @@ public class RISCVCodeGenerator implements Generator {
 
         }
 
+        // // @formatter:off
+        // stringBuilder.append(indent)
+        //     .append("sw      ").append(tempRegister).append(", ")
+        //     .append(stackPointerOffset).append("(").append(STACK_POINTER).append(")")
+        //     .append("\n");
+        // // @formatter:on
+
         // @formatter:off
         stringBuilder.append(indent)
             .append("sw      ").append(tempRegister).append(", ")
-            .append(offset).append("(sp)")
+            .append(framePointerOffset).append("(").append(FRAME_POINTER).append(")")
             .append("\n");
         // @formatter:on
 
@@ -925,55 +971,34 @@ public class RISCVCodeGenerator implements Generator {
             // Load it into a register and return the register used.
 
             int address = riscvStackEntry.address;
-            int offset = address - stackPointer;
+
+            // compute offset from stack_pointer (positive value)
+            int stackPointerOffset = address - stackPointer;
+
+            // compute offset from frame_pointer (negative value)
+            int framePointerOffset = stackPointer - address;
 
             // load word
+
+            // // @formatter:off
+            // stringBuilder.append(indent)
+            //         .append("lw      ")
+            //         .append(register).append(", ")
+            //         .append(stackPointerOffset).append("(").append(STACK_POINTER).append(")")
+            //         .append("\n");
+            // // @formatter:on
+
+            // @formatter:off
             stringBuilder.append(indent)
                     .append("lw      ").append(register).append(", ")
-                    .append(offset).append("(sp)")
+                    .append(framePointerOffset).append("(").append(FRAME_POINTER).append(")")
                     .append("\n");
+            // @formatter:on
 
             return register;
 
         }
 
-    }
-
-    private String loadValueIntoTempRegister(String register, String value) {
-
-        // load
-        stringBuilder.append(indent)
-                .append("li      ")
-                .append(register).append(", ")
-                .append(value)
-                .append("\n");
-
-        return register;
-    }
-
-    private String retrieveLiteralFromExpression(ExpressionASTNode astNode) {
-
-        switch (astNode.expressionType) {
-
-            case Constant:
-                ASTNode temp2 = unwrapConstant(astNode);
-                return temp2.value;
-
-            case Identifier:
-                return astNode.value;
-
-            default:
-                throw new RuntimeException();
-
-        }
-
-        // return "";
-    }
-
-    private ASTNode unwrapConstant(ASTNode astNode) {
-        ConstantDeclarationASTNode temp = (ConstantDeclarationASTNode) astNode.getChildren().get(0);
-        ASTNode temp2 = temp.children.get(0);
-        return temp2;
     }
 
     private void processFunctionCallDelegator(ASTNode astNode) {
@@ -1019,7 +1044,8 @@ public class RISCVCodeGenerator implements Generator {
         // and hence could be overridden by the callee at any time
 
         int formalParmeterCounter = 0;
-        for (FormalParameter formalParameter : callerFunctionCallASTNode.formalParameters) {
+        for (@SuppressWarnings("unused")
+        FormalParameter formalParameter : callerFunctionCallASTNode.formalParameters) {
             String parameterRegister = "a" + formalParmeterCounter;
             stackPushRegister(parameterRegister);
             formalParmeterCounter++;
@@ -1038,8 +1064,11 @@ public class RISCVCodeGenerator implements Generator {
                 label = "" + actualParameter.intValue;
             }
 
-            stringBuilder.append(indent).append("# load argument register ").append(argumentRegisterName)
-                    .append(" with parameter '").append(label).append("'\n");
+            stringBuilder.append(indent).append("# load argument register ")
+                    .append(argumentRegisterName)
+                    .append(" with parameter '")
+                    .append(label)
+                    .append("'\n");
 
             if (actualParameter.name != null) {
                 loadLocalVariableIntoTempRegister(argumentRegisterName, actualParameter.name);
@@ -1054,7 +1083,8 @@ public class RISCVCodeGenerator implements Generator {
         stringBuilder.append(indent).append("call    ").append(calleeFunctionName).append("\n");
 
         // get actual parameters back
-        for (FormalParameter formalParameter : callerFunctionCallASTNode.formalParameters) {
+        for (@SuppressWarnings("unused")
+        FormalParameter formalParameter : callerFunctionCallASTNode.formalParameters) {
             formalParmeterCounter--;
             String parameterRegister = "a" + formalParmeterCounter;
             stackPopRegister(parameterRegister);
@@ -1143,6 +1173,37 @@ public class RISCVCodeGenerator implements Generator {
     private void processExitFunctionCall(ExitASTNode astNode) {
         // call exit
         stringBuilder.append(indent).append("call    exit").append("\n");
+    }
+
+    private String loadValueIntoTempRegister(String register, String value) {
+
+        // load
+        stringBuilder.append(indent)
+                .append("li      ")
+                .append(register).append(", ")
+                .append(value)
+                .append("\n");
+
+        return register;
+    }
+
+    @SuppressWarnings("unused")
+    private String retrieveLiteralFromExpression(ExpressionASTNode astNode) {
+        switch (astNode.expressionType) {
+            case Constant:
+                ASTNode temp2 = unwrapConstant(astNode);
+                return temp2.value;
+            case Identifier:
+                return astNode.value;
+            default:
+                throw new RuntimeException();
+        }
+    }
+
+    private ASTNode unwrapConstant(ASTNode astNode) {
+        ConstantDeclarationASTNode temp = (ConstantDeclarationASTNode) astNode.getChildren().get(0);
+        ASTNode temp2 = temp.children.get(0);
+        return temp2;
     }
 
 }

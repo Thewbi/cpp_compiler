@@ -34,12 +34,8 @@ public class RISCVStackFrame {
 
         int address = stackPointer;
 
-        //for (Map.Entry<String, RISCVStackEntry> entry : stackEntryMap.entrySet()) {
-
-            //RISCVStackEntry stackEntry = entry.getValue();
-
         for (RISCVStackEntry stackEntry : stackEntryList) {
-            
+
             if (stackEntry.isArray) {
 
                 address -= (4 * stackEntry.arraySize);

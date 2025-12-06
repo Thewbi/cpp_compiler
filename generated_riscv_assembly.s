@@ -29,37 +29,37 @@ if_label_0:
         sub     t0, t0, t1
         # variable 'exprTemp_0'
         mv      t0, t0
-        sw      t0, 24(sp)
-        lw      t0, 24(sp)
+        sw      t0, -24(fp)
+        lw      t0, -24(fp)
         # variable 'temp'
         mv      t0, t0
-        sw      t0, 20(sp)
+        sw      t0, -20(fp)
         # factorial() -> factorial()
         # ++ push parameter
         addi    sp, sp, -4
         sw      a0, 0(sp)
         # ++ push parameter
         # load argument register a0 with parameter 'temp'
-        lw      a0, 20(sp)
+        lw      a0, -20(fp)
         call    factorial
         # -- pop parameter
         lw      a0, 0(sp)
         addi    sp, sp, 4
         # -- pop parameter
-        lw      t0, 16(sp)
+        lw      t0, -16(fp)
         # variable 'factorial_result'
         mv      t0, t0
-        sw      t0, 12(sp)
+        sw      t0, -12(fp)
         mv      t0, a0
-        lw      t1, 12(sp)
+        lw      t1, -12(fp)
         mul     t0, t0, t1
         # variable 'exprTemp_1'
         mv      t0, t0
-        sw      t0, 8(sp)
-        lw      t0, 8(sp)
+        sw      t0, -8(fp)
+        lw      t0, -8(fp)
         # variable 'result'
         mv      t0, t0
-        sw      t0, 4(sp)
+        sw      t0, -4(fp)
         # -- stack frame remove --
         lw      ra, 28(sp)
         lw      s0, 24(sp)
@@ -77,15 +77,15 @@ _start:
         # -- stack frame create --
         # variable 'num'
         li      t0, 5
-        sw      t0, 12(sp)
+        sw      t0, -12(fp)
         # main() -> factorial()
         # load argument register a0 with parameter 'num'
-        lw      a0, 12(sp)
+        lw      a0, -12(fp)
         call    factorial
-        lw      t0, 8(sp)
+        lw      t0, -8(fp)
         # variable 'factorial_result'
         mv      t0, t0
-        sw      t0, 4(sp)
+        sw      t0, -4(fp)
         mv      t6, a0
         lui     t0, %hi(.SLL0)
         addi    a0, t0, %lo(.SLL0)
