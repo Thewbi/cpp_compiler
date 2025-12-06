@@ -29,7 +29,7 @@ int main() {
 
     // printf("main\n");
 
-    int num = 5;
+    int num = 2;
     int factorial_result = factorial(num);
 
     printf("factorial of %d is %d\n", num, factorial_result);

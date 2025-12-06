@@ -1,4 +1,6 @@
-// start-symbol: 
+#include <stdio.h>
+
+// start-symbol:
 
 // void funcVoid() {
 //     ;
@@ -7,6 +9,10 @@
 // int funcInt() {
 //     return 3;
 // }
+
+int funcIntWithParameter(int a) {
+    return 3;
+}
 
 // char funcChar() {
 //     return 'c';
@@ -47,14 +53,18 @@ int main()
 
 //     // ok
     // funcVoid();
-//     //funcInt();
+    // funcInt();
+
+    int a = 3;
+    int returnValue = funcIntWithParameter(a);
+
 //     //funcChar();
     // funcIntParamIntInt(1, 2);
 //     //funcIntParamIntChar(1, 'a');
 //     //funcIntParamIntInt(1, funcIntParamIntChar(2, '3'));
 //     //funcIntParamIntInt1(1, funcIntParamIntChar1(funcIntParamIntInt2(1, funcIntParamIntChar2(2, '3')), '3'));
 
-        printf("a");
+        // printf("a");
 
 //     // ok
 //     //length = funcInt();
@@ -66,7 +76,7 @@ int main()
 
 //     // errors
 //     //call_to_function_which_is_not_declared();
-//     //funcInt(1);    
+//     //funcInt(1);
 //     //funcIntParamIntInt(1, funcVoid());
 //     //funcIntParamIntInt(1);
 //     //length = funcIntParamIntInt(1);
@@ -80,6 +90,7 @@ int main()
 //     // this is not detected as an error although it should be
 //     //funcInt(funcVoid());
 
+    exit();
 //     return length;
-//     //return 0;
+    return 0;
 }

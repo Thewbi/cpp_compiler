@@ -1,4 +1,4 @@
-// Msys2: install gcc: 
+// Msys2: install gcc:
 // pacman -S mingw-w64-ucrt-x86_64-gcc
 // gcc.exe is installed to C:\msys64\mingw64\bin
 // Add it to the path environment variable
@@ -22,7 +22,7 @@
 
 #define SUB_DIMENSION 2
 
-/**/
+/*
 int matrixAddInto(int* matrixA, int* matrixB, int rows, int columns) {
     for (int i = 0; i < rows; i++) {
         for (int j = 0; j < columns; j++) {
@@ -40,10 +40,11 @@ int matrixAddInto(int* matrixA, int* matrixB, int rows, int columns) {
 
     return 0;
 }
+    */
 
 /**
  * Copies a subfield into matrixDest.
- * 
+ *
  * matrixDest - destination to copy data into
  * matrixSrc - source to copy data from
  * dim - dimension of source (NOT TARGET!!!!!)
@@ -51,7 +52,7 @@ int matrixAddInto(int* matrixA, int* matrixB, int rows, int columns) {
  * yPos - xPos of field to copy
  * width - xPos of field to copy
  * height - xPos of field to copy
- */
+
 int getSubMatrix(int* matrixDest, int* matrixSrc, int dim, int xPos, int yPos, int width, int height) {
 
     // matrixDest[0] = xPos;
@@ -89,10 +90,6 @@ int getSubMatrix(int* matrixDest, int* matrixSrc, int dim, int xPos, int yPos, i
             int idx = tempIdx + j;
             //matrixDest[counter] = idx; // 0,1,2,3  OK
 
-            
-
-        
-
             //matrixDest[counter] = width; // 2,2,2,2 OK
             //matrixDest[counter] = innerI; // 0,0,1,1 OK
 
@@ -108,7 +105,7 @@ int getSubMatrix(int* matrixDest, int* matrixSrc, int dim, int xPos, int yPos, i
             //matrixDest[counter] = idxC; // 0,1,2,3 INCORRECT: 0,1,4,5
 
             //matrixDest[counter] = idx; // 0,1,2,3  OK
-            
+
             int transfer = matrixSrc[idx];
             matrixDest[idxC] = transfer;
 
@@ -131,10 +128,11 @@ int getSubMatrix(int* matrixDest, int* matrixSrc, int dim, int xPos, int yPos, i
 
     return 0;
 }
+    */
 
 /**
  * Copies a subfield into matrixDest.
- * 
+ *
  * matrixDest - destination to copy data into
  * matrixSrc - source to copy data from
  * dim - dimension of destination (NOT SOURCE!!!!!)
@@ -142,7 +140,7 @@ int getSubMatrix(int* matrixDest, int* matrixSrc, int dim, int xPos, int yPos, i
  * yPos - xPos of field to copy
  * width - xPos of field to copy
  * height - xPos of field to copy
- */
+
 int setSubMatrix(int* matrix_dest, int* matrix_src, int dim, int xPos, int yPos, int width, int height) {
     for (int i = 0; i < height; i++) {
         for (int j = 0; j < width; j++) {
@@ -163,11 +161,11 @@ int setSubMatrix(int* matrix_dest, int* matrix_src, int dim, int xPos, int yPos,
     }
     return 0;
 }
+*/
 
-
-/**/
+/*
 int segmentedMatrixMult(int* matrixA, int* matrixB, int* matrixC, int rows, int columns) {
-    
+
     int nc = 2; // subset size
     int rowSteps = rows / nc;
 
@@ -275,15 +273,16 @@ int segmentedMatrixMult(int* matrixA, int* matrixB, int* matrixC, int rows, int 
 
     }
 
-    printf("IterationCounter: \t %d\n", iterationCounter);
+    //printf("IterationCounter: \t %d\n", iterationCounter);
 
     return 0;
 }
+*/
 
 
-/**/
+/*
 int standardMatrixMult(int* matrixA, int* matrixB, int* matrixC, int rows, int columns) {
-    
+
     //int t1 = matrixA[2];
     // printf("test: %d\n", t1);
     //matrixC[3] = t1;
@@ -297,13 +296,13 @@ int standardMatrixMult(int* matrixA, int* matrixB, int* matrixC, int rows, int c
 
     int counter = 0;
 
-    
+
     // over row of matrix B
     for (int i = 0; i < rows; i++) {
 
         // matrixC[i] = i;
 
-        
+
         // over column of matrix A
         for (int j = 0; j < columns; j++) {
 
@@ -316,7 +315,7 @@ int standardMatrixMult(int* matrixA, int* matrixB, int* matrixC, int rows, int c
             // fuse row and column together into a single cell of matrix C
             for (int k = 0; k < columns; k++) {
 
-                
+
 
                 // int tcounter = counter;
                 // counter = tcounter + 1;
@@ -326,9 +325,9 @@ int standardMatrixMult(int* matrixA, int* matrixB, int* matrixC, int rows, int c
                 // // printf("test: %d\n", t1);
                 // matrixC[3] = t1;
 
-                
 
-                
+
+
 
                 //matrixC[i * rows + j] += matrixA[i * columns + k] * matrixB[k * columns + j];
 
@@ -372,7 +371,7 @@ int standardMatrixMult(int* matrixA, int* matrixB, int* matrixC, int rows, int c
                 // printf("aVal: %d", aVal);
                 // printf("bVal: %d", bVal);
 
-                
+
                 int abc = matrixC[cIdx];
                 // matrixC[7] = abc;
                 int cde = abc + mult_temp;
@@ -385,17 +384,18 @@ int standardMatrixMult(int* matrixA, int* matrixB, int* matrixC, int rows, int c
 
                 // exit();
 
-                
+
             }
 
-            
+
         }
 
-        
+
     }
-        
+
     return 0;
 }
+*/
 
 
 // int printMatrix(int* matrix, int dim) {
@@ -473,19 +473,21 @@ int upCountingMatrix(int* matrix, int dim) {
 }
 */
 
-/*
+/**/
 int zeroMatrix(int* matrix, int dim) {
     for (int i = 0; i < dim; i++) {
         for (int j = 0; j < dim; j++) {
+
             //int idx = dim * i + j;
             int temp = dim * i;
             int idx = temp + j;
+
             matrix[idx] = 0;
         }
     }
     return 0;
 }
-*/
+
 
 /*
 //void multiParamTest(int* matrixA, int* matrixB, int* matrixC, int rows, int columns) {
@@ -568,7 +570,7 @@ int main()
     //int upResult = upCountingMatrix(matrixA, DIMENSION);
     //int upResult = upCountingMatrix(matrixB, DIMENSION);
     //int upResult = upCountingMatrix(matrixC, DIMENSION);
-    
+
 //    printf("A\n");
 //    int pp1 = prettyPrintFormatMatrix(matrixA, DIMENSION);
 
@@ -579,15 +581,15 @@ int main()
     // int subMatrixB[4] = { 255, 255, 255, 255 };
     // int getResult = getSubMatrix(subMatrixB, matrixB, DIMENSION, 0, 0, SUB_DIMENSION, SUB_DIMENSION);
     // int setResult = setSubMatrix(matrixC, subMatrixB, DIMENSION, 0, 0, 2, 2);
-    
+
     // printf("subMatrixB\n");
     // prettyPrintFormatMatrix(subMatrixB, 2);
 
-//    int pp2 = zeroMatrix(matrixC, DIMENSION);
+    // int pp2 = zeroMatrix(matrixC, DIMENSION);
 
 //    int pp3 = standardMatrixMult(matrixA, matrixB, matrixC, DIMENSION, DIMENSION);
 
-    int result_1 = segmentedMatrixMult(matrixA, matrixB, matrixC, DIMENSION, DIMENSION);
+//    int result_1 = segmentedMatrixMult(matrixA, matrixB, matrixC, DIMENSION, DIMENSION);
 
     //multiParamTest(matrixA, matrixB, matrixC, DIMENSION, DIMENSION);
     //multiParamTest(matrixA, matrixB, 4, 5);
@@ -602,7 +604,7 @@ int main()
     //      97,    88,   107,    63,
     //     135,   112,    87,    52
     // };
-    
+
     // Expected result for two up-counting matrices:
     // int[] intArray = new int[] {
     //      90,   100,   110,   120,

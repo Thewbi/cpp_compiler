@@ -162,8 +162,8 @@ public class DefaultTACKYExecutor implements TACKYExecutor {
                             index = jumpIfNotEqual(tackyStackFrame, jumpASTNode, index);
                             break;
 
-                        case JumpGreaterThanOrEqual:
-                            index = jumpGreaterThanOrEqual(tackyStackFrame, jumpASTNode, index);
+                        case JumpIfGreaterThanOrEqual:
+                            index = jumpIfGreaterThanOrEqual(tackyStackFrame, jumpASTNode, index);
                             break;
 
                         default:
@@ -495,7 +495,7 @@ public class DefaultTACKYExecutor implements TACKYExecutor {
         return index + 1;
     }
 
-    private int jumpGreaterThanOrEqual(TACKYStackFrame tackyStackFrame, JumpASTNode jumpASTNode, int index) {
+    private int jumpIfGreaterThanOrEqual(TACKYStackFrame tackyStackFrame, JumpASTNode jumpASTNode, int index) {
 
         ASTNode astNodeLHS = jumpASTNode.getChildren().get(0);
         ASTNode astNodeRHS = jumpASTNode.getChildren().get(1);

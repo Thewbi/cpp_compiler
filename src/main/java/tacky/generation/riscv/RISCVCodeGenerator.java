@@ -7,6 +7,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import ast.ASTNode;
 import ast.ExpressionASTNode;
+import common.ByteArrayUtil;
 import grammar.ActualParameter;
 import tacky.ast.AssignmentASTNode;
 import tacky.ast.ConstIntASTNode;
@@ -28,22 +29,23 @@ import types.FormalParameter;
 
 public class RISCVCodeGenerator implements Generator {
 
-    private static final String STACK_POINTER = "sp";
+    private static final int FP_OFFSET = 4;
+
+    // private static final String STACK_POINTER = "sp";
 
     private static final String FRAME_POINTER = "fp";
 
-    private static final boolean PRINT_STACK_FRAME_LAYOUT = true;
-    // private static final boolean PRINT_STACK_FRAME_LAYOUT = false;
+    // private static final boolean PRINT_STACK_FRAME_LAYOUT = true;
+    private static final boolean PRINT_STACK_FRAME_LAYOUT = false;
 
     public StringBuilder stringBuilder = new StringBuilder();
 
     private int stackPointer = 0x20000;
+    private int framePointer = 0x20000;
 
     public RISCVStackFrame stackFrame;
 
     public String indent = "        ";
-
-    // public String printLabelName = ".LABEL_0";
 
     public FunctionDefinitionASTNode prototype;
 
@@ -204,10 +206,12 @@ public class RISCVCodeGenerator implements Generator {
                 int address = riscvStackEntry.address;
 
                 // compute offset from stack_pointer (positive value)
-                int stackPointerOffset = address - stackPointer;
+                // int stackPointerOffset = address - stackPointer;
 
                 // compute offset from frame_pointer (negative value)
-                int framePointerOffset = stackPointer - address;
+                // int framePointerOffset = framePointer - address - FP_OFFSET;
+                // int framePointerOffset = framePointer - address;
+                int framePointerOffset =  address - framePointer;
 
                 // @formatter:off
                 String tempRegister = "t0";
@@ -249,7 +253,14 @@ public class RISCVCodeGenerator implements Generator {
 
                 int sourceAddress = sourceRISCVStackEntry.address;
                 int targetAddress = targetRISCVStackEntry.address;
-                int offset = targetAddress - stackPointer;
+
+                //int offset = targetAddress - stackPointer;
+                // compute offset from stack_pointer (positive value)
+                // int stackPointerOffset = address - stackPointer;
+
+                // compute offset from frame_pointer (negative value)
+                //int framePointerOffset = stackPointer - targetAddress - FP_OFFSET;
+                int framePointerOffset =  targetAddress - framePointer;
 
                 // @formatter:off
 
@@ -264,13 +275,14 @@ public class RISCVCodeGenerator implements Generator {
                 // li dest, src
                 stringBuilder.append(indent)
                     .append("li      ").append(tempRegister).append(", ")
-                    .append(sourceAddress)
+                    // .append(sourceAddress)
+                    .append(ByteArrayUtil.byteToHex(sourceAddress))
                     .append("\n");
 
                 // sw
                 stringBuilder.append(indent)
                     .append("sw      ").append(tempRegister).append(", ")
-                    .append(offset).append("(sp)")
+                    .append(framePointerOffset).append("(").append(FRAME_POINTER).append(")")
                     .append("\n");
                 // @formatter:on
 
@@ -283,11 +295,6 @@ public class RISCVCodeGenerator implements Generator {
                 //
                 // Store the value contained in the variable 'src' into
                 // the memory cell having the address stored in ptr
-
-                // Generated risc
-                // sw
-
-                // throw new RuntimeException("Not yet implemented ! STORE_TO_ADDRESS");
 
                 ValueASTNode child0 = (ValueASTNode) astNode.children.get(0);
                 ValueASTNode child1 = (ValueASTNode) astNode.children.get(1);
@@ -307,14 +314,16 @@ public class RISCVCodeGenerator implements Generator {
                 String addressRegister = "t3";
                 loadLocalVariableIntoTempRegister(addressRegister, ptrVariableName);
 
-                // @formatter:off
                 int offset = 0;
+
+                // @formatter:off
                 stringBuilder.append(indent)
                     .append("sw      ").append(tempRegister).append(", ")
                     .append(offset).append("(").append(addressRegister).append(")")
                     .append("\n");
                 // @formatter:on
 
+                // DEBUG
                 // stringBuilder.append(indent).append("nop").append("\n");
 
                 // System.out.println();
@@ -355,10 +364,11 @@ public class RISCVCodeGenerator implements Generator {
                 int address = riscvStackEntry.address;
 
                 // compute offset from stack_pointer (positive value)
-                int stackPointerOffset = address - stackPointer;
+                // int stackPointerOffset = address - stackPointer;
 
                 // compute offset from frame_pointer (negative value)
-                int framePointerOffset = stackPointer - address;
+                // int framePointerOffset = stackPointer - address - FP_OFFSET;
+                int framePointerOffset =  address - framePointer;
 
                 // store value into variable
 
@@ -418,12 +428,14 @@ public class RISCVCodeGenerator implements Generator {
         RISCVStackEntry spfpStackEntry = spfp.addToStackFrame(stackFrame);
 
         // 1. for each local variable declaration used in this function,
-        // reserve space on the stack
+        // insert it into the data structure first
         for (ASTNode astNode : functionAstNode.children) {
             @SuppressWarnings("unused")
             RISCVStackEntry stackEntry = astNode.addToStackFrame(stackFrame);
         }
 
+        // 2. for each local variable declaration used in this function,
+        // reserve space on the stack
         int stackSizeUsed = stackFrame.computeAddresses(stackPointer);
 
         stackFrame.stackSizeUsed = stackSizeUsed;
@@ -507,10 +519,27 @@ public class RISCVCodeGenerator implements Generator {
      *
      * @param astNode
      */
-    private void processReturn(ReturnASTNode astNode) {
+    private void processReturn(ReturnASTNode returnASTNode) {
+
+        // check if there is a parameter to the return keyword
+        if (returnASTNode.children.size() > 0) {
+
+            ASTNode astNode = returnASTNode.children.get(0);
+            // System.out.println(astNode);
+
+            if (astNode instanceof ValueASTNode) {
+                loadLocalVariableIntoTempRegister("a0", astNode.value);
+            } else if (astNode instanceof ExpressionASTNode) {
+                loadValueIntoRegister("a0", astNode.value);
+            } else if (astNode instanceof ConstantDeclarationASTNode) {
+                ASTNode temp0 = astNode.children.get(0);
+                loadValueIntoRegister("a0", temp0.value);
+            }
+        }
 
         int stackSizeUsed = stackFrame.stackSizeUsed;
 
+        // comment
         stringBuilder.append(indent).append("# -- stack frame remove --").append("\n");
 
         // ; delete stack frame (inverse operation to create stack frame)
@@ -530,6 +559,7 @@ public class RISCVCodeGenerator implements Generator {
                 .append("addi    sp, sp, ").append(stackSizeUsed)
                 .append("\n");
 
+        // comment
         stringBuilder.append(indent).append("# -- stack frame remove --").append("\n");
 
         // jump to return address
@@ -559,7 +589,7 @@ public class RISCVCodeGenerator implements Generator {
                 if (child0 instanceof ValueASTNode) {
                     loadLocalVariableIntoTempRegister("t0", child0.value);
                 } else if (child0 instanceof ExpressionASTNode) {
-                    loadValueIntoTempRegister("t0", child0.value);
+                    loadValueIntoRegister("t0", child0.value);
                 }
 
                 // @formatter:off
@@ -580,10 +610,10 @@ public class RISCVCodeGenerator implements Generator {
                 if (child0 instanceof ValueASTNode) {
                     loadLocalVariableIntoTempRegister("t0", child0.value);
                 } else if (child0 instanceof ExpressionASTNode) {
-                    loadValueIntoTempRegister("t0", child0.value);
+                    loadValueIntoRegister("t0", child0.value);
                 } else if (child0 instanceof ConstantDeclarationASTNode) {
                     ASTNode temp0 = child0.children.get(0);
-                    loadValueIntoTempRegister("t0", temp0.value);
+                    loadValueIntoRegister("t0", temp0.value);
                 }
 
                 ASTNode child1 = astNode.children.get(1);
@@ -591,10 +621,10 @@ public class RISCVCodeGenerator implements Generator {
                 if (child1 instanceof ValueASTNode) {
                     loadLocalVariableIntoTempRegister("t1", child1.value);
                 } else if (child1 instanceof ExpressionASTNode) {
-                    loadValueIntoTempRegister("t1", child1.value);
+                    loadValueIntoRegister("t1", child1.value);
                 } else if (child1 instanceof ConstantDeclarationASTNode) {
                     ASTNode temp1 = child1.children.get(0);
-                    loadValueIntoTempRegister("t1", temp1.value);
+                    loadValueIntoRegister("t1", temp1.value);
                 }
 
                 // @formatter:off
@@ -615,10 +645,10 @@ public class RISCVCodeGenerator implements Generator {
                 if (child0 instanceof ValueASTNode) {
                     loadLocalVariableIntoTempRegister("t0", child0.value);
                 } else if (child0 instanceof ExpressionASTNode) {
-                    loadValueIntoTempRegister("t0", child0.value);
+                    loadValueIntoRegister("t0", child0.value);
                 } else if (child0 instanceof ConstantDeclarationASTNode) {
                     ASTNode temp0 = child0.children.get(0);
-                    loadValueIntoTempRegister("t0", temp0.value);
+                    loadValueIntoRegister("t0", temp0.value);
                 }
 
                 ASTNode child1 = astNode.children.get(1);
@@ -626,10 +656,10 @@ public class RISCVCodeGenerator implements Generator {
                 if (child1 instanceof ValueASTNode) {
                     loadLocalVariableIntoTempRegister("t1", child1.value);
                 } else if (child1 instanceof ExpressionASTNode) {
-                    loadValueIntoTempRegister("t1", child1.value);
+                    loadValueIntoRegister("t1", child1.value);
                 } else if (child1 instanceof ConstantDeclarationASTNode) {
                     ASTNode temp1 = child1.children.get(0);
-                    loadValueIntoTempRegister("t1", temp1.value);
+                    loadValueIntoRegister("t1", temp1.value);
                 }
 
                 // @formatter:off
@@ -644,7 +674,7 @@ public class RISCVCodeGenerator implements Generator {
             }
                 break;
 
-            case JumpGreaterThanOrEqual: {
+            case JumpIfGreaterThanOrEqual: {
 
                 ASTNode child0 = astNode.children.get(0);
                 ASTNode child1 = astNode.children.get(1);
@@ -652,13 +682,13 @@ public class RISCVCodeGenerator implements Generator {
                 if (child0 instanceof ValueASTNode) {
                     loadLocalVariableIntoTempRegister("t0", child0.value);
                 } else if (child0 instanceof ExpressionASTNode) {
-                    loadValueIntoTempRegister("t0", child0.value);
+                    loadValueIntoRegister("t0", child0.value);
                 }
 
                 if (child1 instanceof ValueASTNode) {
                     loadLocalVariableIntoTempRegister("t1", child1.value);
                 } else if (child1 instanceof ExpressionASTNode) {
-                    loadValueIntoTempRegister("t1", child1.value);
+                    loadValueIntoRegister("t1", child1.value);
                 }
 
                 // @formatter:off
@@ -822,10 +852,11 @@ public class RISCVCodeGenerator implements Generator {
         int address = riscvStackEntry.address;
 
         // compute offset from stack_pointer (positive value)
-        int stackPointerOffset = address - stackPointer;
+        // int stackPointerOffset = address - stackPointer;
 
         // compute offset from frame_pointer (negative value)
-        int framePointerOffset = stackPointer - address;
+        //int framePointerOffset = stackPointer - address - FP_OFFSET;
+        int framePointerOffset =  address - framePointer;
 
         String tempRegister = "t0";
 
@@ -899,11 +930,11 @@ public class RISCVCodeGenerator implements Generator {
                     break;
 
                 case IntegerLiteral:
-                    loadValueIntoTempRegister(tempRegister0, child0.value);
+                    loadValueIntoRegister(tempRegister0, child0.value);
                     break;
 
                 case Constant:
-                    loadValueIntoTempRegister(tempRegister0, unwrapConstant(child0).value);
+                    loadValueIntoRegister(tempRegister0, unwrapConstant(child0).value);
                     break;
 
                 default:
@@ -921,7 +952,7 @@ public class RISCVCodeGenerator implements Generator {
                     loadLocalVariableIntoTempRegister(tempRegister1, child1.value);
                     break;
                 case Constant:
-                    loadValueIntoTempRegister(tempRegister1, unwrapConstant(child1).value);
+                    loadValueIntoRegister(tempRegister1, unwrapConstant(child1).value);
                     break;
                 default:
                     throw new RuntimeException();
@@ -973,10 +1004,11 @@ public class RISCVCodeGenerator implements Generator {
             int address = riscvStackEntry.address;
 
             // compute offset from stack_pointer (positive value)
-            int stackPointerOffset = address - stackPointer;
+            // int stackPointerOffset = address - stackPointer;
 
             // compute offset from frame_pointer (negative value)
-            int framePointerOffset = stackPointer - address;
+            //int framePointerOffset = stackPointer - address - FP_OFFSET;
+            int framePointerOffset =  address - framePointer;
 
             // load word
 
@@ -1073,7 +1105,7 @@ public class RISCVCodeGenerator implements Generator {
             if (actualParameter.name != null) {
                 loadLocalVariableIntoTempRegister(argumentRegisterName, actualParameter.name);
             } else {
-                loadValueIntoTempRegister(argumentRegisterName, "" + actualParameter.intValue);
+                loadValueIntoRegister(argumentRegisterName, "" + actualParameter.intValue);
             }
 
             index++;
@@ -1175,13 +1207,17 @@ public class RISCVCodeGenerator implements Generator {
         stringBuilder.append(indent).append("call    exit").append("\n");
     }
 
-    private String loadValueIntoTempRegister(String register, String value) {
+    private String loadValueIntoRegister(String register, String value) {
+
+        int valueDecimalAsInt = Integer.parseInt(value, 10);
+        String valueAsHexString = ByteArrayUtil.byteToHex(valueDecimalAsInt);
 
         // load
         stringBuilder.append(indent)
                 .append("li      ")
                 .append(register).append(", ")
-                .append(value)
+                // .append(value)
+                .append(valueAsHexString)
                 .append("\n");
 
         return register;

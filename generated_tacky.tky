@@ -1,46 +1,19 @@
 Program("main")
 
-Function("factorial", true, n, [
-    // if statement
-    JumpIfNotEqual(n, Constant(ConstInt(1)), if_label_0)
-        // <start body statements>
+Function("func_void", true, a, [
 
-        return(Constant(ConstInt(1)))
-        // <end body statements>
-    // <if skip label> 
-    Label(if_label_0)
-    exprTemp_0 = Var("exprTemp_0")
-    exprTemp_0 = n - Constant(ConstInt(1))
-    temp = Var("temp")
-    temp = exprTemp_0
+    # -- Function -- printf
+    printf("func_void() a = %d\n",a)
 
-    # -- Function -- factorial
-    tmp.factorial = Var("tmp.factorial")
-    funccall(factorial, false, temp, tmp.factorial)
 
-    factorial_result = Var("factorial_result")
-    factorial_result = tmp.factorial
-    exprTemp_1 = Var("exprTemp_1")
-    exprTemp_1 = n * factorial_result
-    result = Var("result")
-    result = exprTemp_1
-
-    return(result)
+    return(Constant(ConstInt(0)))
 ])
 
 Function("main", true, [
-    num = Var("num")
-    num = Constant(ConstInt(5))
 
-    # -- Function -- factorial
-    tmp.factorial = Var("tmp.factorial")
-    funccall(factorial, false, num, tmp.factorial)
-
-    factorial_result = Var("factorial_result")
-    factorial_result = tmp.factorial
-
-    # -- Function -- printf
-    printf("factorial of %d is %d\n",num,factorial_result)
+    # -- Function -- func_void
+    tmp.func_void = Var("tmp.func_void")
+    funccall(func_void, false, Constant(ConstInt(123)), tmp.func_void)
 
 
     # -- Function -- exit

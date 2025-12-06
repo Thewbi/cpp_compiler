@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import common.ByteArrayUtil;
+
 public class RISCVStackFrame {
 
     public Map<String, RISCVStackEntry> stackEntryMap = new HashMap<String, RISCVStackEntry>();
@@ -34,16 +36,29 @@ public class RISCVStackFrame {
 
         int address = stackPointer;
 
+        // System.out.println("fp: " + ByteArrayUtil.byteToHex(address));
+
+        // subtract -4 because the first stack element is not used?!?!??!!?
+        address = address -4;
+
         for (RISCVStackEntry stackEntry : stackEntryList) {
 
             if (stackEntry.isArray) {
 
+
+                stackEntry.address = address;
+
+                System.out.println(stackEntry.variableName + ":" +  ByteArrayUtil.byteToHex(stackEntry.address) + " (" + (stackEntry.address - stackPointer) + ")");
+
                 address -= (4 * stackEntry.arraySize);
-                stackEntry.address = address + 4;
 
             } else {
 
                 stackEntry.address = address;
+
+                System.out.println(stackEntry.variableName + ":" +  ByteArrayUtil.byteToHex(stackEntry.address) + " (" + (stackEntry.address - stackPointer) + ")");
+
+
                 address -= 4;
 
             }
@@ -51,5 +66,27 @@ public class RISCVStackFrame {
 
         return stackPointer - address;
     }
+
+    // public int computeAddresses(int stackPointer) {
+
+    //     int address = stackPointer;
+
+    //     for (RISCVStackEntry stackEntry : stackEntryList) {
+
+    //         if (stackEntry.isArray) {
+
+    //             address -= (4 * stackEntry.arraySize);
+    //             stackEntry.address = address + 4;
+
+    //         } else {
+
+    //             stackEntry.address = address;
+    //             address -= 4;
+
+    //         }
+    //     }
+
+    //     return stackPointer - address;
+    // }
 
 }

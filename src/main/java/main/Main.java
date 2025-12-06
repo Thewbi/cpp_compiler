@@ -6,8 +6,6 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.Stack;
 
-import javax.management.RuntimeErrorException;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -27,8 +25,6 @@ import com.cpp.grammar.CPreprocessorParser;
 import com.cpp.grammar.CPreprocessorParser.ProgramContext;
 import com.cpp.grammar.PreprocessorLexer;
 import com.cpp.grammar.PreprocessorParser;
-import com.cpp.grammar.CPP14Parser.DeclarationStatementContext;
-import com.cpp.grammar.CPP14Parser.IterationStatementContext;
 import com.cpp.grammar.CPP14Parser.TranslationUnitContext;
 import com.cpp.grammar.PreprocessorParser.Code_fileContext;
 import com.cpp.grammar.RISCVParser.Asm_fileContext;
@@ -71,7 +67,6 @@ import tacky.ast.FunctionDefinitionASTNode;
 import tacky.ast.ProgramASTNode;
 import tacky.generation.riscv.RISCVCodeGenerator;
 import tacky.generation.tacky.TackyGenerator;
-import tacky.generation.x86.X86CodeGenerator;
 import tacky.runtime.DefaultTACKYExecutor;
 import tacky.runtime.TACKYStackFrame;
 import types.FuncDecl;
@@ -81,8 +76,8 @@ import types.FuncDecl;
  */
 public class Main {
 
-    private static final boolean RUN_TACKY_CODE = true;
-    // private static final boolean RUN_TACKY_CODE = false;
+    // private static final boolean RUN_TACKY_CODE = true;
+    private static final boolean RUN_TACKY_CODE = false;
 
     public static void main(String[] args) throws IOException {
 
@@ -665,7 +660,9 @@ public class Main {
         // final String filename = "src/test/resources/examples/matrix_tester_2.cpp";
         // final String filename = "src/test/resources/examples/matrix_tester_3.cpp";
         // final String filename = "src/test/resources/examples/printf.cpp";
-        final String filename = "src/test/resources/examples/factorial.cpp"; // Continue here
+
+        // TODO: return values do not work
+        // final String filename = "src/test/resources/examples/factorial.cpp"; // continue here
 
         // final String filename = "src/test/resources/printf.cpp";
         // final String filename = "src/test/resources/printf_2.cpp";
@@ -677,7 +674,7 @@ public class Main {
 
         // final String filename = "src/test/resources/function_call.cpp";
         // final String filename = "src/test/resources/function_call_2.cpp"; // <--- Language Test 3
-        // final String filename = "src/test/resources/function_call_3.cpp"; // <--- Language Test 4
+        final String filename = "src/test/resources/function_call_3.cpp"; // <--- Language Test 4
         // final String filename = "src/test/resources/function_call_4.cpp"; // <--- test
         // final String filename = "src/test/resources/function_call_5.cpp"; // <--- Language Test 7
         // final String filename = "src/test/resources/function_call_6.cpp"; // <--- THIS HAS TO WORK! this is the full matrix mult!

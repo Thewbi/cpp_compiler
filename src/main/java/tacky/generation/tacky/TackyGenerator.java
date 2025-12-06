@@ -162,9 +162,6 @@ public class TackyGenerator {
 
     private void addVariableToScope(String name, TackyDataType tackyDataType, boolean isArray, boolean isPointer) {
 
-        // if (name.equalsIgnoreCase("matrix")) {
-        // System.out.println("");
-        // }
         TACKYStackFrameVariableDescriptor tackyStackFrameVariableDescriptor = new TACKYStackFrameVariableDescriptor();
         tackyStackFrameVariableDescriptor.name = name;
         tackyStackFrameVariableDescriptor.tackyDataType = tackyDataType;
@@ -909,7 +906,7 @@ public class TackyGenerator {
         // compute the correct address for the index used
         stringBuilder.append(indentString)
             .append(arrayPtrName + ".ptr.tmp").append(" = ")
-            .append(arrayPtrName).append(" + ")
+            .append(arrayPtrName).append(" - ")
             .append(arrayPtrName + ".ptr.tmp.1")
             .append("\n");
 
@@ -985,7 +982,7 @@ public class TackyGenerator {
                 .append(arrayElementIndex).append(" * ").append("sizeof_array_type")
                 .append("\n");
 
-        // advance the pointer forward to the requested fifth element
+        // advance the pointer forward to the requested nth element
         // to point to element #5, move the pointer four times
         // array1d.ptr = array1d.ptr + 4 * sizeof_int
         defineVariable(indent, arrayPtrName + ".ptr.tmp", null);
@@ -1351,7 +1348,7 @@ public class TackyGenerator {
                     String rhs = evaluate((ExpressionASTNode) expressionASTNode.children.get(1)).toString();
 
                     stringBuilder.append(indentString);
-                    stringBuilder.append("JumpGreaterThanOrEqual").append("(")
+                    stringBuilder.append("JumpIfGreaterThanOrEqual").append("(")
                             .append(lhs).append(", ")
                             .append(rhs).append(", ")
                             .append(breakLabelName).append(")").append("\n");
@@ -1444,12 +1441,6 @@ public class TackyGenerator {
         // }
 
         if (isArray) {
-
-            // if (indentString == "") {
-            // System.out.println("temp");
-            // }
-
-            // stringBuilder.append("zzz" + indentString);
 
             // array1d = Var("array1d", Array(int, 5));
             stringBuilder.append(name + " = Var(\"" + name + "\", Array(" + TackyDataType.toString(tackyDataType) + ", "

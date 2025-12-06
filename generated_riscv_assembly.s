@@ -6,98 +6,46 @@ puts:
         li      a7, 92   # ecall for puts
         ecall
         jr      ra
-factorial:
+func_void:
         # -- stack frame create --
-        addi    sp, sp, -32
-        sw      ra, 28(sp)
-        sw      s0, 24(sp)
-        addi    s0, sp, 32
+        addi    sp, sp, -12
+        sw      ra, 8(sp)
+        sw      s0, 4(sp)
+        addi    s0, sp, 12
         # -- stack frame create --
-        mv      t0, a0
-        li      t1, 1
-        bne     t0, t1, if_label_0
+        mv      t6, a0
+        lui     t0, %hi(.SLL0)
+        addi    a0, t0, %lo(.SLL0)
+        call    puts
+        mv      a0, t6
+        li      a0, 0x00
         # -- stack frame remove --
-        lw      ra, 28(sp)
-        lw      s0, 24(sp)
-        addi    sp, sp, 32
-        # -- stack frame remove --
-        # <processReturn()>
-        ret
-if_label_0:
-        mv      t0, a0
-        li      t1, 1
-        sub     t0, t0, t1
-        # variable 'exprTemp_0'
-        mv      t0, t0
-        sw      t0, -24(fp)
-        lw      t0, -24(fp)
-        # variable 'temp'
-        mv      t0, t0
-        sw      t0, -20(fp)
-        # factorial() -> factorial()
-        # ++ push parameter
-        addi    sp, sp, -4
-        sw      a0, 0(sp)
-        # ++ push parameter
-        # load argument register a0 with parameter 'temp'
-        lw      a0, -20(fp)
-        call    factorial
-        # -- pop parameter
-        lw      a0, 0(sp)
-        addi    sp, sp, 4
-        # -- pop parameter
-        lw      t0, -16(fp)
-        # variable 'factorial_result'
-        mv      t0, t0
-        sw      t0, -12(fp)
-        mv      t0, a0
-        lw      t1, -12(fp)
-        mul     t0, t0, t1
-        # variable 'exprTemp_1'
-        mv      t0, t0
-        sw      t0, -8(fp)
-        lw      t0, -8(fp)
-        # variable 'result'
-        mv      t0, t0
-        sw      t0, -4(fp)
-        # -- stack frame remove --
-        lw      ra, 28(sp)
-        lw      s0, 24(sp)
-        addi    sp, sp, 32
+        lw      ra, 8(sp)
+        lw      s0, 4(sp)
+        addi    sp, sp, 12
         # -- stack frame remove --
         # <processReturn()>
         ret
 main:
 _start:
         # -- stack frame create --
-        addi    sp, sp, -20
-        sw      ra, 16(sp)
-        sw      s0, 12(sp)
-        addi    s0, sp, 20
+        addi    sp, sp, -16
+        sw      ra, 12(sp)
+        sw      s0, 8(sp)
+        addi    s0, sp, 16
         # -- stack frame create --
-        # variable 'num'
-        li      t0, 5
-        sw      t0, -12(fp)
-        # main() -> factorial()
-        # load argument register a0 with parameter 'num'
-        lw      a0, -12(fp)
-        call    factorial
-        lw      t0, -8(fp)
-        # variable 'factorial_result'
-        mv      t0, t0
-        sw      t0, -4(fp)
-        mv      t6, a0
-        lui     t0, %hi(.SLL0)
-        addi    a0, t0, %lo(.SLL0)
-        call    puts
-        mv      a0, t6
+        # main() -> func_void()
+        # load argument register a0 with parameter '123'
+        li      a0, 0x7B
+        call    func_void
         call    exit
+        li      a0, 0x00
         # -- stack frame remove --
-        lw      ra, 16(sp)
-        lw      s0, 12(sp)
-        addi    sp, sp, 20
+        lw      ra, 12(sp)
+        lw      s0, 8(sp)
+        addi    sp, sp, 16
         # -- stack frame remove --
         # <processReturn()>
         ret
 .SLL0: 
-        .string "factorial of %d is %d\n"
+        .string "func_void() a = %d\n"
