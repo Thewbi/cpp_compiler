@@ -406,10 +406,15 @@ public class SimpleCPP14ParserBaseListener extends CPP14ParserBaseListener {
         if (ctx.children.size() == 1) {
             return;
         }
+        // if (ctx.children.size() == 3) {
+        //     // empty parameter list in function
+        //     return;
+        // }
 
         // System.out.println("[" + ctx.hashCode() + "] " + ctx.getText());
 
         if (ctx.children.size() == 2) {
+
             if (ctx.children.get(1).getText().equalsIgnoreCase("++")) {
 
                 PostFixExpressionASTNode postFixExpressionASTNode = new PostFixExpressionASTNode();
@@ -421,6 +426,7 @@ public class SimpleCPP14ParserBaseListener extends CPP14ParserBaseListener {
 
                 return;
             }
+
         } else if (ctx.children.size() == 4) {
 
             String startSymbol = ctx.children.get(1).getText();
@@ -466,7 +472,9 @@ public class SimpleCPP14ParserBaseListener extends CPP14ParserBaseListener {
             }
 
         } else {
+
             throw new RuntimeException();
+
         }
     }
 
