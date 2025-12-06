@@ -140,7 +140,7 @@ public class StructureTACKYParserListener extends TACKYParserBaseListener {
 
         String variableSymbolName = ctx.getChild(0).getText();
         variableDeclarationASTNode.variableSymbolName = variableSymbolName;
-        
+
         String variableName = StringUtil.unwrap(ctx.getChild(4).getText());
         variableDeclarationASTNode.variableName = variableName;
 
@@ -295,7 +295,7 @@ public class StructureTACKYParserListener extends TACKYParserBaseListener {
                 break;
 
             default:
-                System.out.println("test");
+                // System.out.println("test");
                 break;
 
         }
@@ -544,6 +544,7 @@ public class StructureTACKYParserListener extends TACKYParserBaseListener {
 
         JumpASTNode jumpASTNode = tackyASTNodeFactory.createJumpASTNode();
         jumpASTNode.jumpType = JumpType.fromString(ctx.getChild(0).getText());
+
         // this is the label to jump to
         jumpASTNode.value = ctx.getChild(4).getText();
 
@@ -561,11 +562,11 @@ public class StructureTACKYParserListener extends TACKYParserBaseListener {
     }
 
     @Override
-    public void enterJump_greater_than_or_equal(TACKYParser.Jump_greater_than_or_equalContext ctx) {
+    public void enterJump_if_equal(TACKYParser.Jump_if_equalContext ctx) {
 
         JumpASTNode jumpASTNode = tackyASTNodeFactory.createJumpASTNode();
         jumpASTNode.jumpType = JumpType.fromString(ctx.getChild(0).getText());
-        
+
         // this is the label to jump to
         jumpASTNode.value = ctx.getChild(6).getText();
 
@@ -577,7 +578,49 @@ public class StructureTACKYParserListener extends TACKYParserBaseListener {
     }
 
     @Override
-    public void exitJump_greater_than_or_equal(TACKYParser.Jump_greater_than_or_equalContext ctx) {
+    public void exitJump_if_equal(TACKYParser.Jump_if_equalContext ctx) {
+        ascend();
+    }
+
+    @Override
+    public void enterJump_if_not_equal(TACKYParser.Jump_if_not_equalContext ctx) {
+
+        JumpASTNode jumpASTNode = tackyASTNodeFactory.createJumpASTNode();
+        jumpASTNode.jumpType = JumpType.fromString(ctx.getChild(0).getText());
+
+        // this is the label to jump to
+        jumpASTNode.value = ctx.getChild(6).getText();
+
+        // connect parent and child
+        connectToParent(currentNode, jumpASTNode);
+
+        // descend
+        descend(jumpASTNode);
+    }
+
+    @Override
+    public void exitJump_if_not_equal(TACKYParser.Jump_if_not_equalContext ctx) {
+        ascend();
+    }
+
+    @Override
+    public void enterJump_if_greater_than_or_equal(TACKYParser.Jump_if_greater_than_or_equalContext ctx) {
+
+        JumpASTNode jumpASTNode = tackyASTNodeFactory.createJumpASTNode();
+        jumpASTNode.jumpType = JumpType.fromString(ctx.getChild(0).getText());
+
+        // this is the label to jump to
+        jumpASTNode.value = ctx.getChild(6).getText();
+
+        // connect parent and child
+        connectToParent(currentNode, jumpASTNode);
+
+        // descend
+        descend(jumpASTNode);
+    }
+
+    @Override
+    public void exitJump_if_greater_than_or_equal(TACKYParser.Jump_if_greater_than_or_equalContext ctx) {
         ascend();
     }
 
@@ -697,7 +740,7 @@ public class StructureTACKYParserListener extends TACKYParserBaseListener {
 
     /**
      * connect parent and child
-     * 
+     *
      * @param parent
      * @param child
      */

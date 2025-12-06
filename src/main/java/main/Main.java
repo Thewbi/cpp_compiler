@@ -368,6 +368,7 @@ public class Main {
 
         // final String filename = "src/test/resources/examples/matrix_test.cpp";
         // final String filename = "src/test/resources/examples/matrix_tester.cpp";
+        // final String filename = "src/test/resources/examples/factorial.cpp";
 
         // preprocessed with preprocessor 2
         // final String filename = "src/test/resources/examples/matrix_tester.cpp.out";
@@ -376,7 +377,8 @@ public class Main {
         // "src/test/resources/examples/matrix_pretty_print.cpp";
         // final String filename = "src/test/resources/array_example.c";
 
-        final String filename = "src/test/resources/preprocessor/preprocessed.pp";
+        //final String filename = "src/test/resources/preprocessor/preprocessed.pp";
+        final String filename = "preprocessed.cpp";
 
         final CharStream charStream = CharStreams
                 .fromFileName(filename);
@@ -663,6 +665,7 @@ public class Main {
         // final String filename = "src/test/resources/examples/matrix_tester_2.cpp";
         // final String filename = "src/test/resources/examples/matrix_tester_3.cpp";
         // final String filename = "src/test/resources/examples/printf.cpp";
+        final String filename = "src/test/resources/examples/factorial.cpp"; // Continue here
 
         // final String filename = "src/test/resources/printf.cpp";
         // final String filename = "src/test/resources/printf_2.cpp";
@@ -689,7 +692,7 @@ public class Main {
 
         // final String filename = "src/test/resources/char_test.cpp";
 
-        final String filename = "src/test/resources/if_2.cpp"; // <-- work here
+        // final String filename = "src/test/resources/if_2.cpp";
 
         ASTNode dummyASTNode = new ASTNode();
         dummyASTNode.value = "__DUMMY___11223344__";
@@ -703,8 +706,6 @@ public class Main {
         defaultFileStackFrameCallback.defineKeyMap = defineKeyMap;
         defaultFileStackFrameCallback.dummyASTNode = dummyASTNode;
 
-        // ExprTreeFileStackFrame fileStackFrame = new ExprTreeFileStackFrame();
-        // DefaultFileStackFrame fileStackFrame = new DefaultFileStackFrame();
         SimpleFileStackFrame fileStackFrame = new SimpleFileStackFrame();
         fileStackFrame.callback = defaultFileStackFrameCallback;
         fileStackFrame.filename = filename;
@@ -727,7 +728,8 @@ public class Main {
         // Files.writeString(Paths.get(filename + ".out"), result);
 
         // write to default temporary file
-        final String outputFilename = "src/test/resources/preprocessor/preprocessed.pp";
+        //final String outputFilename = "src/test/resources/preprocessor/preprocessed.pp";
+        final String outputFilename = "preprocessed.cpp";
         Files.writeString(Paths.get(outputFilename), result);
 
         boolean printMaps = false;

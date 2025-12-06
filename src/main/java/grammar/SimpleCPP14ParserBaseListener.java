@@ -449,12 +449,12 @@ public class SimpleCPP14ParserBaseListener extends CPP14ParserBaseListener {
                 // FunctionCallASTNode functionCallASTNode = new FunctionCallASTNode();
                 functionCallASTNode.value = functionName;
 
-                // DEBUG
-                ParseTree bodyParseTree = ctx.children.get(2);
-                for (int i = 0; i < bodyParseTree.getChildCount(); i++) {
-                    ParseTree child = bodyParseTree.getChild(i);
-                    System.out.println(child);
-                }
+                // // DEBUG
+                // ParseTree bodyParseTree = ctx.children.get(2);
+                // for (int i = 0; i < bodyParseTree.getChildCount(); i++) {
+                //     ParseTree child = bodyParseTree.getChild(i);
+                //     System.out.println(child);
+                // }
 
                 connectToParent(currentNode, functionCallASTNode);
                 descend(functionCallASTNode);
@@ -579,6 +579,33 @@ public class SimpleCPP14ParserBaseListener extends CPP14ParserBaseListener {
         ascend();
     }
 
+    @Override
+    public void enterEqualityExpression(CPP14Parser.EqualityExpressionContext ctx) {
+
+        if (ctx.children.size() == 1) {
+            return;
+        }
+
+        String operatorAsString = ctx.getChild(1).getText();
+
+        ExpressionASTNode exprASTNode = new ExpressionASTNode();
+        exprASTNode.expressionType = ExpressionType.fromString(operatorAsString);
+        exprASTNode.astNodeType = ASTNodeType.EXPRESSION;
+
+        // processExpressionOperator(ctx, ExpressionType.Add);
+
+        connectToParent(currentNode, exprASTNode);
+        descend(exprASTNode);
+    }
+
+    @Override
+    public void exitEqualityExpression(CPP14Parser.EqualityExpressionContext ctx) {
+        if (ctx.children.size() == 1) {
+            return;
+        }
+        ascend();
+    }
+
     // Loops
 
     @Override
@@ -654,7 +681,7 @@ public class SimpleCPP14ParserBaseListener extends CPP14ParserBaseListener {
     @Override
     public void enterSelectionStatement(CPP14Parser.SelectionStatementContext ctx) {
 
-        System.out.println("[" + ctx.hashCode() + "] " + ctx.getText());
+        // System.out.println("[" + ctx.hashCode() + "] " + ctx.getText());
 
         switch (ctx.getStart().getType()) {
 
@@ -662,7 +689,8 @@ public class SimpleCPP14ParserBaseListener extends CPP14ParserBaseListener {
                 SelectionStatementASTNode selectionStatementASTNode = new SelectionStatementASTNode();
                 selectionStatementASTNode.ctx = ctx;
                 selectionStatementASTNode.value = ctx.getText();
-                selectionStatementASTNode.statementType = StatementType.valueOf(ctx.getChild(0).getText().toUpperCase());
+                selectionStatementASTNode.statementType = StatementType
+                        .valueOf(ctx.getChild(0).getText().toUpperCase());
                 selectionStatementASTNode.astNodeType = ASTNodeType.SELECTION_STATEMENT;
 
                 connectToParent(currentNode, selectionStatementASTNode);
@@ -672,7 +700,8 @@ public class SimpleCPP14ParserBaseListener extends CPP14ParserBaseListener {
 
             default:
                 throw new RuntimeException(
-                        "Unknown Selection-Statement Type: " + ctx.getStart().getType() + "! Lookup: CPP14Parser.java!");
+                        "Unknown Selection-Statement Type: " + ctx.getStart().getType()
+                                + "! Lookup: CPP14Parser.java!");
         }
     }
 

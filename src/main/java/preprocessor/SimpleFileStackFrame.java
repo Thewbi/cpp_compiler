@@ -3,7 +3,6 @@ package preprocessor;
 import java.io.IOException;
 import java.util.Map;
 
-import org.antlr.runtime.tree.Tree;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.Token;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -512,15 +511,15 @@ public class SimpleFileStackFrame extends AbstractFileStackFrame {
                     }
 
                     if (
-                        
+
                         currentNode.children.size() == 0
-                        && !temp.equalsIgnoreCase("(") 
+                        && !temp.equalsIgnoreCase("(")
                         && !temp.equalsIgnoreCase(")")
                         ||
                         (token.getType() == Token.EOF)
                         ||
                         temp.equalsIgnoreCase("\n")
-                        
+
                         // && !temp.equalsIgnoreCase("+")
                         // && !temp.equalsIgnoreCase("-")
                         // && !temp.equalsIgnoreCase("*")
@@ -646,7 +645,7 @@ public class SimpleFileStackFrame extends AbstractFileStackFrame {
         if (treeNode == null) {
             return;
         }
-        
+
         if ((treeNode.rhs == null) && (treeNode.lhs == null)) {
 
             if (defineValueMap.containsKey(treeNode.value)) {
@@ -673,11 +672,11 @@ public class SimpleFileStackFrame extends AbstractFileStackFrame {
     }
 
     private void evaluatePreprocessorTreeNodeAsString(TreeNode treeNode, StringBuilder stringBuilder) {
-        
+
         if (treeNode == null) {
             return;
         }
-        
+
         if ((treeNode.rhs == null) && (treeNode.lhs == null)) {
             if (defineValueMap.containsKey(treeNode.value)) {
                 stringBuilder.append(defineValueMap.get(treeNode.value).value);
@@ -695,12 +694,6 @@ public class SimpleFileStackFrame extends AbstractFileStackFrame {
     private void setParserMode(ParserMode parserMode) {
         this.parserMode = parserMode;
     }
-
-    // private void outputRootNode(ASTNode rootNode) {
-    // StringBuilder debugStringBuilder = new StringBuilder();
-    // rootNode.printRecursive(debugStringBuilder, 0);
-    // System.out.println(debugStringBuilder.toString());
-    // }
 
     private void processExpressionNode(String currentTokenAsString) {
 
@@ -738,7 +731,7 @@ public class SimpleFileStackFrame extends AbstractFileStackFrame {
 
         expressionRootNode = insertTokenIntoTree(expressionRootNode, currentTokenAsString, customWeight,
                 isFuncCall);
-        
+
 
         // // DEBUG
         // StringBuilder stringBuilder = new StringBuilder();

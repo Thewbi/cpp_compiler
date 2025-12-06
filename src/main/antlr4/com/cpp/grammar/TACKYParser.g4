@@ -8,32 +8,32 @@ options {
 	tokenVocab = TACKYLexer;
 }
 
-tacky_file : 
+tacky_file :
     ( program top_level+ )
     EOF
     ;
 
-program : 
+program :
     PROGRAM LEFT_PAREN StringLiteral RIGHT_PAREN
     ;
 
-top_level : 
+top_level :
       function_definition
     | static_variable
     | static_constant
     ;
 
 // page 259
-static_variable : 
+static_variable :
     STATICVARIABLE LEFT_PAREN Identifier COMMA ( TRUE | FALSE ) COMMA type COMMA static_init_list RIGHT_PAREN
     ;
 
 // page 442
-static_constant : 
+static_constant :
     STATICCONSTANT LEFT_PAREN ( Identifier | StringLiteral ) COMMA type COMMA static_init RIGHT_PAREN
     ;
 
-type : 
+type :
       INT8 | INT16 | INT32
     | BOOL
     | ASCII
@@ -44,13 +44,13 @@ array_type :
     ARRAY LEFT_PAREN ( type | array_type ) COMMA IntegerLiteral RIGHT_PAREN
     ;
 
-static_init_list : 
+static_init_list :
       static_init static_init_list
     | static_init
     ;
 
 // page 437
-static_init : 
+static_init :
       INTINIT LEFT_PAREN IntegerLiteral RIGHT_PAREN
     | LONGINIT LEFT_PAREN IntegerLiteral RIGHT_PAREN
     | UINTINIT LEFT_PAREN IntegerLiteral RIGHT_PAREN
@@ -71,7 +71,7 @@ static_init :
 
 /*
 // page 438 - I think this is not TACKY but AST!
-identifier_attrs : 
+identifier_attrs :
       FunAttr(bool defined, bool global)
     | StaticAttr(initial_value init, bool global)
     | ConstantAttr(static_init init)
@@ -83,21 +83,21 @@ identifier_attrs :
 //
 // In TACKY, the function definition does not contain a parameter for the return value.
 // Only the function call will contain a parameter for a function return value!
-function_definition : 
+function_definition :
     FUNCTION LEFT_PAREN StringLiteral COMMA ( TRUE | FALSE ) ( param_list )? COMMA LEFT_BRACKET statement_list RIGHT_BRACKET RIGHT_PAREN
     ;
 
-param_list : 
+param_list :
       COMMA Identifier param_list
     | COMMA Identifier
     ;
 
-statement_list : 
+statement_list :
       statement statement_list
     | statement
     ;
 
-statement : 
+statement :
       return_statement
 /* page 309 */
     | sign_extend
@@ -122,7 +122,9 @@ statement :
     | jump
     | jump_if_zero
     | jump_if_not_zero
-    | jump_greater_than_or_equal
+    | jump_if_equal
+    | jump_if_not_equal
+    | jump_if_greater_than_or_equal
     | label
     | var_declaration_statement
     | assignment_statement
@@ -132,43 +134,43 @@ statement :
     | sizeof_call
     ;
 
-sign_extend : 
+sign_extend :
     SIGNEXTEND LEFT_PAREN val COMMA val RIGHT_PAREN
     ;
 
-truncate : 
+truncate :
     TRUNCATE LEFT_PAREN val COMMA val RIGHT_PAREN
     ;
 
-zero_extend : 
+zero_extend :
     ZEROEXTEND LEFT_PAREN val COMMA val RIGHT_PAREN
     ;
 
-double_to_int : 
+double_to_int :
     DOUBLETOINT LEFT_PAREN val COMMA val RIGHT_PAREN
     ;
 
-double_to_uint : 
+double_to_uint :
     DOUBLETOUINT LEFT_PAREN val COMMA val RIGHT_PAREN
     ;
 
-int_to_double : 
+int_to_double :
     INTTODOUBLE LEFT_PAREN val COMMA val RIGHT_PAREN
     ;
 
-uint_to_double : 
+uint_to_double :
     UINTTODOUBLE LEFT_PAREN val COMMA val RIGHT_PAREN
     ;
 
-get_address : 
+get_address :
     GETADDRESS LEFT_PAREN val COMMA val RIGHT_PAREN
     ;
 
-load : 
+load :
     LOAD LEFT_PAREN val COMMA val RIGHT_PAREN
     ;
 
-store : 
+store :
     STORE LEFT_PAREN val COMMA val RIGHT_PAREN
     ;
 
@@ -181,38 +183,38 @@ store :
 // 2nd val - index - The index operand tells us how many elements forward or back to move from the base pointer.
 // 3rd val - scale - The scale operand is the size, in bytes, of each element in the array that ptr points into
 // 4th val - dst - the resulting pointer (out parameter)
-add_ptr : 
+add_ptr :
     ADDPTR LEFT_PAREN val COMMA val COMMA IntegerLiteral COMMA val RIGHT_PAREN
     ;
 
 // Book, page 406
-copy_to_offset : 
+copy_to_offset :
     COPYTOOFFSET val COMMA Identifier COMMA IntegerLiteral RIGHT_PAREN
     ;
 
-copy_from_offset : 
+copy_from_offset :
     COPYFROMOFFSET Identifier COMMA IntegerLiteral COMMA val RIGHT_PAREN
     ;
 
-return_statement : 
+return_statement :
     RETURN LEFT_PAREN ( val )? RIGHT_PAREN
     ;
 
-unary : 
+unary :
     UNARY LEFT_PAREN unary_operator COMMA val COMMA val RIGHT_PAREN
     ;
 
-unary_operator : 
+unary_operator :
       COMPLEMENT
     | NEGATE
     | NOT
     ;
 
-binary : 
+binary :
     BINARY LEFT_PAREN binary_operator COMMA val COMMA val COMMA val RIGHT_PAREN
     ;
 
-binary_operator : 
+binary_operator :
       ADD
     | SUBTRACT
     | MULTIPLY
@@ -226,54 +228,73 @@ binary_operator :
     | GREATEROREQUAL
     ;
 
-copy : 
+copy :
     COPY LEFT_PAREN val COMMA val RIGHT_PAREN
     ;
 
 // Jump is used with Identifier and with StringLiteral
 // page 76, e.g. Jump("there"), page 76, e.g. Jump(end)
-jump : 
+jump :
     JUMP LEFT_PAREN ( Identifier | StringLiteral ) RIGHT_PAREN
     ;
 
 // page 76, e.g. JumpIfZero(v1, false_label)
-jump_if_zero : 
+jump_if_zero :
     JUMPIFZERO LEFT_PAREN val COMMA ( Identifier | StringLiteral ) RIGHT_PAREN
     ;
 
-jump_if_not_zero : 
+jump_if_not_zero :
     JUMPIFNOTZERO LEFT_PAREN val COMMA ( Identifier | StringLiteral ) RIGHT_PAREN
     ;
 
-jump_greater_than_or_equal :
-    JUMPGREATERTHANOREQUAL LEFT_PAREN 
-    ( val | expr ) COMMA          // first parameter
-    ( val | expr ) COMMA          // second parameter 
-    ( Identifier | StringLiteral )          // third parameter 
+jump_if_equal :
+    JUMPIFEQUAL
+    LEFT_PAREN
+    ( val | expr ) COMMA                    // first parameter
+    ( val | expr ) COMMA                    // second parameter
+    ( Identifier | StringLiteral )          // third parameter
+    RIGHT_PAREN
+    ;
+
+jump_if_not_equal :
+    JUMPIFNOTEQUAL
+    LEFT_PAREN
+    ( val | expr ) COMMA                    // first parameter
+    ( val | expr ) COMMA                    // second parameter
+    ( Identifier | StringLiteral )          // third parameter
+    RIGHT_PAREN
+    ;
+
+jump_if_greater_than_or_equal :
+    JUMPIFGREATERTHANOREQUAL
+    LEFT_PAREN
+    ( val | expr ) COMMA                    // first parameter
+    ( val | expr ) COMMA                    // second parameter
+    ( Identifier | StringLiteral )          // third parameter
     RIGHT_PAREN
     ;
 
 // Label is used with Identifier and with StringLiteral
 // page 76, e.g. Label("there"). page 76, e.g. Label(false_label)
-label : 
+label :
     LABEL LEFT_PAREN ( Identifier | StringLiteral ) RIGHT_PAREN
     ;
 
-break : 
+break :
     BREAK
     ;
 
-var_declaration_statement : 
+var_declaration_statement :
     Identifier EQUAL_SIGN VAR LEFT_PAREN ( Identifier | StringLiteral ) RIGHT_PAREN
     |
     Identifier EQUAL_SIGN VAR LEFT_PAREN ( Identifier | StringLiteral ) COMMA ( type | array_type ) RIGHT_PAREN
     ;
 
-assignment_statement : 
+assignment_statement :
     Identifier EQUAL_SIGN expr
     ;
 
-expr : 
+expr :
       expr ( ASTERISK | SLASH ) expr
     | expr ( PLUS | MINUS ) expr
     | expr ( LESS_THAN | LESS_THAN_OR_EQUAL | GREATER_THAN_OR_EQUAL | GREATER_THAN | EQUAL_OPERATOR ) expr
@@ -291,23 +312,23 @@ exprList :
     ;
 
 // page 479
-function_call : 
+function_call :
     FUNCCALL LEFT_PAREN Identifier COMMA ( TRUE | FALSE ) ( COMMA arg_list )? ( COMMA val )? RIGHT_PAREN
     ;
 
-exit_call : 
+exit_call :
     EXIT LEFT_PAREN RIGHT_PAREN
     ;
 
-printf_call : 
+printf_call :
     PRINTF LEFT_PAREN StringLiteral (COMMA exprList)? RIGHT_PAREN
     ;
 
-sizeof_call : 
+sizeof_call :
     SIZEOF LEFT_PAREN type COMMA expr RIGHT_PAREN
     ;
 
-arg_list : 
+arg_list :
       val COMMA arg_list
     | val
     ;
@@ -319,11 +340,11 @@ val :
     | Identifier
     ;
 
-constant_decl : 
+constant_decl :
       CONSTANT LEFT_PAREN const RIGHT_PAREN
     ;
 
-const : 
+const :
       CONSTCHAR LEFT_PAREN CharLiteral RIGHT_PAREN
     | CONSTUCHAR LEFT_PAREN IntegerLiteral RIGHT_PAREN
     | CONSTINT LEFT_PAREN IntegerLiteral RIGHT_PAREN

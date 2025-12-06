@@ -9,6 +9,10 @@ public enum JumpType {
 
     JumpIfNotZero,
 
+    JumpIfEqual,
+
+    JumpIfNotEqual,
+
     JumpGreaterThanOrEqual,
 
     Break,
@@ -23,6 +27,10 @@ public enum JumpType {
             return JumpIfZero;
         } else if (tempData.equalsIgnoreCase("JumpIfNotZero")) {
             return JumpIfNotZero;
+        } else if (tempData.equalsIgnoreCase("JumpIfEqual")) {
+            return JumpIfEqual;
+        } else if (tempData.equalsIgnoreCase("JumpIfNotEqual")) {
+            return JumpIfNotEqual;
         } else if (tempData.equalsIgnoreCase("JumpGreaterThanOrEqual")) {
             return JumpGreaterThanOrEqual;
         } else if (tempData.equalsIgnoreCase("Break")) {

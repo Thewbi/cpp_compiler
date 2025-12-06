@@ -123,13 +123,11 @@ public class RISCVCodeGenerator implements Generator {
             case FUNCTION_DEFINITION: {
                 prototype = (FunctionDefinitionASTNode) astNode;
                 executeFunction((FunctionDefinitionASTNode) astNode);
-
             }
                 break;
 
             case FUNCTION_DECLARATION: {
-                System.out.println(astNode.toString());
-
+                // System.out.println(astNode.toString());
             }
                 break;
 
@@ -537,6 +535,64 @@ public class RISCVCodeGenerator implements Generator {
                 // @formatter:on
             }
                 break;
+
+            case JumpIfEqual: {
+                ASTNode child0 = astNode.children.get(0);
+
+                if (child0 instanceof ValueASTNode) {
+                    loadLocalVariableIntoTempRegister("t0", child0.value);
+                } else if (child0 instanceof ExpressionASTNode) {
+                    loadValueIntoTempRegister("t0", child0.value);
+                }
+
+                ASTNode child1 = astNode.children.get(1);
+
+                if (child1 instanceof ValueASTNode) {
+                    loadLocalVariableIntoTempRegister("t1", child1.value);
+                } else if (child1 instanceof ExpressionASTNode) {
+                    loadValueIntoTempRegister("t1", child1.value);
+                }
+
+                // @formatter:off
+                // this produces code like: beq zero, ... which reads very nicely as "branch equal zero"!
+                stringBuilder.append(indent)
+                    .append("beq     ")
+                    .append("t0").append(", ")
+                    .append("t1").append(", ")
+                    .append(astNode.value)
+                    .append("\n");
+                // @formatter:on
+            }
+            break;
+
+            case JumpIfNotEqual: {
+                ASTNode child0 = astNode.children.get(0);
+
+                if (child0 instanceof ValueASTNode) {
+                    loadLocalVariableIntoTempRegister("t0", child0.value);
+                } else if (child0 instanceof ExpressionASTNode) {
+                    loadValueIntoTempRegister("t0", child0.value);
+                }
+
+                ASTNode child1 = astNode.children.get(1);
+
+                if (child1 instanceof ValueASTNode) {
+                    loadLocalVariableIntoTempRegister("t1", child1.value);
+                } else if (child1 instanceof ExpressionASTNode) {
+                    loadValueIntoTempRegister("t1", child1.value);
+                }
+
+                // @formatter:off
+                // this produces code like: beq zero, ... which reads very nicely as "branch equal zero"!
+                stringBuilder.append(indent)
+                    .append("bne     ")
+                    .append("t0").append(", ")
+                    .append("t1").append(", ")
+                    .append(astNode.value)
+                    .append("\n");
+                // @formatter:on
+            }
+            break;
 
             case JumpGreaterThanOrEqual: {
 

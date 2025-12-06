@@ -1,18 +1,47 @@
 Program("main")
 
-Function("main", true, [
+Function("factorial", true, n, [
     // if statement
-    if_eval_0 = Var("if_eval_0")
-    if_eval_0 = Constant(ConstInt(1))
-    JumpIfZero(if_eval_0, if_label_0)
+    JumpIfNotEqual(n, Constant(ConstInt(1)), if_label_0)
         // <start body statements>
 
-        # -- Function -- printf
-        printf("abcdefghijklmnopqrstuvwxyz\n")
-
+        return(Constant(ConstInt(1)))
         // <end body statements>
     // <if skip label> 
     Label(if_label_0)
+    exprTemp_0 = Var("exprTemp_0")
+    exprTemp_0 = n - Constant(ConstInt(1))
+    temp = Var("temp")
+    temp = exprTemp_0
+
+    # -- Function -- factorial
+    tmp.factorial = Var("tmp.factorial")
+    funccall(factorial, false, temp, tmp.factorial)
+
+    factorial_result = Var("factorial_result")
+    factorial_result = tmp.factorial
+    exprTemp_1 = Var("exprTemp_1")
+    exprTemp_1 = n * factorial_result
+    result = Var("result")
+    result = exprTemp_1
+
+    return(result)
+])
+
+Function("main", true, [
+    num = Var("num")
+    num = Constant(ConstInt(5))
+
+    # -- Function -- factorial
+    tmp.factorial = Var("tmp.factorial")
+    funccall(factorial, false, num, tmp.factorial)
+
+    factorial_result = Var("factorial_result")
+    factorial_result = tmp.factorial
+
+    # -- Function -- printf
+    printf("factorial of %d is %d\n",num,factorial_result)
+
 
     # -- Function -- exit
     exit()

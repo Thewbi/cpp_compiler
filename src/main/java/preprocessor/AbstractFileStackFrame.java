@@ -169,7 +169,6 @@ public abstract class AbstractFileStackFrame implements IFileStackFrame {
             return 1000 - 2;
         }
         else if (operator.equalsIgnoreCase(",")) {
-            //return 1000 - 17;
             return Integer.MAX_VALUE - 200000;
         }
         return Integer.MAX_VALUE - 100000;

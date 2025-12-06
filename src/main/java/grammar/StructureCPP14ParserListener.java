@@ -106,7 +106,7 @@ public class StructureCPP14ParserListener extends CPP14ParserBaseListener {
         FunctionDeclarationASTNode functionDeclarationASTNode = new FunctionDeclarationASTNode();
         functionDeclarationASTNode.returnType = ctx.getChild(0).getText();
         functionDeclarationASTNode.ctx = ctx;
-        
+
         connectToParent(currentNode, functionDeclarationASTNode);
 
         // descend
@@ -846,7 +846,7 @@ public class StructureCPP14ParserListener extends CPP14ParserBaseListener {
         try {
             return expressionStack.pop();
         } catch (EmptyStackException e) {
-            System.out.println("test");
+            // System.out.println("test");
             throw e;
         }
     }

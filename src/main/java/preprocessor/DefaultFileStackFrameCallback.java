@@ -444,9 +444,10 @@ public class DefaultFileStackFrameCallback implements FileStackFrameCallback {
 
     private void outputASTNode(ASTNode astNode, StringBuilder stringBuilder) {
 
-        if (astNode == null) {
-            System.out.println("test");
-        }
+        // DEBUG
+        // if (astNode == null) {
+        //     System.out.println("test");
+        // }
 
         // // DEBUG
         // StringBuilder debugStringBuilder = new StringBuilder();

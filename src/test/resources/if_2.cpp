@@ -2,7 +2,13 @@
 
 int main()
 {
-    if (1) {
+    // if (1) {
+    //     printf("abcdefghijklmnopqrstuvwxyz\n");
+    // }
+
+    int n = 1;
+    if (n == 1) {
+    //if (1 == n) {
         printf("abcdefghijklmnopqrstuvwxyz\n");
     }
 

@@ -286,10 +286,10 @@ public class DefaultFileStackFrame extends AbstractFileStackFrame {
 
             } else if (token.getType() == PreprocessorLexer2.Newline) {
 
-                // DEBUG
-                StringBuilder debugStringBuilder = new StringBuilder();
-                rootNode.printRecursive(debugStringBuilder, 0);
-                System.out.println(debugStringBuilder.toString());
+                // // DEBUG
+                // StringBuilder debugStringBuilder = new StringBuilder();
+                // rootNode.printRecursive(debugStringBuilder, 0);
+                // System.out.println(debugStringBuilder.toString());
 
                 // deal with completely empty lines (the node is still the root node and it has
                 // no children)

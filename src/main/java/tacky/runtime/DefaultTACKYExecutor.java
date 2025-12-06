@@ -119,7 +119,7 @@ public class DefaultTACKYExecutor implements TACKYExecutor {
                     executePrintfBuildInFunction(tackyStackFrame, statement);
                     index++;
                     break;
-                
+
                 case Exit:
                     executeExitBuildInFunction(tackyStackFrame, statement);
                     done = true;
@@ -152,6 +152,14 @@ public class DefaultTACKYExecutor implements TACKYExecutor {
 
                         case JumpIfNotZero:
                             index = jumpIfNotZero(tackyStackFrame, jumpASTNode, index);
+                            break;
+
+                        case JumpIfEqual:
+                            index = jumpIfEqual(tackyStackFrame, jumpASTNode, index);
+                            break;
+
+                        case JumpIfNotEqual:
+                            index = jumpIfNotEqual(tackyStackFrame, jumpASTNode, index);
                             break;
 
                         case JumpGreaterThanOrEqual:
@@ -323,7 +331,7 @@ public class DefaultTACKYExecutor implements TACKYExecutor {
 
     /**
      * To ease development, a built in printf() is provided.
-     * 
+     *
      * @param tackyStackFrame
      * @param statement
      */
@@ -380,7 +388,7 @@ public class DefaultTACKYExecutor implements TACKYExecutor {
             }
 
             counter++;
-            
+
             // if (counter < newLineSplit.length) {
             //     System.out.print(line);
             //     System.out.print("\n");
@@ -453,11 +461,45 @@ public class DefaultTACKYExecutor implements TACKYExecutor {
         return index + 1;
     }
 
-    private int jumpGreaterThanOrEqual(TACKYStackFrame tackyStackFrame, JumpASTNode jumpASTNode, int index) {
-        
+    private int jumpIfEqual(TACKYStackFrame tackyStackFrame, JumpASTNode jumpASTNode, int index) {
+
         ASTNode astNodeLHS = jumpASTNode.getChildren().get(0);
         ASTNode astNodeRHS = jumpASTNode.getChildren().get(1);
-        
+
+        int valueLHS = retrieveValueFromASTNode(tackyStackFrame, astNodeLHS);
+        int valueRHS = retrieveValueFromASTNode(tackyStackFrame, astNodeRHS);
+
+        String targetLabel = jumpASTNode.value;
+
+        if (valueLHS == valueRHS) {
+            return tackyStackFrame.labels.get(targetLabel);
+        }
+
+        return index + 1;
+    }
+
+    private int jumpIfNotEqual(TACKYStackFrame tackyStackFrame, JumpASTNode jumpASTNode, int index) {
+
+        ASTNode astNodeLHS = jumpASTNode.getChildren().get(0);
+        ASTNode astNodeRHS = jumpASTNode.getChildren().get(1);
+
+        int valueLHS = retrieveValueFromASTNode(tackyStackFrame, astNodeLHS);
+        int valueRHS = retrieveValueFromASTNode(tackyStackFrame, astNodeRHS);
+
+        String targetLabel = jumpASTNode.value;
+
+        if (valueLHS != valueRHS) {
+            return tackyStackFrame.labels.get(targetLabel);
+        }
+
+        return index + 1;
+    }
+
+    private int jumpGreaterThanOrEqual(TACKYStackFrame tackyStackFrame, JumpASTNode jumpASTNode, int index) {
+
+        ASTNode astNodeLHS = jumpASTNode.getChildren().get(0);
+        ASTNode astNodeRHS = jumpASTNode.getChildren().get(1);
+
         int valueLHS = retrieveValueFromASTNode(tackyStackFrame, astNodeLHS);
         int valueRHS = retrieveValueFromASTNode(tackyStackFrame, astNodeRHS);
 
@@ -595,7 +637,7 @@ public class DefaultTACKYExecutor implements TACKYExecutor {
 
         ASTNode astNode = constantDeclarationASTNode.getChildren().get(0);
 
-        
+
 
         ConstIntASTNode constIntASTNode = (ConstIntASTNode) astNode;
         return Integer.parseInt(constIntASTNode.value);

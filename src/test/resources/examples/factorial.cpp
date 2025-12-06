@@ -3,9 +3,11 @@
 #include <stdio.h>
 
 int factorial(int n) {
-  
+
+    // printf("factorial\n");
+
     // Base Case:
-    if (n == 1) 
+    if (n == 1)
     {
         return 1;
     }
@@ -14,16 +16,23 @@ int factorial(int n) {
     // of Ns
 
     // return n * factorial(n - 1);
-    int factorial_result = factorial(n - 1);
+    int temp = n - 1;
+    int factorial_result = factorial(temp);
     int result = n * factorial_result;
+
+    // printf("factorial of %d is %d\n", n, result);
+
     return result;
 }
 
 int main() {
-    int num = 5;
-    //printf("Factorial of %d is %d", num, factorial(num));
 
-    factorial(num);
+    // printf("main\n");
+
+    int num = 5;
+    int factorial_result = factorial(num);
+
+    printf("factorial of %d is %d\n", num, factorial_result);
 
     exit();
     return 0;

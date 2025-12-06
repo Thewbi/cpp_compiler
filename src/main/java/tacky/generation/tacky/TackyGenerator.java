@@ -121,7 +121,7 @@ public class TackyGenerator {
                 }
                 break;
 
-            case  RETURN: {
+            case RETURN: {
                 // System.out.println("return");
                 JumpStatementASTNode returnStatementASTNode = (JumpStatementASTNode) astNode;
                 switch (returnStatementASTNode.statementType) {
@@ -136,7 +136,8 @@ public class TackyGenerator {
                 break;
 
             default:
-                // System.out.println("Unknown Tacky-Generator type: \"" + astNode.astNodeType + "\" ");
+                // System.out.println("Unknown Tacky-Generator type: \"" + astNode.astNodeType +
+                // "\" ");
                 enterUnknown(astNode);
                 for (ASTNode child : astNode.children) {
                     process(indent, child);
@@ -190,10 +191,10 @@ public class TackyGenerator {
         stringBuilder.append("\n");
         stringBuilder.append(indentString).append("# -- Function -- ").append(calledFunctionName).append("\n");
 
-
         // -- function return value + actual parameters --
 
-        // String calledFunctionName = astNode.value.substring(0, astNode.value.indexOf("("));
+        // String calledFunctionName = astNode.value.substring(0,
+        // astNode.value.indexOf("("));
 
         // // DEBUG
         // System.out.println("Processing function: \"" + calledFunctionName + "\"");
@@ -225,16 +226,20 @@ public class TackyGenerator {
                 // do nothing, empty parameter list
 
                 // // unwrap parameter decl list ASTNode
-                // ParametersAndQualifiersASTNode parametersAndQualifiersASTNode = (ParametersAndQualifiersASTNode)
+                // ParametersAndQualifiersASTNode parametersAndQualifiersASTNode =
+                // (ParametersAndQualifiersASTNode)
 
-                // //  if the function has any formal parameters prepare code for pointer parameters
+                // // if the function has any formal parameters prepare code for pointer
+                // parameters
                 // if (parametersAndQualifiersASTNode.children.size() > 0) {
-                //     ParameterDeclarationListASTNode parameterDeclarationListASTNode = (ParameterDeclarationListASTNode) parametersAndQualifiersASTNode.children.get(0);
+                // ParameterDeclarationListASTNode parameterDeclarationListASTNode =
+                // (ParameterDeclarationListASTNode)
+                // parametersAndQualifiersASTNode.children.get(0);
 
-                    // // formal parameters
-                    // for (int i = 0; i < parameterDeclarationListASTNode.children.size(); i++) {
+                // // formal parameters
+                // for (int i = 0; i < parameterDeclarationListASTNode.children.size(); i++) {
 
-                    // }
+                // }
 
                 // }
 
@@ -274,7 +279,8 @@ public class TackyGenerator {
 
                                 // CHECK
                                 if (tackyStackFrameVariableDescriptor == null) {
-                                    throw new RuntimeException("Parameter cannot be identified: \"" + param.value + "\"");
+                                    throw new RuntimeException(
+                                            "Parameter cannot be identified: \"" + param.value + "\"");
                                 }
 
                                 // check if the identifier is an array
@@ -326,16 +332,21 @@ public class TackyGenerator {
 
                 // do nothing, empty parameter list
 
-                // ParametersAndQualifiersASTNode parametersAndQualifiersASTNode = (ParametersAndQualifiersASTNode) astNode.children.get(1);
-                // ParameterDeclarationListASTNode parameterDeclarationListASTNode = (ParameterDeclarationListASTNode) parametersAndQualifiersASTNode.children.get(0);
+                // ParametersAndQualifiersASTNode parametersAndQualifiersASTNode =
+                // (ParametersAndQualifiersASTNode) astNode.children.get(1);
+                // ParameterDeclarationListASTNode parameterDeclarationListASTNode =
+                // (ParameterDeclarationListASTNode)
+                // parametersAndQualifiersASTNode.children.get(0);
                 // if the function has any formal parameters prepare code for pointer parameters
-                //if (parametersAndQualifiersASTNode.children.size() > 0) {
+                // if (parametersAndQualifiersASTNode.children.size() > 0) {
 
-                    // ParameterDeclarationListASTNode parameterDeclarationListASTNode = (ParameterDeclarationListASTNode) parametersAndQualifiersASTNode.children.get(0);
-                    // for (int i = 0; i < parameterDeclarationListASTNode.children.size(); i++) {
-                    //     ASTNode param = parameterDeclarationListASTNode.children.get(i);
+                // ParameterDeclarationListASTNode parameterDeclarationListASTNode =
+                // (ParameterDeclarationListASTNode)
+                // parametersAndQualifiersASTNode.children.get(0);
+                // for (int i = 0; i < parameterDeclarationListASTNode.children.size(); i++) {
+                // ASTNode param = parameterDeclarationListASTNode.children.get(i);
 
-                    // }
+                // }
 
                 // }
 
@@ -343,7 +354,7 @@ public class TackyGenerator {
 
                 for (int i = 1; i < astNode.children.size(); i++) {
 
-                     ASTNode param = astNode.children.get(i);
+                    ASTNode param = astNode.children.get(i);
 
                     // System.out.println(param);
 
@@ -353,7 +364,8 @@ public class TackyGenerator {
                         switch (expr.expressionType) {
 
                             case Primary:
-                                //stringBuilder.append(", Constant(ConstInt(").append(param.value).append("))");
+                                // stringBuilder.append(",
+                                // Constant(ConstInt(").append(param.value).append("))");
                                 stringBuilder.append(", ").append(wrapInConstant(param.value));
                                 break;
 
@@ -608,7 +620,7 @@ public class TackyGenerator {
 
                 }
 
-            //} else if (valueASTNode instanceof FunctionCallASTNode) {
+                // } else if (valueASTNode instanceof FunctionCallASTNode) {
             } else if (valueASTNode instanceof DeclaratorASTNode) {
 
                 String returnVariableName = enterFunctionCall(indent, (DeclaratorASTNode) valueASTNode);
@@ -619,8 +631,8 @@ public class TackyGenerator {
                 defineVariable(indent, destinationVarname, null);
 
                 stringBuilder.append(indentString)
-                    .append(destinationVarname).append(" = ").append(returnVariableName)
-                    .append("\n");
+                        .append(destinationVarname).append(" = ").append(returnVariableName)
+                        .append("\n");
 
             } else if (valueASTNode instanceof ExpressionASTNode) {
 
@@ -753,7 +765,8 @@ public class TackyGenerator {
                         break;
 
                     default:
-                        throw new RuntimeException("Unhandeled expressionType: '" + expressionASTNode.expressionType + "'");
+                        throw new RuntimeException(
+                                "Unhandeled expressionType: '" + expressionASTNode.expressionType + "'");
                 }
 
                 String arrayName = child0ASTNode.value;
@@ -813,7 +826,7 @@ public class TackyGenerator {
                 // defineVariable(indent, child0ExpressionASTNode.value, null);
 
                 stringBuilder.append(indentString)
-                .append(child0ExpressionASTNode.value).append(" = ");
+                        .append(child0ExpressionASTNode.value).append(" = ");
                 stringBuilder.append(expr).append("\n");
 
                 // // @formatter:off
@@ -866,8 +879,6 @@ public class TackyGenerator {
 
         stringBuilder.append(indentString).append("// " + arrayElementIndex).append("\n");
 
-
-
         // determine the size of the array element type and store it into a variable for
         // later use
         stringBuilder.append(indentString).append("sizeof_array_type = Var(\"sizeof_array_type\")")
@@ -876,7 +887,6 @@ public class TackyGenerator {
         stringBuilder.append(indentString)
                 .append("sizeof(" + TackyDataType.toString(TackyDataType.INT_32) + ", sizeof_array_type)")
                 .append("\n");
-
 
         // advance the pointer forward to the requested n-th element
         // to point to element #n, move the pointer four times
@@ -913,10 +923,10 @@ public class TackyGenerator {
 
         // tmp.0 = 18
         stringBuilder.append(indentString)
-            .append(arrayPtrName + ".tmp.0").append(" = ")
-            .append(value)
-            // .append(wrapInConstant(value))
-            .append("\n");
+                .append(arrayPtrName + ".tmp.0").append(" = ")
+                .append(value)
+                // .append(wrapInConstant(value))
+                .append("\n");
 
         // write data into the array element
         // Store(tmp.0, array1d.ptr)
@@ -930,16 +940,16 @@ public class TackyGenerator {
     }
 
     private String wrapInConstant(String constant) {
-         return "Constant(ConstInt(" + constant + "))";
+        return "Constant(ConstInt(" + constant + "))";
     }
 
     private void retrieveValueFromArrayElement(int indent, DeclaratorASTNode declaratorASTNode,
             String arrayPtrName, int arrayElementIndex, String destinationVariableName) {
 
         generateArrayAccessIndexer(indent,
-            arrayPtrName,
-            wrapInConstant("" + arrayElementIndex),
-            destinationVariableName);
+                arrayPtrName,
+                wrapInConstant("" + arrayElementIndex),
+                destinationVariableName);
     }
 
     private void retrieveValueFromArrayElementByVariable(int indent, DeclaratorASTNode declaratorASTNode,
@@ -1074,6 +1084,11 @@ public class TackyGenerator {
      */
     private void exitFunctionDeclaration(int indent, ASTNode astNode) {
 
+        stringBuilder.append("])");
+        stringBuilder.append("\n");
+
+        // stringBuilder.append("\n");
+
         stringBuilder.append("\n");
 
         removeScope();
@@ -1094,10 +1109,10 @@ public class TackyGenerator {
 
     private void enterIf(int indent, SelectionStatementASTNode selectionStatementASTNode) {
 
-        // DEBUG
-        StringBuilder debugStringBuilder = new StringBuilder();
-        selectionStatementASTNode.printRecursive(debugStringBuilder, indent);
-        System.out.println(debugStringBuilder.toString());
+        // // DEBUG
+        // StringBuilder debugStringBuilder = new StringBuilder();
+        // selectionStatementASTNode.printRecursive(debugStringBuilder, indent);
+        // System.out.println(debugStringBuilder.toString());
 
         String indentString = buildIndentString(indent);
 
@@ -1108,16 +1123,49 @@ public class TackyGenerator {
         ASTNode child0ASTNode = selectionStatementASTNode.getChildren().get(0);
         ExpressionASTNode child0ExpressionASTNode = (ExpressionASTNode) child0ASTNode;
 
+        // start comment
         stringBuilder.append(indentString).append("// if statement").append("\n");
 
-        String eval = evaluateToString(indent, child0ExpressionASTNode);
-        defineVariable(indent, ifEvalVarName, null);
-        stringBuilder.append(indentString).append(ifEvalVarName).append(" = ").append(eval).append("\n");
+        switch (child0ExpressionASTNode.expressionType) {
 
-        // RISCV jump if not equal to zero
-        // bne x5, x0, not_zero_block
+            case Primary: {
 
-        stringBuilder.append(indentString).append("JumpIfZero(").append(ifEvalVarName).append(", ").append(ifSkipLabelName).append(")").append("\n");
+                String eval0 = evaluateToString(indent, child0ExpressionASTNode);
+
+                defineVariable(indent, ifEvalVarName, null);
+                stringBuilder.append(indentString).append(ifEvalVarName).append(" = ").append(eval0).append("\n");
+
+                // RISCV jump if not equal to zero
+                // bne x5, x0, not_zero_block
+
+                stringBuilder.append(indentString).append("JumpIfZero(")
+                        .append(ifEvalVarName).append(", ")
+                        .append(ifSkipLabelName)
+                        .append(")")
+                        .append("\n");
+            }
+                break;
+
+            case Equality: {
+                // ASTNode child1ASTNode = selectionStatementASTNode.getChildren().get(0);
+                // ExpressionASTNode child1ExpressionASTNode = (ExpressionASTNode) child1ASTNode;
+
+                String evalLHS = evaluateToString(indent, (ExpressionASTNode) child0ExpressionASTNode.children.get(0));
+                String evalRHS = evaluateToString(indent, (ExpressionASTNode) child0ExpressionASTNode.children.get(1));
+
+                // generate the inverse statement since the jump acts as a guard
+                stringBuilder.append(indentString).append("JumpIfNotEqual(")
+                        .append(evalLHS).append(", ")
+                        .append(evalRHS).append(", ")
+                        .append(ifSkipLabelName)
+                        .append(")")
+                        .append("\n");
+            }
+                break;
+
+            default:
+                throw new RuntimeException("e");
+        }
 
         addScope();
 
@@ -1152,12 +1200,12 @@ public class TackyGenerator {
 
         String indentString = buildIndentString(indent);
 
-        ifCounter--;
-        String ifSkipLabelName = "if_label_" + ifCounter;
-
         removeScope();
 
-        // label to jump to in order to skip this if should the condition evaluate to false
+        // label to jump to in order to skip this if should the condition evaluate to
+        // false
+        ifCounter--;
+        String ifSkipLabelName = "if_label_" + ifCounter;
         stringBuilder.append(indentString).append("// <if skip label> ").append("\n");
         stringBuilder.append(indentString).append("Label(" + ifSkipLabelName + ")").append("\n");
     }
@@ -1184,7 +1232,8 @@ public class TackyGenerator {
 
     private void enterReturn(int indent, JumpStatementASTNode returnStatementASTNode) {
         // TODO Auto-generated method stub
-        // throw new UnsupportedOperationException("Unimplemented method 'enterReturn'");
+        // throw new UnsupportedOperationException("Unimplemented method
+        // 'enterReturn'");
 
         stringBuilder.append("\n");
 
@@ -1202,16 +1251,10 @@ public class TackyGenerator {
             stringBuilder.append(returnValue);
         }
         stringBuilder.append(")").append("\n");
-
-        stringBuilder.append("])");
-        stringBuilder.append("\n");
-
-        // stringBuilder.append("\n");
     }
 
     private void exitReturn(int indent, JumpStatementASTNode returnStatementASTNode) {
-        // TODO Auto-generated method stub
-        // throw new UnsupportedOperationException("Unimplemented method 'exitReturn'");
+        // nop
     }
 
     // Unknown
@@ -1295,7 +1338,8 @@ public class TackyGenerator {
             stringBuilder.append(outputExpression(expressionASTNode)).append("\n");
 
             // JumpIfZero(tmp.0, break_label)
-            stringBuilder.append(indentString).append("JumpIfZero(").append(tmp0Name).append(", " + breakLabelName + ")")
+            stringBuilder.append(indentString).append("JumpIfZero(").append(tmp0Name)
+                    .append(", " + breakLabelName + ")")
                     .append("\n");
 
         } else {
@@ -1308,9 +1352,9 @@ public class TackyGenerator {
 
                     stringBuilder.append(indentString);
                     stringBuilder.append("JumpGreaterThanOrEqual").append("(")
-                        .append(lhs).append(", ")
-                        .append(rhs).append(", ")
-                        .append(breakLabelName).append(")").append("\n");
+                            .append(lhs).append(", ")
+                            .append(rhs).append(", ")
+                            .append(breakLabelName).append(")").append("\n");
                 }
                     break;
 
@@ -1396,7 +1440,7 @@ public class TackyGenerator {
 
         // DEBUG
         // if (indentString == "") {
-        //     System.out.println("temp");
+        // System.out.println("temp");
         // }
 
         if (isArray) {
@@ -1479,7 +1523,7 @@ public class TackyGenerator {
             if (NumberUtils.isParsable(expr.value)) {
 
                 return Integer.parseInt(expr.value);
-                //return wrapInConstant(expr.value);
+                // return wrapInConstant(expr.value);
 
             } else {
 
@@ -1566,6 +1610,9 @@ public class TackyGenerator {
             case Div:
                 operator = " / ";
                 break;
+            case Equality:
+                operator = " == ";
+                break;
 
             default:
                 // throw new RuntimeException();
@@ -1587,6 +1634,7 @@ public class TackyGenerator {
             case Subtract:
             case Mul:
             case Div:
+            case Equality:
                 lhs = evaluateToString(indent, (ExpressionASTNode) expressionASTNode.children.get(0));
                 rhs = evaluateToString(indent, (ExpressionASTNode) expressionASTNode.children.get(1));
 
