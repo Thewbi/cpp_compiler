@@ -543,6 +543,9 @@ public class RISCVCodeGenerator implements Generator {
                     loadLocalVariableIntoTempRegister("t0", child0.value);
                 } else if (child0 instanceof ExpressionASTNode) {
                     loadValueIntoTempRegister("t0", child0.value);
+                } else if (child0 instanceof ConstantDeclarationASTNode) {
+                    ASTNode temp0 = child0.children.get(0);
+                    loadValueIntoTempRegister("t0", temp0.value);
                 }
 
                 ASTNode child1 = astNode.children.get(1);
@@ -551,6 +554,9 @@ public class RISCVCodeGenerator implements Generator {
                     loadLocalVariableIntoTempRegister("t1", child1.value);
                 } else if (child1 instanceof ExpressionASTNode) {
                     loadValueIntoTempRegister("t1", child1.value);
+                } else if (child1 instanceof ConstantDeclarationASTNode) {
+                    ASTNode temp1 = child1.children.get(0);
+                    loadValueIntoTempRegister("t1", temp1.value);
                 }
 
                 // @formatter:off
@@ -572,6 +578,9 @@ public class RISCVCodeGenerator implements Generator {
                     loadLocalVariableIntoTempRegister("t0", child0.value);
                 } else if (child0 instanceof ExpressionASTNode) {
                     loadValueIntoTempRegister("t0", child0.value);
+                } else if (child0 instanceof ConstantDeclarationASTNode) {
+                    ASTNode temp0 = child0.children.get(0);
+                    loadValueIntoTempRegister("t0", temp0.value);
                 }
 
                 ASTNode child1 = astNode.children.get(1);
@@ -580,6 +589,9 @@ public class RISCVCodeGenerator implements Generator {
                     loadLocalVariableIntoTempRegister("t1", child1.value);
                 } else if (child1 instanceof ExpressionASTNode) {
                     loadValueIntoTempRegister("t1", child1.value);
+                } else if (child1 instanceof ConstantDeclarationASTNode) {
+                    ASTNode temp1 = child1.children.get(0);
+                    loadValueIntoTempRegister("t1", temp1.value);
                 }
 
                 // @formatter:off

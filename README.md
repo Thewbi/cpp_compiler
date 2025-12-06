@@ -15,6 +15,15 @@ C++ compiler written in Java
 
 ## Language Bugs
 
+### Function Calls are not emitted if the return value is ignored
+
+Store the return value into a local variable. The compiler will then emit a call instruction.
+
+```
+int num = 5;
+int factorial_result = factorial(num);
+```
+
 ### Array Variables need Initializer!
 
 Currently an array variable always has to be initialized:

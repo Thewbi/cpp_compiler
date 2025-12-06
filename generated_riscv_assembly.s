@@ -14,6 +14,7 @@ factorial:
         addi    s0, sp, 32
         # -- stack frame create --
         mv      t0, a0
+        li      t1, 1
         bne     t0, t1, if_label_0
         # -- stack frame remove --
         lw      ra, 28(sp)
