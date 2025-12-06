@@ -280,7 +280,7 @@ int segmentedMatrixMult(int* matrixA, int* matrixB, int* matrixC, int rows, int 
 */
 
 
-/*
+/**/
 int standardMatrixMult(int* matrixA, int* matrixB, int* matrixC, int rows, int columns) {
 
     //int t1 = matrixA[2];
@@ -296,12 +296,10 @@ int standardMatrixMult(int* matrixA, int* matrixB, int* matrixC, int rows, int c
 
     int counter = 0;
 
-
     // over row of matrix B
     for (int i = 0; i < rows; i++) {
 
         // matrixC[i] = i;
-
 
         // over column of matrix A
         for (int j = 0; j < columns; j++) {
@@ -315,8 +313,6 @@ int standardMatrixMult(int* matrixA, int* matrixB, int* matrixC, int rows, int c
             // fuse row and column together into a single cell of matrix C
             for (int k = 0; k < columns; k++) {
 
-
-
                 // int tcounter = counter;
                 // counter = tcounter + 1;
                 // matrixC[1] = counter;
@@ -324,10 +320,6 @@ int standardMatrixMult(int* matrixA, int* matrixB, int* matrixC, int rows, int c
                 // int t1 = matrixA[0];
                 // // printf("test: %d\n", t1);
                 // matrixC[3] = t1;
-
-
-
-
 
                 //matrixC[i * rows + j] += matrixA[i * columns + k] * matrixB[k * columns + j];
 
@@ -371,7 +363,6 @@ int standardMatrixMult(int* matrixA, int* matrixB, int* matrixC, int rows, int c
                 // printf("aVal: %d", aVal);
                 // printf("bVal: %d", bVal);
 
-
                 int abc = matrixC[cIdx];
                 // matrixC[7] = abc;
                 int cde = abc + mult_temp;
@@ -384,18 +375,15 @@ int standardMatrixMult(int* matrixA, int* matrixB, int* matrixC, int rows, int c
 
                 // exit();
 
-
             }
 
-
         }
-
 
     }
 
     return 0;
 }
-*/
+
 
 
 // int printMatrix(int* matrix, int dim) {
@@ -569,7 +557,7 @@ int main()
 
     //int upResult = upCountingMatrix(matrixA, DIMENSION);
     //int upResult = upCountingMatrix(matrixB, DIMENSION);
-    //int upResult = upCountingMatrix(matrixC, DIMENSION);
+    // int upResult = upCountingMatrix(matrixC, DIMENSION);
 
 //    printf("A\n");
 //    int pp1 = prettyPrintFormatMatrix(matrixA, DIMENSION);
@@ -587,7 +575,7 @@ int main()
 
     // int pp2 = zeroMatrix(matrixC, DIMENSION);
 
-//    int pp3 = standardMatrixMult(matrixA, matrixB, matrixC, DIMENSION, DIMENSION);
+   int pp3 = standardMatrixMult(matrixA, matrixB, matrixC, DIMENSION, DIMENSION);
 
 //    int result_1 = segmentedMatrixMult(matrixA, matrixB, matrixC, DIMENSION, DIMENSION);
 

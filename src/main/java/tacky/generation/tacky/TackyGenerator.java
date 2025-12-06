@@ -988,7 +988,7 @@ public class TackyGenerator {
         defineVariable(indent, arrayPtrName + ".ptr.tmp", null);
         stringBuilder.append(indentString)
                 .append(arrayPtrName + ".ptr.tmp").append(" = ")
-                .append(arrayPtrName).append(" + ")
+                .append(arrayPtrName).append(" - ")
                 .append(arrayPtrName + ".ptr.tmp.1")
                 .append("\n");
 

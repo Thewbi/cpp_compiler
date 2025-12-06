@@ -674,10 +674,10 @@ public class Main {
 
         // final String filename = "src/test/resources/function_call.cpp";
         // final String filename = "src/test/resources/function_call_2.cpp"; // <--- Language Test 3
-        final String filename = "src/test/resources/function_call_3.cpp"; // <--- Language Test 4
+        // final String filename = "src/test/resources/function_call_3.cpp"; // <--- Language Test 4
         // final String filename = "src/test/resources/function_call_4.cpp"; // <--- test
         // final String filename = "src/test/resources/function_call_5.cpp"; // <--- Language Test 7
-        // final String filename = "src/test/resources/function_call_6.cpp"; // <--- THIS HAS TO WORK! this is the full matrix mult!
+        final String filename = "src/test/resources/function_call_6.cpp"; // <--- THIS HAS TO WORK! this is the full matrix mult!
         // final String filename = "src/test/resources/function_call_7.cpp";
         // final String filename = "src/test/resources/function_call_8.cpp"; // <--- Language Test 5
         // final String filename = "src/test/resources/function_call_9.cpp"; // <--- Language Test 6
