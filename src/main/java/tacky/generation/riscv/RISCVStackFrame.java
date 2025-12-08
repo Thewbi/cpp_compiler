@@ -32,6 +32,25 @@ public class RISCVStackFrame {
         return stackEntry;
     }
 
+    public void removeVariable(String variableName) {
+        stackEntryMap.remove(variableName);
+
+        boolean found = false;
+        RISCVStackEntry foundStackEntry = null;
+        for (RISCVStackEntry stackEntry : stackEntryList) {
+
+            // CASE SENSITIVE !!!
+            if (stackEntry.variableName.equals(variableName)) {
+                found = true;
+                foundStackEntry = stackEntry;
+                break;
+            }
+        }
+        if (found) {
+            stackEntryList.remove(foundStackEntry);
+        }
+    }
+
     public int computeAddresses(int stackPointer) {
 
         int address = stackPointer;
@@ -77,5 +96,7 @@ public class RISCVStackFrame {
 
         return stringBuilder.toString();
     }
+
+
 
 }

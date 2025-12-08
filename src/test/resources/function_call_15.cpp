@@ -203,15 +203,22 @@ int segmentedMatrixMult(int* matrixA, int* matrixB, int* matrixC, int rows, int 
 
             int xPos_b = pc * kc;
             int yPos_b = jc * nc;
-            int sub_matrix_1 = getSubMatrix(subMatrixB, matrixA, DIMENSION, xPos_b, yPos_b, kc, nc);
+            int sub_matrix_1 = getSubMatrix(subMatrixB, matrixB, DIMENSION, xPos_b, yPos_b, kc, nc);
 
             // test 1
             int resultPrettyPrintB = prettyPrintFormatMatrix(subMatrixB, SUB_DIMENSION);
             int separator = 123;
             putint(separator);
 
+            // int sub_matrix_2 = getSubMatrix(subMatrixA, matrixA, DIMENSION, xPos_b, yPos_b, kc, nc);
 
-/*
+            // // test 1
+            // int resultPrettyPrintA = prettyPrintFormatMatrix(subMatrixA, SUB_DIMENSION);
+            // int separator2 = 124;
+            // putint(separator2);
+
+
+/**/
             // for ic = 0 to m-1 step mc
             // Loop 3
             for (int ic = 0; ic < innerSteps; ic++) {
@@ -223,11 +230,12 @@ int segmentedMatrixMult(int* matrixA, int* matrixB, int* matrixC, int rows, int 
 
                 // test 1
                 int resultPrettyPrintA = prettyPrintFormatMatrix(subMatrixA, SUB_DIMENSION);
-                int separator2 = 123;
+                int separator2 = 124;
                 putint(separator2);
 
             }
-                */
+
+
         }
 
     }
@@ -265,11 +273,17 @@ int main()
     //     0, 0, 0, 0,
     //     0, 0, 0, 0
     // };
+    // int matrixC[ELEMENTS] = {
+    //     1, 2, 3, 4,
+    //     5, 6, 7, 8,
+    //     9, 10, 11, 12,
+    //     13, 14, 15, 16
+    // };
     int matrixC[ELEMENTS] = {
-        1, 2, 3, 4,
-        5, 6, 7, 8,
-        9, 10, 11, 12,
-        13, 14, 15, 16
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0
     };
 
     /*

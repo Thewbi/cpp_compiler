@@ -499,10 +499,10 @@ break_label_4:
 segmentedMatrixMult:
         # -- stack frame create --
         print_reg sp
-        addi    sp, sp, -180
-        sw      ra, 176(sp)
-        sw      fp, 172(sp)
-        addi    fp, sp, 180
+        addi    sp, sp, -220
+        sw      ra, 216(sp)
+        sw      fp, 212(sp)
+        addi    fp, sp, 220
         # -- stack frame create --
         # variable 'nc'
         li      t0, 2
@@ -547,7 +547,7 @@ segmentedMatrixMult:
         li      t0, 4
         sw      t0, -64(fp)
         # GetAddress(subMatrixA, subMatrixA.ptr)
-        addi      t0, fp, 0xFFFFFFD0
+        addi    t0, fp, 0xFFFFFFD0
         sw      t0, -68(fp)
         # <sizeof int32>
         li      t0, 4
@@ -641,7 +641,7 @@ segmentedMatrixMult:
         li      t0, 4
         sw      t0, -64(fp)
         # GetAddress(subMatrixB, subMatrixB.ptr)
-        addi      t0, fp, 0xFFFFFFAC
+        addi    t0, fp, 0xFFFFFFAC
         sw      t0, -100(fp)
         # <sizeof int32>
         li      t0, 4
@@ -766,33 +766,33 @@ start_7:
         mv      t0, t0
         sw      t0, -152(fp)
         # GetAddress(subMatrixB, tmp.1.ptr)
-        addi      t0, fp, 0xFFFFFFAC
+        addi    t0, fp, 0xFFFFFFAC
         sw      t0, -160(fp)
         # segmentedMatrixMult() -> getSubMatrix()
-        # ++ push parameter
+        # ++ transfer parameter 'matrixA' to stack
         addi    sp, sp, -4
         sw      a0, 0(sp)
-        # ++ push parameter
-        # ++ push parameter
+        # ++ transfer parameter 'matrixA' to stack
+        # ++ transfer parameter 'matrixB' to stack
         addi    sp, sp, -4
         sw      a1, 0(sp)
-        # ++ push parameter
-        # ++ push parameter
+        # ++ transfer parameter 'matrixB' to stack
+        # ++ transfer parameter 'matrixC' to stack
         addi    sp, sp, -4
         sw      a2, 0(sp)
-        # ++ push parameter
-        # ++ push parameter
+        # ++ transfer parameter 'matrixC' to stack
+        # ++ transfer parameter 'rows' to stack
         addi    sp, sp, -4
         sw      a3, 0(sp)
-        # ++ push parameter
-        # ++ push parameter
+        # ++ transfer parameter 'rows' to stack
+        # ++ transfer parameter 'columns' to stack
         addi    sp, sp, -4
         sw      a4, 0(sp)
-        # ++ push parameter
+        # ++ transfer parameter 'columns' to stack
         # load argument register a0 with parameter 'tmp.1.ptr'
         lw      a0, -160(fp)
-        # load argument register a1 with parameter 'matrixC'
-        mv      a1, a2
+        # load argument register a1 with parameter 'matrixB'
+        lw      a1, -228(fp)
         # load argument register a2 with parameter '4'
         li      a2, 0x04
         # load argument register a3 with parameter 'xPos_b'
@@ -807,54 +807,54 @@ start_7:
         call    getSubMatrix
         print_reg sp
         nop
-        # -- pop parameter
+        # -- remove transferred parameter from stack
         lw      a4, 0(sp)
         addi    sp, sp, 4
-        # -- pop parameter
-        # -- pop parameter
+        # -- remove transferred parameter from stack
+        # -- remove transferred parameter from stack
         lw      a3, 0(sp)
         addi    sp, sp, 4
-        # -- pop parameter
-        # -- pop parameter
+        # -- remove transferred parameter from stack
+        # -- remove transferred parameter from stack
         lw      a2, 0(sp)
         addi    sp, sp, 4
-        # -- pop parameter
-        # -- pop parameter
+        # -- remove transferred parameter from stack
+        # -- remove transferred parameter from stack
         lw      a1, 0(sp)
         addi    sp, sp, 4
-        # -- pop parameter
-        # -- pop parameter
+        # -- remove transferred parameter from stack
+        # -- remove transferred parameter from stack
         lw      a0, 0(sp)
         addi    sp, sp, 4
-        # -- pop parameter
+        # -- remove transferred parameter from stack
         lw      t0, -156(fp)
         # variable 'sub_matrix_1'
         mv      t0, t0
         sw      t0, -164(fp)
         # GetAddress(subMatrixB, tmp.1.ptr)
-        addi      t0, fp, 0xFFFFFFAC
+        addi    t0, fp, 0xFFFFFFAC
         sw      t0, -160(fp)
         # segmentedMatrixMult() -> prettyPrintFormatMatrix()
-        # ++ push parameter
+        # ++ transfer parameter 'matrixA' to stack
         addi    sp, sp, -4
         sw      a0, 0(sp)
-        # ++ push parameter
-        # ++ push parameter
+        # ++ transfer parameter 'matrixA' to stack
+        # ++ transfer parameter 'matrixB' to stack
         addi    sp, sp, -4
         sw      a1, 0(sp)
-        # ++ push parameter
-        # ++ push parameter
+        # ++ transfer parameter 'matrixB' to stack
+        # ++ transfer parameter 'matrixC' to stack
         addi    sp, sp, -4
         sw      a2, 0(sp)
-        # ++ push parameter
-        # ++ push parameter
+        # ++ transfer parameter 'matrixC' to stack
+        # ++ transfer parameter 'rows' to stack
         addi    sp, sp, -4
         sw      a3, 0(sp)
-        # ++ push parameter
-        # ++ push parameter
+        # ++ transfer parameter 'rows' to stack
+        # ++ transfer parameter 'columns' to stack
         addi    sp, sp, -4
         sw      a4, 0(sp)
-        # ++ push parameter
+        # ++ transfer parameter 'columns' to stack
         # load argument register a0 with parameter 'tmp.1.ptr'
         lw      a0, -160(fp)
         # load argument register a1 with parameter '2'
@@ -863,26 +863,26 @@ start_7:
         call    prettyPrintFormatMatrix
         print_reg sp
         nop
-        # -- pop parameter
+        # -- remove transferred parameter from stack
         lw      a4, 0(sp)
         addi    sp, sp, 4
-        # -- pop parameter
-        # -- pop parameter
+        # -- remove transferred parameter from stack
+        # -- remove transferred parameter from stack
         lw      a3, 0(sp)
         addi    sp, sp, 4
-        # -- pop parameter
-        # -- pop parameter
+        # -- remove transferred parameter from stack
+        # -- remove transferred parameter from stack
         lw      a2, 0(sp)
         addi    sp, sp, 4
-        # -- pop parameter
-        # -- pop parameter
+        # -- remove transferred parameter from stack
+        # -- remove transferred parameter from stack
         lw      a1, 0(sp)
         addi    sp, sp, 4
-        # -- pop parameter
-        # -- pop parameter
+        # -- remove transferred parameter from stack
+        # -- remove transferred parameter from stack
         lw      a0, 0(sp)
         addi    sp, sp, 4
-        # -- pop parameter
+        # -- remove transferred parameter from stack
         lw      t0, -168(fp)
         # variable 'resultPrettyPrintB'
         mv      t0, t0
@@ -894,6 +894,175 @@ start_7:
         lw      a0, -176(fp)
         call    putint
         mv      a0, t6
+        # variable 'ic'
+        li      t0, 0
+        sw      t0, -188(fp)
+start_8:
+        lw      t0, -188(fp)
+        lw      t1, -44(fp)
+        ble     t1, t0, break_label_8
+        lw      t0, -188(fp)
+        lw      t1, -36(fp)
+        mul     t0, t0, t1
+        # variable 'exprTemp_22'
+        mv      t0, t0
+        sw      t0, -192(fp)
+        lw      t0, -192(fp)
+        # variable 'xPos_a'
+        mv      t0, t0
+        sw      t0, -196(fp)
+        lw      t0, -136(fp)
+        lw      t1, -24(fp)
+        mul     t0, t0, t1
+        # variable 'exprTemp_23'
+        mv      t0, t0
+        sw      t0, -200(fp)
+        lw      t0, -200(fp)
+        # variable 'yPos_a'
+        mv      t0, t0
+        sw      t0, -204(fp)
+        # GetAddress(subMatrixA, tmp.1.ptr)
+        addi    t0, fp, 0xFFFFFFD0
+        sw      t0, -160(fp)
+        # segmentedMatrixMult() -> getSubMatrix()
+        # ++ transfer parameter 'matrixA' to stack
+        addi    sp, sp, -4
+        sw      a0, 0(sp)
+        # ++ transfer parameter 'matrixA' to stack
+        # ++ transfer parameter 'matrixB' to stack
+        addi    sp, sp, -4
+        sw      a1, 0(sp)
+        # ++ transfer parameter 'matrixB' to stack
+        # ++ transfer parameter 'matrixC' to stack
+        addi    sp, sp, -4
+        sw      a2, 0(sp)
+        # ++ transfer parameter 'matrixC' to stack
+        # ++ transfer parameter 'rows' to stack
+        addi    sp, sp, -4
+        sw      a3, 0(sp)
+        # ++ transfer parameter 'rows' to stack
+        # ++ transfer parameter 'columns' to stack
+        addi    sp, sp, -4
+        sw      a4, 0(sp)
+        # ++ transfer parameter 'columns' to stack
+        # load argument register a0 with parameter 'tmp.1.ptr'
+        lw      a0, -160(fp)
+        # load argument register a1 with parameter 'matrixA'
+        lw      a1, -224(fp)
+        # load argument register a2 with parameter '4'
+        li      a2, 0x04
+        # load argument register a3 with parameter 'xPos_a'
+        lw      a3, -196(fp)
+        # load argument register a4 with parameter 'yPos_a'
+        lw      a4, -204(fp)
+        # load argument register a5 with parameter 'mc'
+        lw      a5, -36(fp)
+        # load argument register a6 with parameter 'kc'
+        lw      a6, -24(fp)
+        print_reg sp
+        call    getSubMatrix
+        print_reg sp
+        nop
+        # -- remove transferred parameter from stack
+        lw      a4, 0(sp)
+        addi    sp, sp, 4
+        # -- remove transferred parameter from stack
+        # -- remove transferred parameter from stack
+        lw      a3, 0(sp)
+        addi    sp, sp, 4
+        # -- remove transferred parameter from stack
+        # -- remove transferred parameter from stack
+        lw      a2, 0(sp)
+        addi    sp, sp, 4
+        # -- remove transferred parameter from stack
+        # -- remove transferred parameter from stack
+        lw      a1, 0(sp)
+        addi    sp, sp, 4
+        # -- remove transferred parameter from stack
+        # -- remove transferred parameter from stack
+        lw      a0, 0(sp)
+        addi    sp, sp, 4
+        # -- remove transferred parameter from stack
+        lw      t0, -156(fp)
+        # variable 'sub_matrix_2'
+        mv      t0, t0
+        sw      t0, -208(fp)
+        # GetAddress(subMatrixA, tmp.1.ptr)
+        addi    t0, fp, 0xFFFFFFD0
+        sw      t0, -160(fp)
+        # segmentedMatrixMult() -> prettyPrintFormatMatrix()
+        # ++ transfer parameter 'matrixA' to stack
+        addi    sp, sp, -4
+        sw      a0, 0(sp)
+        # ++ transfer parameter 'matrixA' to stack
+        # ++ transfer parameter 'matrixB' to stack
+        addi    sp, sp, -4
+        sw      a1, 0(sp)
+        # ++ transfer parameter 'matrixB' to stack
+        # ++ transfer parameter 'matrixC' to stack
+        addi    sp, sp, -4
+        sw      a2, 0(sp)
+        # ++ transfer parameter 'matrixC' to stack
+        # ++ transfer parameter 'rows' to stack
+        addi    sp, sp, -4
+        sw      a3, 0(sp)
+        # ++ transfer parameter 'rows' to stack
+        # ++ transfer parameter 'columns' to stack
+        addi    sp, sp, -4
+        sw      a4, 0(sp)
+        # ++ transfer parameter 'columns' to stack
+        # load argument register a0 with parameter 'tmp.1.ptr'
+        lw      a0, -160(fp)
+        # load argument register a1 with parameter '2'
+        li      a1, 0x02
+        print_reg sp
+        call    prettyPrintFormatMatrix
+        print_reg sp
+        nop
+        # -- remove transferred parameter from stack
+        lw      a4, 0(sp)
+        addi    sp, sp, 4
+        # -- remove transferred parameter from stack
+        # -- remove transferred parameter from stack
+        lw      a3, 0(sp)
+        addi    sp, sp, 4
+        # -- remove transferred parameter from stack
+        # -- remove transferred parameter from stack
+        lw      a2, 0(sp)
+        addi    sp, sp, 4
+        # -- remove transferred parameter from stack
+        # -- remove transferred parameter from stack
+        lw      a1, 0(sp)
+        addi    sp, sp, 4
+        # -- remove transferred parameter from stack
+        # -- remove transferred parameter from stack
+        lw      a0, 0(sp)
+        addi    sp, sp, 4
+        # -- remove transferred parameter from stack
+        lw      t0, -168(fp)
+        # variable 'resultPrettyPrintA'
+        mv      t0, t0
+        sw      t0, -212(fp)
+        # variable 'separator2'
+        li      t0, 124
+        sw      t0, -216(fp)
+        mv      t6, a0
+        lw      a0, -216(fp)
+        call    putint
+        mv      a0, t6
+continue_label_8:
+        lw      t0, -188(fp)
+        li      t1, 0x01
+        add     t0, t0, t1
+        # variable 'tmp.1.8'
+        mv      t0, t0
+        sw      t0, -184(fp)
+        lw      t0, -184(fp)
+        # variable 'ic'
+        mv      t0, t0
+        sw      t0, -188(fp)
+        j       start_8
+break_label_8:
 continue_label_7:
         lw      t0, -136(fp)
         li      t1, 0x01
@@ -922,9 +1091,9 @@ continue_label_6:
 break_label_6:
         li      a0, 0x00
         # -- stack frame remove --
-        lw      ra, 176(sp)
-        lw      s0, 172(sp)
-        addi    sp, sp, 180
+        lw      ra, 216(sp)
+        lw      s0, 212(sp)
+        addi    sp, sp, 220
         print_reg sp
         # -- stack frame remove --
         nop
@@ -943,7 +1112,7 @@ _start:
         li      t0, 4
         sw      t0, -76(fp)
         # GetAddress(matrixA, matrixA.ptr)
-        addi      t0, fp, 0xFFFFFFF4
+        addi    t0, fp, 0xFFFFFFF4
         sw      t0, -80(fp)
         # <sizeof int32>
         li      t0, 4
@@ -1301,7 +1470,7 @@ _start:
         li      t0, 4
         sw      t0, -76(fp)
         # GetAddress(matrixC, matrixC.ptr)
-        addi      t0, fp, 0xFFFFFFA0
+        addi    t0, fp, 0xFFFFFFA0
         sw      t0, -160(fp)
         # <sizeof int32>
         li      t0, 4
@@ -1659,7 +1828,7 @@ _start:
         li      t0, 4
         sw      t0, -76(fp)
         # GetAddress(matrixB, matrixB.ptr)
-        addi      t0, fp, 0xFFFFFF50
+        addi    t0, fp, 0xFFFFFF50
         sw      t0, -240(fp)
         # <sizeof int32>
         li      t0, 4
@@ -2014,13 +2183,13 @@ _start:
         lw      t3, -248(fp)
         sw      t2, 0(t3)
         # GetAddress(matrixA, tmp.1.ptr)
-        addi      t0, fp, 0xFFFFFFF4
+        addi    t0, fp, 0xFFFFFFF4
         sw      t0, -260(fp)
         # GetAddress(matrixB, tmp.2.ptr)
-        addi      t0, fp, 0xFFFFFF50
+        addi    t0, fp, 0xFFFFFF50
         sw      t0, -264(fp)
         # GetAddress(matrixC, tmp.3.ptr)
-        addi      t0, fp, 0xFFFFFFA0
+        addi    t0, fp, 0xFFFFFFA0
         sw      t0, -268(fp)
         # main() -> segmentedMatrixMult()
         # load argument register a0 with parameter 'tmp.1.ptr'

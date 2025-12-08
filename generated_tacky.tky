@@ -419,7 +419,7 @@ Function("segmentedMatrixMult", true, matrixA, matrixB, matrixC, rows, columns, 
             // parameter 1 for function call
             tmp.1.ptr = Var("tmp.1.ptr")
             GetAddress(subMatrixB, tmp.1.ptr)
-            funccall(getSubMatrix, false, tmp.1.ptr, matrixC, Constant(ConstInt(4)), xPos_b, yPos_b, kc, nc, tmp.getSubMatrix)
+            funccall(getSubMatrix, false, tmp.1.ptr, matrixB, Constant(ConstInt(4)), xPos_b, yPos_b, kc, nc, tmp.getSubMatrix)
 
             sub_matrix_1 = Var("sub_matrix_1")
             sub_matrix_1 = tmp.getSubMatrix
@@ -436,6 +436,57 @@ Function("segmentedMatrixMult", true, matrixA, matrixB, matrixC, rows, columns, 
             separator = Var("separator")
             separator = Constant(ConstInt(123))
             putint(separator)
+            //
+            // Loop 8
+            //
+            tmp.0.8 = Var("tmp.0.8")
+            tmp.1.8 = Var("tmp.1.8")
+            // <instructions for init>
+            ic = Var("ic")
+            ic = Constant(ConstInt(0))
+            Label(start_8)
+            // <instructions for condition>
+            JumpIfGreaterThanOrEqual(ic, innerSteps, break_label_8)
+                // <start body statements>
+                exprTemp_22 = Var("exprTemp_22")
+                exprTemp_22 = ic * mc
+                xPos_a = Var("xPos_a")
+                xPos_a = exprTemp_22
+                exprTemp_23 = Var("exprTemp_23")
+                exprTemp_23 = pc * kc
+                yPos_a = Var("yPos_a")
+                yPos_a = exprTemp_23
+
+                # -- Function -- getSubMatrix
+                tmp.getSubMatrix = Var("tmp.getSubMatrix")
+                // parameter 1 for function call
+                tmp.1.ptr = Var("tmp.1.ptr")
+                GetAddress(subMatrixA, tmp.1.ptr)
+                funccall(getSubMatrix, false, tmp.1.ptr, matrixA, Constant(ConstInt(4)), xPos_a, yPos_a, mc, kc, tmp.getSubMatrix)
+
+                sub_matrix_2 = Var("sub_matrix_2")
+                sub_matrix_2 = tmp.getSubMatrix
+
+                # -- Function -- prettyPrintFormatMatrix
+                tmp.prettyPrintFormatMatrix = Var("tmp.prettyPrintFormatMatrix")
+                // parameter 1 for function call
+                tmp.1.ptr = Var("tmp.1.ptr")
+                GetAddress(subMatrixA, tmp.1.ptr)
+                funccall(prettyPrintFormatMatrix, false, tmp.1.ptr, Constant(ConstInt(2)), tmp.prettyPrintFormatMatrix)
+
+                resultPrettyPrintA = Var("resultPrettyPrintA")
+                resultPrettyPrintA = tmp.prettyPrintFormatMatrix
+                separator2 = Var("separator2")
+                separator2 = Constant(ConstInt(124))
+                putint(separator2)
+                // <end body statements>
+            // <continue label> 
+            Label(continue_label_8)
+            // <instructions for post>
+            tmp.1.8 = ic + Constant(ConstInt(1))
+            ic = tmp.1.8
+            Jump(start_8)
+            Label(break_label_8)
             // <end body statements>
         // <continue label> 
         Label(continue_label_7)

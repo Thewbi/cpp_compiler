@@ -179,19 +179,39 @@
          
           for ( int pc = 0 ; pc < columnsSteps ; pc ++ ) {
 
-             
-
-             
-             
               int xPos_b = pc * kc ;
               int yPos_b = jc * nc ;
-              int sub_matrix_1 = getSubMatrix ( subMatrixB , matrixC , 4 , xPos_b , yPos_b , kc , nc ) ;
+              int sub_matrix_1 = getSubMatrix ( subMatrixB , matrixB , 4 , xPos_b , yPos_b , kc , nc ) ;
 
              
               int resultPrettyPrintB = prettyPrintFormatMatrix ( subMatrixB , 2 ) ;
               int separator = 123 ;
               putint ( separator ) ;
 
+             
+
+             
+             
+             
+             
+
+
+
+             
+             
+              for ( int ic = 0 ; ic < innerSteps ; ic ++ ) {
+
+                  int xPos_a = ic * mc ;
+                  int yPos_a = pc * kc ;
+
+                  int sub_matrix_2 = getSubMatrix ( subMatrixA , matrixA , 4 , xPos_a , yPos_a , mc , kc ) ;
+
+                 
+                  int resultPrettyPrintA = prettyPrintFormatMatrix ( subMatrixA , 2 ) ;
+                  int separator2 = 124 ;
+                  putint ( separator2 ) ;
+
+              }
 
 
           }

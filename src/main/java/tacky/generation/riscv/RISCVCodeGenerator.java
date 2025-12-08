@@ -302,7 +302,7 @@ public class RISCVCodeGenerator implements Generator {
 
                 // addi dest, fp, fp_rel
                 stringBuilder.append(indent)
-                    .append("addi      ").append(tempRegister).append(", ")
+                    .append("addi    ").append(tempRegister).append(", ")
                     .append("fp").append(", ")
                     .append(ByteArrayUtil.byteToHex(sourceAddressOffset))
                     .append("\n");
@@ -1118,6 +1118,7 @@ public class RISCVCodeGenerator implements Generator {
         stringBuilder.append(indent).append("mv      a0, t6").append("\n");
     }
 
+    @SuppressWarnings("unused")
     private void processFunctionCall(FunctionDefinitionASTNode callerFunctionCallASTNode,
             FunctionCallASTNode calleeFunctionCallASTNode) {
 
@@ -1129,14 +1130,19 @@ public class RISCVCodeGenerator implements Generator {
         stringBuilder.append(indent).append("# ").append(callerFunctionName + "() -> " + calleeFunctionName + "()")
                 .append("\n");
 
+        // DEBUG
+        if (calleeFunctionName.equalsIgnoreCase("prettyPrintFormatMatrix")) {
+            System.out.println("test");
+        }
+
         // save caller actual parameter registers a0 - a7 since they are caller saved
         // and hence could be overridden by the callee at any time
 
         int formalParmeterCounter = 0;
-        for (@SuppressWarnings("unused")
-        FormalParameter formalParameter : callerFunctionCallASTNode.formalParameters) {
+        for (FormalParameter formalParameter : callerFunctionCallASTNode.formalParameters) {
             String parameterRegister = "a" + formalParmeterCounter;
-            stackPushRegister(parameterRegister);
+            // stackPushRegister(parameterRegister);
+            stackTransferParameterToStack(parameterRegister, formalParameter.getName(), false, 0);
             formalParmeterCounter++;
         }
 
@@ -1153,11 +1159,17 @@ public class RISCVCodeGenerator implements Generator {
                 label = "" + actualParameter.intValue;
             }
 
+            // comment
             stringBuilder.append(indent).append("# load argument register ")
                     .append(argumentRegisterName)
                     .append(" with parameter '")
                     .append(label)
                     .append("'\n");
+
+            // // DEBUG
+            // if (label.equalsIgnoreCase("matrixA")) {
+            //     System.out.println("test");
+            // }
 
             if (actualParameter.name != null) {
                 loadLocalVariableIntoTempRegister(argumentRegisterName, actualParameter.name);
@@ -1182,12 +1194,73 @@ public class RISCVCodeGenerator implements Generator {
         stringBuilder.append(indent).append("nop").append("\n");
 
         // get actual parameters back
-        for (@SuppressWarnings("unused")
-        FormalParameter formalParameter : callerFunctionCallASTNode.formalParameters) {
+        for (FormalParameter formalParameter : callerFunctionCallASTNode.formalParameters) {
             formalParmeterCounter--;
             String parameterRegister = "a" + formalParmeterCounter;
-            stackPopRegister(parameterRegister);
+            // stackPopRegister(parameterRegister);
+            stackRemoveTransferParameterFromStack(parameterRegister, formalParameter.getName());
         }
+    }
+
+    /**
+     * Same as a stackPushRegister() but also creates a stack frame entry.
+     * Moves a actual parameter from a0, a1, ... register onto the stack!
+     *
+     * @param register
+     */
+    private void stackTransferParameterToStack(String register, String variableName, boolean isArray, int arraySize) {
+
+        // comment
+        stringBuilder.append(indent).append("# ++ transfer parameter '").append(variableName).append("' to stack").append("\n");
+
+        // b - byte - 8 bits
+        // h - half word - 16 bits (2 bytes)
+        // w - word - 32 bits (4 bytes)
+        // d - double word - 64 bits (8 bytes)
+
+        int offset = 0;
+
+        // addi sp, sp, -4
+        stringBuilder.append(indent).append("addi    sp, sp, -4").append("\n");
+        // sw <register>, 24(sp)
+        stringBuilder.append(indent)
+                .append("sw      ").append(register).append(", ")
+                .append(offset).append("(sp)").append("\n");
+
+        RISCVStackEntry riscvStackEntry = stackFrame.addVariable(variableName, isArray, arraySize);
+        riscvStackEntry.address = 0; // not required
+        riscvStackEntry.fpRelativeAddress = stackFrame.stackSizeUsed + 4;
+        stackFrame.stackSizeUsed += 4;
+
+        // comment
+        stringBuilder.append(indent).append("# ++ transfer parameter '").append(variableName).append("' to stack").append("\n");
+    }
+
+    /**
+     * Inverse to stackTransferParameterToStack(). Removes the stack frame entry.
+     * Moves stack value back into a0, a1, ... register
+     *
+     * @param register
+     */
+    private void stackRemoveTransferParameterFromStack(String register, String variableName) {
+
+        int offset = 0;
+
+        stackFrame.removeVariable(variableName);
+        stackFrame.stackSizeUsed -= 4;
+
+        // comment
+        stringBuilder.append(indent).append("# -- remove transferred parameter from stack").append("\n");
+
+        // lw <register>, 24(sp)
+        stringBuilder.append(indent)
+                .append("lw      ").append(register).append(", ")
+                .append(offset).append("(sp)").append("\n");
+        // addi sp, sp, 4
+        stringBuilder.append(indent).append("addi    sp, sp, 4").append("\n");
+
+        // comment
+        stringBuilder.append(indent).append("# -- remove transferred parameter from stack").append("\n");
     }
 
     private void stackPushRegister(String register) {
@@ -1263,9 +1336,9 @@ public class RISCVCodeGenerator implements Generator {
                 .append("%lo(").append(literalStringRecord.getLabel()).append(")")
                 .append("\n");
 
-        // stringBuilder.append(indent).append("li      ").append(tempRegister1).append(", ")
-        //     .append(literalStringRecord.getLabel())
-        //     .append("\n");
+        // stringBuilder.append(indent).append("li ").append(tempRegister1).append(", ")
+        // .append(literalStringRecord.getLabel())
+        // .append("\n");
 
         stringBuilder.append(indent).append("print_reg sp").append("\n");
 
