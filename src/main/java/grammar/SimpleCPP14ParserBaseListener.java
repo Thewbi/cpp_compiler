@@ -404,7 +404,7 @@ public class SimpleCPP14ParserBaseListener extends CPP14ParserBaseListener {
     @Override
     public void enterPostfixExpression(CPP14Parser.PostfixExpressionContext ctx) {
 
-        // System.out.println("[" + ctx.hashCode() + "] " + ctx.getText());
+        System.out.println("[" + ctx.hashCode() + "] " + ctx.getText());
 
         if (ctx.children.size() == 1) {
             return;

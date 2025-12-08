@@ -38,15 +38,15 @@ public class RISCVCodeGenerator implements Generator {
 
     // stack frame generation
 
-    private static final int FP_OFFSET = 4;
+    // private static final int FP_OFFSET = 4;
 
     private static final String FRAME_POINTER = "fp";
 
     private static final boolean PRINT_STACK_FRAME_LAYOUT = true;
     // private static final boolean PRINT_STACK_FRAME_LAYOUT = false;
 
-    private int stackPointer = 0x20000;
-    private int framePointer = 0x20000;
+    private int STACK_POINTER_ADDRESS = 0x20000;
+    private int framePointer = STACK_POINTER_ADDRESS;
 
     public RISCVStackFrame stackFrame;
 
@@ -229,7 +229,7 @@ public class RISCVCodeGenerator implements Generator {
                 // compute offset from frame_pointer (negative value)
                 // int framePointerOffset = framePointer - address - FP_OFFSET;
                 // int framePointerOffset = framePointer - address;
-                int framePointerOffset =  address - framePointer;
+                int framePointerOffset = address - framePointer;
 
                 // @formatter:off
                 String tempRegister = "t0";
@@ -272,13 +272,13 @@ public class RISCVCodeGenerator implements Generator {
                 int sourceAddress = sourceRISCVStackEntry.address;
                 int targetAddress = targetRISCVStackEntry.address;
 
-                //int offset = targetAddress - stackPointer;
+                // int offset = targetAddress - stackPointer;
                 // compute offset from stack_pointer (positive value)
                 // int stackPointerOffset = address - stackPointer;
 
                 // compute offset from frame_pointer (negative value)
-                //int framePointerOffset = stackPointer - targetAddress - FP_OFFSET;
-                int framePointerOffset =  targetAddress - framePointer;
+                // int framePointerOffset = stackPointer - targetAddress - FP_OFFSET;
+                int framePointerOffset = targetAddress - framePointer;
 
                 // @formatter:off
 
@@ -386,7 +386,7 @@ public class RISCVCodeGenerator implements Generator {
 
                 // compute offset from frame_pointer (negative value)
                 // int framePointerOffset = stackPointer - address - FP_OFFSET;
-                int framePointerOffset =  address - framePointer;
+                int framePointerOffset = address - framePointer;
 
                 // store value into variable
 
@@ -426,7 +426,6 @@ public class RISCVCodeGenerator implements Generator {
 
         // build StackFrame for this function call
 
-        stackPointer = 0x20000;
         stackFrame = new RISCVStackFrame();
 
         // reserve space on the stack for the 'ra' (return address register)
@@ -460,17 +459,13 @@ public class RISCVCodeGenerator implements Generator {
 
         // 2. for each local variable declaration used in this function,
         // reserve space on the stack
-        int stackSizeUsed = stackFrame.computeAddresses(stackPointer);
+        int stackSizeUsed = stackFrame.computeAddresses(STACK_POINTER_ADDRESS);
 
         stackFrame.stackSizeUsed = stackSizeUsed;
 
         // DEBUG - output the stack frame and it's details
         if (PRINT_STACK_FRAME_LAYOUT) {
-            System.out.println("\n°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°");
-            for (RISCVStackEntry entry : stackFrame.stackEntryList) {
-                System.out.println(entry.toString());
-            }
-            System.out.println("000000000000000000000000000000000000000\n");
+            System.out.println(stackFrame.toString());
         }
 
         // insert function label for the function
@@ -509,16 +504,18 @@ public class RISCVCodeGenerator implements Generator {
                 .append("\n");
 
         // set new s0/fp (frame pointer) to the start of our new
-        // stackframe.
-        // Now offseting (with negative offsets) from new s0/fp grants
-        // access to all elements of the new stack frame
+        // stackframe. Now offseting (with negative offsets) from new
+        // s0/fp grants access to all local variables contained the new stack frame
+        // This means the stragey in the emitted assembler code is to refer to
+        // local variables not via the stack pointer but via the frame pointer.
+        // The frame pointer is used to access the stack frame hence the name.
 
         // addi s0, sp, 32
         stringBuilder.append(indent)
                 .append("addi    fp, sp, ").append(stackSizeUsed)
                 .append("\n");
 
-        stackPointer -= stackSizeUsed;
+        // stackPointer -= stackSizeUsed;
 
         stringBuilder.append(indent).append("# -- stack frame create --").append("\n");
 
@@ -874,20 +871,15 @@ public class RISCVCodeGenerator implements Generator {
                 throw new RuntimeException(expressionASTNode.expressionType.toString() + " " + expressionASTNode.value);
         }
 
-        //
         // Store result of the add operation into the destination (= Assignment)
-        //
 
         RISCVStackEntry riscvStackEntry = stackFrame.stackEntryMap.get(variableName);
 
-        int address = riscvStackEntry.address;
+        // // compute offset from frame_pointer (negative value)
+        // int address = riscvStackEntry.address;
+        // int framePointerOffset = address - framePointer;
 
-        // compute offset from stack_pointer (positive value)
-        // int stackPointerOffset = address - stackPointer;
-
-        // compute offset from frame_pointer (negative value)
-        //int framePointerOffset = stackPointer - address - FP_OFFSET;
-        int framePointerOffset =  address - framePointer;
+        int framePointerOffset = (-1) * riscvStackEntry.fpRelativeAddress;
 
         String tempRegister = "t0";
 
@@ -1032,14 +1024,11 @@ public class RISCVCodeGenerator implements Generator {
             // the variable is local on the stack and not a function parameter.
             // Load it into a register and return the register used.
 
-            int address = riscvStackEntry.address;
+            // // compute offset from frame_pointer (negative value)
+            // int address = riscvStackEntry.address;
+            // int framePointerOffset = address - framePointer;
 
-            // compute offset from stack_pointer (positive value)
-            // int stackPointerOffset = address - stackPointer;
-
-            // compute offset from frame_pointer (negative value)
-            //int framePointerOffset = stackPointer - address - FP_OFFSET;
-            int framePointerOffset =  address - framePointer;
+            int framePointerOffset = (-1) * riscvStackEntry.fpRelativeAddress;
 
             // load word
 
@@ -1106,9 +1095,9 @@ public class RISCVCodeGenerator implements Generator {
         loadLocalVariableIntoTempRegister(tempRegister, astNode.value);
 
         // stringBuilder.append(indent)
-        //     .append("li      ").append(tempRegister).append(", ")
-        //     .append(astNode.value)
-        //     .append("\n");
+        // .append("li ").append(tempRegister).append(", ")
+        // .append(astNode.value)
+        // .append("\n");
 
         // call putint
         stringBuilder.append(indent).append("call    putint").append("\n");

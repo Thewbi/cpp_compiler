@@ -45,8 +45,8 @@ public class RISCVStackFrame {
 
             if (stackEntry.isArray) {
 
-
                 stackEntry.address = address;
+                stackEntry.fpRelativeAddress = stackPointer - address;
 
                 System.out.println(stackEntry.variableName + ":" +  ByteArrayUtil.byteToHex(stackEntry.address) + " (" + (stackEntry.address - stackPointer) + ")");
 
@@ -55,9 +55,9 @@ public class RISCVStackFrame {
             } else {
 
                 stackEntry.address = address;
+                stackEntry.fpRelativeAddress = stackPointer - address;
 
                 System.out.println(stackEntry.variableName + ":" +  ByteArrayUtil.byteToHex(stackEntry.address) + " (" + (stackEntry.address - stackPointer) + ")");
-
 
                 address -= 4;
 
@@ -67,26 +67,15 @@ public class RISCVStackFrame {
         return stackPointer - address;
     }
 
-    // public int computeAddresses(int stackPointer) {
+    public String toString() {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("\n").append("°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°").append("\n");
+        for (RISCVStackEntry entry : stackEntryList) {
+            stringBuilder.append(entry.toString()).append("\n");
+        }
+        stringBuilder.append("000000000000000000000000000000000000000").append("\n");
 
-    //     int address = stackPointer;
-
-    //     for (RISCVStackEntry stackEntry : stackEntryList) {
-
-    //         if (stackEntry.isArray) {
-
-    //             address -= (4 * stackEntry.arraySize);
-    //             stackEntry.address = address + 4;
-
-    //         } else {
-
-    //             stackEntry.address = address;
-    //             address -= 4;
-
-    //         }
-    //     }
-
-    //     return stackPointer - address;
-    // }
+        return stringBuilder.toString();
+    }
 
 }

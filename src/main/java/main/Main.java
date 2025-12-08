@@ -698,7 +698,11 @@ public class Main {
         // final String filename = "src/test/resources/putint.cpp";
         // final String filename = "src/test/resources/putint_2.cpp";
 
-        final String filename = "src/test/resources/stackframe_test.cpp";
+        // final String filename = "src/test/resources/stackframe_test.cpp";
+
+        // final String filename = "src/test/resources/local_variables.cpp";
+        // final String filename = "src/test/resources/local_variables_2.cpp";
+        final String filename = "src/test/resources/local_variables_3.cpp";
 
         ASTNode dummyASTNode = new ASTNode();
         dummyASTNode.value = "__DUMMY___11223344__";
