@@ -260,6 +260,8 @@ public class RISCVCodeGenerator implements Generator {
 
             case GET_ADDRESS: {
 
+                // NEEDS TO USE ABSOLUTE ADDRESSES
+
                 // GetAddress(temp_array, temp_array.ptr)
                 // load address of variable 'temp_array' into variable 'temp_array.ptr'
 
@@ -269,8 +271,8 @@ public class RISCVCodeGenerator implements Generator {
                 RISCVStackEntry sourceRISCVStackEntry = stackFrame.stackEntryMap.get(child0.value);
                 RISCVStackEntry targetRISCVStackEntry = stackFrame.stackEntryMap.get(child1.value);
 
-                int sourceAddress = sourceRISCVStackEntry.address;
-                int targetAddress = targetRISCVStackEntry.address;
+                int sourceAddressOffset = (-1) * sourceRISCVStackEntry.fpRelativeAddress;
+                int targetAddressOffset = (-1) * targetRISCVStackEntry.fpRelativeAddress;
 
                 // int offset = targetAddress - stackPointer;
                 // compute offset from stack_pointer (positive value)
@@ -278,7 +280,8 @@ public class RISCVCodeGenerator implements Generator {
 
                 // compute offset from frame_pointer (negative value)
                 // int framePointerOffset = stackPointer - targetAddress - FP_OFFSET;
-                int framePointerOffset = targetAddress - framePointer;
+                // int framePointerOffset = targetAddress - framePointer;
+                // int framePointerOffset = targetRISCVStackEntry.fpRelativeAddress;
 
                 // @formatter:off
 
@@ -290,17 +293,24 @@ public class RISCVCodeGenerator implements Generator {
 
                 String tempRegister = "t0";
 
-                // li dest, src
+                // // li dest, src
+                // stringBuilder.append(indent)
+                //     .append("li      ").append(tempRegister).append(", ")
+                //     // .append(sourceAddress)
+                //     .append(ByteArrayUtil.byteToHex(sourceAddress))
+                //     .append("\n");
+
+                // addi dest, fp, fp_rel
                 stringBuilder.append(indent)
-                    .append("li      ").append(tempRegister).append(", ")
-                    // .append(sourceAddress)
-                    .append(ByteArrayUtil.byteToHex(sourceAddress))
+                    .append("addi      ").append(tempRegister).append(", ")
+                    .append("fp").append(", ")
+                    .append(ByteArrayUtil.byteToHex(sourceAddressOffset))
                     .append("\n");
 
                 // sw
                 stringBuilder.append(indent)
                     .append("sw      ").append(tempRegister).append(", ")
-                    .append(framePointerOffset).append("(").append(FRAME_POINTER).append(")")
+                    .append(targetAddressOffset).append("(").append(FRAME_POINTER).append(")")
                     .append("\n");
                 // @formatter:on
 
@@ -309,16 +319,18 @@ public class RISCVCodeGenerator implements Generator {
 
             case STORE_TO_ADDRESS: {
 
+                // NEEDS TO USE ABSOLUTE ADDRESSES
+
                 // Store(src, ptr)
                 //
                 // Store the value contained in the variable 'src' into
                 // the memory cell having the address stored in ptr
 
-                ValueASTNode child0 = (ValueASTNode) astNode.children.get(0);
-                ValueASTNode child1 = (ValueASTNode) astNode.children.get(1);
+                ValueASTNode sourceRISCVStackEntry = (ValueASTNode) astNode.children.get(0);
+                ValueASTNode targetRISCVStackEntry = (ValueASTNode) astNode.children.get(1);
 
-                String valueVariableName = child0.value;
-                String ptrVariableName = child1.value;
+                String valueVariableName = sourceRISCVStackEntry.value;
+                String ptrVariableName = targetRISCVStackEntry.value;
 
                 // RISCVStackEntry riscvStackEntry =
                 // stackFrame.stackEntryMap.get(ptrVariableName);
@@ -1235,19 +1247,25 @@ public class RISCVCodeGenerator implements Generator {
 
         // parameter a0 is the format string's address
 
-        String tempRegister1 = "t0";
+        String tempRegister1 = "a0";
         // has to be a0 because this is where the ecall expects to find the string-data
         // to print!
         String tempRegister2 = "a0";
 
         // lui a5, %hi(.LC3)
-        stringBuilder.append(indent).append("lui     ").append(tempRegister1).append(", ").append("%hi(")
-                .append(literalStringRecord.getLabel()).append(")")
+        stringBuilder.append(indent).append("lui     ").append(tempRegister1).append(", ")
+                .append("%hi(").append(literalStringRecord.getLabel()).append(")")
                 .append("\n");
+
         // addi a0, a5, %lo(.LC3)
-        stringBuilder.append(indent).append("addi    ").append(tempRegister2).append(", ").append(tempRegister1)
-                .append(", ").append("%lo(").append(literalStringRecord.getLabel()).append(")")
+        stringBuilder.append(indent).append("addi    ").append(tempRegister2).append(", ")
+                .append(tempRegister1).append(", ")
+                .append("%lo(").append(literalStringRecord.getLabel()).append(")")
                 .append("\n");
+
+        // stringBuilder.append(indent).append("li      ").append(tempRegister1).append(", ")
+        //     .append(literalStringRecord.getLabel())
+        //     .append("\n");
 
         stringBuilder.append(indent).append("print_reg sp").append("\n");
 

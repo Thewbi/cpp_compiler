@@ -2,7 +2,8 @@
 
 int main()
 {
-    putint(100);
+    int tempVal = 100;
+    putint(tempVal);
 
     exit();
     return 0;

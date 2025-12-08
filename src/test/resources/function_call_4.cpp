@@ -1,16 +1,17 @@
 #include "stdio.h"
 
 #define DIMENSION 4
-#define ELEMENTS DIMENSION *DIMENSION
+#define ELEMENTS DIMENSION * DIMENSION
 
 int prettyPrintFormatMatrix(int* matrix, int dim) {
     for (int i = 0; i < dim; i++) {
         for (int j = 0; j < dim; j++) {
 
             int idx = dim * i + j;
-            
+
             int temp = matrix[idx];
-            printf("%d", temp);
+            // printf("%d", temp);
+            putint(temp);
         }
     }
 

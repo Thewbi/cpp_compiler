@@ -9,6 +9,8 @@ void func_void()
 
 int main()
 {
+    int a = 1;
+    putint(a);
     func_void();
 
     exit();

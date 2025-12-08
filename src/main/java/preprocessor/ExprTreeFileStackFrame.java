@@ -523,6 +523,7 @@ public class ExprTreeFileStackFrame extends AbstractFileStackFrame {
 
     }
 
+    @SuppressWarnings("unused")
     private void outputRootNode(ASTNode rootNode) {
         StringBuilder debugStringBuilder = new StringBuilder();
         rootNode.printRecursive(debugStringBuilder, 0);

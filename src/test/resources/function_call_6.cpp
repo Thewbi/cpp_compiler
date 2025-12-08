@@ -23,15 +23,36 @@
 #define SUB_DIMENSION 2
 
 
+int prettyPrintFormatMatrix(int* matrix, int dim) {
+
+    int count = 1;
+
+    for (int i = 0; i < dim; i++) {
+        for (int j = 0; j < dim; j++) {
+
+            // int idx = dim * i + j;
+            int idx_temp = dim * i;
+            int idx = idx_temp + j;
+
+            int temp = matrix[idx];
+
+            putint(temp);
+        }
+    }
+
+    return 0;
+}
+
+
 int test_function(int* matrixDest) {
-    printf("test_function\n");
+    // printf("test_function\n");
     return 0;
 }
 
 /**/
 int matrixAddInto(int* matrixA, int* matrixB, int rows, int columns) {
 
-    printf("matrixAddInto()\n");
+    // printf("matrixAddInto()\n");
 
     for (int i = 0; i < rows; i++) {
         for (int j = 0; j < columns; j++) {
@@ -64,7 +85,7 @@ int matrixAddInto(int* matrixA, int* matrixB, int rows, int columns) {
  */
 int getSubMatrix(int* matrixDest, int* matrixSrc, int dim, int xPos, int yPos, int width, int height) {
 
-    printf("getSubMatrix()\n");
+    // printf("getSubMatrix()\n");
 
     /**/
     // matrixDest[0] = xPos;
@@ -158,7 +179,7 @@ int getSubMatrix(int* matrixDest, int* matrixSrc, int dim, int xPos, int yPos, i
  */
 int setSubMatrix(int* matrix_dest, int* matrix_src, int dim, int xPos, int yPos, int width, int height) {
 
-    printf("setSubMatrix()\n");
+    // printf("setSubMatrix()\n");
 
     for (int i = 0; i < height; i++) {
         for (int j = 0; j < width; j++) {
@@ -186,7 +207,7 @@ int setSubMatrix(int* matrix_dest, int* matrix_src, int dim, int xPos, int yPos,
 /**/
 int standardMatrixMult(int* matrixA, int* matrixB, int* matrixC, int rows, int columns) {
 
-    printf("standardMatrixMult()\n");
+    // printf("standardMatrixMult()\n");
 
     //int t1 = matrixA[2];
     // printf("test: %d\n", t1);
@@ -300,7 +321,7 @@ int segmentedMatrixMult(int* matrixA, int* matrixB, int* matrixC, int rows, int 
     //int result = test_function(matrixA);
 
     /**/
-    printf("segmentedMatrixMult()\n");
+    // printf("segmentedMatrixMult()\n");
 
     int nc = 2; // subset size
     int rowSteps = rows / nc;
@@ -320,10 +341,10 @@ int segmentedMatrixMult(int* matrixA, int* matrixB, int* matrixC, int rows, int 
     // DEBUG
     //int iterationCounter = 0;
 
-    int subMatrixA[4] = { 80, 81, 82, 83 };
-    int subMatrixB[4] = { 70, 71, 72, 73 };
-    // int tempMult[4] = { 0, 0, 0, 0 };
-    int tempAccum[4] = { 60, 61, 62, 63 };
+    // int subMatrixA[4] = { 80, 81, 82, 83 };
+    // int subMatrixB[4] = { 70, 71, 72, 73 };
+    // // int tempMult[4] = { 0, 0, 0, 0 };
+    // int tempAccum[4] = { 60, 61, 62, 63 };
 
     // for jc = 0 to n-1 step nc
     // Loop 1
@@ -335,15 +356,14 @@ int segmentedMatrixMult(int* matrixA, int* matrixB, int* matrixC, int rows, int 
 
             // upCountingMatrix(matrixC, DIMENSION);
 
-
             // int* subMatrixB = subMatrix(matrixB, pc * kc, jc * nc, kc, nc);
             //int subMatrixB[4] = { 0, 0, 0, 0 };
             int xPos_b = pc * kc;
             int yPos_b = jc * nc;
-//            int sub_matrix_1 = getSubMatrix(subMatrixB, matrixB, DIMENSION, xPos_b, yPos_b, kc, nc);
+            int sub_matrix_1 = getSubMatrix(subMatrixB, matrixB, DIMENSION, xPos_b, yPos_b, kc, nc);
 
 
-
+/*
             //prettyPrintFormatMatrix(subMatrixB, 2);
 
             // for ic = 0 to m-1 step mc
@@ -367,7 +387,7 @@ int segmentedMatrixMult(int* matrixA, int* matrixB, int* matrixC, int rows, int 
                 //putint(mc);
                 //putint(kc);
 
-//                int sub_matrix_2 = getSubMatrix(subMatrixA, matrixA, DIMENSION, xPos_a, yPos_a, mc, kc);
+                int sub_matrix_2 = getSubMatrix(subMatrixA, matrixA, DIMENSION, xPos_a, yPos_a, mc, kc);
 
                 // int vvva = subMatrixA[0];
                 // putint(vvva);
@@ -377,7 +397,7 @@ int segmentedMatrixMult(int* matrixA, int* matrixB, int* matrixC, int rows, int 
                 // putint(vvva);
                 // vvva = subMatrixA[3];
                 // putint(vvva);
-/*
+
                 // printf("[\n");
                 // //prettyPrintFormatMatrix(subMatrixA, 2, "%6d");
                 // int aba = prettyPrintFormatMatrix(subMatrixA, 2);
@@ -450,9 +470,9 @@ int segmentedMatrixMult(int* matrixA, int* matrixB, int* matrixC, int rows, int 
                 // printf("-----------------------------\n");
 
                 //break;
-*/
-            }
 
+            }
+*/
             //break;
 
         }
@@ -463,7 +483,7 @@ int segmentedMatrixMult(int* matrixA, int* matrixB, int* matrixC, int rows, int 
 
     //printf("IterationCounter: \t %d\n", iterationCounter);
 
-    printf("segmentedMatrixMult() end\n");
+    // printf("segmentedMatrixMult() end\n");
 
 
     return 0;
@@ -533,7 +553,7 @@ int prettyPrintFormatMatrix(int* matrix, int dim) {
 /**/
 int upCountingMatrix(int* matrix, int dim) {
 
-    printf("upCountingMatrix()\n");
+    // printf("upCountingMatrix()\n");
 
     int count = 1;
     for (int i = 0; i < dim; i++) {
@@ -606,7 +626,7 @@ void multiParamTest(int* matrixA, int* matrixB, int rows, int columns) {
 
 int main()
 {
-    printf("main() 1\n");
+    // printf("main() 1\n");
 
     /*
     9 0 9 4
@@ -614,18 +634,20 @@ int main()
     9 3 8 1
     6 9 7 1
     */
-    // int matrixA[ELEMENTS] = {
-    //     9, 0, 9, 4,
-    //     2, 6, 6, 7,
-    //     9, 3, 8, 1,
-    //     6, 9, 7, 1
-    // };
     int matrixA[ELEMENTS] = {
-        1,2,3,4,
-        5,6,7,8,
-        9,10,11,12,
-        13,14,15,16
+        9, 0, 9, 4,
+        2, 6, 6, 7,
+        9, 3, 8, 1,
+        6, 9, 7, 1
     };
+    // int matrixA[ELEMENTS] = {
+    //     1,2,3,4,
+    //     5,6,7,8,
+    //     9,10,11,12,
+    //     13,14,15,16
+    // };
+
+    // printf("main() 2\n");
 
     // int matrixC[ELEMENTS] = {
     //     254, 255, 255, 255,
@@ -647,82 +669,86 @@ int main()
         0, 0, 0, 0
     };
 
+    // printf("main() 3\n");
+
     /*
     1 2 4 2
     8 6 0 0
     7 6 8 5
     8 4 7 5
     */
-    // int matrixB[ELEMENTS] = {
-    //     1, 2, 4, 2,
-    //     8, 6, 0, 0,
-    //     7, 6, 8, 5,
-    //     8, 4, 7, 5
-    // };
     int matrixB[ELEMENTS] = {
-        1,2,3,4,
-        5,6,7,8,
-        9,10,11,12,
-        13,14,15,16
+        1, 2, 4, 2,
+        8, 6, 0, 0,
+        7, 6, 8, 5,
+        8, 4, 7, 5
     };
+    // int matrixB[ELEMENTS] = {
+    //     1,2,3,4,
+    //     5,6,7,8,
+    //     9,10,11,12,
+    //     13,14,15,16
+    // };
 
-    //int upResult = upCountingMatrix(matrixA, DIMENSION);
-    //int upResult = upCountingMatrix(matrixB, DIMENSION);
-    // int upResult = upCountingMatrix(matrixC, DIMENSION);
+    // printf("main() 4\n");
 
-//    printf("A\n");
-//    int pp1 = prettyPrintFormatMatrix(matrixA, DIMENSION);
+//     //int upResult = upCountingMatrix(matrixA, DIMENSION);
+//     //int upResult = upCountingMatrix(matrixB, DIMENSION);
+//     // int upResult = upCountingMatrix(matrixC, DIMENSION);
 
-//    printf("B\n");
-//    int pp2 = prettyPrintFormatMatrix(matrixB, DIMENSION);
+// //    printf("A\n");
+// //    int pp1 = prettyPrintFormatMatrix(matrixA, DIMENSION);
 
-    //int subMatrixB[4] = { 16, 32, 48, 64 };
-    // int subMatrixB[4] = { 255, 255, 255, 255 };
-    // int getResult = getSubMatrix(subMatrixB, matrixB, DIMENSION, 0, 0, SUB_DIMENSION, SUB_DIMENSION);
-    // int setResult = setSubMatrix(matrixC, subMatrixB, DIMENSION, 0, 0, SUB_DIMENSION, SUB_DIMENSION);
+// //    printf("B\n");
+// //    int pp2 = prettyPrintFormatMatrix(matrixB, DIMENSION);
 
-    // int subMatrixA[4] = { 1, 2, 3, 4 };
-    // int subMatrixB[4] = { 1, 2, 3, 4 };
-    // int getResult = matrixAddInto(subMatrixA, subMatrixB, SUB_DIMENSION, SUB_DIMENSION);
+//     //int subMatrixB[4] = { 16, 32, 48, 64 };
+//     // int subMatrixB[4] = { 255, 255, 255, 255 };
+//     // int getResult = getSubMatrix(subMatrixB, matrixB, DIMENSION, 0, 0, SUB_DIMENSION, SUB_DIMENSION);
+//     // int setResult = setSubMatrix(matrixC, subMatrixB, DIMENSION, 0, 0, SUB_DIMENSION, SUB_DIMENSION);
 
-    // printf("subMatrixB\n");
-    // prettyPrintFormatMatrix(subMatrixB, 2);
+//     // int subMatrixA[4] = { 1, 2, 3, 4 };
+//     // int subMatrixB[4] = { 1, 2, 3, 4 };
+//     // int getResult = matrixAddInto(subMatrixA, subMatrixB, SUB_DIMENSION, SUB_DIMENSION);
 
-    // int pp2 = zeroMatrix(matrixC, DIMENSION);
+//     // printf("subMatrixB\n");
+//     // prettyPrintFormatMatrix(subMatrixB, 2);
+
+//     // int pp2 = zeroMatrix(matrixC, DIMENSION);
 
 //    int pp3 = standardMatrixMult(matrixA, matrixB, matrixC, DIMENSION, DIMENSION);
 
-    printf("main() 2\n");
+    // printf("main() 5\n");
 
     int result_1 = segmentedMatrixMult(matrixA, matrixB, matrixC, DIMENSION, DIMENSION);
 
-    printf("main() 3\n");
+    // printf("main() 6\n");
 
-    //multiParamTest(matrixA, matrixB, matrixC, DIMENSION, DIMENSION);
-    //multiParamTest(matrixA, matrixB, 4, 5);
+//     //multiParamTest(matrixA, matrixB, matrixC, DIMENSION, DIMENSION);
+//     //multiParamTest(matrixA, matrixB, 4, 5);
 
-    // printf("C\n");
-    // int result_2 = prettyPrintFormatMatrix(matrixC, DIMENSION);
+//     // printf("C\n");
+//     // int result_2 = prettyPrintFormatMatrix(matrixC, DIMENSION);
 
-    // Expected result for the two sample matrixes
-    // int[] intArray = new int[] {
-    //     104,    88,   136,    83,
-    //     148,   104,   105,    69,
-    //      97,    88,   107,    63,
-    //     135,   112,    87,    52
-    // };
+//     // Expected result for the two sample matrixes
+//     // int[] intArray = new int[] {
+//     //     104,    88,   136,    83,
+//     //     148,   104,   105,    69,
+//     //      97,    88,   107,    63,
+//     //     135,   112,    87,    52
+//     // };
 
-    // Expected result for two up-counting matrices:
-    // int[] intArray = new int[] {
-    //      90,   100,   110,   120,
-    //     202,   228,   254,   280,
-    //     314,   356,   398,   440,
-    //     426,   484,   542,   600
-    // };
+//     // Expected result for two up-counting matrices:
+//     // int[] intArray = new int[] {
+//     //      90,   100,   110,   120,
+//     //     202,   228,   254,   280,
+//     //     314,   356,   398,   440,
+//     //     426,   484,   542,   600
+//     // };
 
-    // putint(103);
+//     // putint(103);
 
-    printf("main() 4\n");
+//     printf("main() 4\n");
 
     exit();
     return 0;

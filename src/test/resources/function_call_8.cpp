@@ -7,6 +7,9 @@ int func_void(int a, int b)
     int c = a + b;
     //int c = a * b;
 
+    // printf("func_void() c = ");
+    putint(c);
+
     return c;
 }
 
@@ -14,7 +17,8 @@ int main()
 {
     int c = func_void(123, 12);
 
-    printf("func_void() c = %d\n", c);
+    // printf("main() c = ");
+    putint(c);
 
     exit();
     return 0;
