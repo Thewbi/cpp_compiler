@@ -827,7 +827,7 @@ Function("segmentedMatrixMult", true, matrixA, matrixB, matrixC, rows, columns, 
                 // parameter 2 for function call
                 tmp.2.ptr = Var("tmp.2.ptr")
                 GetAddress(tempAccum, tmp.2.ptr)
-                funccall(setSubMatrix, false, matrixC, tmp.2.ptr, Constant(ConstInt(4)), xPos_c, yPos_c, nc, kc, tmp.setSubMatrix)
+                funccall(setSubMatrix, false, matrixC, tmp.2.ptr, Constant(ConstInt(4)), yPos_c, xPos_c, nc, kc, tmp.setSubMatrix)
 
                 a244 = Var("a244")
                 a244 = tmp.setSubMatrix
@@ -859,6 +859,77 @@ Function("segmentedMatrixMult", true, matrixA, matrixB, matrixC, rows, columns, 
     return(Constant(ConstInt(0)))
 ])
 
+Function("upCountingMatrix", true, matrix, dim, [
+    count = Var("count")
+    count = Constant(ConstInt(1))
+    //
+    // Loop 14
+    //
+    tmp.0.14 = Var("tmp.0.14")
+    tmp.1.14 = Var("tmp.1.14")
+    // <instructions for init>
+    i = Var("i")
+    i = Constant(ConstInt(0))
+    Label(start_14)
+    // <instructions for condition>
+    JumpIfGreaterThanOrEqual(i, dim, break_label_14)
+        // <start body statements>
+        //
+        // Loop 15
+        //
+        tmp.0.15 = Var("tmp.0.15")
+        tmp.1.15 = Var("tmp.1.15")
+        // <instructions for init>
+        j = Var("j")
+        j = Constant(ConstInt(0))
+        Label(start_15)
+        // <instructions for condition>
+        JumpIfGreaterThanOrEqual(j, dim, break_label_15)
+            // <start body statements>
+            exprTemp_37 = Var("exprTemp_37")
+            exprTemp_37 = dim * i
+            temp = Var("temp")
+            temp = exprTemp_37
+            exprTemp_38 = Var("exprTemp_38")
+            exprTemp_38 = temp + j
+            idx = Var("idx")
+            idx = exprTemp_38
+            // assign to array-element
+            // idx
+            sizeof_array_type = Var("sizeof_array_type")
+            sizeof(int32, sizeof_array_type)
+            matrix.ptr.tmp.1 = Var("matrix.ptr.tmp.1")
+            matrix.ptr.tmp.1 = idx * sizeof_array_type
+            matrix.ptr.tmp = Var("matrix.ptr.tmp")
+            matrix.ptr.tmp = matrix - matrix.ptr.tmp.1
+            matrix.tmp.0 = Var("matrix.tmp.0")
+            matrix.tmp.0 = count
+            Store(matrix.tmp.0, matrix.ptr.tmp)
+            exprTemp_39 = Var("exprTemp_39")
+            exprTemp_39 = count + Constant(ConstInt(1))
+            t = Var("t")
+            t = exprTemp_39
+            count = t
+            // <end body statements>
+        // <continue label> 
+        Label(continue_label_15)
+        // <instructions for post>
+        tmp.1.15 = j + Constant(ConstInt(1))
+        j = tmp.1.15
+        Jump(start_15)
+        Label(break_label_15)
+        // <end body statements>
+    // <continue label> 
+    Label(continue_label_14)
+    // <instructions for post>
+    tmp.1.14 = i + Constant(ConstInt(1))
+    i = tmp.1.14
+    Jump(start_14)
+    Label(break_label_14)
+
+    return(Constant(ConstInt(0)))
+])
+
 Function("main", true, [
     matrixA = Var("matrixA", Array(int32, 16))
     sizeof_array_type = Var("sizeof_array_type")
@@ -874,7 +945,7 @@ Function("main", true, [
     matrixA.ptr.ptr.tmp = Var("matrixA.ptr.ptr.tmp")
     matrixA.ptr.ptr.tmp = matrixA.ptr - matrixA.ptr.ptr.tmp.1
     matrixA.ptr.tmp.0 = Var("matrixA.ptr.tmp.0")
-    matrixA.ptr.tmp.0 = 9
+    matrixA.ptr.tmp.0 = 1
     Store(matrixA.ptr.tmp.0, matrixA.ptr.ptr.tmp)
     // assign to array-element
     // 1
@@ -885,7 +956,7 @@ Function("main", true, [
     matrixA.ptr.ptr.tmp = Var("matrixA.ptr.ptr.tmp")
     matrixA.ptr.ptr.tmp = matrixA.ptr - matrixA.ptr.ptr.tmp.1
     matrixA.ptr.tmp.0 = Var("matrixA.ptr.tmp.0")
-    matrixA.ptr.tmp.0 = 0
+    matrixA.ptr.tmp.0 = 2
     Store(matrixA.ptr.tmp.0, matrixA.ptr.ptr.tmp)
     // assign to array-element
     // 2
@@ -896,7 +967,7 @@ Function("main", true, [
     matrixA.ptr.ptr.tmp = Var("matrixA.ptr.ptr.tmp")
     matrixA.ptr.ptr.tmp = matrixA.ptr - matrixA.ptr.ptr.tmp.1
     matrixA.ptr.tmp.0 = Var("matrixA.ptr.tmp.0")
-    matrixA.ptr.tmp.0 = 9
+    matrixA.ptr.tmp.0 = 3
     Store(matrixA.ptr.tmp.0, matrixA.ptr.ptr.tmp)
     // assign to array-element
     // 3
@@ -918,7 +989,7 @@ Function("main", true, [
     matrixA.ptr.ptr.tmp = Var("matrixA.ptr.ptr.tmp")
     matrixA.ptr.ptr.tmp = matrixA.ptr - matrixA.ptr.ptr.tmp.1
     matrixA.ptr.tmp.0 = Var("matrixA.ptr.tmp.0")
-    matrixA.ptr.tmp.0 = 2
+    matrixA.ptr.tmp.0 = 5
     Store(matrixA.ptr.tmp.0, matrixA.ptr.ptr.tmp)
     // assign to array-element
     // 5
@@ -940,7 +1011,7 @@ Function("main", true, [
     matrixA.ptr.ptr.tmp = Var("matrixA.ptr.ptr.tmp")
     matrixA.ptr.ptr.tmp = matrixA.ptr - matrixA.ptr.ptr.tmp.1
     matrixA.ptr.tmp.0 = Var("matrixA.ptr.tmp.0")
-    matrixA.ptr.tmp.0 = 6
+    matrixA.ptr.tmp.0 = 7
     Store(matrixA.ptr.tmp.0, matrixA.ptr.ptr.tmp)
     // assign to array-element
     // 7
@@ -951,7 +1022,7 @@ Function("main", true, [
     matrixA.ptr.ptr.tmp = Var("matrixA.ptr.ptr.tmp")
     matrixA.ptr.ptr.tmp = matrixA.ptr - matrixA.ptr.ptr.tmp.1
     matrixA.ptr.tmp.0 = Var("matrixA.ptr.tmp.0")
-    matrixA.ptr.tmp.0 = 7
+    matrixA.ptr.tmp.0 = 8
     Store(matrixA.ptr.tmp.0, matrixA.ptr.ptr.tmp)
     // assign to array-element
     // 8
@@ -973,7 +1044,7 @@ Function("main", true, [
     matrixA.ptr.ptr.tmp = Var("matrixA.ptr.ptr.tmp")
     matrixA.ptr.ptr.tmp = matrixA.ptr - matrixA.ptr.ptr.tmp.1
     matrixA.ptr.tmp.0 = Var("matrixA.ptr.tmp.0")
-    matrixA.ptr.tmp.0 = 3
+    matrixA.ptr.tmp.0 = 10
     Store(matrixA.ptr.tmp.0, matrixA.ptr.ptr.tmp)
     // assign to array-element
     // 10
@@ -984,7 +1055,7 @@ Function("main", true, [
     matrixA.ptr.ptr.tmp = Var("matrixA.ptr.ptr.tmp")
     matrixA.ptr.ptr.tmp = matrixA.ptr - matrixA.ptr.ptr.tmp.1
     matrixA.ptr.tmp.0 = Var("matrixA.ptr.tmp.0")
-    matrixA.ptr.tmp.0 = 8
+    matrixA.ptr.tmp.0 = 11
     Store(matrixA.ptr.tmp.0, matrixA.ptr.ptr.tmp)
     // assign to array-element
     // 11
@@ -995,7 +1066,7 @@ Function("main", true, [
     matrixA.ptr.ptr.tmp = Var("matrixA.ptr.ptr.tmp")
     matrixA.ptr.ptr.tmp = matrixA.ptr - matrixA.ptr.ptr.tmp.1
     matrixA.ptr.tmp.0 = Var("matrixA.ptr.tmp.0")
-    matrixA.ptr.tmp.0 = 1
+    matrixA.ptr.tmp.0 = 12
     Store(matrixA.ptr.tmp.0, matrixA.ptr.ptr.tmp)
     // assign to array-element
     // 12
@@ -1006,7 +1077,7 @@ Function("main", true, [
     matrixA.ptr.ptr.tmp = Var("matrixA.ptr.ptr.tmp")
     matrixA.ptr.ptr.tmp = matrixA.ptr - matrixA.ptr.ptr.tmp.1
     matrixA.ptr.tmp.0 = Var("matrixA.ptr.tmp.0")
-    matrixA.ptr.tmp.0 = 6
+    matrixA.ptr.tmp.0 = 13
     Store(matrixA.ptr.tmp.0, matrixA.ptr.ptr.tmp)
     // assign to array-element
     // 13
@@ -1017,7 +1088,7 @@ Function("main", true, [
     matrixA.ptr.ptr.tmp = Var("matrixA.ptr.ptr.tmp")
     matrixA.ptr.ptr.tmp = matrixA.ptr - matrixA.ptr.ptr.tmp.1
     matrixA.ptr.tmp.0 = Var("matrixA.ptr.tmp.0")
-    matrixA.ptr.tmp.0 = 9
+    matrixA.ptr.tmp.0 = 14
     Store(matrixA.ptr.tmp.0, matrixA.ptr.ptr.tmp)
     // assign to array-element
     // 14
@@ -1028,7 +1099,7 @@ Function("main", true, [
     matrixA.ptr.ptr.tmp = Var("matrixA.ptr.ptr.tmp")
     matrixA.ptr.ptr.tmp = matrixA.ptr - matrixA.ptr.ptr.tmp.1
     matrixA.ptr.tmp.0 = Var("matrixA.ptr.tmp.0")
-    matrixA.ptr.tmp.0 = 7
+    matrixA.ptr.tmp.0 = 15
     Store(matrixA.ptr.tmp.0, matrixA.ptr.ptr.tmp)
     // assign to array-element
     // 15
@@ -1039,7 +1110,7 @@ Function("main", true, [
     matrixA.ptr.ptr.tmp = Var("matrixA.ptr.ptr.tmp")
     matrixA.ptr.ptr.tmp = matrixA.ptr - matrixA.ptr.ptr.tmp.1
     matrixA.ptr.tmp.0 = Var("matrixA.ptr.tmp.0")
-    matrixA.ptr.tmp.0 = 1
+    matrixA.ptr.tmp.0 = 16
     Store(matrixA.ptr.tmp.0, matrixA.ptr.ptr.tmp)
     matrixC = Var("matrixC", Array(int32, 16))
     sizeof_array_type = Var("sizeof_array_type")
@@ -1258,7 +1329,7 @@ Function("main", true, [
     matrixB.ptr.ptr.tmp = Var("matrixB.ptr.ptr.tmp")
     matrixB.ptr.ptr.tmp = matrixB.ptr - matrixB.ptr.ptr.tmp.1
     matrixB.ptr.tmp.0 = Var("matrixB.ptr.tmp.0")
-    matrixB.ptr.tmp.0 = 4
+    matrixB.ptr.tmp.0 = 3
     Store(matrixB.ptr.tmp.0, matrixB.ptr.ptr.tmp)
     // assign to array-element
     // 3
@@ -1269,7 +1340,7 @@ Function("main", true, [
     matrixB.ptr.ptr.tmp = Var("matrixB.ptr.ptr.tmp")
     matrixB.ptr.ptr.tmp = matrixB.ptr - matrixB.ptr.ptr.tmp.1
     matrixB.ptr.tmp.0 = Var("matrixB.ptr.tmp.0")
-    matrixB.ptr.tmp.0 = 2
+    matrixB.ptr.tmp.0 = 4
     Store(matrixB.ptr.tmp.0, matrixB.ptr.ptr.tmp)
     // assign to array-element
     // 4
@@ -1280,7 +1351,7 @@ Function("main", true, [
     matrixB.ptr.ptr.tmp = Var("matrixB.ptr.ptr.tmp")
     matrixB.ptr.ptr.tmp = matrixB.ptr - matrixB.ptr.ptr.tmp.1
     matrixB.ptr.tmp.0 = Var("matrixB.ptr.tmp.0")
-    matrixB.ptr.tmp.0 = 8
+    matrixB.ptr.tmp.0 = 5
     Store(matrixB.ptr.tmp.0, matrixB.ptr.ptr.tmp)
     // assign to array-element
     // 5
@@ -1302,7 +1373,7 @@ Function("main", true, [
     matrixB.ptr.ptr.tmp = Var("matrixB.ptr.ptr.tmp")
     matrixB.ptr.ptr.tmp = matrixB.ptr - matrixB.ptr.ptr.tmp.1
     matrixB.ptr.tmp.0 = Var("matrixB.ptr.tmp.0")
-    matrixB.ptr.tmp.0 = 0
+    matrixB.ptr.tmp.0 = 7
     Store(matrixB.ptr.tmp.0, matrixB.ptr.ptr.tmp)
     // assign to array-element
     // 7
@@ -1313,7 +1384,7 @@ Function("main", true, [
     matrixB.ptr.ptr.tmp = Var("matrixB.ptr.ptr.tmp")
     matrixB.ptr.ptr.tmp = matrixB.ptr - matrixB.ptr.ptr.tmp.1
     matrixB.ptr.tmp.0 = Var("matrixB.ptr.tmp.0")
-    matrixB.ptr.tmp.0 = 0
+    matrixB.ptr.tmp.0 = 8
     Store(matrixB.ptr.tmp.0, matrixB.ptr.ptr.tmp)
     // assign to array-element
     // 8
@@ -1324,7 +1395,7 @@ Function("main", true, [
     matrixB.ptr.ptr.tmp = Var("matrixB.ptr.ptr.tmp")
     matrixB.ptr.ptr.tmp = matrixB.ptr - matrixB.ptr.ptr.tmp.1
     matrixB.ptr.tmp.0 = Var("matrixB.ptr.tmp.0")
-    matrixB.ptr.tmp.0 = 7
+    matrixB.ptr.tmp.0 = 9
     Store(matrixB.ptr.tmp.0, matrixB.ptr.ptr.tmp)
     // assign to array-element
     // 9
@@ -1335,7 +1406,7 @@ Function("main", true, [
     matrixB.ptr.ptr.tmp = Var("matrixB.ptr.ptr.tmp")
     matrixB.ptr.ptr.tmp = matrixB.ptr - matrixB.ptr.ptr.tmp.1
     matrixB.ptr.tmp.0 = Var("matrixB.ptr.tmp.0")
-    matrixB.ptr.tmp.0 = 6
+    matrixB.ptr.tmp.0 = 10
     Store(matrixB.ptr.tmp.0, matrixB.ptr.ptr.tmp)
     // assign to array-element
     // 10
@@ -1346,7 +1417,7 @@ Function("main", true, [
     matrixB.ptr.ptr.tmp = Var("matrixB.ptr.ptr.tmp")
     matrixB.ptr.ptr.tmp = matrixB.ptr - matrixB.ptr.ptr.tmp.1
     matrixB.ptr.tmp.0 = Var("matrixB.ptr.tmp.0")
-    matrixB.ptr.tmp.0 = 8
+    matrixB.ptr.tmp.0 = 11
     Store(matrixB.ptr.tmp.0, matrixB.ptr.ptr.tmp)
     // assign to array-element
     // 11
@@ -1357,7 +1428,7 @@ Function("main", true, [
     matrixB.ptr.ptr.tmp = Var("matrixB.ptr.ptr.tmp")
     matrixB.ptr.ptr.tmp = matrixB.ptr - matrixB.ptr.ptr.tmp.1
     matrixB.ptr.tmp.0 = Var("matrixB.ptr.tmp.0")
-    matrixB.ptr.tmp.0 = 5
+    matrixB.ptr.tmp.0 = 12
     Store(matrixB.ptr.tmp.0, matrixB.ptr.ptr.tmp)
     // assign to array-element
     // 12
@@ -1368,7 +1439,7 @@ Function("main", true, [
     matrixB.ptr.ptr.tmp = Var("matrixB.ptr.ptr.tmp")
     matrixB.ptr.ptr.tmp = matrixB.ptr - matrixB.ptr.ptr.tmp.1
     matrixB.ptr.tmp.0 = Var("matrixB.ptr.tmp.0")
-    matrixB.ptr.tmp.0 = 8
+    matrixB.ptr.tmp.0 = 13
     Store(matrixB.ptr.tmp.0, matrixB.ptr.ptr.tmp)
     // assign to array-element
     // 13
@@ -1379,7 +1450,7 @@ Function("main", true, [
     matrixB.ptr.ptr.tmp = Var("matrixB.ptr.ptr.tmp")
     matrixB.ptr.ptr.tmp = matrixB.ptr - matrixB.ptr.ptr.tmp.1
     matrixB.ptr.tmp.0 = Var("matrixB.ptr.tmp.0")
-    matrixB.ptr.tmp.0 = 4
+    matrixB.ptr.tmp.0 = 14
     Store(matrixB.ptr.tmp.0, matrixB.ptr.ptr.tmp)
     // assign to array-element
     // 14
@@ -1390,7 +1461,7 @@ Function("main", true, [
     matrixB.ptr.ptr.tmp = Var("matrixB.ptr.ptr.tmp")
     matrixB.ptr.ptr.tmp = matrixB.ptr - matrixB.ptr.ptr.tmp.1
     matrixB.ptr.tmp.0 = Var("matrixB.ptr.tmp.0")
-    matrixB.ptr.tmp.0 = 7
+    matrixB.ptr.tmp.0 = 15
     Store(matrixB.ptr.tmp.0, matrixB.ptr.ptr.tmp)
     // assign to array-element
     // 15
@@ -1401,7 +1472,7 @@ Function("main", true, [
     matrixB.ptr.ptr.tmp = Var("matrixB.ptr.ptr.tmp")
     matrixB.ptr.ptr.tmp = matrixB.ptr - matrixB.ptr.ptr.tmp.1
     matrixB.ptr.tmp.0 = Var("matrixB.ptr.tmp.0")
-    matrixB.ptr.tmp.0 = 5
+    matrixB.ptr.tmp.0 = 16
     Store(matrixB.ptr.tmp.0, matrixB.ptr.ptr.tmp)
 
     # -- Function -- segmentedMatrixMult
@@ -1429,9 +1500,6 @@ Function("main", true, [
 
     resultPrettyPrintC = Var("resultPrettyPrintC")
     resultPrettyPrintC = tmp.prettyPrintFormatMatrix
-    separatorC = Var("separatorC")
-    separatorC = Constant(ConstInt(127))
-    putint(separatorC)
 
     # -- Function -- exit
     exit()

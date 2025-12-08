@@ -383,7 +383,7 @@ int segmentedMatrixMult(int* matrixA, int* matrixB, int* matrixC, int rows, int 
 
 
 
-                int a244 = setSubMatrix(matrixC, tempAccum, DIMENSION, xPos_c, yPos_c, nc, kc);
+                int a244 = setSubMatrix(matrixC, tempAccum, DIMENSION, yPos_c, xPos_c, nc, kc);
 
             }
 
@@ -395,22 +395,56 @@ int segmentedMatrixMult(int* matrixA, int* matrixB, int* matrixC, int rows, int 
     return 0;
 }
 
+int upCountingMatrix(int* matrix, int dim) {
 
+    // printf("upCountingMatrix()\n");
+
+    int count = 1;
+    for (int i = 0; i < dim; i++) {
+        for (int j = 0; j < dim; j++) {
+
+            //int idx = dim * i + j;
+            int temp = dim * i;
+            int idx = temp + j;
+
+            matrix[idx] = count;
+
+            int t = count + 1;
+            count = t;
+        }
+    }
+    return 0;
+}
 
 
 int main()
 {
+    // printf("main starts\n");
+
     /*
     9 0 9 4
     2 6 6 7
     9 3 8 1
     6 9 7 1
     */
+    // int matrixA[ELEMENTS] = {
+    //     9, 0, 9, 4,
+    //     2, 6, 6, 7,
+    //     9, 3, 8, 1,
+    //     6, 9, 7, 1
+    // };
+
+    /*
+    1 2 3 4
+    5 6 7 8
+    9 10 11 12
+    13 14 15 16
+    */
     int matrixA[ELEMENTS] = {
-        9, 0, 9, 4,
-        2, 6, 6, 7,
-        9, 3, 8, 1,
-        6, 9, 7, 1
+        1, 2, 3, 4,
+        5, 6, 7, 8,
+        9, 10, 11, 12,
+        13, 14, 15, 16
     };
 
     /*
@@ -444,16 +478,50 @@ int main()
     7 6 8 5
     8 4 7 5
     */
+    // int matrixB[ELEMENTS] = {
+    //     1, 2, 4, 2,
+    //     8, 6, 0, 0,
+    //     7, 6, 8, 5,
+    //     8, 4, 7, 5
+    // };
+
+     /*
+    1 2 3 4
+    5 6 7 8
+    9 10 11 12
+    13 14 15 16
+    */
     int matrixB[ELEMENTS] = {
-        1, 2, 4, 2,
-        8, 6, 0, 0,
-        7, 6, 8, 5,
-        8, 4, 7, 5
+        1, 2, 3, 4,
+        5, 6, 7, 8,
+        9, 10, 11, 12,
+        13, 14, 15, 16
     };
+
+    // upCountingMatrix(matrixA, DIMENSION);
+    // upCountingMatrix(matrixB, DIMENSION);
 
     int result_1 = segmentedMatrixMult(matrixA, matrixB, matrixC, DIMENSION, DIMENSION);
 
 
+    /*
+    90
+    100
+    110
+    120
+    102
+    228
+    254
+    280
+    314
+    356
+    398
+    440
+    426
+    484
+    542
+    600
+    */
 
     int resultPrettyPrintC = prettyPrintFormatMatrix(matrixC, DIMENSION);
     // int separatorC = 127;

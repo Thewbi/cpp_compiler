@@ -1764,10 +1764,10 @@ start_13:
         lw      a1, -268(fp)
         # load argument register a2 with parameter '4'
         li      a2, 0x04
-        # load argument register a3 with parameter 'xPos_c'
-        lw      a3, -284(fp)
-        # load argument register a4 with parameter 'yPos_c'
-        lw      a4, -292(fp)
+        # load argument register a3 with parameter 'yPos_c'
+        lw      a3, -292(fp)
+        # load argument register a4 with parameter 'xPos_c'
+        lw      a4, -284(fp)
         # load argument register a5 with parameter 'nc'
         lw      a5, -12(fp)
         # load argument register a6 with parameter 'kc'
@@ -1849,14 +1849,132 @@ break_label_11:
         nop
         # <processReturn()>
         ret
+upCountingMatrix:
+        # -- stack frame create --
+        print_reg sp
+        addi    sp, sp, -80
+        sw      ra, 76(sp)
+        sw      fp, 72(sp)
+        addi    fp, sp, 80
+        # -- stack frame create --
+        # variable 'count'
+        li      t0, 1
+        sw      t0, -12(fp)
+        # variable 'i'
+        li      t0, 0
+        sw      t0, -24(fp)
+start_14:
+        lw      t0, -24(fp)
+        mv      t1, a1
+        ble     t1, t0, break_label_14
+        # variable 'j'
+        li      t0, 0
+        sw      t0, -36(fp)
+start_15:
+        lw      t0, -36(fp)
+        mv      t1, a1
+        ble     t1, t0, break_label_15
+        mv      t0, a1
+        lw      t1, -24(fp)
+        mul     t0, t0, t1
+        # variable 'exprTemp_37'
+        mv      t0, t0
+        sw      t0, -40(fp)
+        lw      t0, -40(fp)
+        # variable 'temp'
+        mv      t0, t0
+        sw      t0, -44(fp)
+        lw      t0, -44(fp)
+        lw      t1, -36(fp)
+        add     t0, t0, t1
+        # variable 'exprTemp_38'
+        mv      t0, t0
+        sw      t0, -48(fp)
+        lw      t0, -48(fp)
+        # variable 'idx'
+        mv      t0, t0
+        sw      t0, -52(fp)
+        # <sizeof int32>
+        li      t0, 4
+        sw      t0, -56(fp)
+        lw      t0, -52(fp)
+        lw      t1, -56(fp)
+        mul     t0, t0, t1
+        # variable 'matrix.ptr.tmp.1'
+        mv      t0, t0
+        sw      t0, -60(fp)
+        mv      t0, a0
+        lw      t1, -60(fp)
+        sub     t0, t0, t1
+        # variable 'matrix.ptr.tmp'
+        mv      t0, t0
+        sw      t0, -64(fp)
+        lw      t0, -12(fp)
+        # variable 'matrix.tmp.0'
+        mv      t0, t0
+        sw      t0, -68(fp)
+        # StoreToAddress()
+        lw      t2, -68(fp)
+        lw      t3, -64(fp)
+        sw      t2, 0(t3)
+        lw      t0, -12(fp)
+        li      t1, 0x01
+        add     t0, t0, t1
+        # variable 'exprTemp_39'
+        mv      t0, t0
+        sw      t0, -72(fp)
+        lw      t0, -72(fp)
+        # variable 't'
+        mv      t0, t0
+        sw      t0, -76(fp)
+        lw      t0, -76(fp)
+        # variable 'count'
+        mv      t0, t0
+        sw      t0, -12(fp)
+continue_label_15:
+        lw      t0, -36(fp)
+        li      t1, 0x01
+        add     t0, t0, t1
+        # variable 'tmp.1.15'
+        mv      t0, t0
+        sw      t0, -32(fp)
+        lw      t0, -32(fp)
+        # variable 'j'
+        mv      t0, t0
+        sw      t0, -36(fp)
+        j       start_15
+break_label_15:
+continue_label_14:
+        lw      t0, -24(fp)
+        li      t1, 0x01
+        add     t0, t0, t1
+        # variable 'tmp.1.14'
+        mv      t0, t0
+        sw      t0, -20(fp)
+        lw      t0, -20(fp)
+        # variable 'i'
+        mv      t0, t0
+        sw      t0, -24(fp)
+        j       start_14
+break_label_14:
+        li      a0, 0x00
+        # -- stack frame remove --
+        lw      ra, 76(sp)
+        lw      s0, 72(sp)
+        addi    sp, sp, 80
+        print_reg sp
+        # -- stack frame remove --
+        nop
+        # <processReturn()>
+        ret
 main:
 _start:
         # -- stack frame create --
         print_reg sp
-        addi    sp, sp, -288
-        sw      ra, 284(sp)
-        sw      fp, 280(sp)
-        addi    fp, sp, 288
+        addi    sp, sp, -284
+        sw      ra, 280(sp)
+        sw      fp, 276(sp)
+        addi    fp, sp, 284
         # -- stack frame create --
         # <sizeof int32>
         li      t0, 4
@@ -1880,7 +1998,7 @@ _start:
         mv      t0, t0
         sw      t0, -88(fp)
         # variable 'matrixA.ptr.tmp.0'
-        li      t0, 9
+        li      t0, 1
         sw      t0, -92(fp)
         # StoreToAddress()
         lw      t2, -92(fp)
@@ -1902,7 +2020,7 @@ _start:
         mv      t0, t0
         sw      t0, -88(fp)
         # variable 'matrixA.ptr.tmp.0'
-        li      t0, 0
+        li      t0, 2
         sw      t0, -92(fp)
         # StoreToAddress()
         lw      t2, -92(fp)
@@ -1924,7 +2042,7 @@ _start:
         mv      t0, t0
         sw      t0, -88(fp)
         # variable 'matrixA.ptr.tmp.0'
-        li      t0, 9
+        li      t0, 3
         sw      t0, -92(fp)
         # StoreToAddress()
         lw      t2, -92(fp)
@@ -1968,7 +2086,7 @@ _start:
         mv      t0, t0
         sw      t0, -88(fp)
         # variable 'matrixA.ptr.tmp.0'
-        li      t0, 2
+        li      t0, 5
         sw      t0, -92(fp)
         # StoreToAddress()
         lw      t2, -92(fp)
@@ -2012,7 +2130,7 @@ _start:
         mv      t0, t0
         sw      t0, -88(fp)
         # variable 'matrixA.ptr.tmp.0'
-        li      t0, 6
+        li      t0, 7
         sw      t0, -92(fp)
         # StoreToAddress()
         lw      t2, -92(fp)
@@ -2034,7 +2152,7 @@ _start:
         mv      t0, t0
         sw      t0, -88(fp)
         # variable 'matrixA.ptr.tmp.0'
-        li      t0, 7
+        li      t0, 8
         sw      t0, -92(fp)
         # StoreToAddress()
         lw      t2, -92(fp)
@@ -2078,7 +2196,7 @@ _start:
         mv      t0, t0
         sw      t0, -88(fp)
         # variable 'matrixA.ptr.tmp.0'
-        li      t0, 3
+        li      t0, 10
         sw      t0, -92(fp)
         # StoreToAddress()
         lw      t2, -92(fp)
@@ -2100,7 +2218,7 @@ _start:
         mv      t0, t0
         sw      t0, -88(fp)
         # variable 'matrixA.ptr.tmp.0'
-        li      t0, 8
+        li      t0, 11
         sw      t0, -92(fp)
         # StoreToAddress()
         lw      t2, -92(fp)
@@ -2122,7 +2240,7 @@ _start:
         mv      t0, t0
         sw      t0, -88(fp)
         # variable 'matrixA.ptr.tmp.0'
-        li      t0, 1
+        li      t0, 12
         sw      t0, -92(fp)
         # StoreToAddress()
         lw      t2, -92(fp)
@@ -2144,7 +2262,7 @@ _start:
         mv      t0, t0
         sw      t0, -88(fp)
         # variable 'matrixA.ptr.tmp.0'
-        li      t0, 6
+        li      t0, 13
         sw      t0, -92(fp)
         # StoreToAddress()
         lw      t2, -92(fp)
@@ -2166,7 +2284,7 @@ _start:
         mv      t0, t0
         sw      t0, -88(fp)
         # variable 'matrixA.ptr.tmp.0'
-        li      t0, 9
+        li      t0, 14
         sw      t0, -92(fp)
         # StoreToAddress()
         lw      t2, -92(fp)
@@ -2188,7 +2306,7 @@ _start:
         mv      t0, t0
         sw      t0, -88(fp)
         # variable 'matrixA.ptr.tmp.0'
-        li      t0, 7
+        li      t0, 15
         sw      t0, -92(fp)
         # StoreToAddress()
         lw      t2, -92(fp)
@@ -2210,7 +2328,7 @@ _start:
         mv      t0, t0
         sw      t0, -88(fp)
         # variable 'matrixA.ptr.tmp.0'
-        li      t0, 1
+        li      t0, 16
         sw      t0, -92(fp)
         # StoreToAddress()
         lw      t2, -92(fp)
@@ -2640,7 +2758,7 @@ _start:
         mv      t0, t0
         sw      t0, -248(fp)
         # variable 'matrixB.ptr.tmp.0'
-        li      t0, 4
+        li      t0, 3
         sw      t0, -252(fp)
         # StoreToAddress()
         lw      t2, -252(fp)
@@ -2662,7 +2780,7 @@ _start:
         mv      t0, t0
         sw      t0, -248(fp)
         # variable 'matrixB.ptr.tmp.0'
-        li      t0, 2
+        li      t0, 4
         sw      t0, -252(fp)
         # StoreToAddress()
         lw      t2, -252(fp)
@@ -2684,7 +2802,7 @@ _start:
         mv      t0, t0
         sw      t0, -248(fp)
         # variable 'matrixB.ptr.tmp.0'
-        li      t0, 8
+        li      t0, 5
         sw      t0, -252(fp)
         # StoreToAddress()
         lw      t2, -252(fp)
@@ -2728,7 +2846,7 @@ _start:
         mv      t0, t0
         sw      t0, -248(fp)
         # variable 'matrixB.ptr.tmp.0'
-        li      t0, 0
+        li      t0, 7
         sw      t0, -252(fp)
         # StoreToAddress()
         lw      t2, -252(fp)
@@ -2750,7 +2868,7 @@ _start:
         mv      t0, t0
         sw      t0, -248(fp)
         # variable 'matrixB.ptr.tmp.0'
-        li      t0, 0
+        li      t0, 8
         sw      t0, -252(fp)
         # StoreToAddress()
         lw      t2, -252(fp)
@@ -2772,7 +2890,7 @@ _start:
         mv      t0, t0
         sw      t0, -248(fp)
         # variable 'matrixB.ptr.tmp.0'
-        li      t0, 7
+        li      t0, 9
         sw      t0, -252(fp)
         # StoreToAddress()
         lw      t2, -252(fp)
@@ -2794,7 +2912,7 @@ _start:
         mv      t0, t0
         sw      t0, -248(fp)
         # variable 'matrixB.ptr.tmp.0'
-        li      t0, 6
+        li      t0, 10
         sw      t0, -252(fp)
         # StoreToAddress()
         lw      t2, -252(fp)
@@ -2816,7 +2934,7 @@ _start:
         mv      t0, t0
         sw      t0, -248(fp)
         # variable 'matrixB.ptr.tmp.0'
-        li      t0, 8
+        li      t0, 11
         sw      t0, -252(fp)
         # StoreToAddress()
         lw      t2, -252(fp)
@@ -2838,7 +2956,7 @@ _start:
         mv      t0, t0
         sw      t0, -248(fp)
         # variable 'matrixB.ptr.tmp.0'
-        li      t0, 5
+        li      t0, 12
         sw      t0, -252(fp)
         # StoreToAddress()
         lw      t2, -252(fp)
@@ -2860,7 +2978,7 @@ _start:
         mv      t0, t0
         sw      t0, -248(fp)
         # variable 'matrixB.ptr.tmp.0'
-        li      t0, 8
+        li      t0, 13
         sw      t0, -252(fp)
         # StoreToAddress()
         lw      t2, -252(fp)
@@ -2882,7 +3000,7 @@ _start:
         mv      t0, t0
         sw      t0, -248(fp)
         # variable 'matrixB.ptr.tmp.0'
-        li      t0, 4
+        li      t0, 14
         sw      t0, -252(fp)
         # StoreToAddress()
         lw      t2, -252(fp)
@@ -2904,7 +3022,7 @@ _start:
         mv      t0, t0
         sw      t0, -248(fp)
         # variable 'matrixB.ptr.tmp.0'
-        li      t0, 7
+        li      t0, 15
         sw      t0, -252(fp)
         # StoreToAddress()
         lw      t2, -252(fp)
@@ -2926,7 +3044,7 @@ _start:
         mv      t0, t0
         sw      t0, -248(fp)
         # variable 'matrixB.ptr.tmp.0'
-        li      t0, 5
+        li      t0, 16
         sw      t0, -252(fp)
         # StoreToAddress()
         lw      t2, -252(fp)
@@ -2976,19 +3094,12 @@ _start:
         # variable 'resultPrettyPrintC'
         mv      t0, t0
         sw      t0, -280(fp)
-        # variable 'separatorC'
-        li      t0, 127
-        sw      t0, -284(fp)
-        mv      t6, a0
-        lw      a0, -284(fp)
-        call    putint
-        mv      a0, t6
         call    exit
         li      a0, 0x00
         # -- stack frame remove --
-        lw      ra, 284(sp)
-        lw      s0, 280(sp)
-        addi    sp, sp, 288
+        lw      ra, 280(sp)
+        lw      s0, 276(sp)
+        addi    sp, sp, 284
         print_reg sp
         # -- stack frame remove --
         nop
