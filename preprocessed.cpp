@@ -150,6 +150,134 @@
       return 0 ;
  }
 
+ int standardMatrixMult ( int * matrixA , int * matrixB , int * matrixC , int rows , int columns ) {
+
+     
+
+     
+     
+     
+     
+
+     
+
+     
+
+     
+
+      int counter = 0 ;
+
+     
+      for ( int i = 0 ; i < rows ; i ++ ) {
+
+         
+
+         
+          for ( int j = 0 ; j < columns ; j ++ ) {
+
+             
+             
+             
+
+             
+
+             
+              for ( int k = 0 ; k < columns ; k ++ ) {
+
+                 
+                 
+                 
+
+                 
+                 
+                 
+
+                 
+
+                 
+                  int temp_aIdx = i * columns ;
+                  int aIdx = temp_aIdx + k ;
+
+                 
+
+                 
+                  int temp_bIdx = k * columns ;
+                  int bIdx = temp_bIdx + j ;
+
+                 
+
+                 
+                  int temp_cIdx = i * rows ;
+                  int cIdx = temp_cIdx + j ;
+
+                 
+
+                  int aVal = matrixA [ aIdx ] ;
+                 
+                 
+
+                  int bVal = matrixB [ bIdx ] ;
+                 
+
+                  int mult_temp = aVal * bVal ;
+
+                 
+
+                 
+
+                 
+                 
+                 
+                 
+                 
+                 
+                 
+                 
+
+                  int abc = matrixC [ cIdx ] ;
+                 
+                  int cde = abc + mult_temp ;
+                 
+                  matrixC [ cIdx ] = cde ;
+
+                 
+
+                 
+
+                 
+
+              }
+
+          }
+
+      }
+
+      return 0 ;
+ }
+
+ int matrixAddInto ( int * matrixA , int * matrixB , int rows , int columns ) {
+
+     
+
+      for ( int i = 0 ; i < rows ; i ++ ) {
+          for ( int j = 0 ; j < columns ; j ++ ) {
+
+             
+              int temp = i * rows ;
+              int tempIndex = temp + j ;
+
+             
+              int tempAValue = matrixA [ tempIndex ] ;
+              int tempBValue = matrixB [ tempIndex ] ;
+
+              int transfer = tempAValue + tempBValue ;
+              matrixA [ tempIndex ] = transfer ;
+          }
+      }
+
+      return 0 ;
+ }
+
 
  int segmentedMatrixMult ( int * matrixA , int * matrixB , int * matrixC , int rows , int columns ) {
 
@@ -164,6 +292,8 @@
 
       int subMatrixA [ 4 ] = { 0 , 0 , 0 , 0 } ;
       int subMatrixB [ 4 ] = { 0 , 0 , 0 , 0 } ;
+
+      int tempAccum [ 4 ] = { 0 , 0 , 0 , 0 } ;
 
      
      
@@ -184,17 +314,9 @@
               int sub_matrix_1 = getSubMatrix ( subMatrixB , matrixB , 4 , xPos_b , yPos_b , kc , nc ) ;
 
              
-              int resultPrettyPrintB = prettyPrintFormatMatrix ( subMatrixB , 2 ) ;
-              int separator = 123 ;
-              putint ( separator ) ;
-
-             
-
              
              
              
-             
-
 
 
              
@@ -207,9 +329,39 @@
                   int sub_matrix_2 = getSubMatrix ( subMatrixA , matrixA , 4 , xPos_a , yPos_a , mc , kc ) ;
 
                  
-                  int resultPrettyPrintA = prettyPrintFormatMatrix ( subMatrixA , 2 ) ;
-                  int separator2 = 124 ;
-                  putint ( separator2 ) ;
+                 
+                 
+                 
+
+
+
+
+                  int tempMult [ 4 ] = { 0 , 0 , 0 , 0 } ;
+                  int a22 = standardMatrixMult ( subMatrixA , subMatrixB , tempMult , 2 , 2 ) ;
+
+                 
+                 
+                 
+
+
+
+
+                  int xPos_c = ic * kc ;
+                  int yPos_c = jc * nc ;
+                  int a33423 = getSubMatrix ( tempAccum , matrixC , 4 , xPos_c , yPos_c , nc , kc ) ;
+
+
+
+
+
+
+                  int a239 = matrixAddInto ( tempAccum , tempMult , 2 , 2 ) ;
+
+
+
+
+
+                  int a244 = setSubMatrix ( matrixC , tempAccum , 4 , xPos_c , yPos_c , nc , kc ) ;
 
               }
 
@@ -241,11 +393,17 @@
      
      
      
+     
+     
+     
+     
+     
+     
       int matrixC [ 16 ] = {
-          1 , 2 , 3 , 4 ,
-          5 , 6 , 7 , 8 ,
-          9 , 10 , 11 , 12 ,
-          13 , 14 , 15 , 16
+          0 , 0 , 0 , 0 ,
+          0 , 0 , 0 , 0 ,
+          0 , 0 , 0 , 0 ,
+          0 , 0 , 0 , 0
       } ;
 
      
@@ -257,6 +415,13 @@
       } ;
 
       int result_1 = segmentedMatrixMult ( matrixA , matrixB , matrixC , 4 , 4 ) ;
+
+
+
+      int resultPrettyPrintC = prettyPrintFormatMatrix ( matrixC , 4 ) ;
+      int separatorC = 127 ;
+      putint ( separatorC ) ;
+
 
       exit ( ) ;
       return 0 ;

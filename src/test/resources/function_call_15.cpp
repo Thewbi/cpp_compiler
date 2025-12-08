@@ -170,6 +170,134 @@ int setSubMatrix(int* matrix_dest, int* matrix_src, int dim, int xPos, int yPos,
     return 0;
 }
 
+int standardMatrixMult(int* matrixA, int* matrixB, int* matrixC, int rows, int columns) {
+
+    // printf("standardMatrixMult()\n");
+
+    //int t1 = matrixA[2];
+    // printf("test: %d\n", t1);
+    //matrixC[3] = t1;
+    // matrixC[3] = 32;
+
+    // matrixA[3] = 32;
+
+    // //printf("standardMatrixMult()\n");
+
+    // // matrixC[1] = 1;
+
+    int counter = 0;
+
+    // over row of matrix B
+    for (int i = 0; i < rows; i++) {
+
+        // matrixC[i] = i;
+
+        // over column of matrix A
+        for (int j = 0; j < columns; j++) {
+
+            // int tcounter = counter;
+            // counter = tcounter + 1;
+            // matrixC[1] = counter;
+
+            //matrixC[j] = j;
+
+            // fuse row and column together into a single cell of matrix C
+            for (int k = 0; k < columns; k++) {
+
+                // int tcounter = counter;
+                // counter = tcounter + 1;
+                // matrixC[1] = counter;
+
+                // int t1 = matrixA[0];
+                // // printf("test: %d\n", t1);
+                // matrixC[3] = t1;
+
+                //matrixC[i * rows + j] += matrixA[i * columns + k] * matrixB[k * columns + j];
+
+                // int aIdx = i * columns + k;
+                int temp_aIdx = i * columns;
+                int aIdx = temp_aIdx + k;
+
+                // matrixC[1] = aIdx;
+
+                // int bIdx = k * columns + j;
+                int temp_bIdx = k * columns;
+                int bIdx = temp_bIdx + j;
+
+                // matrixC[2] = bIdx;
+
+                // int cIdx = i * rows + j;
+                int temp_cIdx = i * rows;
+                int cIdx = temp_cIdx + j;
+
+                // matrixC[3] = cIdx;
+
+                int aVal = matrixA[aIdx];
+                // matrixC[4] = aVal;
+                // // printf("test");
+
+                int bVal = matrixB[bIdx];
+                // matrixC[5] = bVal;
+
+                int mult_temp = aVal * bVal;
+
+                // matrixC[6] = mult_temp;
+
+                //printf("test");
+
+                // DEBUG
+                // printf("aIdx: %d", aIdx);
+                // printf("bIdx: %d", bIdx);
+                // printf("cIdx: %d", cIdx);
+                // printf("aVal: %d", aVal);
+                // printf("bVal: %d", bVal);
+                // printf("aVal: %d", aVal);
+                // printf("bVal: %d", bVal);
+
+                int abc = matrixC[cIdx];
+                // matrixC[7] = abc;
+                int cde = abc + mult_temp;
+                // matrixC[8] = cde;
+                matrixC[cIdx] = cde;
+
+                // matrixC[cIdx] = 1;
+
+                // matrixC[1] = 1;
+
+                // exit();
+
+            }
+
+        }
+
+    }
+
+    return 0;
+}
+
+int matrixAddInto(int* matrixA, int* matrixB, int rows, int columns) {
+
+    // printf("matrixAddInto()\n");
+
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < columns; j++) {
+
+            // int tempIndex = i * rows + j;
+            int temp = i * rows;
+            int tempIndex = temp + j;
+
+            // matrixA[temp] += matrixB[temp];
+            int tempAValue = matrixA[tempIndex];
+            int tempBValue = matrixB[tempIndex];
+
+            int transfer = tempAValue + tempBValue;
+            matrixA[tempIndex] = transfer;
+        }
+    }
+
+    return 0;
+}
+
 /**
  * Computes: MatrixC = MatrixA * MatrixB
  */
@@ -186,6 +314,8 @@ int segmentedMatrixMult(int* matrixA, int* matrixB, int* matrixC, int rows, int 
 
     int subMatrixA[4] = { 0, 0, 0, 0 };
     int subMatrixB[4] = { 0, 0, 0, 0 };
+
+    int tempAccum[4] = { 0, 0, 0, 0 };
 
     //int sub_matrix_1 = getSubMatrix(subMatrixB, matrixB, DIMENSION, 0, 0, 2, 2);
     // int resultPrettyPrint = prettyPrintFormatMatrix(subMatrixB, SUB_DIMENSION);
@@ -205,20 +335,12 @@ int segmentedMatrixMult(int* matrixA, int* matrixB, int* matrixC, int rows, int 
             int yPos_b = jc * nc;
             int sub_matrix_1 = getSubMatrix(subMatrixB, matrixB, DIMENSION, xPos_b, yPos_b, kc, nc);
 
-            // test 1
-            int resultPrettyPrintB = prettyPrintFormatMatrix(subMatrixB, SUB_DIMENSION);
-            int separator = 123;
-            putint(separator);
-
-            // int sub_matrix_2 = getSubMatrix(subMatrixA, matrixA, DIMENSION, xPos_b, yPos_b, kc, nc);
-
-            // // test 1
-            // int resultPrettyPrintA = prettyPrintFormatMatrix(subMatrixA, SUB_DIMENSION);
-            // int separator2 = 124;
-            // putint(separator2);
+            // // print subB
+            // int resultPrettyPrintB = prettyPrintFormatMatrix(subMatrixB, SUB_DIMENSION);
+            // int separator = 123;
+            // putint(separator);
 
 
-/**/
             // for ic = 0 to m-1 step mc
             // Loop 3
             for (int ic = 0; ic < innerSteps; ic++) {
@@ -228,10 +350,40 @@ int segmentedMatrixMult(int* matrixA, int* matrixB, int* matrixC, int rows, int 
 
                 int sub_matrix_2 = getSubMatrix(subMatrixA, matrixA, DIMENSION, xPos_a, yPos_a, mc, kc);
 
-                // test 1
-                int resultPrettyPrintA = prettyPrintFormatMatrix(subMatrixA, SUB_DIMENSION);
-                int separator2 = 124;
-                putint(separator2);
+                // // print subA
+                // int resultPrettyPrintA = prettyPrintFormatMatrix(subMatrixA, SUB_DIMENSION);
+                // int separator2 = 124;
+                // putint(separator2);
+
+
+
+
+                int tempMult[4] = { 0, 0, 0, 0 };
+                int a22 = standardMatrixMult(subMatrixA, subMatrixB, tempMult, 2, 2);
+
+                // int resultPrettyPrintM = prettyPrintFormatMatrix(tempMult, SUB_DIMENSION);
+                // int separator3 = 125;
+                // putint(separator3);
+
+
+
+
+                int xPos_c = ic * kc;
+                int yPos_c = jc * nc;
+                int a33423 = getSubMatrix(tempAccum, matrixC, DIMENSION, xPos_c, yPos_c, nc, kc);
+
+
+
+
+
+
+                int a239 = matrixAddInto(tempAccum, tempMult, 2, 2);
+
+
+
+
+
+                int a244 = setSubMatrix(matrixC, tempAccum, DIMENSION, xPos_c, yPos_c, nc, kc);
 
             }
 
@@ -300,6 +452,13 @@ int main()
     };
 
     int result_1 = segmentedMatrixMult(matrixA, matrixB, matrixC, DIMENSION, DIMENSION);
+
+
+
+    int resultPrettyPrintC = prettyPrintFormatMatrix(matrixC, DIMENSION);
+    // int separatorC = 127;
+    // putint(separatorC);
+
 
     exit();
     return 0;
