@@ -54,7 +54,7 @@ public class DefaultStructureCallback implements StructureCallback {
         // System.out.println("[STR-CB] functionCall() Name: \"" + name + "\" Params: " + expressionList);
 
         startScope();
-        System.out.println("");
+        // System.out.println("");
     }
 
     @Override

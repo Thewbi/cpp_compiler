@@ -11,17 +11,17 @@ import grammar.ExplicitRISCVRow;
 /**
  * https://marz.utk.edu/my-courses/cosc230/book/example-risc-v-assembly-programs/
  * https://mcyoung.xyz/2021/11/29/assembly-1/
- * 
+ *
  * Current toolchain:
- * 
+ *
  * Assembler (Encoder): https://riscvasm.lucasteske.dev/#
- * 
+ *
  * Decoder: https://luplab.gitlab.io/rvcodecjs/#q=fe010113&abi=false&isa=AUTO
  */
 public class RISCVInstructionDecoder {
 
     private List<ExplicitRISCVRow> rows = new ArrayList<>();
-    
+
     public void decode() {
 
         // add t1,t0,a0
@@ -79,7 +79,7 @@ public class RISCVInstructionDecoder {
         // dataAsArray[idx++] = 0xff010113; // ADDI x2, x2, -16
         // dataAsArray[idx++] = 0x00112623; // SW x1, 12(x2)
         // dataAsArray[idx++] = 0x00812423; // SW x8, 8(x2)
-        // dataAsArray[idx++] = 0x02a50433; // MUL x8, x10, x10 
+        // dataAsArray[idx++] = 0x02a50433; // MUL x8, x10, x10
         // dataAsArray[idx++] = 0x03400513; // ADDI x10, x0, 52
         // dataAsArray[idx++] = 0x00040593; // ADDI x11, x8, 0
         // dataAsArray[idx++] = 0x018000ef; // JAL x1, 24
@@ -90,7 +90,7 @@ public class RISCVInstructionDecoder {
         // dataAsArray[idx++] = 0x00008067; // JALR x0, x1, 0
         // dataAsArray[idx++] = 0x00008067; // JALR x0, x1, 0
         // dataAsArray[idx++] = 0x000a6425; // c.lui x8, 9
-        
+
         int[] dataAsArray = new int[256];
         int idx = 0;
         idx = insertFibonacciApp(dataAsArray, idx);
@@ -294,12 +294,12 @@ public class RISCVInstructionDecoder {
             case B: {
 
                 //
-                // The encoding/decoding scheme only makes sense when looking at 
+                // The encoding/decoding scheme only makes sense when looking at
                 // https://en.wikipedia.org/wiki/RISC-V#ISA_base_and_extensions
                 // and the graphic "32-bit RISC-V instruction formats"
                 //
-                // Each cell of the encoded instruction contains the target indexes 
-                // in the decoded immediate. This means, you take the value from a 
+                // Each cell of the encoded instruction contains the target indexes
+                // in the decoded immediate. This means, you take the value from a
                 // cell and place that value into the location that the cell is labeled
                 // with!
                 //
@@ -357,12 +357,12 @@ public class RISCVInstructionDecoder {
                 RISCVRegister rdRISCVRegister = RISCVRegister.fromValue(rd);
 
                 //
-                // The encoding/decoding scheme only makes sense when looking at 
+                // The encoding/decoding scheme only makes sense when looking at
                 // https://en.wikipedia.org/wiki/RISC-V#ISA_base_and_extensions
                 // and the graphic "32-bit RISC-V instruction formats"
                 //
-                // Each cell of the encoded instruction contains the target indexes 
-                // in the decoded immediate. This means, you take the value from a 
+                // Each cell of the encoded instruction contains the target indexes
+                // in the decoded immediate. This means, you take the value from a
                 // cell and place that value into the location that the cell is labeled
                 // with!
                 //
@@ -417,7 +417,7 @@ public class RISCVInstructionDecoder {
                 riscRow.setRiscVInstruction(riscVInstruction);
                 riscRow.setRdRISCVRegister(rdRISCVRegister);
                 riscRow.setImmediate(immCombined);
-                        
+
                 return riscRow;
             }
 
@@ -428,12 +428,13 @@ public class RISCVInstructionDecoder {
 
     /**
      * page 67 RISC V specification v2.2 (https://riscv.org/wp-content/uploads/2017/05/riscv-spec-v2.2.pdf)
-     * @param data 
+     * @param data
      */
     private ExplicitRISCVRow decodeCStandardExtension(int idx, int data) {
 
-        String encodedInstructionBinary = StringUtils.leftPad(Integer.toBinaryString(data), 32, '0');
-        System.out.println(encodedInstructionBinary);
+        // DEBUG
+        // String encodedInstructionBinary = StringUtils.leftPad(Integer.toBinaryString(data), 32, '0');
+        // System.out.println(encodedInstructionBinary);
 
         int opcode1 = ((data & 0xE000) >> 11);
         int opcode2 = ((data & 0x03) >> 0);
@@ -556,7 +557,7 @@ public class RISCVInstructionDecoder {
 
     /**
      * https://riscv.org/wp-content/uploads/2017/05/riscv-spec-v2.2.pdf
-     * 
+     *
      * @param opcode
      * @param funct3
      * @param funct7

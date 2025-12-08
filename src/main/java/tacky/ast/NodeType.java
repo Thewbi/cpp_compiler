@@ -31,9 +31,11 @@ public enum NodeType {
     FunctionCall,
 
     Value,
-    
-    DataType, 
-    
-    Sizeof;
+
+    DataType,
+
+    Sizeof,
+
+    Putint;
 
 }

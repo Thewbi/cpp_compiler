@@ -50,6 +50,8 @@ public enum ASTNodeType {
 
     DATA_TYPE,
 
-    SIZEOF;
+    SIZEOF,
+
+    PUTINT;
 
 }

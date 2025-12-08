@@ -32,7 +32,7 @@ public class PreprocessorParserListener extends PreprocessorParserBaseListener {
         String filename = terminalNode.getText();
         filename = StringUtils.replace(filename, "\"", "");
 
-        System.out.println("Including: \"" + filename + "\"");
+        // System.out.println("Including: \"" + filename + "\"");
 
         if (!processedIncludeFiles.contains(filename)) {
         //if (!processedIncludeFiles.contains("test2.h")) {

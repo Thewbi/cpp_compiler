@@ -131,6 +131,7 @@ statement :
     | function_call
     | exit_call
     | printf_call
+    | putint_call
     | sizeof_call
     ;
 
@@ -322,6 +323,10 @@ exit_call :
 
 printf_call :
     PRINTF LEFT_PAREN StringLiteral (COMMA exprList)? RIGHT_PAREN
+    ;
+
+putint_call :
+    PUTINT LEFT_PAREN expr RIGHT_PAREN
     ;
 
 sizeof_call :

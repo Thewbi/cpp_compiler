@@ -29,7 +29,7 @@ public class DefaultExpressionBuilder implements ExpressionBuilder {
 
         // DEBUG
         //System.out.println(token + " Type: " + vocabulary.getSymbolicName(token.getType()));
-        System.out.println(token);
+        // System.out.println(token);
 
         // // DEBUG
         // if (token.getText().equalsIgnoreCase("*")) {
@@ -225,7 +225,7 @@ public class DefaultExpressionBuilder implements ExpressionBuilder {
                     } else {
                         tempParent.children.add(stackASTNode);
                     }
-                    
+
                 } else {
 
                     // inserting them into the parent as is
@@ -340,5 +340,5 @@ public class DefaultExpressionBuilder implements ExpressionBuilder {
     public Stack<ASTNode> getStack() {
         return stack;
     }
-    
+
 }

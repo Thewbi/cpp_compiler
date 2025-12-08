@@ -32,7 +32,7 @@ public class DefaultRegisterFile implements IRegisterFile, EventHandler<GridChan
 
     /**
      * ctor
-     * 
+     *
      * https://en.wikichip.org/wiki/risc-v/registers
      */
     public DefaultRegisterFile() {
@@ -173,9 +173,9 @@ public class DefaultRegisterFile implements IRegisterFile, EventHandler<GridChan
 
         rows.add(row);
 
-        
-        
-        
+
+
+
         rowIdx = 4;
         row = FXCollections.observableArrayList();
         spreadsheetCell = SpreadsheetCellType.STRING.createCell(rowIdx, 0, 1, 1, "x4 (tp)");
@@ -354,7 +354,7 @@ public class DefaultRegisterFile implements IRegisterFile, EventHandler<GridChan
         int targetAddress = col * 8 + row;
         registerFile[targetAddress] = IntegerParserUtil.parseInt((String) gridChangeEvent.getNewValue());
 
-        System.out.println(targetAddress);
+        // System.out.println(targetAddress);
     }
-    
+
 }

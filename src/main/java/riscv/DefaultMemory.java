@@ -10,9 +10,7 @@ import common.IMemory;
 import common.IntegerParserUtil;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.Event;
 import javafx.event.EventHandler;
-import javafx.event.EventType;
 
 public class DefaultMemory implements IMemory, EventHandler<GridChange> {
 

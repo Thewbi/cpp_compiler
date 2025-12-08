@@ -6,6 +6,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 
 import ast.ASTNode;
+import ast.ASTNodeType;
 import ast.DeclaratorASTNode;
 import ast.ExpressionASTNode;
 import ast.ExpressionType;
@@ -202,6 +203,11 @@ public class TackyGenerator {
             processFunctionCall(indent, astNode);
 
         } else if (calledFunctionName.equalsIgnoreCase("exit")) {
+
+            // special treatment for exit()
+            processFunctionCall(indent, astNode);
+
+        } else if (calledFunctionName.equalsIgnoreCase("putint")) {
 
             // special treatment for exit()
             processFunctionCall(indent, astNode);
@@ -437,6 +443,17 @@ public class TackyGenerator {
     }
 
     private void enterSimpleDeclaration(int indent, SimpleDeclarationASTNode simpleDeclarationASTNode) {
+
+        if (simpleDeclarationASTNode.type != null) {
+            if (simpleDeclarationASTNode.type.equalsIgnoreCase("putint")) {
+                System.out.println("putint");
+
+                String indentString = buildIndentString(indent);
+                //processPutintFunctionCall(simpleDeclarationASTNode, indentString);
+                stringBuilder.append(indentString).append("putint").append(simpleDeclarationASTNode.getChildren().get(0).value).append("\n");
+            }
+        }
+
         for (ASTNode astNode : simpleDeclarationASTNode.children) {
             process(indent, astNode);
         }
@@ -513,7 +530,34 @@ public class TackyGenerator {
             stringBuilder.append(")");
             stringBuilder.append("\n");
 
+        } else if (functionName.equalsIgnoreCase("putint")) {
+
+            processPutintFunctionCall(declaratorASTNode, indentString);
+
         }
+    }
+
+    private void processPutintFunctionCall(ASTNode declaratorASTNode, String indentString) {
+
+        stringBuilder.append(indentString).append("putint").append("(");
+
+        int counter = 0;
+        for (ASTNode child : declaratorASTNode.getChildren()) {
+            counter++;
+            if (counter == 1) {
+                continue;
+            }
+            if (counter > 2) {
+                stringBuilder.append(",");
+            }
+
+            if (child.value != null) {
+                stringBuilder.append(child.value);
+            }
+        }
+
+        stringBuilder.append(")");
+        stringBuilder.append("\n");
     }
 
     private void processVariableDeclaration(int indent, DeclaratorASTNode declaratorASTNode) {
@@ -687,8 +731,11 @@ public class TackyGenerator {
 
                     } else {
 
-                        retrieveValueFromArrayElementByVariable(indent, declaratorASTNode, arrayPointerName, c1.value,
-                                destinationVariableName);
+                        retrieveValueFromArrayElementByVariable(indent,
+                            declaratorASTNode,
+                            arrayPointerName,
+                            c1.value,
+                            destinationVariableName);
 
                     }
 
@@ -814,17 +861,39 @@ public class TackyGenerator {
 
                 ExpressionASTNode child0ExpressionASTNode = (ExpressionASTNode) child0ASTNode;
 
-                // ASTNode child1ASTNode = declaratorASTNode.children.get(1);
+                // ASTNode child0ASTNode = declaratorASTNode.children.get(0);
                 ExpressionASTNode child1expressionASTNode = (ExpressionASTNode) declaratorASTNode.children.get(1);
 
-                // String expr = outputExpression(child1expressionASTNode);
-                String expr = evaluateToString(indent + 1, child1expressionASTNode);
+                if (child1expressionASTNode.expressionType == ExpressionType.ArrayIndexing) {
 
-                // defineVariable(indent, child0ExpressionASTNode.value, null);
+                    System.out.println("array indexing");
 
-                stringBuilder.append(indentString)
-                        .append(child0ExpressionASTNode.value).append(" = ");
-                stringBuilder.append(expr).append("\n");
+                    String arrayName = child1expressionASTNode.value;
+
+                    String tempVarName = arrayName + ".addr.ptr";
+
+                    defineVariable(indent, tempVarName, null);
+
+                    String destVarName = declaratorASTNode.children.get(0).value;
+                    String idx = child1expressionASTNode.children.get(1).value;
+
+                    retrieveValueFromArrayElementByVariable(indent,
+                        declaratorASTNode,
+                        tempVarName,
+                        idx,
+                        destVarName);
+
+                } else {
+
+                    String expr = evaluateToString(indent + 1, child1expressionASTNode);
+
+                    // defineVariable(indent, child0ExpressionASTNode.value, null);
+
+                    stringBuilder.append(indentString)
+                            .append(child0ExpressionASTNode.value).append(" = ");
+                    stringBuilder.append(expr).append("\n");
+
+                }
 
                 // // @formatter:off
                 // stringBuilder.append(child0ExpressionASTNode.value)
@@ -907,6 +976,7 @@ public class TackyGenerator {
         stringBuilder.append(indentString)
             .append(arrayPtrName + ".ptr.tmp").append(" = ")
             .append(arrayPtrName).append(" - ")
+            // .append(arrayPtrName).append(" + ")
             .append(arrayPtrName + ".ptr.tmp.1")
             .append("\n");
 
@@ -950,8 +1020,8 @@ public class TackyGenerator {
     }
 
     private void retrieveValueFromArrayElementByVariable(int indent, DeclaratorASTNode declaratorASTNode,
-            String arrayPtrName, String indexVarName, String destinationVariableName) {
-        generateArrayAccessIndexer(indent, arrayPtrName, indexVarName, destinationVariableName);
+            String arrayPtrName, String arrayElementIndex, String destinationVariableName) {
+        generateArrayAccessIndexer(indent, arrayPtrName, arrayElementIndex, destinationVariableName);
     }
 
     private void generateArrayAccessIndexer(int indent, String arrayPtrName, String arrayElementIndex,
@@ -989,6 +1059,7 @@ public class TackyGenerator {
         stringBuilder.append(indentString)
                 .append(arrayPtrName + ".ptr.tmp").append(" = ")
                 .append(arrayPtrName).append(" - ")
+                // .append(arrayPtrName).append(" + ")
                 .append(arrayPtrName + ".ptr.tmp.1")
                 .append("\n");
 
@@ -1145,7 +1216,8 @@ public class TackyGenerator {
 
             case Equality: {
                 // ASTNode child1ASTNode = selectionStatementASTNode.getChildren().get(0);
-                // ExpressionASTNode child1ExpressionASTNode = (ExpressionASTNode) child1ASTNode;
+                // ExpressionASTNode child1ExpressionASTNode = (ExpressionASTNode)
+                // child1ASTNode;
 
                 String evalLHS = evaluateToString(indent, (ExpressionASTNode) child0ExpressionASTNode.children.get(0));
                 String evalRHS = evaluateToString(indent, (ExpressionASTNode) child0ExpressionASTNode.children.get(1));
@@ -1640,6 +1712,7 @@ public class TackyGenerator {
 
             case Identifier:
                 return expressionASTNode.value;
+
 
             default:
                 throw new RuntimeException();

@@ -19,6 +19,7 @@ import tacky.ast.JumpASTNode;
 import tacky.ast.LabelASTNode;
 import tacky.ast.LoadFromAddressASTNode;
 import tacky.ast.PrintfASTNode;
+import tacky.ast.PutintASTNode;
 import tacky.ast.ReturnASTNode;
 import tacky.ast.SizeofASTNode;
 import tacky.ast.ValueASTNode;
@@ -29,25 +30,31 @@ import types.FormalParameter;
 
 public class RISCVCodeGenerator implements Generator {
 
-    private static final int FP_OFFSET = 4;
+    // output of code
 
-    // private static final String STACK_POINTER = "sp";
+    public StringBuilder stringBuilder = new StringBuilder();
+
+    public String indent = "        ";
+
+    // stack frame generation
+
+    private static final int FP_OFFSET = 4;
 
     private static final String FRAME_POINTER = "fp";
 
-    // private static final boolean PRINT_STACK_FRAME_LAYOUT = true;
-    private static final boolean PRINT_STACK_FRAME_LAYOUT = false;
-
-    public StringBuilder stringBuilder = new StringBuilder();
+    private static final boolean PRINT_STACK_FRAME_LAYOUT = true;
+    // private static final boolean PRINT_STACK_FRAME_LAYOUT = false;
 
     private int stackPointer = 0x20000;
     private int framePointer = 0x20000;
 
     public RISCVStackFrame stackFrame;
 
-    public String indent = "        ";
+    // function parameter handling
 
     public FunctionDefinitionASTNode prototype;
+
+    // printf processing
 
     public int literalStringRecordIndex;
 
@@ -80,6 +87,17 @@ public class RISCVCodeGenerator implements Generator {
         stringBuilder.append("puts:").append("\n");
         // li a7, 92 ; ecall for puts
         stringBuilder.append(indent).append("li      a7, 92   # ecall for puts").append("\n");
+        // ecall
+        stringBuilder.append(indent).append("ecall").append("\n");
+        // jr ra
+        stringBuilder.append(indent).append("jr      ra").append("\n");
+
+        // add definition of "putint" function
+
+        // putint:
+        stringBuilder.append("putint:").append("\n");
+        // li a7, 92 ; ecall for putint
+        stringBuilder.append(indent).append("li      a7, 105   # ecall for putint").append("\n");
         // ecall
         stringBuilder.append(indent).append("ecall").append("\n");
         // jr ra
@@ -430,6 +448,12 @@ public class RISCVCodeGenerator implements Generator {
         // 1. for each local variable declaration used in this function,
         // insert it into the data structure first
         for (ASTNode astNode : functionAstNode.children) {
+
+            // in order to correctly allocate memory for all local variables,
+            // this has to recursively dive into the for-loop and if-else statements.
+            // Basically, every nested scope has to be visited and local varibles need
+            // to go into the stack frame.
+
             @SuppressWarnings("unused")
             RISCVStackEntry stackEntry = astNode.addToStackFrame(stackFrame);
         }
@@ -464,6 +488,8 @@ public class RISCVCodeGenerator implements Generator {
         // (I think GCC always builds stack frames with a multiple of
         // 16 byte sizes! Not all elements are used!)
 
+        stringBuilder.append(indent).append("print_reg sp").append("\n");
+
         // @formatter:off
         stringBuilder.append(indent)
             .append("addi    sp, sp, ").append((-1) * stackSizeUsed)
@@ -479,7 +505,7 @@ public class RISCVCodeGenerator implements Generator {
         // sw s0,24(sp) // store old s0/fp (frame pointer) on the stack so it can be
         // restored later because it will be used within this function
         stringBuilder.append(indent)
-                .append("sw      s0, " + (stackSizeUsed - 8) + "(sp)")
+                .append("sw      fp, " + (stackSizeUsed - 8) + "(sp)")
                 .append("\n");
 
         // set new s0/fp (frame pointer) to the start of our new
@@ -489,7 +515,7 @@ public class RISCVCodeGenerator implements Generator {
 
         // addi s0, sp, 32
         stringBuilder.append(indent)
-                .append("addi    s0, sp, ").append(stackSizeUsed)
+                .append("addi    fp, sp, ").append(stackSizeUsed)
                 .append("\n");
 
         stackPointer -= stackSizeUsed;
@@ -559,8 +585,13 @@ public class RISCVCodeGenerator implements Generator {
                 .append("addi    sp, sp, ").append(stackSizeUsed)
                 .append("\n");
 
+        stringBuilder.append(indent).append("print_reg sp").append("\n");
+
         // comment
         stringBuilder.append(indent).append("# -- stack frame remove --").append("\n");
+
+        // DEBUG - NOP
+        stringBuilder.append(indent).append("nop").append("\n");
 
         // jump to return address
         stringBuilder.append(indent).append("# ").append("<processReturn()>").append("\n");
@@ -1045,6 +1076,11 @@ public class RISCVCodeGenerator implements Generator {
             // special treatment for built-in exit()
             processExitFunctionCall((ExitASTNode) astNode);
 
+        } else if (astNode instanceof PutintASTNode) {
+
+            // special treatment for built-in exit()
+            processPutintFunctionCall((PutintASTNode) astNode);
+
         } else if (astNode instanceof FunctionCallASTNode) {
 
             FunctionDefinitionASTNode currentFunction = (FunctionDefinitionASTNode) astNode.parent;
@@ -1059,6 +1095,26 @@ public class RISCVCodeGenerator implements Generator {
             throw new RuntimeException();
 
         }
+    }
+
+    private void processPutintFunctionCall(PutintASTNode astNode) {
+
+        // save a0 because it is used
+        stringBuilder.append(indent).append("mv      t6, a0").append("\n");
+
+        String tempRegister = "a0";
+        loadLocalVariableIntoTempRegister(tempRegister, astNode.value);
+
+        // stringBuilder.append(indent)
+        //     .append("li      ").append(tempRegister).append(", ")
+        //     .append(astNode.value)
+        //     .append("\n");
+
+        // call putint
+        stringBuilder.append(indent).append("call    putint").append("\n");
+
+        // restore a0
+        stringBuilder.append(indent).append("mv      a0, t6").append("\n");
     }
 
     private void processFunctionCall(FunctionDefinitionASTNode callerFunctionCallASTNode,
@@ -1111,8 +1167,18 @@ public class RISCVCodeGenerator implements Generator {
             index++;
         }
 
+        // DEBUG - NOP
+        // stringBuilder.append(indent).append("nop").append("\n");
+
+        stringBuilder.append(indent).append("print_reg sp").append("\n");
+
         // call function
         stringBuilder.append(indent).append("call    ").append(calleeFunctionName).append("\n");
+
+        stringBuilder.append(indent).append("print_reg sp").append("\n");
+
+        // DEBUG - NOP
+        stringBuilder.append(indent).append("nop").append("\n");
 
         // get actual parameters back
         for (@SuppressWarnings("unused")
@@ -1194,8 +1260,12 @@ public class RISCVCodeGenerator implements Generator {
                 .append(", ").append("%lo(").append(literalStringRecord.getLabel()).append(")")
                 .append("\n");
 
+        stringBuilder.append(indent).append("print_reg sp").append("\n");
+
         // call puts
         stringBuilder.append(indent).append("call    puts").append("\n");
+
+        stringBuilder.append(indent).append("print_reg sp").append("\n");
 
         // restore a0
         stringBuilder.append(indent).append("mv      a0, t6").append("\n");

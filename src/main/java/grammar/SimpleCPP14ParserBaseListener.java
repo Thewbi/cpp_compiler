@@ -1,6 +1,5 @@
 package grammar;
 
-import org.antlr.v4.runtime.tree.ParseTree;
 import org.apache.commons.lang3.math.NumberUtils;
 
 import com.cpp.grammar.CPP14Parser;
@@ -24,7 +23,6 @@ import ast.PostFixExpressionASTNode;
 import ast.SelectionStatementASTNode;
 import ast.SimpleDeclarationASTNode;
 import ast.StatementType;
-import tacky.ast.FunctionCallASTNode;
 
 public class SimpleCPP14ParserBaseListener extends CPP14ParserBaseListener {
 
@@ -34,6 +32,8 @@ public class SimpleCPP14ParserBaseListener extends CPP14ParserBaseListener {
 
     @Override
     public void enterSimpleDeclaration(CPP14Parser.SimpleDeclarationContext ctx) {
+
+        // System.out.println("[" + ctx.hashCode() + "] " + ctx.getText());
 
         SimpleDeclarationASTNode simpleDeclarationASTNode = new SimpleDeclarationASTNode();
         simpleDeclarationASTNode.ctx = ctx;
@@ -53,6 +53,8 @@ public class SimpleCPP14ParserBaseListener extends CPP14ParserBaseListener {
 
     @Override
     public void enterInitDeclarator(CPP14Parser.InitDeclaratorContext ctx) {
+
+        // System.out.println("[" + ctx.hashCode() + "] " + ctx.getText());
 
         if (ctx.children.size() == 1) {
             return;
@@ -119,7 +121,6 @@ public class SimpleCPP14ParserBaseListener extends CPP14ParserBaseListener {
             return;
         }
 
-        // NoPointerDeclarator noPointerDeclarator = (NoPointerDeclarator) currentNode;
         DeclaratorASTNode noPointerDeclarator = (DeclaratorASTNode) currentNode;
 
         processDeclarator(ctx, noPointerDeclarator);
@@ -218,6 +219,8 @@ public class SimpleCPP14ParserBaseListener extends CPP14ParserBaseListener {
 
     @Override
     public void enterFunctionDefinition(CPP14Parser.FunctionDefinitionContext ctx) {
+
+        // System.out.println("[" + ctx.hashCode() + "] " + ctx.getText());
 
         FunctionDeclarationASTNode functionDeclarationASTNode = new FunctionDeclarationASTNode();
         functionDeclarationASTNode.ctx = ctx;
@@ -406,12 +409,6 @@ public class SimpleCPP14ParserBaseListener extends CPP14ParserBaseListener {
         if (ctx.children.size() == 1) {
             return;
         }
-        // if (ctx.children.size() == 3) {
-        //     // empty parameter list in function
-        //     return;
-        // }
-
-        // System.out.println("[" + ctx.hashCode() + "] " + ctx.getText());
 
         if (ctx.children.size() == 2) {
 

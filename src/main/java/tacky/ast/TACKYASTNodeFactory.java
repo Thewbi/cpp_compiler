@@ -1,6 +1,7 @@
 package tacky.ast;
 
 import ast.ASTNodeType;
+import grammar.PutintASTNode;
 
 public class TACKYASTNodeFactory {
 
@@ -36,20 +37,6 @@ public class TACKYASTNodeFactory {
         AssignmentASTNode node = new AssignmentASTNode();
         node.nodeType = NodeType.Assignment;
         node.astNodeType = ASTNodeType.ASSIGNMENT;
-        return node;
-    }
-
-    public PrintfASTNode createPrintfASTNode() {
-        PrintfASTNode node = new PrintfASTNode();
-        node.nodeType = NodeType.Printf;
-        node.astNodeType = ASTNodeType.PRINTF;
-        return node;
-    }
-
-    public ExitASTNode createExitASTNode() {
-        ExitASTNode node = new ExitASTNode();
-        node.nodeType = NodeType.Exit;
-        node.astNodeType = ASTNodeType.EXIT;
         return node;
     }
 
@@ -116,10 +103,31 @@ public class TACKYASTNodeFactory {
         return node;
     }
 
+    public PrintfASTNode createPrintfASTNode() {
+        PrintfASTNode node = new PrintfASTNode();
+        node.nodeType = NodeType.Printf;
+        node.astNodeType = ASTNodeType.PRINTF;
+        return node;
+    }
+
+    public ExitASTNode createExitASTNode() {
+        ExitASTNode node = new ExitASTNode();
+        node.nodeType = NodeType.Exit;
+        node.astNodeType = ASTNodeType.EXIT;
+        return node;
+    }
+
     public SizeofASTNode createSizeofASTNode() {
         SizeofASTNode node = new SizeofASTNode();
         node.nodeType = NodeType.Sizeof;
         node.astNodeType = ASTNodeType.SIZEOF;
+        return node;
+    }
+
+    public PutintASTNode createPutintASTNode() {
+        PutintASTNode node = new PutintASTNode();
+        node.nodeType = NodeType.Putint;
+        node.astNodeType = ASTNodeType.PUTINT;
         return node;
     }
 

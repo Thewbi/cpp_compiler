@@ -41,9 +41,7 @@ public class StructureCPP14ParserListener extends CPP14ParserBaseListener {
 
     public Stack<ExpressionASTNode> expressionStack = new Stack<>();
 
-    //
     // struct, class declarations
-    //
 
     @Override
     public void enterClassSpecifier(CPP14Parser.ClassSpecifierContext ctx) {
@@ -96,9 +94,7 @@ public class StructureCPP14ParserListener extends CPP14ParserBaseListener {
         currentNode = currentNode.parent;
     }
 
-    //
     // Functions and Parameters
-    //
 
     @Override
     public void enterFunctionDefinition(CPP14Parser.FunctionDefinitionContext ctx) {
@@ -151,9 +147,7 @@ public class StructureCPP14ParserListener extends CPP14ParserBaseListener {
         currentNode = currentNode.parent;
     }
 
-    //
     // Type specifier (int, float, double, custom types ...)
-    //
 
     @Override
     public void enterTypeSpecifier(CPP14Parser.TypeSpecifierContext ctx) {
@@ -164,9 +158,7 @@ public class StructureCPP14ParserListener extends CPP14ParserBaseListener {
         currentNode.type = ctx.getChild(0).getText();
     }
 
-    //
     // typedefs
-    //
 
     @Override
     public void enterDeclSpecifier(CPP14Parser.DeclSpecifierContext ctx) {
@@ -183,9 +175,7 @@ public class StructureCPP14ParserListener extends CPP14ParserBaseListener {
         }
     }
 
-    //
     // Variable declarations
-    //
 
     @Override
     public void enterSimpleDeclaration(CPP14Parser.SimpleDeclarationContext ctx) {
@@ -278,9 +268,7 @@ public class StructureCPP14ParserListener extends CPP14ParserBaseListener {
                 .valueOf(storageSpecifierAsString.toUpperCase());
     }
 
-    //
     // Expressions
-    //
 
     @Override
     public void enterPrimaryExpression(CPP14Parser.PrimaryExpressionContext ctx) {
@@ -339,9 +327,7 @@ public class StructureCPP14ParserListener extends CPP14ParserBaseListener {
         expressionStackPush(expressionASTNode);
     }
 
-    //
     // Operators in Expressions
-    //
 
     @Override
     public void enterAdditiveExpression(CPP14Parser.AdditiveExpressionContext ctx) {
@@ -538,9 +524,7 @@ public class StructureCPP14ParserListener extends CPP14ParserBaseListener {
         expressionStackPush(expressionListASTNode);
     }
 
-    //
     // type cast
-    //
 
     @Override
     public void enterCastExpression(CPP14Parser.CastExpressionContext ctx) {
@@ -586,9 +570,7 @@ public class StructureCPP14ParserListener extends CPP14ParserBaseListener {
         expressionStackPush(expressionASTNode);
     }
 
-    //
     // Statements
-    //
 
     @Override
     public void enterCompoundStatement(CPP14Parser.CompoundStatementContext ctx) {
@@ -832,9 +814,7 @@ public class StructureCPP14ParserListener extends CPP14ParserBaseListener {
         currentNode.children.add(expressionStatementASTNode);
     }
 
-    //
     // utility
-    //
 
     private void connectToParent(ASTNode parent, ASTNode child) {
         // connect parent and child

@@ -120,6 +120,11 @@ public class DefaultTACKYExecutor implements TACKYExecutor {
                     index++;
                     break;
 
+                case Putint:
+                    executePutintBuildInFunction(tackyStackFrame, statement);
+                    index++;
+                    break;
+
                 case Exit:
                     executeExitBuildInFunction(tackyStackFrame, statement);
                     done = true;
@@ -406,6 +411,16 @@ public class DefaultTACKYExecutor implements TACKYExecutor {
 
     private void executeExitBuildInFunction(TACKYStackFrame tackyStackFrame, TACKYASTNode statement) {
         // nop
+    }
+
+    private void executePutintBuildInFunction(TACKYStackFrame tackyStackFrame, TACKYASTNode statement) {
+
+        String outputString = statement.value;
+        TACKYStackFrameVariableDescriptor varDesc = tackyStackFrame.variables.get(outputString);
+        int value = memory[varDesc.address / 4];
+
+        // print character (this is the whole purpose of putint. This is not a debug statement)
+        System.out.println(value);
     }
 
     private ReturnResult returnStatement(TACKYStackFrame tackyStackFrame, ReturnASTNode returnASTNode) {

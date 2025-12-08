@@ -24,8 +24,8 @@ public class RISCVInstructionEncoder {
             return;
         }
 
-        System.out.println("Encoding: " + riscRow);
-        System.out.println("LabelMap: " + labelMap);
+        // System.out.println("Encoding: " + riscRow);
+        // System.out.println("LabelMap: " + labelMap);
 
         // RISCVRow resolvedRiscRow = riscRow;
 
@@ -58,7 +58,7 @@ public class RISCVInstructionEncoder {
             resolvedRiscRow.setLine(riscRow.getLine());
             resolvedRiscRow.getBufferIdxs().addAll(riscRow.getBufferIdxs());
 
-            // 
+            //
             RISCVRowParam riscVRowParam = new RISCVRowParam();
             riscVRowParam.setRegister(riscRow.getParameters().get(1).getRegister());
             resolvedRiscRow.getParameters().add(riscVRowParam);
@@ -68,7 +68,7 @@ public class RISCVInstructionEncoder {
             riscVRowParam.setRegister(riscRow.getParameters().get(0).getRegister());
             resolvedRiscRow.getParameters().add(riscVRowParam);
 
-            // 
+            //
             riscVRowParam = new RISCVRowParam();
             riscVRowParam.setExpression(riscRow.getParameters().get(2).getExpression());
 
@@ -109,7 +109,7 @@ public class RISCVInstructionEncoder {
             resolvedRiscRow.setLine(riscRow.getLine());
             resolvedRiscRow.getBufferIdxs().addAll(riscRow.getBufferIdxs());
 
-            // 
+            //
             RISCVRowParam riscVRowParam = new RISCVRowParam();
             riscVRowParam.setRegister("x0");
             resolvedRiscRow.getParameters().add(riscVRowParam);
@@ -119,7 +119,7 @@ public class RISCVInstructionEncoder {
             riscVRowParam.setRegister(riscRow.getParameters().get(0).getRegister());
             resolvedRiscRow.getParameters().add(riscVRowParam);
 
-            // 
+            //
             riscVRowParam = new RISCVRowParam();
             riscVRowParam.setOffset(0);
             riscVRowParam.setExpression("0");
@@ -163,7 +163,7 @@ public class RISCVInstructionEncoder {
         // encode all rows
         //
         // if a row has children, the children are encoded instead of the row itself
-        // this happens, when a pseudo instruction is replaced by one or more 
+        // this happens, when a pseudo instruction is replaced by one or more
         // real instructions
         if (CollectionUtils.isEmpty(riscRow.getChildren())) {
             encodeRiscVRow(riscRow);
@@ -173,7 +173,7 @@ public class RISCVInstructionEncoder {
                 riscRow.getBufferIdxs().add(bufferIdx);
             }
         }
-        
+
     }
 
     private RISCVRow synthesizeJAL(final RISCVRow riscRow, final Map<String, Integer> labelMap, String instruction,
@@ -264,29 +264,29 @@ public class RISCVInstructionEncoder {
         RISCVRowParam param1 = riscVRow.getParameters().get(0);
         int registerIndexParam1 = RISCVRegister.mapRegister(param1.getRegister());
         int rd = ((registerIndexParam1) << 7);
-        System.out.println("rd " + StringUtils.leftPad(Integer.toBinaryString(rd), 12, '0'));
+        // System.out.println("rd " + StringUtils.leftPad(Integer.toBinaryString(rd), 12, '0'));
 
         // funct3
         int funct3 = RISCVInstruction.getFunc3(riscVInstruction);
         funct3 <<= 12;
-        System.out.println("funct3 " + StringUtils.leftPad(Integer.toBinaryString(funct3), 15, '0'));
+        // System.out.println("funct3 " + StringUtils.leftPad(Integer.toBinaryString(funct3), 15, '0'));
 
         // rs1
         RISCVRowParam param2 = riscVRow.getParameters().get(1);
         int registerIndexParam2 = RISCVRegister.mapRegister(param2.getRegister());
         int rs1 = ((registerIndexParam2) << 15);
-        System.out.println("rs1 " + StringUtils.leftPad(Integer.toBinaryString(rs1), 20, '0'));
+        // System.out.println("rs1 " + StringUtils.leftPad(Integer.toBinaryString(rs1), 20, '0'));
 
         // rs2
         RISCVRowParam param3 = riscVRow.getParameters().get(2);
         int registerIndexParam3 = RISCVRegister.mapRegister(param3.getRegister());
         int rs2 = ((registerIndexParam3) << 20);
-        System.out.println("rs2 " + StringUtils.leftPad(Integer.toBinaryString(rs2), 25, '0'));
+        // System.out.println("rs2 " + StringUtils.leftPad(Integer.toBinaryString(rs2), 25, '0'));
 
         // funct7
         int funct7 = RISCVInstruction.getFunc7(riscVInstruction);
         funct7 <<= 25;
-        System.out.println("funct7 " + StringUtils.leftPad(Integer.toBinaryString(funct7), 25, '0'));
+        // System.out.println("funct7 " + StringUtils.leftPad(Integer.toBinaryString(funct7), 25, '0'));
 
         // assemble
         int encoded = funct7 | rs2 | rs1 | funct3 | rd | opcode;
@@ -298,7 +298,7 @@ public class RISCVInstructionEncoder {
         //         encodedBinary);
 
         // DEBUG
-        System.out.println(IntegerParserUtil.hex(encoded));
+        // System.out.println(IntegerParserUtil.hex(encoded));
 
         riscVRow.getBufferIdxs().add(bufferIdx);
 
@@ -318,7 +318,7 @@ public class RISCVInstructionEncoder {
 
     private int encodeJ(RISCVRow riscVRow, RISCVInstruction riscVInstruction,
             RISCVInstructionType riscVInstructionType) {
-        
+
         // opcode
         int opcode = RISCVInstruction.getOpcode(riscVInstruction);
 
@@ -353,7 +353,7 @@ public class RISCVInstructionEncoder {
         //         encodedBinary);
 
         // DEBUG
-        System.out.println(IntegerParserUtil.hex(encoded));
+        // System.out.println(IntegerParserUtil.hex(encoded));
 
         riscVRow.getBufferIdxs().add(bufferIdx);
 
@@ -373,7 +373,7 @@ public class RISCVInstructionEncoder {
 
     /**
      * https://luplab.gitlab.io/rvcodecjs/#q=fee7cee3&abi=false&isa=AUTO
-     * 
+     *
      * @param riscVRow
      * @param riscVInstruction
      * @param riscVInstructionType
@@ -384,24 +384,24 @@ public class RISCVInstructionEncoder {
 
         // opcode
         int opcode = RISCVInstruction.getOpcode(riscVInstruction);
-        System.out.println("opcode " + StringUtils.leftPad(Integer.toBinaryString(opcode), 7, '0'));
+        // System.out.println("opcode " + StringUtils.leftPad(Integer.toBinaryString(opcode), 7, '0'));
 
         // funct3
         int funct3 = RISCVInstruction.getFunc3(riscVInstruction);
         funct3 <<= 12;
-        System.out.println("funct3 " + StringUtils.leftPad(Integer.toBinaryString(funct3), 15, '0'));
+        // System.out.println("funct3 " + StringUtils.leftPad(Integer.toBinaryString(funct3), 15, '0'));
 
         // rs1
         RISCVRowParam param1 = riscVRow.getParameters().get(0);
         int registerIndexParam1 = RISCVRegister.mapRegister(param1.getRegister());
         int rs1 = ((registerIndexParam1) << 15);
-        System.out.println("rs1 " + StringUtils.leftPad(Integer.toBinaryString(rs1), 20, '0'));
+        // System.out.println("rs1 " + StringUtils.leftPad(Integer.toBinaryString(rs1), 20, '0'));
 
         // rs2
         RISCVRowParam param2 = riscVRow.getParameters().get(1);
         int registerIndexParam2 = RISCVRegister.mapRegister(param2.getRegister());
         int rs2 = ((registerIndexParam2) << 20);
-        System.out.println("rs2 " + StringUtils.leftPad(Integer.toBinaryString(rs2), 25, '0'));
+        // System.out.println("rs2 " + StringUtils.leftPad(Integer.toBinaryString(rs2), 25, '0'));
 
         // immediate
         RISCVRowParam param3 = riscVRow.getParameters().get(2);
@@ -414,25 +414,25 @@ public class RISCVInstructionEncoder {
             throw new RuntimeException("Could not retrieve an immediate value!");
         }
 
-        System.out.println("immediateValue " + StringUtils.leftPad(Integer.toBinaryString(immediateValue), 32, '0'));
+        // System.out.println("immediateValue " + StringUtils.leftPad(Integer.toBinaryString(immediateValue), 32, '0'));
 
         int imm11 = ((immediateValue & 0b100000000000) >> 4);
-        System.out.println("imm11 " + StringUtils.leftPad(Integer.toBinaryString(imm11), 8, '0'));
+        // System.out.println("imm11 " + StringUtils.leftPad(Integer.toBinaryString(imm11), 8, '0'));
 
         int imm41 = ((immediateValue & 0b11110) << 7);
-        System.out.println("imm41 " + StringUtils.leftPad(Integer.toBinaryString(imm41), 12, '0'));
+        // System.out.println("imm41 " + StringUtils.leftPad(Integer.toBinaryString(imm41), 12, '0'));
 
         int imm105 = ((immediateValue & 0b11111100000) << 20);
-        System.out.println("imm105 " + StringUtils.leftPad(Integer.toBinaryString(imm105), 31, '0'));
+        // System.out.println("imm105 " + StringUtils.leftPad(Integer.toBinaryString(imm105), 31, '0'));
 
         int imm12 = ((immediateValue & 0b1000000000000) << 19);
-        System.out.println("imm12 " + StringUtils.leftPad(Integer.toBinaryString(imm12), 32, '0'));
+        // System.out.println("imm12 " + StringUtils.leftPad(Integer.toBinaryString(imm12), 32, '0'));
 
         // assemble
         int encoded = imm12 | imm105 | rs2 | rs1 | funct3 | imm41 | imm11 | opcode;
 
         // DEBUG
-        System.out.println(IntegerParserUtil.hex(encoded));
+        // System.out.println(IntegerParserUtil.hex(encoded));
 
         // // DEBUG
         // String encodedBinary = StringUtils.leftPad(Integer.toBinaryString(encoded), 32,
@@ -441,23 +441,22 @@ public class RISCVInstructionEncoder {
         //         encodedBinary);
 
         // DEBUG
-        System.out.println(IntegerParserUtil.hex(encoded));
+        // System.out.println(IntegerParserUtil.hex(encoded));
 
         riscVRow.getBufferIdxs().add(bufferIdx);
 
         int oldBufferIdx = bufferIdx;
         IntegerParserUtil.insert(buffer, bufferIdx, encoded);
 
-        // DEBUG
-        int encodedInstruction = IntegerParserUtil.retrieveIntegerFromBuffer(buffer, bufferIdx);
-        if (encodedInstruction != 0) {
-            System.out.println(IntegerParserUtil.hex(encodedInstruction));
-        }
+        // // DEBUG
+        // int encodedInstruction = IntegerParserUtil.retrieveIntegerFromBuffer(buffer, bufferIdx);
+        // if (encodedInstruction != 0) {
+        //     System.out.println(IntegerParserUtil.hex(encodedInstruction));
+        // }
 
         bufferIdx += 4;
 
         return oldBufferIdx;
-                
     }
 
     /**
@@ -465,7 +464,7 @@ public class RISCVInstructionEncoder {
      * sw ra, 28(sp)
      * 0x00112e23
      * </pre>
-     * 
+     *
      * @param riscRow
      * @param riscVInstruction
      * @param riscVInstructionType
@@ -528,7 +527,7 @@ public class RISCVInstructionEncoder {
         //         encodedBinary);
 
         // DEBUG
-        System.out.println(IntegerParserUtil.hex(encoded));
+        // System.out.println(IntegerParserUtil.hex(encoded));
 
         riscVRow.getBufferIdxs().add(bufferIdx);
 
@@ -551,7 +550,7 @@ public class RISCVInstructionEncoder {
      * 0x02010413
      * ADDI x8, x2, 32
      * </pre>
-     * 
+     *
      * @param riscVRow
      * @param riscVInstruction
      * @param riscVInstructionType
@@ -559,7 +558,7 @@ public class RISCVInstructionEncoder {
     private int encodeI(RISCVRow riscVRow, RISCVInstruction riscVInstruction,
             RISCVInstructionType riscVInstructionType) {
 
-        System.out.println("Encoding: " + riscVRow);
+        // System.out.println("Encoding: " + riscVRow);
 
         // TODO: remember the index of the current byte in the output buffer where
         // this riscRow has been assembled into.
@@ -605,7 +604,7 @@ public class RISCVInstructionEncoder {
         } else {
             immediateValue = riscVRow.getParameters().get(1).getOffset();
         }
-        
+
         int imm110 = ((immediateValue) << 20);
 
         // DEBUG
@@ -624,7 +623,7 @@ public class RISCVInstructionEncoder {
         //         encodedBinary);
 
         // DEBUG
-        System.out.println(IntegerParserUtil.hex(encoded));
+        // System.out.println(IntegerParserUtil.hex(encoded));
 
         riscVRow.getBufferIdxs().add(bufferIdx);
 

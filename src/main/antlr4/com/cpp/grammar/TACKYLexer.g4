@@ -31,7 +31,11 @@ fragment Z:[zZ];
 // Custom
 //
 
+EXIT : E X I T ;
+
 PRINTF : P R I N T F ;
+
+PUTINT : P U T I N T ;
 
 SIZEOF : S I Z E O F ;
 
@@ -71,7 +75,6 @@ DOUBLETOINT : D O U B L E T O I N T ;
 DOUBLETOUINT : D O U B L E T O U I N T ;
 
 EQUAL : E Q U A L ;
-EXIT : E X I T ;
 
 FALSE : F A L S E ;
 FUNCCALL : F U N C C A L L ;

@@ -5,7 +5,6 @@ import java.util.Map;
 
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.ParseTree;
-import org.antlr.v4.runtime.tree.TerminalNode;
 import org.antlr.v4.runtime.tree.TerminalNodeImpl;
 
 import com.cpp.grammar.TACKYLexer;
@@ -35,6 +34,7 @@ import tacky.ast.LabelASTNode;
 import tacky.ast.LoadFromAddressASTNode;
 import tacky.ast.PrintfASTNode;
 import tacky.ast.ProgramASTNode;
+import tacky.ast.PutintASTNode;
 import tacky.ast.ReturnASTNode;
 import tacky.ast.SizeofASTNode;
 import tacky.ast.StoreToAddressASTNode;
@@ -49,8 +49,6 @@ import types.FormalParameter;
 public class StructureTACKYParserListener extends TACKYParserBaseListener {
 
     public ASTNode currentNode;
-
-    // public ASTNode constVal;
 
     public TACKYASTNodeFactory tackyASTNodeFactory = new TACKYASTNodeFactory();
 
@@ -390,6 +388,25 @@ public class StructureTACKYParserListener extends TACKYParserBaseListener {
     public void exitExit_call(TACKYParser.Exit_callContext ctx) {
         ascend();
     }
+
+    // putint()
+
+    @Override
+    public void enterPutint_call(TACKYParser.Putint_callContext ctx) {
+
+        PutintASTNode exitASTNode = tackyASTNodeFactory.createPutintASTNode();
+        exitASTNode.value = ctx.getChild(2).getText();
+        exitASTNode.astNodeType = ASTNodeType.FUNCTION_CALL;
+
+        // connect parent and child
+        connectToParent(currentNode, exitASTNode);
+
+        // descend
+        descend(exitASTNode);
+    }
+
+	@Override
+    public void exitPutint_call(TACKYParser.Putint_callContext ctx) { ascend(); }
 
     // Function Call
 
