@@ -483,7 +483,7 @@ usingDeclaration:
 usingDirective:
 	attributeSpecifierSeq? Using Namespace nestedNameSpecifier? namespaceName Semi;
 
-asmDefinition: Asm LeftParen StringLiteral RightParen Semi;
+asmDefinition: Asm LeftParen StringLiteral+ RightParen Semi;
 
 linkageSpecification:
 	Extern StringLiteral (

@@ -21,6 +21,7 @@ import ast.ASTNodeType;
 import ast.ExpressionASTNode;
 import ast.ExpressionType;
 import common.StringUtil;
+import tacky.ast.AsmStatementASTNode;
 import tacky.ast.AssignmentASTNode;
 import tacky.ast.ConstCharASTNode;
 import tacky.ast.ConstIntASTNode;
@@ -405,8 +406,10 @@ public class StructureTACKYParserListener extends TACKYParserBaseListener {
         descend(exitASTNode);
     }
 
-	@Override
-    public void exitPutint_call(TACKYParser.Putint_callContext ctx) { ascend(); }
+    @Override
+    public void exitPutint_call(TACKYParser.Putint_callContext ctx) {
+        ascend();
+    }
 
     // Function Call
 
@@ -661,6 +664,7 @@ public class StructureTACKYParserListener extends TACKYParserBaseListener {
 
     @Override
     public void enterReturn_statement(TACKYParser.Return_statementContext ctx) {
+
         ReturnASTNode returnASTNode = tackyASTNodeFactory.createReturnASTNode();
 
         connectToParent(currentNode, returnASTNode);
@@ -677,6 +681,7 @@ public class StructureTACKYParserListener extends TACKYParserBaseListener {
 
     @Override
     public void enterExpr(TACKYParser.ExprContext ctx) {
+
         // System.out.println("ENTER [" + ctx.hashCode() + "] " + ctx.getText());
 
         ExpressionASTNode expressionASTNode = new ExpressionASTNode();
@@ -744,6 +749,23 @@ public class StructureTACKYParserListener extends TACKYParserBaseListener {
             valueASTNode.value = ctx.getText();
             connectToParent(currentNode, valueASTNode);
         }
+    }
+
+    // asm
+
+    @Override
+    public void enterAsm_statement(TACKYParser.Asm_statementContext ctx) {
+
+        AsmStatementASTNode asmStatementASTNode = tackyASTNodeFactory.createAsmStatementASTNode();
+
+        String asmLine = ctx.children.get(2).getText();
+        asmStatementASTNode.value = asmLine;
+
+        connectToParent(currentNode, asmStatementASTNode);
+    }
+
+    @Override
+    public void exitAsm_statement(TACKYParser.Asm_statementContext ctx) {
     }
 
     // Terminal - all keywords

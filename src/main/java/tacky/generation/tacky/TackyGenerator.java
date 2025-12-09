@@ -2,11 +2,10 @@ package tacky.generation.tacky;
 
 import java.util.Stack;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 
 import ast.ASTNode;
-import ast.ASTNodeType;
+import ast.AsmDefinitionASTNode;
 import ast.DeclaratorASTNode;
 import ast.ExpressionASTNode;
 import ast.ExpressionType;
@@ -18,7 +17,6 @@ import ast.PostFixExpressionASTNode;
 import ast.SelectionStatementASTNode;
 import ast.SimpleDeclarationASTNode;
 import ast.StatementASTNode;
-import tacky.ast.FunctionCallASTNode;
 import tacky.runtime.TACKYStackFrame;
 import tacky.runtime.TACKYStackFrameVariableDescriptor;
 
@@ -123,7 +121,6 @@ public class TackyGenerator {
                 break;
 
             case RETURN: {
-                // System.out.println("return");
                 JumpStatementASTNode returnStatementASTNode = (JumpStatementASTNode) astNode;
                 switch (returnStatementASTNode.statementType) {
                     case RETURN:
@@ -132,6 +129,15 @@ public class TackyGenerator {
                         break;
                     default:
                         throw new RuntimeException();
+                }
+            }
+                break;
+
+            case ASM_STATEMENT: {
+                AsmDefinitionASTNode asmDefinitionASTNode = (AsmDefinitionASTNode) astNode;
+                String indentString = buildIndentString(indent);
+                for (String asmLine : asmDefinitionASTNode.asmLines) {
+                    stringBuilder.append(indentString).append("asm(\"").append(asmLine).append("\")").append("\n");
                 }
             }
                 break;
@@ -186,7 +192,7 @@ public class TackyGenerator {
 
         String calledFunctionName = astNode.children.get(0).value;
 
-        stringBuilder.append("\n");
+        // stringBuilder.append("\n");
         stringBuilder.append(indentString).append("# -- Function -- ").append(calledFunctionName).append("\n");
 
         // -- function return value + actual parameters --
@@ -433,7 +439,7 @@ public class TackyGenerator {
             stringBuilder.append(", ").append(returnValueVariableName).append(")").append("\n");
         }
 
-        stringBuilder.append("\n");
+        // stringBuilder.append("\n");
 
         return returnValueVariableName;
     }
@@ -449,8 +455,9 @@ public class TackyGenerator {
                 System.out.println("putint");
 
                 String indentString = buildIndentString(indent);
-                //processPutintFunctionCall(simpleDeclarationASTNode, indentString);
-                stringBuilder.append(indentString).append("putint").append(simpleDeclarationASTNode.getChildren().get(0).value).append("\n");
+                // processPutintFunctionCall(simpleDeclarationASTNode, indentString);
+                stringBuilder.append(indentString).append("putint")
+                        .append(simpleDeclarationASTNode.getChildren().get(0).value).append("\n");
             }
         }
 
@@ -732,10 +739,10 @@ public class TackyGenerator {
                     } else {
 
                         retrieveValueFromArrayElementByVariable(indent,
-                            declaratorASTNode,
-                            arrayPointerName,
-                            c1.value,
-                            destinationVariableName);
+                                declaratorASTNode,
+                                arrayPointerName,
+                                c1.value,
+                                destinationVariableName);
 
                     }
 
@@ -878,10 +885,10 @@ public class TackyGenerator {
                     String idx = child1expressionASTNode.children.get(1).value;
 
                     retrieveValueFromArrayElementByVariable(indent,
-                        declaratorASTNode,
-                        tempVarName,
-                        idx,
-                        destVarName);
+                            declaratorASTNode,
+                            tempVarName,
+                            idx,
+                            destVarName);
 
                 } else {
 
@@ -965,7 +972,6 @@ public class TackyGenerator {
 
         stringBuilder.append(indentString)
             .append(arrayPtrName + ".ptr.tmp.1").append(" = ")
-            //.append(wrapInConstant(arrayElementIndex))
             .append(arrayElementIndex)
             .append(" * ").append("sizeof_array_type")
             .append("\n");
@@ -976,7 +982,6 @@ public class TackyGenerator {
         stringBuilder.append(indentString)
             .append(arrayPtrName + ".ptr.tmp").append(" = ")
             .append(arrayPtrName).append(" - ")
-            // .append(arrayPtrName).append(" + ")
             .append(arrayPtrName + ".ptr.tmp.1")
             .append("\n");
 
@@ -1300,11 +1305,8 @@ public class TackyGenerator {
     }
 
     private void enterReturn(int indent, JumpStatementASTNode returnStatementASTNode) {
-        // TODO Auto-generated method stub
-        // throw new UnsupportedOperationException("Unimplemented method
-        // 'enterReturn'");
 
-        stringBuilder.append("\n");
+        // stringBuilder.append("\n");
 
         String indentString = buildIndentString(indent);
         stringBuilder.append(indentString);
@@ -1712,7 +1714,6 @@ public class TackyGenerator {
 
             case Identifier:
                 return expressionASTNode.value;
-
 
             default:
                 throw new RuntimeException();

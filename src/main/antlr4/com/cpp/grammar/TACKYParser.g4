@@ -133,6 +133,11 @@ statement :
     | printf_call
     | putint_call
     | sizeof_call
+    | asm_statement
+    ;
+
+asm_statement :
+    ASM LEFT_PAREN StringLiteral RIGHT_PAREN
     ;
 
 sign_extend :

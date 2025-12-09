@@ -52,6 +52,8 @@ public enum ASTNodeType {
 
     SIZEOF,
 
-    PUTINT;
+    PUTINT,
+
+    ASM_STATEMENT;
 
 }

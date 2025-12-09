@@ -1,5 +1,6 @@
 package grammar;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 
 import com.cpp.grammar.CPP14Parser;
@@ -9,6 +10,7 @@ import com.cpp.grammar.CPP14ParserBaseListener;
 
 import ast.ASTNode;
 import ast.ASTNodeType;
+import ast.AsmDefinitionASTNode;
 import ast.BodyASTNode;
 import ast.DeclaratorASTNode;
 import ast.ExpressionASTNode;
@@ -714,6 +716,34 @@ public class SimpleCPP14ParserBaseListener extends CPP14ParserBaseListener {
     public void exitSelectionStatement(CPP14Parser.SelectionStatementContext ctx) {
         ascend();
     }
+
+    // asm
+
+    @Override
+    public void enterAsmDefinition(CPP14Parser.AsmDefinitionContext ctx) {
+
+        // System.out.println("[" + ctx.hashCode() + "] " + ctx.getText());
+
+        AsmDefinitionASTNode asmDefinitionASTNode = new AsmDefinitionASTNode();
+        asmDefinitionASTNode.ctx = ctx;
+        // asmDefinitionASTNode.value = ctx.getText();
+        asmDefinitionASTNode.statementType = StatementType.valueOf(ctx.getChild(0).getText().toUpperCase());
+        asmDefinitionASTNode.astNodeType = ASTNodeType.ASM_STATEMENT;
+
+        for (int i = 2; i < ctx.children.size() - 2; i++) {
+
+            String data = ctx.children.get(i).getText();
+            data = StringUtils.unwrap(data, "\"");
+            data = data.replaceAll("(\\\\r|\\\\n|\\\\n\\\\t)$", "");
+
+            asmDefinitionASTNode.asmLines.add(data);
+        }
+
+        connectToParent(currentNode, asmDefinitionASTNode);
+     }
+
+    @Override
+    public void exitAsmDefinition(CPP14Parser.AsmDefinitionContext ctx) { }
 
     // utility
 

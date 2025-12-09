@@ -36,6 +36,8 @@ public enum NodeType {
 
     Sizeof,
 
-    Putint;
+    Putint,
+
+    AsmStatement;
 
 }

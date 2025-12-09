@@ -340,7 +340,6 @@ int segmentedMatrixMult(int* matrixA, int* matrixB, int* matrixC, int rows, int 
             // int separator = 123;
             // putint(separator);
 
-
             // for ic = 0 to m-1 step mc
             // Loop 3
             for (int ic = 0; ic < innerSteps; ic++) {
@@ -415,7 +414,6 @@ int upCountingMatrix(int* matrix, int dim) {
     }
     return 0;
 }
-
 
 int main()
 {

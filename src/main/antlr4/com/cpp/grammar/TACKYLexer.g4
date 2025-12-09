@@ -48,6 +48,7 @@ ADDPTR : A D D P T R ;
 ASCII : A S C I I ;
 ASCIIZ : A S C I I Z ;
 ARRAY : A R R A Y ;
+ASM : A S M ;
 
 BINARY : B I N A R Y ;
 BOOL : B O O L ;

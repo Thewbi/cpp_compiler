@@ -687,7 +687,7 @@ public class Main {
         // final String filename = "src/test/resources/function_call_12.cpp";
         // final String filename = "src/test/resources/function_call_13.cpp";
         // final String filename = "src/test/resources/function_call_14.cpp";
-        final String filename = "src/test/resources/function_call_15.cpp";
+        // final String filename = "src/test/resources/function_call_15.cpp";
 
         // final String filename = "src/test/resources/for_loop.cpp"; // <--- Language Test 1
         // final String filename = "src/test/resources/for_loop_2.cpp";
@@ -705,6 +705,8 @@ public class Main {
         // final String filename = "src/test/resources/local_variables.cpp";
         // final String filename = "src/test/resources/local_variables_2.cpp";
         // final String filename = "src/test/resources/local_variables_3.cpp";
+
+        final String filename = "src/test/resources/asm_test.cpp";
 
         ASTNode dummyASTNode = new ASTNode();
         dummyASTNode.value = "__DUMMY___11223344__";

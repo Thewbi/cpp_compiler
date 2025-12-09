@@ -131,4 +131,11 @@ public class TACKYASTNodeFactory {
         return node;
     }
 
+    public AsmStatementASTNode createAsmStatementASTNode() {
+        AsmStatementASTNode node = new AsmStatementASTNode();
+        node.nodeType = NodeType.AsmStatement;
+        node.astNodeType = ASTNodeType.ASM_STATEMENT;
+        return node;
+    }
+
 }

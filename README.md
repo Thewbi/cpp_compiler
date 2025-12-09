@@ -15,6 +15,23 @@ C++ compiler written in Java
 
 ## Language Bugs
 
+### Order of functions
+
+Currently the assembler is not capable of correctly resolving circular constructs or functions
+that are used before they are defined.
+
+Try to create code that represent cycle-less call-graphs and make sure the define functions
+before they are called!
+
+### Function Calls without formal parameters do not work
+
+Causes problems:
+
+```
+int num = 5;
+int factorial_result = factorial();
+```
+
 ### Function Calls are not emitted if the return value is ignored
 
 Store the return value into a local variable. The compiler will then emit a call instruction.
@@ -134,7 +151,7 @@ else if
 while
 do while
 elvis operator
-for
+for [DONE]
 structs
 pointers
 enum
@@ -142,6 +159,74 @@ union
 switch
 ```
 
+## Inline Assembly
+
+Source: https://www.ibiblio.org/gferg/ldp/GCC-Inline-Assembly-HOWTO.html
+
+The whole point of inline assembly is that it allows assembly instructions to
+be inserted into C code. The C compiler will pass through the assembly to
+the code generation. The inline assembly will part of the output just like
+the rest of the generated assembly code.
+
+Inline assembly is usefull if you want to make use of custom assembly
+instructions that the C compiler does not know and hence cannot generate.
+It is also usefull if you want to access custom registers that the Compiler would
+otherwise not be able to access.
+
+## Assembler Syntaxes for x86 assembler
+
+```
++------------------------------+------------------------------------+
+|       Intel Code             |      AT&T Code                     |
++------------------------------+------------------------------------+
+| mov     eax,1                |  movl    $1,%eax                   |
+| mov     ebx,0ffh             |  movl    $0xff,%ebx                |
+| int     80h                  |  int     $0x80                     |
+| mov     ebx, eax             |  movl    %eax, %ebx                |
+| mov     eax,[ecx]            |  movl    (%ecx),%eax               |
+| mov     eax,[ebx+3]          |  movl    3(%ebx),%eax              |
+| mov     eax,[ebx+20h]        |  movl    0x20(%ebx),%eax           |
+| add     eax,[ebx+ecx*2h]     |  addl    (%ebx,%ecx,0x2),%eax      |
+| lea     eax,[ebx+ecx]        |  leal    (%ebx,%ecx),%eax          |
+| sub     eax,[ebx+ecx*4h-20h] |  subl    -0x20(%ebx,%ecx,0x4),%eax |
++------------------------------+------------------------------------+
+```
+
+There two ways to insert assembly:
+
+1. Basic Inline
+1. Extended Asm
+
+### Basic Inline
+
+Two syntaxes is allowed:
+
+```
+asm("movl %ecx %eax"); /* moves the contents of ecx to eax */
+__asm__("movb %bh (%eax)"); /*moves the byte from bh to the memory pointed by eax */
+```
+
+> You might have noticed that here I’ve used asm and __asm__. Both are valid. We can use __asm__ if the keyword asm conflicts with something in our program. If we have more than one instructions, we write one per line in double quotes, and also suffix a ’\n’ and ’\t’ to the instruction. This is because gcc sends each instruction as a string to as(GAS) and by using the newline/tab we send correctly formatted lines to the assembler.
+
+```
+asm ("movl %eax, %ebx\n\t"
+    "movl $56, %esi\n\t"
+    "movl %ecx, $label(%edx,%ebx,$4)\n\t"
+    "movb %ah, (%ebx)");
+
+__asm__ ("movl %eax, %ebx\n\t"
+        "movl $56, %esi\n\t"
+        "movl %ecx, $label(%edx,%ebx,$4)\n\t"
+        "movb %ah, (%ebx)");
+```
+
+When inspecting the Parse Tree that the cpp antlr grammar generates using http://lab.antlr.org/ it can be seen that the asm variant produces different ast nodes then the __asm__ variant. The asm variant produces a way simpler parse tree with an explicit asnDefinition node!
+
+
+
+### Extended Asm
+
+To complicated for me to implement.
 
 ## RISC V
 

@@ -353,7 +353,7 @@ public class RISCVCodeGenerator implements Generator {
                     .append("\n");
                 // @formatter:on
 
-                // DEBUG
+                // // DEBUG
                 // stringBuilder.append(indent).append("nop").append("\n");
 
                 // System.out.println();
@@ -421,7 +421,11 @@ public class RISCVCodeGenerator implements Generator {
 
                 stringBuilder.append(indent).append("# << store to stack").append("\n");
                 // @formatter:on
+            }
+                break;
 
+            case ASM_STATEMENT: {
+                stringBuilder.append(indent).append(StringUtils.unwrap(astNode.value, "\"")).append("\n");
             }
                 break;
 
@@ -599,8 +603,8 @@ public class RISCVCodeGenerator implements Generator {
         // comment
         stringBuilder.append(indent).append("# -- stack frame remove --").append("\n");
 
-        // DEBUG - NOP
-        stringBuilder.append(indent).append("nop").append("\n");
+        // // DEBUG - NOP
+        // stringBuilder.append(indent).append("nop").append("\n");
 
         // jump to return address
         stringBuilder.append(indent).append("# ").append("<processReturn()>").append("\n");
@@ -1168,7 +1172,7 @@ public class RISCVCodeGenerator implements Generator {
 
             // // DEBUG
             // if (label.equalsIgnoreCase("matrixA")) {
-            //     System.out.println("test");
+            // System.out.println("test");
             // }
 
             if (actualParameter.name != null) {
@@ -1180,7 +1184,7 @@ public class RISCVCodeGenerator implements Generator {
             index++;
         }
 
-        // DEBUG - NOP
+        // // DEBUG - NOP
         // stringBuilder.append(indent).append("nop").append("\n");
 
         stringBuilder.append(indent).append("print_reg sp").append("\n");
@@ -1190,8 +1194,8 @@ public class RISCVCodeGenerator implements Generator {
 
         stringBuilder.append(indent).append("print_reg sp").append("\n");
 
-        // DEBUG - NOP
-        stringBuilder.append(indent).append("nop").append("\n");
+        // // DEBUG - NOP
+        // stringBuilder.append(indent).append("nop").append("\n");
 
         // get actual parameters back
         for (FormalParameter formalParameter : callerFunctionCallASTNode.formalParameters) {
@@ -1211,7 +1215,8 @@ public class RISCVCodeGenerator implements Generator {
     private void stackTransferParameterToStack(String register, String variableName, boolean isArray, int arraySize) {
 
         // comment
-        stringBuilder.append(indent).append("# ++ transfer parameter '").append(variableName).append("' to stack").append("\n");
+        stringBuilder.append(indent).append("# ++ transfer parameter '").append(variableName).append("' to stack")
+                .append("\n");
 
         // b - byte - 8 bits
         // h - half word - 16 bits (2 bytes)
@@ -1233,7 +1238,8 @@ public class RISCVCodeGenerator implements Generator {
         stackFrame.stackSizeUsed += 4;
 
         // comment
-        stringBuilder.append(indent).append("# ++ transfer parameter '").append(variableName).append("' to stack").append("\n");
+        stringBuilder.append(indent).append("# ++ transfer parameter '").append(variableName).append("' to stack")
+                .append("\n");
     }
 
     /**
