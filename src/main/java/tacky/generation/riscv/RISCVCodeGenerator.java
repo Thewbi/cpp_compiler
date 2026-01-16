@@ -30,6 +30,10 @@ import types.FormalParameter;
 
 public class RISCVCodeGenerator implements Generator {
 
+    private static final boolean GENERATE_DEBUG_PRINT_REG_SP = false;
+
+    private static final boolean INSERT_FUNCTION_SIZE_COMPUTATION = false;
+
     // output of code
 
     public StringBuilder stringBuilder = new StringBuilder();
@@ -42,8 +46,8 @@ public class RISCVCodeGenerator implements Generator {
 
     private static final String FRAME_POINTER = "fp";
 
-    private static final boolean PRINT_STACK_FRAME_LAYOUT = true;
-    // private static final boolean PRINT_STACK_FRAME_LAYOUT = false;
+    // private static final boolean PRINT_STACK_FRAME_LAYOUT = true;
+    private static final boolean PRINT_STACK_FRAME_LAYOUT = false;
 
     private int STACK_POINTER_ADDRESS = 0x20000;
     private int framePointer = STACK_POINTER_ADDRESS;
@@ -69,6 +73,8 @@ public class RISCVCodeGenerator implements Generator {
 
         // CODE SEGMENT
         // stringBuilder.append("\n").append(indent).append(".text").append("\n").append("\n");
+        // tell the assembler to place this code into the text section
+        stringBuilder.append(indent).append(".text").append("\n\n\n");
 
         // add definition of "exit" function
 
@@ -138,6 +144,7 @@ public class RISCVCodeGenerator implements Generator {
                 break;
 
             case PROGRAM: {
+
             }
                 break;
 
@@ -201,8 +208,6 @@ public class RISCVCodeGenerator implements Generator {
 
             case RETURN: {
                 processReturn((ReturnASTNode) astNode);
-                // remove the callee function from the stack and make the caller current again
-                // functionCallStack.pop();
             }
                 break;
 
@@ -484,22 +489,38 @@ public class RISCVCodeGenerator implements Generator {
             System.out.println(stackFrame.toString());
         }
 
+        stringBuilder.append("\n\n\n");
+
+        if (INSERT_FUNCTION_SIZE_COMPUTATION) {
+            // insert assembler prelude
+            // https://stackoverflow.com/questions/70323125/why-function-that-refers-to-a-global-function-in-the-same-section-can-only-be-so
+            stringBuilder.append(indent).append(".globl ").append(functionAstNode.value).append("\n");
+            stringBuilder.append(indent).append(".type ").append(functionAstNode.value).append(", @function").append("\n");
+        }
+
         // insert function label for the function
         stringBuilder.append(functionAstNode.value).append(":").append("\n");
+
+        // CRT initialization = C runtime initialization
+        // if this happens to be the main function, directly add the CRT _start label too
+        // This is incorrect as soon as the user wants to add CRT startup crt0.s files
+        // to the system!
         if (functionAstNode.value.equalsIgnoreCase("main")) {
 
             // insert start symbol for the function called main
             stringBuilder.append("_start:").append("\n");
         }
 
-        stringBuilder.append(indent).append("# -- stack frame create --").append("\n");
+        stringBuilder.append(indent).append("# -- START stack frame create --").append("\n");
 
         // advance stack pointer
         // move stack pointer, make space for new stackframe (8 elements)
         // (I think GCC always builds stack frames with a multiple of
         // 16 byte sizes! Not all elements are used!)
 
-        stringBuilder.append(indent).append("print_reg sp").append("\n");
+        if (GENERATE_DEBUG_PRINT_REG_SP) {
+            stringBuilder.append(indent).append("print_reg sp").append("\n");
+        }
 
         // @formatter:off
         stringBuilder.append(indent)
@@ -531,9 +552,7 @@ public class RISCVCodeGenerator implements Generator {
                 .append("addi    fp, sp, ").append(stackSizeUsed)
                 .append("\n");
 
-        // stackPointer -= stackSizeUsed;
-
-        stringBuilder.append(indent).append("# -- stack frame create --").append("\n");
+        stringBuilder.append(indent).append("# -- END stack frame create --").append("\n");
 
         // generate code for all children
         for (ASTNode astNode : functionAstNode.children) {
@@ -543,6 +562,19 @@ public class RISCVCodeGenerator implements Generator {
         // no ret command or jr ra is added since these types
         // of return statements are handled by the code generation for
         // the return-statement. See processReturn()
+
+        if (INSERT_FUNCTION_SIZE_COMPUTATION) {
+
+            // insert assembler function size computation
+            // https://stackoverflow.com/questions/70323125/why-function-that-refers-to-a-global-function-in-the-same-section-can-only-be-so
+            //
+            // Lmain_end:
+            // .size main, .Lmain_end-main
+            String endLabelName = "L" + functionAstNode.value + "_end";
+            stringBuilder.append(endLabelName).append(":").append("\n");
+            stringBuilder.append(indent).append(".size ").append(functionAstNode.value).append(", ").append(endLabelName).append(" - ").append(functionAstNode.value).append("\n");
+
+        }
     }
 
     /**
@@ -579,7 +611,7 @@ public class RISCVCodeGenerator implements Generator {
         int stackSizeUsed = stackFrame.stackSizeUsed;
 
         // comment
-        stringBuilder.append(indent).append("# -- stack frame remove --").append("\n");
+        stringBuilder.append(indent).append("# -- START stack frame remove --").append("\n");
 
         // ; delete stack frame (inverse operation to create stack frame)
         // lw ra,28(sp) ; restore address to return to
@@ -598,10 +630,12 @@ public class RISCVCodeGenerator implements Generator {
                 .append("addi    sp, sp, ").append(stackSizeUsed)
                 .append("\n");
 
-        stringBuilder.append(indent).append("print_reg sp").append("\n");
+        if (GENERATE_DEBUG_PRINT_REG_SP) {
+            stringBuilder.append(indent).append("print_reg sp").append("\n");
+        }
 
         // comment
-        stringBuilder.append(indent).append("# -- stack frame remove --").append("\n");
+        stringBuilder.append(indent).append("# -- END stack frame remove --").append("\n");
 
         // // DEBUG - NOP
         // stringBuilder.append(indent).append("nop").append("\n");
@@ -1134,10 +1168,10 @@ public class RISCVCodeGenerator implements Generator {
         stringBuilder.append(indent).append("# ").append(callerFunctionName + "() -> " + calleeFunctionName + "()")
                 .append("\n");
 
-        // DEBUG
-        if (calleeFunctionName.equalsIgnoreCase("prettyPrintFormatMatrix")) {
-            System.out.println("test");
-        }
+        // // DEBUG
+        // if (calleeFunctionName.equalsIgnoreCase("prettyPrintFormatMatrix")) {
+        //     System.out.println("test");
+        // }
 
         // save caller actual parameter registers a0 - a7 since they are caller saved
         // and hence could be overridden by the callee at any time
@@ -1187,12 +1221,16 @@ public class RISCVCodeGenerator implements Generator {
         // // DEBUG - NOP
         // stringBuilder.append(indent).append("nop").append("\n");
 
-        stringBuilder.append(indent).append("print_reg sp").append("\n");
+        if (GENERATE_DEBUG_PRINT_REG_SP) {
+            stringBuilder.append(indent).append("print_reg sp").append("\n");
+        }
 
         // call function
         stringBuilder.append(indent).append("call    ").append(calleeFunctionName).append("\n");
 
-        stringBuilder.append(indent).append("print_reg sp").append("\n");
+        if (GENERATE_DEBUG_PRINT_REG_SP) {
+            stringBuilder.append(indent).append("print_reg sp").append("\n");
+        }
 
         // // DEBUG - NOP
         // stringBuilder.append(indent).append("nop").append("\n");
@@ -1346,12 +1384,16 @@ public class RISCVCodeGenerator implements Generator {
         // .append(literalStringRecord.getLabel())
         // .append("\n");
 
-        stringBuilder.append(indent).append("print_reg sp").append("\n");
+        if (GENERATE_DEBUG_PRINT_REG_SP) {
+            stringBuilder.append(indent).append("print_reg sp").append("\n");
+        }
 
         // call puts
         stringBuilder.append(indent).append("call    puts").append("\n");
 
-        stringBuilder.append(indent).append("print_reg sp").append("\n");
+        if (GENERATE_DEBUG_PRINT_REG_SP) {
+            stringBuilder.append(indent).append("print_reg sp").append("\n");
+        }
 
         // restore a0
         stringBuilder.append(indent).append("mv      a0, t6").append("\n");

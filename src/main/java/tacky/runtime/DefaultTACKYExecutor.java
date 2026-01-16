@@ -234,7 +234,13 @@ public class DefaultTACKYExecutor implements TACKYExecutor {
                     int address = ptrDescriptor.address;
                     int ptrTargetAddressValue = memory[address / 4];
 
-                    memory[ptrTargetAddressValue / 4] = varValue;
+                    int ptr = ptrTargetAddressValue / 4;
+
+                    if (ptr < 0) {
+                        throw new RuntimeException("ptr is negative!");
+                    }
+
+                    memory[ptr] = varValue;
                 }
 
                     // execute next instruction

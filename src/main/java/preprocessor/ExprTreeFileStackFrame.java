@@ -287,9 +287,9 @@ public class ExprTreeFileStackFrame extends AbstractFileStackFrame {
                     node = new ASTNode();
                     node.value = ")";
 
-                    if (currentNode == null) {
-                        System.out.println("test");
-                    }
+                    // if (currentNode == null) {
+                    //     System.out.println("test");
+                    // }
 
                     currentNode.children.add(node);
                     node.parent = currentNode;

@@ -55,24 +55,8 @@ int prettyPrintFormatMatrix(int* matrix, int dim) {
  */
 int getSubMatrix(int* matrixDest, int* matrixSrc, int dim, int xPos, int yPos, int width, int height) {
 
-    // printf("getSubMatrix()\n");
-
-    /**/
-    // matrixDest[0] = xPos;
-    // matrixDest[1] = yPos;
-    // matrixDest[2] = width;
-    // matrixDest[3] = height;
-
-    // matrixDest[0] = 16;
-    // matrixDest[1] = 32;
-    // matrixDest[2] = 48;
-    // matrixDest[3] = 64;
-
     int xEnd = xPos + width;
     int yEnd = yPos + height;
-
-    // matrixDest[0] = xEnd;
-    // matrixDest[1] = yEnd;
 
     int counter = 0;
 
@@ -86,32 +70,11 @@ int getSubMatrix(int* matrixDest, int* matrixSrc, int dim, int xPos, int yPos, i
 
             // int idx = i * dim + j;
             int tempIdx = i * dim;
-            //matrixDest[counter] = tempIdx; // 0,0,2,2  OK
-
-            //matrixDest[counter] = j; // 0,1,0,1  OK
-
             int idx = tempIdx + j;
-            //matrixDest[counter] = idx; // 0,1,2,3  OK
-
-            //matrixDest[counter] = width; // 2,2,2,2 OK
-            //matrixDest[counter] = innerI; // 0,0,1,1 OK
-
             // // int idxC = innerI * width + innerJ;
             int tempIdxC = innerI * width;
-            //matrixDest[counter] = tempIdxC; // 0,0,2,2 OK
-
-            //matrixDest[counter] = innerJ; // 0,1,0,1 OK
-
             int idxC = tempIdxC + innerJ;
-            //matrixDest[counter] = idxC; // 0,1,2,3
-
-            //matrixDest[counter] = idxC; // 0,1,2,3 INCORRECT: 0,1,4,5
-
-            //matrixDest[counter] = idx; // 0,1,2,3  OK
-
             int transfer = matrixSrc[idx];
-            //putint(idx);
-            //putint(transfer);
             matrixDest[idxC] = transfer;
 
             // copy the src index into dest for debugging. Should be: 0,1,4,5 but is 0,1,3,4
@@ -275,6 +238,46 @@ int standardMatrixMult(int* matrixA, int* matrixB, int* matrixC, int rows, int c
     return 0;
 }
 
+int outerProductMatrixMult(int* matrixA, int* matrixB, int* matrixC, int rows, int columns) {
+
+    // Matrix matrixC = new Matrix(rows, columns);
+
+    // over all columns in matrix A
+    for (int pivot = 0; pivot < columns; pivot++) {
+
+        // over all rows in matrix A
+        for (int rowA = 0; rowA < rows; rowA++) {
+
+            // use the same row in matrix A and B
+
+            // over all columns in matrix B
+            for (int colB = 0; colB < columns; colB++) {
+
+                // int a = data[rowA * rows + pivot];
+                int aMultResult = rowA * rows;
+                int aIndexResult = aMultResult + pivot;
+                int a = matrixA[aIndexResult];
+
+                // int b = matrixB.data[pivot * rows + colB];
+                int bMultResult = pivot * rows;
+                int bIndexResult = bMultResult + colB;
+                int b = matrixB[bIndexResult];
+
+                // matrixC.data[rowA * rows + colB] += a * b;
+                int rowMultResult = rowA * rows;
+                int indexResult = rowMultResult + colB;
+                int mulResult = a * b;
+                int temp = matrixC[indexResult];
+                temp = temp + mulResult;
+                matrixC[indexResult] = temp;
+
+            }
+        }
+    }
+
+    return 0;
+}
+
 int matrixAddInto(int* matrixA, int* matrixB, int rows, int columns) {
 
     // printf("matrixAddInto()\n");
@@ -358,8 +361,17 @@ int segmentedMatrixMult(int* matrixA, int* matrixB, int* matrixC, int rows, int 
 
 
 
+                //
+                // inner kernel multiplication
+                //
+
                 int tempMult[4] = { 0, 0, 0, 0 };
-                int a22 = standardMatrixMult(subMatrixA, subMatrixB, tempMult, 2, 2);
+
+                // use standard matrix multiplication
+                //int a22 = standardMatrixMult(subMatrixA, subMatrixB, tempMult, 2, 2);
+
+                // use the outer product multiplication
+                int a22 = outerProductMatrixMult(subMatrixA, subMatrixB, tempMult, 2, 2);
 
                 // int resultPrettyPrintM = prettyPrintFormatMatrix(tempMult, SUB_DIMENSION);
                 // int separator3 = 125;
@@ -521,9 +533,7 @@ int main()
     // upCountingMatrix(matrixA, DIMENSION);
     // upCountingMatrix(matrixB, DIMENSION);
 
-    //int result_1 = segmentedMatrixMult(matrixA, matrixB, matrixC, DIMENSION, DIMENSION);
-
-    int result_1 = standardMatrixMult(matrixA, matrixB, matrixC, DIMENSION, DIMENSION);
+    int result_1 = segmentedMatrixMult(matrixA, matrixB, matrixC, DIMENSION, DIMENSION);
 
     /* Expected resutl for multiplying two up-counting matrixes ( 1, 2, 3, ... )
     90

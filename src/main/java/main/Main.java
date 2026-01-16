@@ -202,6 +202,7 @@ public class Main {
         System.out.println("----------------------------------------------------------\n");
 
         if (RUN_TACKY_CODE) {
+
             System.out.println("-- 5 - Run the TACKY code --------------------------------");
 
             //
@@ -688,6 +689,11 @@ public class Main {
         // final String filename = "src/test/resources/function_call_13.cpp";
         // final String filename = "src/test/resources/function_call_14.cpp";
         // final String filename = "src/test/resources/function_call_15.cpp";
+        // final String filename = "src/test/resources/function_call_16.cpp";
+        // final String filename = "src/test/resources/function_call_17.cpp"; <-- outer matrix mult test
+        final String filename = "src/test/resources/function_call_18.cpp";
+
+        // final String filename = "src/test/resources/rvv/rvv_test.cpp";
 
         // final String filename = "src/test/resources/for_loop.cpp"; // <--- Language Test 1
         // final String filename = "src/test/resources/for_loop_2.cpp";
@@ -706,7 +712,7 @@ public class Main {
         // final String filename = "src/test/resources/local_variables_2.cpp";
         // final String filename = "src/test/resources/local_variables_3.cpp";
 
-        final String filename = "src/test/resources/asm_test.cpp";
+        // final String filename = "src/test/resources/asm_test.cpp";
 
         ASTNode dummyASTNode = new ASTNode();
         dummyASTNode.value = "__DUMMY___11223344__";

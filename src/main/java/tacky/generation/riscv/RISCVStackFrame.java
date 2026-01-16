@@ -67,7 +67,8 @@ public class RISCVStackFrame {
                 stackEntry.address = address;
                 stackEntry.fpRelativeAddress = stackPointer - address;
 
-                System.out.println(stackEntry.variableName + ":" +  ByteArrayUtil.byteToHex(stackEntry.address) + " (" + (stackEntry.address - stackPointer) + ")");
+                // DEBUG
+                // System.out.println(stackEntry.variableName + ":" +  ByteArrayUtil.byteToHex(stackEntry.address) + " (" + (stackEntry.address - stackPointer) + ")");
 
                 address -= (4 * stackEntry.arraySize);
 
@@ -76,7 +77,8 @@ public class RISCVStackFrame {
                 stackEntry.address = address;
                 stackEntry.fpRelativeAddress = stackPointer - address;
 
-                System.out.println(stackEntry.variableName + ":" +  ByteArrayUtil.byteToHex(stackEntry.address) + " (" + (stackEntry.address - stackPointer) + ")");
+                // DEBUG
+                // System.out.println(stackEntry.variableName + ":" +  ByteArrayUtil.byteToHex(stackEntry.address) + " (" + (stackEntry.address - stackPointer) + ")");
 
                 address -= 4;
 

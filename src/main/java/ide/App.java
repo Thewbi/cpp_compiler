@@ -391,7 +391,7 @@ public class App extends Application {
 
                 riscVProcessor.setBuffer(buffer);
 
-                System.out.println("test");
+                // System.out.println("test");
 
                 int pc = riscVProcessor.getPc();
                 highlightRow(pc);

@@ -2,6 +2,53 @@
 
 C++ compiler written in Java
 
+## Usage
+
+Currently this project does not produce an executable. Instead currently the compiler is only usable when debugging the file src\main\java\main\Main.java.
+
+The main() function makes several calls. The Calls to translate a subset of the C-application into RISC-V assembly are:
+
+```
+public static void main(String[] args) throws IOException {
+
+    System.out.println("Start");
+
+    preprocessor_2();
+
+    ASTNode rootNode = translationUnit(); // <---------------- C - Compiler
+
+    generateTACKY(rootNode);
+    tacky();
+
+    System.out.println("End");
+}
+```
+
+The preprocessor_2(); function executes the preprocessor. The preprocessor reads the input file C-file. Currently only a single C-file is specified as an input inside preprocessor_2(). Then it will resolve the includes in that files and all recursively included files. The preprocessor resolves defines and then outputs a large C application into the output file "preprocessed.cpp" which is located in the root folder of the project.
+
+The next function call is translationUnit(). This function uses the antlr4 infrastructure to convert the C-file preprocessed.cpp into a tree of nodes. This tree is called Abstract Syntax Tree, AST in the context of this project. The root node of the AST is returned.
+
+The following call to generateTACKY() takes that root node as a parameter and generates TACKY nodes. As a result, the TACKY representation is written into a "generated_tacky.tky" file. The "generated_tacky.tky" is located in the root folder of the project, just like the "preprocessed.cpp" file. TACKY is an intermediate representation and is defined on a Virtual Machine that has infinite amount of registers and memory. There is a test implementation of TACKY which can be used to execute the TACKY scripts in order to evaluate if the TACKY code has the expected effect of the original C-application or not.
+
+The TACKY code is then further processed by the tacky() function. The tacky() function reads the "generated_tacky.tky" again using the antlr4 infrastructure and generates another AST from it. It can print the AST to the console and start a simulation of the TACKY application. tacky() then takes the root node of the TACKY AST and processes it using a RISC code generator:
+
+```
+RISCVCodeGenerator riscvCodeGenerator = new RISCVCodeGenerator();
+
+riscvCodeGenerator.start();
+
+for (ASTNode child : rootNode.children) {
+    riscvCodeGenerator.execute(child);
+}
+
+riscvCodeGenerator.end();
+```
+
+The RISCVCodeGenerator class internally maintains a large string buffer (StringBuilder). This buffer will contain the entire RISC-V assembly once code generation is done. The generated RISC-V code is written from the buffer into the file "generated_riscv_assembly.s". "generated_riscv_assembly.s" is contained in the root folder of this project.
+
+This is where the compiler stops processing. In order to get machine code from the "generated_riscv_assembly.s", you need to use an assembler. This compiler will not produce machine code! You can use https://github.com/Thewbi/riscvassembler_java as an assembler if you wish.
+
+
 ## TODO
 
 * Add Scopes to For-Loops so that temporary variables declared inside the scope of a nested loop do not lead to an error for variables declared twice!
@@ -192,7 +239,7 @@ otherwise not be able to access.
 +------------------------------+------------------------------------+
 ```
 
-There two ways to insert assembly:
+There are two ways to insert assembly:
 
 1. Basic Inline
 1. Extended Asm

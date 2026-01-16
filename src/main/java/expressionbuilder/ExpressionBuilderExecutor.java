@@ -62,11 +62,11 @@ public class ExpressionBuilderExecutor {
                 continue;
             }
         }
-        
+
         ASTNode astNode = expressionBuilder.getStack().peek();
 
         return astNode;
 
     }
-    
+
 }
