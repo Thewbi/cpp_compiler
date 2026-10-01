@@ -24,7 +24,6 @@ public class SimpleFileStackFrame extends AbstractFileStackFrame {
     private TreeNode expressionRootNode = null;
     private int customWeight = 0;
     private int balance = 0;
-    // private boolean functionCall = false;
     private boolean identifier = false;
     private boolean lookAheadUsed = false;
 
@@ -43,6 +42,13 @@ public class SimpleFileStackFrame extends AbstractFileStackFrame {
         // DEBUG
         // int line = 1;
         //System.out.println("Line: " + line);
+
+        //
+        // Comments:
+        //
+        // Using a lexer has the advange that the lexer will not emit any comments!
+        // The preprocessor contains no code that deals with comments!
+        //
 
         Token token = lexer.nextToken();
         while ((token != null) && (token.getType() != Token.EOF)) {
@@ -222,11 +228,6 @@ public class SimpleFileStackFrame extends AbstractFileStackFrame {
 
                 fileStack.push(fileStackFrame);
 
-                // setParserMode(ParserMode.NORMAL);
-
-                // TODO: reactivate
-                // fileStackFrame.start();
-
                 setParserMode(ParserMode.NORMAL);
 
             } else if (text.equalsIgnoreCase("(")) {
@@ -241,7 +242,6 @@ public class SimpleFileStackFrame extends AbstractFileStackFrame {
 
                 } else if (parserMode == ParserMode.PREPROCESSOR) {
 
-                    // ????
                     throw new RuntimeException("");
 
                 } else {
@@ -255,84 +255,7 @@ public class SimpleFileStackFrame extends AbstractFileStackFrame {
 
             } else if (text.equalsIgnoreCase(")")) {
 
-                // if (ADD_SUB_NODE) {
-                // // ascend (out of sub into parent)
-                // currentNode = currentNode.parent;
-                // }
-
                 if (parserMode == ParserMode.DEFINE) {
-
-                    // // an expression is finished
-                    // if (expressionRootNode.balance == 0) {
-
-                    // // expressionRootNode.linearAddInto(currentNode.children);
-                    // // expressionRootNode = null;
-
-                    // // node = new ASTNode();
-                    // // node.value = token.getText();
-                    // // currentNode.children.add(node);
-
-                    // // // go back to the root node
-                    // // currentNode = currentNode.parent;
-
-                    // // // parserMode = ParserMode.NORMAL;
-
-                    // // if (ADD_SUB_NODE) {
-                    // // // ascend (out of sub into parent)
-                    // // currentNode = currentNode.parent;
-                    // // }
-
-                    // //node = new ASTNode();
-                    // ///node.value = ")";
-
-                    // // DEBUG
-                    // // if (currentNode == null) {
-                    // // System.out.println("test");
-                    // // }
-
-                    // // currentNode.children.add(node);
-                    // // node.parent = currentNode;
-
-                    // // if (currentNode.parent == null) {
-
-                    // // token = lexer.nextToken();
-                    // // continue;
-                    // // }
-
-                    // // if (ADD_SUB_NODE) {
-                    // // // ascend (out of sub into parent)
-                    // // currentNode = currentNode.parent;
-                    // // }
-
-                    // // if (currentNode.value != null &&
-                    // currentNode.value.equalsIgnoreCase("defined")) {
-                    // // // ascend (out of sub into parent)
-                    // // currentNode = currentNode.parent;
-                    // // }
-
-                    // // if ("define_key___".equalsIgnoreCase(currentNode.type)) {
-
-                    // // currentNode = currentNode.parent;
-                    // // defineModeKey = false;
-                    // // defineModeValue = true;
-
-                    // // node = new ASTNode();
-
-                    // // currentNode.children.add(node);
-                    // // node.parent = currentNode;
-
-                    // // node.value = "define_value___";
-                    // // node.type = "define_value___";
-
-                    // // // descend into key
-                    // // currentNode = node;
-
-                    // // }
-
-                    // currentNode.children.add(expressionRootNode);
-                    // expressionRootNode = null;
-
-                    // } else {
 
                     processExpressionNode(text);
 
@@ -345,22 +268,14 @@ public class SimpleFileStackFrame extends AbstractFileStackFrame {
                         identifier = false;
                     }
 
-                    // }
-
                 } else if (parserMode == ParserMode.EXPRESSION) {
 
                     // an if-statement is finished
-                    // if (expressionRootNode.balance == 0) {
                     if (balance == 0) {
 
                         currentNode.children.add(expressionRootNode);
 
-                        // expressionRootNode.linearAddInto(currentNode.children);
                         expressionRootNode = null;
-
-                        // node = new ASTNode();
-                        // node.value = token.getText();
-                        // currentNode.children.add(node);
 
                         // go back to the root node
                         currentNode = currentNode.parent;
@@ -382,20 +297,8 @@ public class SimpleFileStackFrame extends AbstractFileStackFrame {
 
             } else if (token.getType() == PreprocessorLexer2.Newline) {
 
-                // // DEBUG
-                // line++;
-                // System.out.println("Line: " + line);
-
-                // DEBUG
-                // if (line == 12) {
-                // System.out.println("");
-                // }
-
-                // DEBUG
-                // outputRootNode(rootNode);
-
-                // deal with completely empty lines (the node is still the root node and it has
-                // no children)
+                // deal with completely empty lines
+                // (the node is still the root node and it has no children)
                 if (rootNode.children.size() == 0) {
                     token = lexer.nextToken();
                     continue;
@@ -434,66 +337,7 @@ public class SimpleFileStackFrame extends AbstractFileStackFrame {
                 setParserMode(ParserMode.NORMAL);
 
             } else {
-
-                /*
-                 * if (text.equalsIgnoreCase("if")) {
-                 *
-                 * if (ADD_SUB_NODE) {
-                 * node.value = "sub";
-                 *
-                 * currentNode.children.add(node);
-                 * node.parent = currentNode;
-                 *
-                 * // descend
-                 * currentNode = node;
-                 * }
-                 *
-                 * TreeNode treeNode = new TreeNode();
-                 * treeNode.value = text;
-                 *
-                 * // connect child and parent
-                 * currentNode.children.add(treeNode);
-                 * treeNode.parent = currentNode;
-                 *
-                 * // ascend
-                 * currentNode = treeNode;
-                 *
-                 * parserMode = ParserMode.EXPRESSION;
-                 *
-                 * // skip whitespace up to bracket
-                 * do {
-                 * token = lexer.nextToken();
-                 * } while (!token.getText().equalsIgnoreCase("("));
-                 *
-                 * node = new ASTNode();
-                 * node.value = token.getText();
-                 *
-                 * currentNode.parent.children.add(node);
-                 * node.parent = currentNode.parent;
-                 *
-                 * //currentNode.children.add(node);
-                 *
-                 * token = lexer.nextToken();
-                 *
-                 * continue;
-                 * }
-                 */
-
                 if (parserMode == ParserMode.DEFINE) {
-
-                    // if (expressionRootNode != null) {
-                    // if (!text.equalsIgnoreCase("(") && !text.equalsIgnoreCase(")")) {
-
-                    // System.out.println("new");
-
-                    // currentNode.children.add(expressionRootNode);
-
-                    // balance = 0;
-                    // customWeight = 0;
-                    // identifier = false;
-                    // expressionRootNode = null;
-                    // }
-                    // }
 
                     processExpressionNode(text);
 
@@ -519,13 +363,7 @@ public class SimpleFileStackFrame extends AbstractFileStackFrame {
                         (token.getType() == Token.EOF)
                         ||
                         temp.equalsIgnoreCase("\n")
-
-                        // && !temp.equalsIgnoreCase("+")
-                        // && !temp.equalsIgnoreCase("-")
-                        // && !temp.equalsIgnoreCase("*")
-                        // && !temp.equalsIgnoreCase("/")
-                ) {
-
+                    ) {
                         currentNode.children.add(expressionRootNode);
 
                         balance = 0;
@@ -570,38 +408,15 @@ public class SimpleFileStackFrame extends AbstractFileStackFrame {
 
                     }
 
-                    // if (ADD_SUB_NODE) {
-                    // if (currentNode.value.equalsIgnoreCase("defined")) {
-                    // // ascend ( out of sub into parent )
-                    // currentNode = currentNode.parent;
-                    // }
-                    // }
-
                 } else {
-
-                    // throw new RuntimeException();
-                    // System.out.println(text);
-
-                    // if (text.equalsIgnoreCase("DIMENSION")) {
-                    //     System.out.println("test");
-                    // }
-                    // if (text.equalsIgnoreCase("ELEMENTS")) {
-                    //     System.out.println("test");
-                    // }
-
+                    // Replace defined symbols by their defined meaning!
                     text = filterByPreprocessorValues(text);
-
+                    // ???
                     DefaultFileStackFrameCallback cb = (preprocessor.DefaultFileStackFrameCallback) callback;
                     if (cb.ifStack.isEmpty() || cb.ifStack.peek().performOutput) {
                         outputStringBuilder.append(" ").append(text);
                     }
-
-                    // ((DefaultFileStackFrameCallback) callback).stringBuilder =
-                    // outputStringBuilder;
-                    // callback.execute(null);
-
                 }
-
             }
 
             if (!lookAheadUsed) {
@@ -609,7 +424,6 @@ public class SimpleFileStackFrame extends AbstractFileStackFrame {
             }
 
             lookAheadUsed = false;
-
         }
 
         // output the very last node
@@ -622,19 +436,24 @@ public class SimpleFileStackFrame extends AbstractFileStackFrame {
 
     }
 
+    /**
+     * Replace defined symbols by their defined meaning!
+     *
+     * @param data
+     * @return
+     */
     private String filterByPreprocessorValues(String data) {
 
+        // if the current symbol is not a DEFINED symbol which needs to be replaced, early out
         if (!defineValueMap.containsKey(data)) {
             return data;
         }
 
+        // replace the DEFINED symbol by it's definition
         TreeNode treeNode = (TreeNode) defineValueMap.get(data);
-
-        StringBuilder stringBuilder = new StringBuilder();
-        // evaluatePreprocessorTreeNodeInteger(treeNode, stringBuilder);
-        // evaluatePreprocessorTreeNodeAsString(treeNode, stringBuilder);
         evaluatePreprocessorTreeNode(treeNode);
 
+        StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(treeNode.stringValueEval);
 
         return stringBuilder.toString();
