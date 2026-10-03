@@ -18,7 +18,6 @@ import org.antlr.v4.runtime.CharStreams;
 public abstract class AbstractFileStackFrame implements IFileStackFrame {
 
     public String filename;
-
     /**
      * When angle brackets / chevrons are used, the include file
      * is resolved using the include-path. The include-path is a variable
@@ -32,15 +31,10 @@ public abstract class AbstractFileStackFrame implements IFileStackFrame {
      * is also defined in this class.
      */
     public boolean useIncludePathResolution;
-
     public List<Path> includePath = new ArrayList<>();
-
     public Path basePath;
-
     public StringBuilder outputStringBuilder;
-
     public FileStackFrameCallback callback;
-
     public Stack<IFileStackFrame> fileStack;
 
     abstract public void start() throws IOException;
@@ -123,52 +117,43 @@ public abstract class AbstractFileStackFrame implements IFileStackFrame {
      * @param operator
      * @return
      */
-    public static int getPriority(String operator) {
+    public static int getOperatorPriority(String operator) {
 
         if (operator == null) {
             System.out.println("null!");
         }
 
+        // if (operator.equalsIgnoreCase("defined")) {
+        //     return 1000 - 13;
+        // } else
+
         if (operator.equalsIgnoreCase("%")) {
             return 1000 - 3;
-        }
-        else if (operator.equalsIgnoreCase("+")) {
+        } else if (operator.equalsIgnoreCase("+")) {
             return 1000 - 4;
-        }
-        else if (operator.equalsIgnoreCase("*")) {
+        } else if (operator.equalsIgnoreCase("*")) {
             return 1000 - 3;
-        }
-        else if (operator.equalsIgnoreCase(".")) {
+        } else if (operator.equalsIgnoreCase(".")) {
             return 1000 - 1;
-        }
-        else if (operator.equalsIgnoreCase("||")) {
+        } else if (operator.equalsIgnoreCase("||")) {
             return 1000 - 12;
-        }
-        else if (operator.equalsIgnoreCase("&&")) {
+        } else if (operator.equalsIgnoreCase("&&")) {
             return 1000 - 11;
-        }
-        else if (operator.equalsIgnoreCase(">")) {
+        } else if (operator.equalsIgnoreCase(">")) {
             return 1000 - 6;
-        }
-        else if (operator.equalsIgnoreCase(">=")) {
+        } else if (operator.equalsIgnoreCase(">=")) {
             return 1000 - 6;
-        }
-        else if (operator.equalsIgnoreCase("<")) {
+        } else if (operator.equalsIgnoreCase("<")) {
             return 1000 - 6;
-        }
-        else if (operator.equalsIgnoreCase("<=")) {
+        } else if (operator.equalsIgnoreCase("<=")) {
             return 1000 - 6;
-        }
-        else if (operator.equalsIgnoreCase("==")) {
+        } else if (operator.equalsIgnoreCase("==")) {
             return 1000 - 7;
-        }
-        else if (operator.equalsIgnoreCase("!=")) {
+        } else if (operator.equalsIgnoreCase("!=")) {
             return 1000 - 7;
-        }
-        else if (operator.equalsIgnoreCase("!")) {
+        } else if (operator.equalsIgnoreCase("!")) {
             return 1000 - 2;
-        }
-        else if (operator.equalsIgnoreCase(",")) {
+        } else if (operator.equalsIgnoreCase(",")) {
             return Integer.MAX_VALUE - 200000;
         }
         return Integer.MAX_VALUE - 100000;

@@ -1,9 +1,11 @@
 //#define _DEBUG
 //#undef _DEBUG
-//#define _UNIT_TEST
 
-#define BUFSIZE 1
-//#define BUFSIZE 2048
+#define _UNIT_TEST
+//#undef _UNIT_TEST
+
+//#define BUFSIZE 1
+#define BUFSIZE 2048
 
 /*
 #if defined(_DEBUG)
@@ -46,12 +48,12 @@
 #endif
 */
 
-/**/
+/*
 #if defined BUFSIZE && BUFSIZE >= 1024
   // Code here
   printf("test G\n");
 #endif
-
+*/
 
 /*
 #if defined (__vax__) || defined (__ns16000__)
@@ -64,10 +66,12 @@
 #if X == 1
 ...
 #else // X != 1
-#if X == 2
-...
-#else // X != 2
-...
-#endif // X != 2
+
+    #if X == 2
+    ...
+    #else // X != 2
+    ...
+    #endif // X != 2
+
 #endif // X != 1
 */

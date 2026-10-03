@@ -1,370 +1,370 @@
-package preprocessor;
+// package preprocessor;
 
-import java.io.IOException;
+// import java.io.IOException;
 
-import org.antlr.v4.runtime.CharStream;
-import org.antlr.v4.runtime.Token;
+// import org.antlr.v4.runtime.CharStream;
+// import org.antlr.v4.runtime.Token;
 
-import com.cpp.grammar.PreprocessorLexer2;
+// import com.cpp.grammar.PreprocessorLexer2;
 
-import ast.ASTNode;
-import common.StringUtil;
+// import ast.ASTNode;
+// import common.StringUtil;
 
-public class DefaultFileStackFrame extends AbstractFileStackFrame {
+// public class DefaultFileStackFrame extends AbstractFileStackFrame {
 
-    private static final boolean ADD_SUB_NODE = true;
+//     private static final boolean ADD_SUB_NODE = true;
 
-    public boolean defineMode;
-    public boolean defineModeKey;
-    public boolean defineModeValue;
+//     public boolean defineMode;
+//     public boolean defineModeKey;
+//     public boolean defineModeValue;
 
-    private ParserMode parserMode = ParserMode.NORMAL;
+//     private ParserMode parserMode = ParserMode.NORMAL;
 
-    public void start() throws IOException {
+//     public void start() throws IOException {
 
-        CharStream charStream = includeToCharStream();
-        final PreprocessorLexer2 lexer = new PreprocessorLexer2(charStream);
+//         CharStream charStream = includeToCharStream();
+//         final PreprocessorLexer2 lexer = new PreprocessorLexer2(charStream);
 
-        ASTNode rootNode = new ASTNode();
-        rootNode.value = "root____";
-        rootNode.parent = null;
+//         ASTNode rootNode = new ASTNode();
+//         rootNode.value = "root____";
+//         rootNode.parent = null;
 
-        ASTNode currentNode = rootNode;
+//         ASTNode currentNode = rootNode;
 
-        int line = 1;
-        // System.out.println("Line: " + line);
+//         int line = 1;
+//         // System.out.println("Line: " + line);
 
-        Token token = lexer.nextToken();
-        while ((token != null) && (token.getType() != Token.EOF)) {
+//         Token token = lexer.nextToken();
+//         while ((token != null) && (token.getType() != Token.EOF)) {
 
-            if (line != token.getLine()) {
-                line = token.getLine();
-                // System.out.println("Line: " + line);
-            }
+//             if (line != token.getLine()) {
+//                 line = token.getLine();
+//                 // System.out.println("Line: " + line);
+//             }
 
-            // DEBUG
-            // System.out.println(
-            // " " + token.getChannel() + "[" + token.getTokenIndex() + "] : " +
-            // token.getText());
+//             // DEBUG
+//             // System.out.println(
+//             // " " + token.getChannel() + "[" + token.getTokenIndex() + "] : " +
+//             // token.getText());
 
-            ASTNode node = new ASTNode();
+//             ASTNode node = new ASTNode();
 
-            String text = token.getText();
+//             String text = token.getText();
 
-            if (text.equalsIgnoreCase(" ")) {
+//             if (text.equalsIgnoreCase(" ")) {
 
-                // what is this branch for?
+//                 // what is this branch for?
 
-                if (currentNode.parent == null) {
-                    token = lexer.nextToken();
-                    continue;
-                }
+//                 if (currentNode.parent == null) {
+//                     token = lexer.nextToken();
+//                     continue;
+//                 }
 
-            } else if (text.equalsIgnoreCase("#define")) {
+//             } else if (text.equalsIgnoreCase("#define")) {
 
-                defineMode = true;
-                defineModeKey = true;
-                defineModeValue = false;
+//                 defineMode = true;
+//                 defineModeKey = true;
+//                 defineModeValue = false;
 
-                node = new ASTNode();
-                node.value = "#define";
-                currentNode.children.add(node);
-                node.parent = currentNode;
+//                 node = new ASTNode();
+//                 node.value = "#define";
+//                 currentNode.children.add(node);
+//                 node.parent = currentNode;
 
-                // descend
-                currentNode = node;
+//                 // descend
+//                 currentNode = node;
 
-                node = new ASTNode();
+//                 node = new ASTNode();
 
-            } else if (text.equalsIgnoreCase("#if")) {
+//             } else if (text.equalsIgnoreCase("#if")) {
 
-                node = new ASTNode();
-                node.value = "#if";
-                currentNode.children.add(node);
-                node.parent = currentNode;
+//                 node = new ASTNode();
+//                 node.value = "#if";
+//                 currentNode.children.add(node);
+//                 node.parent = currentNode;
 
-                // descend
-                currentNode = node;
+//                 // descend
+//                 currentNode = node;
 
-            } else if (text.equalsIgnoreCase("#elif")) {
+//             } else if (text.equalsIgnoreCase("#elif")) {
 
-                node = new ASTNode();
-                node.value = "#elif";
-                currentNode.children.add(node);
-                node.parent = currentNode;
+//                 node = new ASTNode();
+//                 node.value = "#elif";
+//                 currentNode.children.add(node);
+//                 node.parent = currentNode;
 
-                // descend
-                currentNode = node;
+//                 // descend
+//                 currentNode = node;
 
-            } else if (text.equalsIgnoreCase("#else")) {
+//             } else if (text.equalsIgnoreCase("#else")) {
 
-                node = new ASTNode();
-                node.value = "#else";
-                currentNode.children.add(node);
-                node.parent = currentNode;
+//                 node = new ASTNode();
+//                 node.value = "#else";
+//                 currentNode.children.add(node);
+//                 node.parent = currentNode;
 
-                // descend
-                currentNode = node;
+//                 // descend
+//                 currentNode = node;
 
-            } else if (text.equalsIgnoreCase("#ifdef")) {
+//             } else if (text.equalsIgnoreCase("#ifdef")) {
 
-                node = new ASTNode();
-                node.value = "#ifdef";
-                currentNode.children.add(node);
-                node.parent = currentNode;
+//                 node = new ASTNode();
+//                 node.value = "#ifdef";
+//                 currentNode.children.add(node);
+//                 node.parent = currentNode;
 
-                // descend
-                currentNode = node;
+//                 // descend
+//                 currentNode = node;
 
-            } else if (text.equalsIgnoreCase("#ifndef")) {
+//             } else if (text.equalsIgnoreCase("#ifndef")) {
 
-                node = new ASTNode();
-                node.value = "#ifndef";
-                currentNode.children.add(node);
-                node.parent = currentNode;
+//                 node = new ASTNode();
+//                 node.value = "#ifndef";
+//                 currentNode.children.add(node);
+//                 node.parent = currentNode;
 
-                // descend
-                currentNode = node;
+//                 // descend
+//                 currentNode = node;
 
-            } else if (text.equalsIgnoreCase("#include")) {
+//             } else if (text.equalsIgnoreCase("#include")) {
 
-                String temp = "";
-                boolean useIncludePathResolution = false;
+//                 String temp = "";
+//                 boolean useIncludePathResolution = false;
 
-                StringBuilder includeFilePreprocessorCommand = new StringBuilder();
+//                 StringBuilder includeFilePreprocessorCommand = new StringBuilder();
 
-                boolean includeFileStringAssembled = false;
-                while (!includeFileStringAssembled) {
+//                 boolean includeFileStringAssembled = false;
+//                 while (!includeFileStringAssembled) {
 
-                    while (temp.isBlank()) {
-                        temp = lexer.nextToken().getText();
-                    }
+//                     while (temp.isBlank()) {
+//                         temp = lexer.nextToken().getText();
+//                     }
 
-                    if (temp.equalsIgnoreCase("<")) {
+//                     if (temp.equalsIgnoreCase("<")) {
 
-                        includeFilePreprocessorCommand.append(temp);
+//                         includeFilePreprocessorCommand.append(temp);
 
-                        // when angle brackets / chevrons are used, the include file
-                        // is resolved using the include-path. The include-path is a variable
-                        // combining several folders where include files are searched
-                        useIncludePathResolution = true;
+//                         // when angle brackets / chevrons are used, the include file
+//                         // is resolved using the include-path. The include-path is a variable
+//                         // combining several folders where include files are searched
+//                         useIncludePathResolution = true;
 
-                    } else if (temp.equalsIgnoreCase(">")) {
+//                     } else if (temp.equalsIgnoreCase(">")) {
 
-                        includeFilePreprocessorCommand.append(temp);
-                        includeFileStringAssembled = true;
+//                         includeFilePreprocessorCommand.append(temp);
+//                         includeFileStringAssembled = true;
 
-                    } else if (temp.startsWith("\"")) {
+//                     } else if (temp.startsWith("\"")) {
 
-                        includeFilePreprocessorCommand.append(temp);
-                        includeFileStringAssembled = true;
+//                         includeFilePreprocessorCommand.append(temp);
+//                         includeFileStringAssembled = true;
 
-                    } else {
+//                     } else {
 
-                        includeFilePreprocessorCommand.append(temp);
+//                         includeFilePreprocessorCommand.append(temp);
 
-                        // throw new RuntimeException("Cannot parse include-file preprocessor
-                        // command!");
+//                         // throw new RuntimeException("Cannot parse include-file preprocessor
+//                         // command!");
 
-                    }
+//                     }
 
-                    temp = "";
+//                     temp = "";
 
-                }
+//                 }
 
-                String includeFile = StringUtil.unwrap(includeFilePreprocessorCommand.toString());
+//                 String includeFile = StringUtil.unwrap(includeFilePreprocessorCommand.toString());
 
-                // DEBUG
-                // System.out.println("Processing include file: \"" + includeFile + "\"");
+//                 // DEBUG
+//                 // System.out.println("Processing include file: \"" + includeFile + "\"");
 
-                ((DefaultFileStackFrameCallback) callback).stringBuilder = outputStringBuilder;
+//                 ((DefaultFileStackFrameCallback) callback).stringBuilder = outputStringBuilder;
 
-                DefaultFileStackFrame fileStackFrame = new DefaultFileStackFrame();
-                fileStackFrame.filename = includeFile;
-                fileStackFrame.useIncludePathResolution = useIncludePathResolution;
-                fileStackFrame.includePath.add(basePath.getParent()); // fake dummy include path using the basepath
-                fileStackFrame.basePath = basePath;
-                fileStackFrame.outputStringBuilder = outputStringBuilder;
-                fileStackFrame.callback = callback;
-                fileStackFrame.fileStack = fileStack;
+//                 DefaultFileStackFrame fileStackFrame = new DefaultFileStackFrame();
+//                 fileStackFrame.filename = includeFile;
+//                 fileStackFrame.useIncludePathResolution = useIncludePathResolution;
+//                 fileStackFrame.includePath.add(basePath.getParent()); // fake dummy include path using the basepath
+//                 fileStackFrame.basePath = basePath;
+//                 fileStackFrame.outputStringBuilder = outputStringBuilder;
+//                 fileStackFrame.callback = callback;
+//                 fileStackFrame.fileStack = fileStack;
 
-                fileStack.push(fileStackFrame);
+//                 fileStack.push(fileStackFrame);
 
-                fileStackFrame.start();
+//                 fileStackFrame.start();
 
-            } else if (text.equalsIgnoreCase("(")) {
+//             } else if (text.equalsIgnoreCase("(")) {
 
-                if (ADD_SUB_NODE) {
-                    node.value = "sub";
+//                 if (ADD_SUB_NODE) {
+//                     node.value = "sub";
 
-                    currentNode.children.add(node);
-                    node.parent = currentNode;
+//                     currentNode.children.add(node);
+//                     node.parent = currentNode;
 
-                    // descend
-                    currentNode = node;
+//                     // descend
+//                     currentNode = node;
 
-                    node = new ASTNode();
-                }
+//                     node = new ASTNode();
+//                 }
 
-                node.value = "(";
-                currentNode.children.add(node);
+//                 node.value = "(";
+//                 currentNode.children.add(node);
 
-            } else if (text.equalsIgnoreCase(")")) {
+//             } else if (text.equalsIgnoreCase(")")) {
 
-                node = new ASTNode();
-                node.value = ")";
-                currentNode.children.add(node);
-                node.parent = currentNode;
+//                 node = new ASTNode();
+//                 node.value = ")";
+//                 currentNode.children.add(node);
+//                 node.parent = currentNode;
 
-                if (currentNode.parent == null) {
+//                 if (currentNode.parent == null) {
 
-                    token = lexer.nextToken();
-                    continue;
-                }
+//                     token = lexer.nextToken();
+//                     continue;
+//                 }
 
-                if (ADD_SUB_NODE) {
-                    // ascend ( out of sub into parent )
-                    currentNode = currentNode.parent;
-                }
+//                 if (ADD_SUB_NODE) {
+//                     // ascend ( out of sub into parent )
+//                     currentNode = currentNode.parent;
+//                 }
 
-                if (currentNode.value != null && currentNode.value.equalsIgnoreCase("defined")) {
-                    // ascend ( out of sub into parent )
-                    currentNode = currentNode.parent;
-                }
+//                 if (currentNode.value != null && currentNode.value.equalsIgnoreCase("defined")) {
+//                     // ascend ( out of sub into parent )
+//                     currentNode = currentNode.parent;
+//                 }
 
-                if ("define_key___".equalsIgnoreCase(currentNode.type)) {
+//                 if ("define_key___".equalsIgnoreCase(currentNode.type)) {
 
-                    currentNode = currentNode.parent;
-                    defineModeKey = false;
-                    defineModeValue = true;
+//                     currentNode = currentNode.parent;
+//                     defineModeKey = false;
+//                     defineModeValue = true;
 
-                    node = new ASTNode();
+//                     node = new ASTNode();
 
-                    currentNode.children.add(node);
-                    node.parent = currentNode;
+//                     currentNode.children.add(node);
+//                     node.parent = currentNode;
 
-                    node.value = "define_value___";
-                    node.type = "define_value___";
+//                     node.value = "define_value___";
+//                     node.type = "define_value___";
 
-                    // descend into key
-                    currentNode = node;
+//                     // descend into key
+//                     currentNode = node;
 
-                }
+//                 }
 
-            } else if (text.equalsIgnoreCase("defined")) {
+//             } else if (text.equalsIgnoreCase("defined")) {
 
-                node = new ASTNode();
-                node.value = "defined";
-                currentNode.children.add(node);
-                node.parent = currentNode;
+//                 node = new ASTNode();
+//                 node.value = "defined";
+//                 currentNode.children.add(node);
+//                 node.parent = currentNode;
 
-                // descend
-                currentNode = node;
+//                 // descend
+//                 currentNode = node;
 
-            } else if (text.equalsIgnoreCase("||")
-                    ||
-                    text.equalsIgnoreCase("&&")
-                    ||
-                    text.equalsIgnoreCase(">=")) {
+//             } else if (text.equalsIgnoreCase("||")
+//                     ||
+//                     text.equalsIgnoreCase("&&")
+//                     ||
+//                     text.equalsIgnoreCase(">=")) {
 
-                int size = currentNode.children.size();
-                ASTNode lhs = currentNode.children.get(size - 1);
+//                 int size = currentNode.children.size();
+//                 ASTNode lhs = currentNode.children.get(size - 1);
 
-                currentNode.children.remove(lhs);
+//                 currentNode.children.remove(lhs);
 
-                node = new ASTNode();
-                node.value = text;
-                currentNode.children.add(node);
-                node.parent = currentNode;
+//                 node = new ASTNode();
+//                 node.value = text;
+//                 currentNode.children.add(node);
+//                 node.parent = currentNode;
 
-                // reparent
-                node.children.add(lhs);
-                lhs.parent = node;
+//                 // reparent
+//                 node.children.add(lhs);
+//                 lhs.parent = node;
 
-                // descend
-                currentNode = node;
+//                 // descend
+//                 currentNode = node;
 
-            } else if (token.getType() == PreprocessorLexer2.Newline) {
+//             } else if (token.getType() == PreprocessorLexer2.Newline) {
 
-                // // DEBUG
-                // StringBuilder debugStringBuilder = new StringBuilder();
-                // rootNode.printRecursive(debugStringBuilder, 0);
-                // System.out.println(debugStringBuilder.toString());
+//                 // // DEBUG
+//                 // StringBuilder debugStringBuilder = new StringBuilder();
+//                 // rootNode.printRecursive(debugStringBuilder, 0);
+//                 // System.out.println(debugStringBuilder.toString());
 
-                // deal with completely empty lines (the node is still the root node and it has
-                // no children)
-                if (rootNode.children.size() == 0) {
-                    token = lexer.nextToken();
-                    continue;
-                }
+//                 // deal with completely empty lines (the node is still the root node and it has
+//                 // no children)
+//                 if (rootNode.children.size() == 0) {
+//                     token = lexer.nextToken();
+//                     continue;
+//                 }
 
-                ((DefaultFileStackFrameCallback) callback).stringBuilder = outputStringBuilder;
-                callback.execute(rootNode);
+//                 ((DefaultFileStackFrameCallback) callback).stringBuilder = outputStringBuilder;
+//                 callback.execute(rootNode);
 
-                // start a new root
-                rootNode = new ASTNode();
-                rootNode.value = "root____";
-                rootNode.parent = null;
+//                 // start a new root
+//                 rootNode = new ASTNode();
+//                 rootNode.value = "root____";
+//                 rootNode.parent = null;
 
-                currentNode = rootNode;
+//                 currentNode = rootNode;
 
-                defineMode = false;
+//                 defineMode = false;
 
-            } else {
+//             } else {
 
-                node.value = text;
+//                 node.value = text;
 
-                if (text.equalsIgnoreCase("if")) {
-                    parserMode = ParserMode.EXPRESSION;
-                }
+//                 if (text.equalsIgnoreCase("if")) {
+//                     parserMode = ParserMode.EXPRESSION;
+//                 }
 
-                if ("define_key___".equalsIgnoreCase(currentNode.type)) {
+//                 if ("define_key___".equalsIgnoreCase(currentNode.type)) {
 
-                    node.type = "define_value___";
+//                     node.type = "define_value___";
 
-                    currentNode = currentNode.parent;
+//                     currentNode = currentNode.parent;
 
-                    currentNode.children.add(node);
-                    node.parent = currentNode;
+//                     currentNode.children.add(node);
+//                     node.parent = currentNode;
 
-                    token = lexer.nextToken();
-                    continue;
-                }
+//                     token = lexer.nextToken();
+//                     continue;
+//                 }
 
-                currentNode.children.add(node);
-                node.parent = currentNode;
+//                 currentNode.children.add(node);
+//                 node.parent = currentNode;
 
-                if (defineMode && defineModeKey) {
+//                 if (defineMode && defineModeKey) {
 
-                    node.type = "define_key___";
+//                     node.type = "define_key___";
 
-                    // descend into key
-                    currentNode = node;
+//                     // descend into key
+//                     currentNode = node;
 
-                    defineModeKey = false;
+//                     defineModeKey = false;
 
-                }
+//                 }
 
-                if (ADD_SUB_NODE) {
-                    if (currentNode.value.equalsIgnoreCase("defined")) {
-                        // ascend ( out of sub into parent )
-                        currentNode = currentNode.parent;
-                    }
-                }
+//                 if (ADD_SUB_NODE) {
+//                     if (currentNode.value.equalsIgnoreCase("defined")) {
+//                         // ascend ( out of sub into parent )
+//                         currentNode = currentNode.parent;
+//                     }
+//                 }
 
-            }
+//             }
 
-            token = lexer.nextToken();
+//             token = lexer.nextToken();
 
-        }
+//         }
 
-        // output the very last node
-        if (rootNode.children.size() != 0) {
+//         // output the very last node
+//         if (rootNode.children.size() != 0) {
 
-            callback.execute(rootNode);
-        }
+//             callback.execute(rootNode);
+//         }
 
-        fileStack.pop();
-    }
+//         fileStack.pop();
+//     }
 
-}
+// }

@@ -50,6 +50,7 @@ import grammar.StructureTACKYParserListener;
 import grammar.SyntaxErrorListener;
 import preprocessor.AbstractFileStackFrame;
 import preprocessor.DefaultFileStackFrameCallback;
+import preprocessor.DefinedSymbolStruct;
 import riscv.ExplicitRISCVProcessor;
 import riscv.RISCVInstructionDecoder;
 import riscv.RISCVInstructionEncoder;
@@ -576,13 +577,19 @@ public class Main {
         // final String filename = "src/test/resources/preprocessor3.cpp";
         // final String filename = "src/test/resources/preprocessor4.cpp";
         // final String filename = "src/test/resources/preprocessor5.cpp";
+        final String filename = "src/test/resources/preprocessor6.cpp";
+
         // final String filename = "src/test/resources/main.cpp";
+
         // final String filename = "src/test/resources/class.h";
+
         // final String filename = "src/test/resources/for_loop.cpp";
+
         // final String filename = "src/test/resources/helloworld.cpp";
         // final String filename = "src/test/resources/helloworld2.cpp";
+
         // final String filename = "src/test/resources/declaration_type_error.cpp";
-        final String filename = "src/test/resources/examples/matrix_tester.cpp";
+        // final String filename = "src/test/resources/examples/matrix_tester.cpp";
 
         List<String> processedIncludeFiles = new ArrayList<>();
 
@@ -595,28 +602,27 @@ public class Main {
 
     private static void preprocessor_2() throws IOException {
 
-        // TODO:
-        // STATUS: SQUARE macro is parsed correctly, but not resolved when encountered!
-        // final String filename = "src/test/resources/preprocessor/define_square.pp";
-
         // STATUS: OK
         // SQUARE macro is parsed correctly! The define key map contains the
         // function call including the formal parameter and the define map contains
         // the macro body
         // final String filename = "src/test/resources/preprocessor/define.pp";
-        // final String filename = "src/test/resources/preprocessor/define_2.pp";
+        // final String filename = "src/test/resources/preprocessor/define_2.pp"; // TODO
+
+        // STATUS: OK
+        // final String filename = "src/test/resources/preprocessor/define_square.pp";
 
         // TODO:
         // STATUS: goes into PREPROCESSOR parse mode and this is throwing a
         // RuntimeException!
         // final String filename = "src/test/resources/preprocessor/dgame.pp"; // TODO
 
-        // STATUS: OK
-        // final String filename =
-        // "src/test/resources/preprocessor/if_defined_nested.pp";
+        // STATUS: TODO
+        // final String filename = "src/test/resources/preprocessor/if_defined_nested.pp";
 
         // STATUS: OK
-        // final String filename = "src/test/resources/preprocessor/if_defined.pp";
+        final String filename = "src/test/resources/preprocessor/if_defined.pp";
+        // final String filename = "src/test/resources/preprocessor/if_defined_1.pp";
 
         // STATUS: Macro is defined correctly, but not resolved when encountered!
         // final String filename = "src/test/resources/preprocessor/if_not_defined.pp";
@@ -640,7 +646,6 @@ public class Main {
 
         // final String filename = "src/test/resources/preprocessor/funcs.h";
         // final String filename = "src/test/resources/preprocessor/vars.h";
-        //
 
         // final String filename = "src/test/resources/preprocessor/replace_1.pp";
         // final String filename = "src/test/resources/preprocessor/replace_2.pp";
@@ -691,7 +696,14 @@ public class Main {
         // final String filename = "src/test/resources/function_call_15.cpp";
         // final String filename = "src/test/resources/function_call_16.cpp";
         // final String filename = "src/test/resources/function_call_17.cpp"; <-- outer matrix mult test
-        final String filename = "src/test/resources/function_call_18.cpp";
+        //final String filename = "src/test/resources/function_call_18.cpp";
+
+        // final String filename = "src/test/resources/preprocessor.cpp";
+        // final String filename = "src/test/resources/preprocessor2.cpp";
+        // final String filename = "src/test/resources/preprocessor3.cpp";
+        // final String filename = "src/test/resources/preprocessor4.cpp";
+        // final String filename = "src/test/resources/preprocessor5.cpp";
+        // final String filename = "src/test/resources/preprocessor6.cpp";
 
         // final String filename = "src/test/resources/rvv/rvv_test.cpp";
 
@@ -714,15 +726,17 @@ public class Main {
 
         // final String filename = "src/test/resources/asm_test.cpp";
 
-        ASTNode dummyASTNode = new ASTNode();
+        TreeNode dummyASTNode = new TreeNode();
         dummyASTNode.value = "__DUMMY___11223344__";
 
         StringBuilder outputStringBuilder = new StringBuilder();
-        Map<String, ASTNode> defineMap = new HashMap<>();
+        //Map<String, ASTNode> defineMap = new HashMap<>();
+        Map<String, DefinedSymbolStruct> defineMap = new HashMap<>();
         Map<String, ASTNode> defineKeyMap = new HashMap<>();
+        // Map<String, DefinedSymbolStruct> defineKeyMap = new HashMap<>();
 
         DefaultFileStackFrameCallback defaultFileStackFrameCallback = new DefaultFileStackFrameCallback();
-        defaultFileStackFrameCallback.defineMap = defineMap;
+        defaultFileStackFrameCallback.defineValueMap = defineMap;
         defaultFileStackFrameCallback.defineKeyMap = defineKeyMap;
         defaultFileStackFrameCallback.dummyASTNode = dummyASTNode;
 
@@ -771,10 +785,10 @@ public class Main {
 
             System.out.println("\n\n---------------- Define Value Map ------------------");
 
-            for (Map.Entry<String, ASTNode> entry : defineMap.entrySet()) {
+            for (Map.Entry<String, DefinedSymbolStruct> entry : defineMap.entrySet()) {
 
                 String entryKey = entry.getKey();
-                ASTNode entryValue = entry.getValue();
+                ASTNode entryValue = entry.getValue().treeNode;
 
                 StringBuilder stringBuilder = new StringBuilder();
                 entryValue.printRecursive(stringBuilder, 0);

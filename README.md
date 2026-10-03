@@ -2,6 +2,21 @@
 
 C++ compiler written in Java
 
+## Maven
+
+Recompile the antlr-4 parser and lexer.
+
+```
+mvn clean
+mvn compile
+mvn generate-sources
+```
+
+If you want to run '''mvn generate-sources''' only, without prior clean,
+then the .java file will only be generated again, if the source .g4 file
+has seen a change! This means, you need to make a change to the .g4 file,
+then execute '''mvn generate-sources'''.
+
 ## Usage
 
 Currently this project does not produce an executable. Instead currently the compiler is only usable when debugging the file src\main\java\main\Main.java.

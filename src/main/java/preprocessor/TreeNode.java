@@ -1,29 +1,18 @@
 package preprocessor;
 
 import java.util.List;
-
-import org.stringtemplate.v4.compiler.STParser.ifstat_return;
-
 import ast.ASTNode;
 
 public class TreeNode extends ASTNode {
 
     public boolean side;
-
     public TreeNode lhs;
-
     public TreeNode rhs;
-
-    public int customWeight = 0;
-
+    public int customWeight;
     public boolean unaryOperator;
-
     public boolean functionCall;
-
     public int balance;
-
     public String stringValueEval;
-
     public Integer integerValueEval;
 
     public void addChild(TreeNode node) {
@@ -102,6 +91,7 @@ public class TreeNode extends ASTNode {
 
         // output this node
         stringBuilder.append(value);
+
         if (functionCall) {
             stringBuilder.append(" (functionCall)");
         }
@@ -110,18 +100,27 @@ public class TreeNode extends ASTNode {
             stringBuilder.append("\n");
         }
 
+        // output LHS, RHS
         if (unaryOperator) {
             if (lhs != null) {
                 lhs.printRecursive(stringBuilder, indent + 1, true);
             }
         } else {
-            // output all children
+
             if (lhs != null) {
                 lhs.printRecursive(stringBuilder, indent + 1, true);
             }
             if (rhs != null) {
                 rhs.printRecursive(stringBuilder, indent + 1, true);
             }
+        }
+
+        // output all children
+        for (ASTNode child : children) {
+            if (child == null) {
+                System.out.println("test");
+            }
+            child.printRecursive(stringBuilder, indent + 1, true);
         }
     }
 
@@ -162,4 +161,32 @@ public class TreeNode extends ASTNode {
         }
     }
 
+    public TreeNode deepClone() {
+
+        TreeNode clone = new TreeNode();
+        // if (parent != null) {
+        //     clone.parent = ((TreeNode) parent).deepClone();
+        // }
+        clone.value = value;
+        clone.type = type;
+        clone.ctx = ctx;
+        if (lhs != null) {
+            clone.lhs = lhs.deepClone();
+        }
+        if (rhs != null) {
+            clone.rhs = rhs.deepClone();
+        }
+
+        if (!children.isEmpty()) {
+
+            for (ASTNode childNode : children) {
+
+                TreeNode childNodeClone = ((TreeNode) childNode).deepClone();
+                childNodeClone.parent = clone;
+                clone.children.add(childNodeClone);
+            }
+        }
+
+        return clone;
+    }
 }

@@ -26,6 +26,10 @@ PREPROC_DEFINE :
     '#define'
     ;
 
+PREPROC_UNDEF :
+    '#undef'
+    ;
+
 PREPROC_INCLUDE :
     '#include'
     ;

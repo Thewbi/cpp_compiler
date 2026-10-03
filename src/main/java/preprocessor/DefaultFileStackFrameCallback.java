@@ -7,68 +7,56 @@ import org.apache.commons.lang3.StringUtils;
 
 import ast.ASTNode;
 
+/**
+ * This class is executing preprocessor instructions.
+ *
+ * Once an entire line has been parsed and a newline is encountered,
+ * the driver (SimpleFileStackFrame), will call this callback.
+ */
 public class DefaultFileStackFrameCallback implements FileStackFrameCallback {
 
-    public ASTNode dummyASTNode;
-
-    public Map<String, ASTNode> defineMap;
-
+    public TreeNode dummyASTNode;
+    public Map<String, DefinedSymbolStruct> defineValueMap;
     public Map<String, ASTNode> defineKeyMap;
-
     public Stack<IfStackFrame> ifStack = new Stack<>();
-
     public StringBuilder stringBuilder;
 
     @Override
-    public void execute(ASTNode astNode) {
+    public void execute(DefinedSymbolStruct definedSymbolStruct) {
 
-        // // DEBUG
-        // StringBuilder hierarchyStringBuilder = new StringBuilder();
-        // int indent = 0;
-        // astNode.printRecursive(hierarchyStringBuilder, indent);
-        // System.out.println(hierarchyStringBuilder.toString());
+        TreeNode astNode = definedSymbolStruct.treeNode;
+
+        // DEBUG
+        StringBuilder stringBuilder = new StringBuilder();
+        int indent = 0;
+        astNode.printRecursive(stringBuilder, indent);
+        System.out.println(stringBuilder.toString());
 
         ASTNode node = null;
-        if (isDefine(astNode) != null) {
-
-            processDefine(isDefine(astNode));
-
+        if ((node = isDefine(astNode)) != null) {
+            processDefine(definedSymbolStruct);
+        } else if ((node = isUndef(astNode)) != null) {
+            processUndef(definedSymbolStruct);
         } else if ((node = isPreprocessorIf(astNode)) != null) {
-
             processPreprocessorIf(node);
-
         } else if ((node = isIfdef(astNode)) != null) {
-
             processIfdef(node);
-
         } else if ((node = isIfndef(astNode)) != null) {
-
             processIfndef(node);
-
         } else if ((node = isElif(astNode)) != null) {
-
             processElif(node);
-
         } else if ((node = isElse(astNode)) != null) {
-
             processElse(node);
-
         } else if ((node = isEndif(astNode)) != null) {
-
             processEndif(node);
-
         } else if (ifStack.isEmpty() || ifStack.peek().performOutput) {
-
             outputASTNode(astNode, stringBuilder);
             stringBuilder.append("\n");
-
-            // DEBUG
-            // System.out.println(stringBuilder.toString());
-
         }
     }
 
     private ASTNode isPreprocessorIf(ASTNode astNode) {
+        // skip blank nodes until the first non-blank is found
         int i = 0;
         while ((i < astNode.children.size()) && astNode.children.get(i).value.isBlank()) {
             i++;
@@ -76,6 +64,8 @@ public class DefaultFileStackFrameCallback implements FileStackFrameCallback {
         if (i >= astNode.children.size()) {
             return null;
         }
+
+        // first non-blank node has to be #if
         if ("#if".equalsIgnoreCase(astNode.children.get(i).value)) {
             return astNode.children.get(i);
         }
@@ -84,28 +74,34 @@ public class DefaultFileStackFrameCallback implements FileStackFrameCallback {
 
     private void processPreprocessorIf(ASTNode astNode) {
 
-        // // DEBUG
-        // StringBuilder debugStringBuilder = new StringBuilder();
-        // astNode.printRecursive(debugStringBuilder, 0);
-        // System.out.println(debugStringBuilder.toString());
-
+        // create new if element and make the current if-element it's parent
         IfStackFrame ifStackFrame = new IfStackFrame();
         if (!ifStack.empty()) {
+            // set parent into new if
             ifStackFrame.parent = ifStack.peek();
         }
 
+        // if the parent if statement should not perform output,
+        // initially also block the new if statement
+        // Later evaluation might unblock the new if statement.
         if (!ifStack.empty() && ifStack.peek().performOutput == false) {
+            // block the new if
             ifStackFrame.blocked = true;
         }
 
+        // push the new if
         ifStack.push(ifStackFrame);
 
-        ifStack.peek().performOutput = false;
-
-        // evaluate expression and enable output content for the branch
+        // evaluate the if's expression
         ASTNode child0 = astNode.children.get(0);
         boolean evaluationResult = evaluate(child0);
+
+        // store evaluation result
         ifStackFrame.processed = evaluationResult;
+
+        // enable output for the if statement content
+        // if the evaluationResult is true
+        ifStack.peek().performOutput = false;
         if (evaluationResult) {
             ifStackFrame.performOutput = true;
         }
@@ -129,7 +125,7 @@ public class DefaultFileStackFrameCallback implements FileStackFrameCallback {
 
         ASTNode dataASTNode = astNode.children.get(0);
 
-        boolean isDefined = defineMap.containsKey(dataASTNode.value);
+        boolean isDefined = defineValueMap.containsKey(dataASTNode.value);
 
         IfStackFrame ifStackFrame = new IfStackFrame();
         if (!ifStack.empty()) {
@@ -165,7 +161,7 @@ public class DefaultFileStackFrameCallback implements FileStackFrameCallback {
 
         ASTNode dataASTNode = astNode.children.get(0);
 
-        boolean isDefined = defineMap.containsKey(dataASTNode.value);
+        boolean isDefined = defineValueMap.containsKey(dataASTNode.value);
 
         IfStackFrame ifStackFrame = new IfStackFrame();
         if (!ifStack.empty()) {
@@ -275,6 +271,7 @@ public class DefaultFileStackFrameCallback implements FileStackFrameCallback {
 
     private ASTNode isDefine(ASTNode astNode) {
 
+        // find first non-blank child node
         int i = 0;
         while ((i < astNode.children.size()) && astNode.children.get(i).value.isBlank()) {
             i++;
@@ -282,6 +279,8 @@ public class DefaultFileStackFrameCallback implements FileStackFrameCallback {
         if (i >= astNode.children.size()) {
             return null;
         }
+
+        // check if the first non-blank child is #define
         if ("#define".equalsIgnoreCase(astNode.children.get(i).value)) {
             return astNode.children.get(i);
         }
@@ -289,13 +288,17 @@ public class DefaultFileStackFrameCallback implements FileStackFrameCallback {
         return null;
     }
 
-    private void processDefine(ASTNode astNode) {
+    //private void processDefine(ASTNode astNode) {
+    private void processDefine(DefinedSymbolStruct definedSymbolStruct) {
 
         // this define might be contained inside an #ifdef statement.
-        // Check if the if-stack frame is disabled. If so, do not perform any operations
+        // Check if the if-stack frame is disabled.
+        // If so, do not perform any operations and do not define the symbol!
         if (!ifStack.isEmpty() && !ifStack.peek().performOutput) {
             return;
         }
+
+        TreeNode astNode = (TreeNode) definedSymbolStruct.treeNode.children.get(0);
 
         // insert into define map
         ASTNode keyASTNode = astNode.children.get(0);
@@ -305,35 +308,82 @@ public class DefaultFileStackFrameCallback implements FileStackFrameCallback {
             defineKeyMap.put(keyASTNode.value, keyASTNode);
 
             valueASTNode = astNode.children.get(1);
-            defineMap.put(keyASTNode.value, valueASTNode);
 
+            defineValueMap.put(keyASTNode.value, definedSymbolStruct);
+
+            // output preprocessed data into the destination file
             StringBuilder keyStringBuilder = new StringBuilder();
             outputASTNode(keyASTNode, keyStringBuilder);
 
+            // output preprocessed data into the destination file
             StringBuilder valueStringBuilder = new StringBuilder();
             outputASTNode(valueASTNode, valueStringBuilder);
 
-            // System.out.println("processDefine(): Defining Symbol: " + keyASTNode.value +
-            // " key: "
-            // + keyStringBuilder.toString() + " value: " + valueStringBuilder.toString());
+
 
         } else {
 
             defineKeyMap.put(keyASTNode.value, keyASTNode);
 
             dummyASTNode.value = "<dummy>";
-            defineMap.put(keyASTNode.value, dummyASTNode);
+
+            definedSymbolStruct.treeNode = dummyASTNode;
+            defineValueMap.put(keyASTNode.value, definedSymbolStruct);
 
             StringBuilder keyStringBuilder = new StringBuilder();
             outputASTNode(keyASTNode, keyStringBuilder);
 
             StringBuilder valueStringBuilder = new StringBuilder();
             outputASTNode(dummyASTNode, valueStringBuilder);
+        }
+    }
 
-            // System.out.println("processDefine(): Defining Symbol: " + keyASTNode.value +
-            // " key: "
-            // + keyStringBuilder.toString() + " value: " + valueStringBuilder.toString());
+    private ASTNode isUndef(ASTNode astNode) {
 
+        // find first non-blank child node
+        int i = 0;
+        while ((i < astNode.children.size()) && astNode.children.get(i).value.isBlank()) {
+            i++;
+        }
+        if (i >= astNode.children.size()) {
+            return null;
+        }
+
+        // check if the first non-blank child is #define
+        if ("#undef".equalsIgnoreCase(astNode.children.get(i).value)) {
+            return astNode.children.get(i);
+        }
+
+        return null;
+    }
+
+    /**
+     * The purpose of #undef is to remove a previously defined symbol from
+     * the symbol store. Therefore perform a remove using the symbol on the
+     * defineKeyMap
+     */
+    private void processUndef(DefinedSymbolStruct definedSymbolStruct) {
+
+        // this define might be contained inside an #ifdef statement.
+        // Check if the if-stack frame is disabled.
+        // If so, do not perform any operations and do not define the symbol!
+        if (!ifStack.isEmpty() && !ifStack.peek().performOutput) {
+            return;
+        }
+
+        TreeNode astNode = (TreeNode) definedSymbolStruct.treeNode.children.get(0);
+
+        // the purpose of #undef is to remove a previously defined symbol from
+        // the symbol store. Therefore perform a remove using the symbol on the
+        // defineKeyMap
+
+        // remove from define map
+        ASTNode keyASTNode = astNode.children.get(0);
+        if (defineKeyMap.containsKey(keyASTNode.value)) {
+            defineKeyMap.remove(keyASTNode.value);
+        }
+        if (defineValueMap.containsKey(keyASTNode.value)) {
+            defineValueMap.remove(keyASTNode.value);
         }
     }
 
@@ -384,18 +434,27 @@ public class DefaultFileStackFrameCallback implements FileStackFrameCallback {
 
                 TreeNode treeNode = (TreeNode) astNode;
 
+                // the defined-operator evaluates to true if the symbol
+                // is contained in the definedMap, in other words, if it is defined
                 if (treeNode.lhs != null) {
-                    return defineMap.containsKey(treeNode.lhs.value);
+                    return defineValueMap.containsKey(treeNode.lhs.value);
                 }
                 if (treeNode.rhs != null) {
-                    return defineMap.containsKey(treeNode.rhs.value);
+                    return defineValueMap.containsKey(treeNode.rhs.value);
                 }
 
+                for (ASTNode child : treeNode.children) {
+                    if (defineValueMap.containsKey(child.value)) {
+                        return true;
+                    }
+                }
+
+                return false;
             } else {
 
                 ASTNode sub = astNode.children.get(0);
                 ASTNode dataASTNode = sub.children.get(1);
-                return defineMap.containsKey(dataASTNode.value);
+                return defineValueMap.containsKey(dataASTNode.value);
 
             }
 
@@ -413,11 +472,12 @@ public class DefaultFileStackFrameCallback implements FileStackFrameCallback {
                     if (StringUtils.isNumeric(key)) {
                         rhsDouble = Double.parseDouble(key);
                     } else {
-                        if (!defineMap.containsKey(key)) {
+                        if (!defineValueMap.containsKey(key)) {
                             return false;
                         }
-                        ASTNode valueASTNode = defineMap.get(key);
-                        lhsDouble = Double.parseDouble(valueASTNode.value);
+                        DefinedSymbolStruct definedSymbolStruct = defineValueMap.get(key);
+                        //lhsDouble = Double.parseDouble(definedSymbolStruct.treeNode.value);
+                        lhsDouble = Double.parseDouble(definedSymbolStruct.symbolName);
                     }
                 }
                 if (treeNode.rhs != null) {
@@ -425,11 +485,11 @@ public class DefaultFileStackFrameCallback implements FileStackFrameCallback {
                     if (StringUtils.isNumeric(key)) {
                         rhsDouble = Double.parseDouble(key);
                     } else {
-                        if (!defineMap.containsKey(key)) {
+                        if (!defineValueMap.containsKey(key)) {
                             return false;
                         }
-                        ASTNode valueASTNode = defineMap.get(key);
-                        lhsDouble = Double.parseDouble(valueASTNode.value);
+                        DefinedSymbolStruct definedSymbolStruct = defineValueMap.get(key);
+                        lhsDouble = Double.parseDouble(definedSymbolStruct.treeNode.value);
                     }
                 }
 
@@ -443,17 +503,6 @@ public class DefaultFileStackFrameCallback implements FileStackFrameCallback {
     }
 
     private void outputASTNode(ASTNode astNode, StringBuilder stringBuilder) {
-
-        // DEBUG
-        // if (astNode == null) {
-        //     System.out.println("test");
-        // }
-
-        // // DEBUG
-        // StringBuilder debugStringBuilder = new StringBuilder();
-        // astNode.printRecursive(debugStringBuilder, 0);
-        // System.out.println(debugStringBuilder.toString());
-        // System.out.println("");
 
         try {
 
@@ -476,7 +525,7 @@ public class DefaultFileStackFrameCallback implements FileStackFrameCallback {
             for (ASTNode childNode : astNode.children) {
 
                 // if the child node is not a symbol go to next child
-                if (!defineMap.containsKey(childNode.value)) {
+                if (!defineValueMap.containsKey(childNode.value)) {
                     index++;
                     continue;
                 }
@@ -485,16 +534,17 @@ public class DefaultFileStackFrameCallback implements FileStackFrameCallback {
                 ASTNode key = defineKeyMap.get(childNode.value);
 
                 // 1. retrieve the value ASTNode from the map
-                ASTNode newValueASTNode = defineMap.get(childNode.value);
 
-                if (newValueASTNode.children.size() == 0) {
+                DefinedSymbolStruct definedSymbolStruct = defineValueMap.get(childNode.value);
 
-                    childNode.value = newValueASTNode.value;
+                if (definedSymbolStruct.treeNode.children.size() == 0) {
+
+                    childNode.value = definedSymbolStruct.treeNode.value;
 
                 } else {
 
                     // 2. clone it
-                    ASTNode definedReplacement = newValueASTNode.deepClone();
+                    ASTNode definedReplacement = definedSymbolStruct.treeNode.deepClone();
 
                     // 3. Inside the clone, replace the variable with the actual parameter value
 
@@ -525,17 +575,10 @@ public class DefaultFileStackFrameCallback implements FileStackFrameCallback {
                     //
 
                     astNode.children.get(index + 1).purge();
-
                 }
 
                 index++;
-
             }
-
-            // // add the parents value
-            // if (astNode.parent != null) {
-            //     stringBuilder.append(astNode.value);
-            // }
 
             // finally output children
             for (ASTNode childNode : astNode.children) {
@@ -551,27 +594,14 @@ public class DefaultFileStackFrameCallback implements FileStackFrameCallback {
 
             }
 
-            // // finally output children
-            // for (ASTNode childNode : astNode.children) {
-
-            // String val = childNode.value;
-            // if (val != null) {
-            // stringBuilder.append(val).append(" ");
-            // }
-
-            // if (childNode.children.size() != 0) {
-            // outputASTNode(childNode, stringBuilder);
-            // }
-
-            // }
-
         } catch (IndexOutOfBoundsException e) {
             e.printStackTrace();
         }
     }
 
-    private void replaceActualParameterByValue(ASTNode definedReplacement, String formalParameterIdentifier,
-            String newValue) {
+    private void replaceActualParameterByValue(ASTNode definedReplacement,
+        String formalParameterIdentifier, String newValue)
+    {
         if (definedReplacement.value.equalsIgnoreCase(formalParameterIdentifier)) {
             definedReplacement.value = newValue;
         }
@@ -580,21 +610,8 @@ public class DefaultFileStackFrameCallback implements FileStackFrameCallback {
         }
     }
 
-    // private void outputASTNode(ASTNode astNode, StringBuilder stringBuilder) {
-
-    // // when inside a if-branch which is skipped (= blocked) because the
-    // // expression did evaluate to false, then do not output the line
-    // if (!ifStack.empty() && ifStack.peek().blocked) {
-    // return;
-    // }
-
-    // // add the parents value
-    // stringBuilder.append(astNode.value);
-
-    // // finally output children
-    // for (ASTNode childNode : astNode.getChildren()) {
-    // outputASTNode(childNode, stringBuilder);
-    // }
-    // }
-
 }
+
+// System.out.println("processDefine(): Defining Symbol: " + keyASTNode.value +
+            // " key: "
+            // + keyStringBuilder.toString() + " value: " + valueStringBuilder.toString());
