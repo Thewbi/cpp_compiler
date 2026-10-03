@@ -2,3 +2,5 @@
 
 //#define _DEBUG
 //#define _DEBUG 1
+
+SQUARE(10)

@@ -1,4 +1,4 @@
-//#define _DEBUG
+#define _DEBUG
 //#undef _DEBUG
 
 #define _UNIT_TEST
@@ -7,11 +7,11 @@
 //#define BUFSIZE 1
 #define BUFSIZE 2048
 
-/*
+/**/
 #if defined(_DEBUG)
     printf("test A\n");
 #endif
-*/
+
 
 /*
 #if defined(_DEBUG) || defined(_UNIT_TEST)

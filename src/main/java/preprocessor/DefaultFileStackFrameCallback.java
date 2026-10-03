@@ -22,6 +22,12 @@ public class DefaultFileStackFrameCallback implements FileStackFrameCallback {
     public StringBuilder stringBuilder;
 
     @Override
+    public void executePragma(String pragma_instruction) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'executePragma'");
+    }
+
+    @Override
     public void execute(DefinedSymbolStruct definedSymbolStruct) {
 
         TreeNode astNode = definedSymbolStruct.treeNode;
@@ -52,6 +58,8 @@ public class DefaultFileStackFrameCallback implements FileStackFrameCallback {
         } else if (ifStack.isEmpty() || ifStack.peek().performOutput) {
             outputASTNode(astNode, stringBuilder);
             stringBuilder.append("\n");
+        } else {
+            throw new RuntimeException("" + astNode);
         }
     }
 
@@ -84,6 +92,9 @@ public class DefaultFileStackFrameCallback implements FileStackFrameCallback {
         // if the parent if statement should not perform output,
         // initially also block the new if statement
         // Later evaluation might unblock the new if statement.
+        //
+        // Question: Why is it possible to unblock an if statement
+        // if the parent is disabled???
         if (!ifStack.empty() && ifStack.peek().performOutput == false) {
             // block the new if
             ifStackFrame.blocked = true;
@@ -101,7 +112,7 @@ public class DefaultFileStackFrameCallback implements FileStackFrameCallback {
 
         // enable output for the if statement content
         // if the evaluationResult is true
-        ifStack.peek().performOutput = false;
+        ifStackFrame.performOutput = false;
         if (evaluationResult) {
             ifStackFrame.performOutput = true;
         }

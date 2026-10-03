@@ -25,7 +25,7 @@ public class SimpleFileStackFrame extends AbstractFileStackFrame {
      * The key is: SQUARE and the value is an ASTNode which is the root
      * of the ASTNode.
      */
-    //public Map<String, ASTNode> defineValueMap; // TODO teh value needs to be a struct with ASTNode as root and the amount of parameters expected!
+    //public Map<String, ASTNode> defineValueMap; // TODO the value needs to be a struct with ASTNode as root and the amount of parameters expected!
     public Map<String, DefinedSymbolStruct> defineValueMap;
     public boolean defineMode;
     public boolean defineModeKey;
@@ -285,52 +285,59 @@ public class SimpleFileStackFrame extends AbstractFileStackFrame {
                 String temp = "";
                 boolean useIncludePathResolution = false;
 
+                // this string buffer is extended until the entire include path has
+                // been parsed
                 StringBuilder includeFilePreprocessorCommand = new StringBuilder();
 
+                // #include <include_filename>
+                //
+                // This while loop loops until the entire <include_filename>
+                // is consumed. The <include_filename> may consist of a absolute
+                // or relative path to a file.
                 boolean includeFileStringAssembled = false;
                 while (!includeFileStringAssembled) {
 
+                    // inner while loop
+                    // find the next non-blank token
                     while (temp.isBlank()) {
                         temp = lexer.nextToken().getText();
                     }
 
+                    // append the token to the string buffer in order
+                    // to complete the include filename
                     if (temp.equalsIgnoreCase("<")) {
-
                         includeFilePreprocessorCommand.append(temp);
-
                         // when angle brackets / chevrons are used, the include file
                         // is resolved using the include-path. The include-path is a variable
-                        // combining several folders where include files are searched
+                        // combining several folders where include files are searched.
+                        // The include path can be customized when calling the compiler in
+                        // order to teach the compiler about the development environment
+                        // in which it is currently running.
                         useIncludePathResolution = true;
-
                     } else if (temp.equalsIgnoreCase(">")) {
-
                         includeFilePreprocessorCommand.append(temp);
                         includeFileStringAssembled = true;
-
                     } else if (temp.startsWith("\"")) {
-
                         includeFilePreprocessorCommand.append(temp);
                         includeFileStringAssembled = true;
-
                     } else {
-
                         includeFilePreprocessorCommand.append(temp);
-
                     }
 
                     temp = "";
-
                 }
 
+                // the include filename has been consumed and is contained in the buffer
+                // Create a String from it.
                 String includeFile = StringUtil.unwrap(includeFilePreprocessorCommand.toString());
 
                 // DEBUG
-                // System.out.println("Processing include file: \"" + includeFile + "\"");
+                System.out.println("Processing include file: \"" + includeFile + "\"");
 
                 ((DefaultFileStackFrameCallback) callback).stringBuilder = outputStringBuilder;
 
-                //DefaultFileStackFrame fileStackFrame = new DefaultFileStackFrame();
+                // descend into the included header file by createing a new file stackframe
+                // for the file stack denoting the header file to includ
                 SimpleFileStackFrame fileStackFrame = new SimpleFileStackFrame();
                 fileStackFrame.filename = includeFile;
                 fileStackFrame.useIncludePathResolution = useIncludePathResolution;
@@ -339,10 +346,56 @@ public class SimpleFileStackFrame extends AbstractFileStackFrame {
                 fileStackFrame.outputStringBuilder = outputStringBuilder;
                 fileStackFrame.callback = callback;
                 fileStackFrame.fileStack = fileStack;
+                fileStackFrame.defineValueMap = defineValueMap;
 
+                // add file stackframe onto the stack
                 fileStack.push(fileStackFrame);
 
+                // here, the stackframe parses the input file
+                fileStackFrame.start();
+
                 setParserMode(ParserMode.NORMAL);
+
+            } else if (text.equalsIgnoreCase("#pragma")) {
+                System.out.println("pragma");
+
+                // set mode to pragma
+                // In pragma mode, the parser will just collect all token
+                // up to the newline.
+                // the pragma along with all following token are then
+                // setParserMode(ParserMode.PRAGMA);
+
+                StringBuilder stringBuilder = new StringBuilder();
+
+                // do {
+                //     token = lexer.nextToken();
+                //     // System.out.println("TOKEN: " + token);
+                //     stringBuilder.append(token.getText());
+                // } while (token.getType() != PreprocessorLexer2.Newline);
+
+                token = lexer.nextToken();
+                while (token.getType() != PreprocessorLexer2.Newline) {
+
+                    // System.out.println("TOKEN: " + token);
+                    stringBuilder.append(token.getText());
+
+                    token = lexer.nextToken();
+                }
+
+                String pragma_instruction = stringBuilder.toString().trim();
+                System.out.println("pragma_instruction: \"" + pragma_instruction + "\"");
+
+                //
+                // process the pragma instruction or let the callback process the
+                // pragma instruction!
+                //
+
+                callback.executePragma(pragma_instruction);
+
+                // tell the system that a lookahead has been consumed so
+                // that it does not consume the next token by accident but
+                // just continues without consuming another token
+                lookAheadUsed = true;
 
             } else if (text.equalsIgnoreCase("(")) {
 
@@ -413,21 +466,7 @@ public class SimpleFileStackFrame extends AbstractFileStackFrame {
                 }
             }
             // else if (text.equalsIgnoreCase("defined")) {
-
-            //     node = new TreeNode();
-            //     node.value = "defined";
-            //     currentNode.children.add(node);
-            //     node.parent = currentNode;
-
-            //     // descend
-            //     currentNode = node;
-
-            //     // this will consume the 'defined' token itself
-            //     token = lexer.nextToken();
-
-            //     // processExpressionNode(text);
-
-            //     continue;
+            //      defined works without code! defined is an operator!
             // }
             else if (token.getType() == PreprocessorLexer2.Newline) {
 
@@ -547,6 +586,7 @@ public class SimpleFileStackFrame extends AbstractFileStackFrame {
 
                         // DEBUG
                         System.out.println("Defined Preprocessor Symbol '" + text + "' found!");
+
                         definedSymbolStruct = new DefinedSymbolStruct();
                         definedSymbolStruct.symbolName = text;
                         definedSymbolStruct.treeNode = rootNode;
@@ -631,11 +671,12 @@ public class SimpleFileStackFrame extends AbstractFileStackFrame {
                     }
 
                 } else {
+
                     //
                     // parserMode is ParserMode.NORMAL
                     //
 
-                    // Replace defined symbols by their defined meaning!
+                    // replace defined symbols by their defined meaning!
                     text = filterByPreprocessorValues(text);
 
                     // output if no sourrounding if-statement exists
@@ -661,6 +702,7 @@ public class SimpleFileStackFrame extends AbstractFileStackFrame {
             callback.execute(definedSymbolStruct);
         }
 
+        // all lines in the file have been processed, the stackframe removes itself from the stack!
         fileStack.pop();
     }
 

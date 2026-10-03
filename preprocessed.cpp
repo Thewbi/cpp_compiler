@@ -1,36 +1,11 @@
 
 
+ int main ( ) {
 
 
+      printf ( "Debug mode is ON\n" ) ;
 
 
+      return 0 ;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-   
-    printf ( "test G\n" ) ;
-
-
-
-
-
-
-
-
-
-
-
+ }

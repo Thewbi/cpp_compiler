@@ -6,6 +6,10 @@ public enum ParserMode {
 
     EXPRESSION,
 
-    PREPROCESSOR, DEFINE
+    PREPROCESSOR,
+
+    DEFINE,
+
+    // PRAGMA
 
 }

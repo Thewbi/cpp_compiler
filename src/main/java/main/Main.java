@@ -606,8 +606,11 @@ public class Main {
         // SQUARE macro is parsed correctly! The define key map contains the
         // function call including the formal parameter and the define map contains
         // the macro body
+
+        // STATUS: TODO
+        // final String filename = "src/test/resources/preprocessor/define_2.pp";
+        // STATUS: OK
         // final String filename = "src/test/resources/preprocessor/define.pp";
-        // final String filename = "src/test/resources/preprocessor/define_2.pp"; // TODO
 
         // STATUS: OK
         // final String filename = "src/test/resources/preprocessor/define_square.pp";
@@ -621,10 +624,10 @@ public class Main {
         // final String filename = "src/test/resources/preprocessor/if_defined_nested.pp";
 
         // STATUS: OK
-        final String filename = "src/test/resources/preprocessor/if_defined.pp";
+        // final String filename = "src/test/resources/preprocessor/if_defined.pp";
         // final String filename = "src/test/resources/preprocessor/if_defined_1.pp";
 
-        // STATUS: Macro is defined correctly, but not resolved when encountered!
+        // STATUS: OK
         // final String filename = "src/test/resources/preprocessor/if_not_defined.pp";
 
         // STATUS: OK
@@ -649,6 +652,8 @@ public class Main {
 
         // final String filename = "src/test/resources/preprocessor/replace_1.pp";
         // final String filename = "src/test/resources/preprocessor/replace_2.pp";
+
+        final String filename = "src/test/resources/preprocessor/ucrt.pp";
 
         // TODO: next
         //
@@ -740,16 +745,17 @@ public class Main {
         defaultFileStackFrameCallback.defineKeyMap = defineKeyMap;
         defaultFileStackFrameCallback.dummyASTNode = dummyASTNode;
 
+        Stack<IFileStackFrame> fileStack = new Stack<>();
+
         SimpleFileStackFrame fileStackFrame = new SimpleFileStackFrame();
         fileStackFrame.callback = defaultFileStackFrameCallback;
         fileStackFrame.filename = filename;
         fileStackFrame.defineValueMap = defineMap;
         fileStackFrame.outputStringBuilder = outputStringBuilder;
-
-        Stack<IFileStackFrame> fileStack = new Stack<>();
-        fileStack.push(fileStackFrame);
-
         fileStackFrame.fileStack = fileStack;
+
+        // add file stackframe onto the stack
+        fileStack.push(fileStackFrame);
 
         // here, the stackframe parses the input file
         fileStackFrame.start();

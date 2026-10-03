@@ -51,6 +51,8 @@ public abstract class AbstractFileStackFrame implements IFileStackFrame {
         if (useIncludePathResolution) {
 
             for (Path path : includePath) {
+
+                // TODO FIX: this instruction loads hardcoded stdio.h !!!!
                 Optional<Path> result = match("glob:**/stdio.h", path.toAbsolutePath().toString());
                 if (result.isPresent()) {
                     String foundFile = result.get().toAbsolutePath().toString();
@@ -69,8 +71,7 @@ public abstract class AbstractFileStackFrame implements IFileStackFrame {
         } else {
 
             Path newFile = basePath.resolveSibling(filename);
-            charStream = CharStreams
-                    .fromFileName(newFile.toString());
+            charStream = CharStreams.fromFileName(newFile.toString());
 
         }
 
@@ -122,10 +123,6 @@ public abstract class AbstractFileStackFrame implements IFileStackFrame {
         if (operator == null) {
             System.out.println("null!");
         }
-
-        // if (operator.equalsIgnoreCase("defined")) {
-        //     return 1000 - 13;
-        // } else
 
         if (operator.equalsIgnoreCase("%")) {
             return 1000 - 3;

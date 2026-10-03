@@ -1,4 +1,8 @@
 Program("main")
 
-# -- Function -- printf
-printf("test G\n")
+Function("main", true, [
+    # -- Function -- printf
+    printf("Debug mode is ON\n")
+    return(Constant(ConstInt(0)))
+])
+
