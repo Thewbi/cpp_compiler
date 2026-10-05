@@ -609,6 +609,7 @@ public class Main {
 
         // STATUS: TODO
         // final String filename = "src/test/resources/preprocessor/define_2.pp";
+        // final String filename = "src/test/resources/preprocessor/define_3.pp";
         // STATUS: OK
         // final String filename = "src/test/resources/preprocessor/define.pp";
 
@@ -638,6 +639,7 @@ public class Main {
         // function call including the formal parameter and the define map contains
         // the macro body
         // final String filename = "src/test/resources/preprocessor/ifdef_2.pp";
+        final String filename = "src/test/resources/preprocessor/ifdef_3.pp";
 
         // final String filename = "src/test/resources/preprocessor/ifdef_else.pp";
 
@@ -653,7 +655,7 @@ public class Main {
         // final String filename = "src/test/resources/preprocessor/replace_1.pp";
         // final String filename = "src/test/resources/preprocessor/replace_2.pp";
 
-        final String filename = "src/test/resources/preprocessor/ucrt.pp";
+        // final String filename = "src/test/resources/preprocessor/ucrt.pp";
 
         // TODO: next
         //

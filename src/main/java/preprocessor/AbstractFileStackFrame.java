@@ -44,38 +44,92 @@ public abstract class AbstractFileStackFrame implements IFileStackFrame {
         return Files.walk(Paths.get(location)).filter(pathMatcher::matches).findFirst();
     }
 
-    public CharStream includeToCharStream() throws IOException {
+    /**
+     * Option 1 - useIncludePathResolution is set to true, the function uses the include path
+     * to resolve the file
+     *
+     * Option 2 - useIncludePathResolution is false and a base path is configured,
+     * the file is loaded from the base path
+     *
+     * Option 3 - useIncludePathResolution is false and no base path is configured,
+     * the file is loaded without base path just using the specified filename.
+     * The basepath membervariable is updated with the folder that contains the file!
+     * This will change the state of the file stack frame for subsequent loads!
+     *
+     * This function iterates over all paths contained in the includePath list collection.
+     * It looks for the filename in each folder.
+     *
+     * @param filename
+     * @return
+     * @throws IOException
+     */
+    public Path includeToCharStream(final String filename) throws IOException {
 
-        CharStream charStream = null;
+        // CharStream charStream = null;
 
         if (useIncludePathResolution) {
 
+            // option 1 - use include path
+
+            String foundFile = null;
+            int filesFound = 0;
+
             for (Path path : includePath) {
 
-                // TODO FIX: this instruction loads hardcoded stdio.h !!!!
-                Optional<Path> result = match("glob:**/stdio.h", path.toAbsolutePath().toString());
+                String pathAsString = path.toAbsolutePath().toString();
+                // String filenameAsString = StringUtil.unwrap(filename);
+
+                // DEBUG
+                System.out.println("Path: \"" + pathAsString + "\" Filename: \"" + filename + "\"");
+
+                Optional<Path> result = match("glob:**/" + filename, pathAsString);
                 if (result.isPresent()) {
-                    String foundFile = result.get().toAbsolutePath().toString();
-                    System.out.println("Result: \"" + foundFile + "\"");
-                    charStream = CharStreams.fromFileName(foundFile);
-                    break;
+                    foundFile = result.get().toAbsolutePath().toString();
+                    filesFound++;
+
+                    // DEBUG
+                    System.out.println("Found file: \"" + foundFile + "\"");
                 }
             }
 
-        } else if (basePath == null) {
+            if (filesFound == 1) {
+                // DEBUG
+                System.out.println("Including file: \"" + foundFile + "\"");
 
-            basePath = Path.of(filename);
-            //System.out.println("BasePath: \"" + basePath.getParent().toString() + "\"");
-            charStream = CharStreams .fromFileName(filename);
+                //charStream = CharStreams.fromFileName(foundFile);
+
+                Path newFile = basePath.resolveSibling(foundFile);
+                return newFile;
+            } else if (filesFound > 1) {
+                throw new RuntimeException("File \"" + filename + "\" found in more than a single directory! Ambiguous! Aborting operation!");
+            } else {
+                throw new RuntimeException("File \"" + filename + "\" not found! Aborting operation!");
+            }
+
+
+
+        } else if (basePath != null) {
+
+            // option 2 - use basepath
+
+            Path newFile = basePath.resolveSibling(filename);
+            return newFile;
+            //charStream = CharStreams.fromFileName(newFile.toString());
 
         } else {
 
-            Path newFile = basePath.resolveSibling(filename);
-            charStream = CharStreams.fromFileName(newFile.toString());
+            // option 3 - just use the filename and update the base path
+
+            basePath = Path.of(filename);
+            return basePath;
+            //charStream = CharStreams.fromFileName(filename);
+
+            // DEBUG - output the new basepath
+            //System.out.println("BasePath: \"" + basePath.getParent().toString() + "\"");
 
         }
 
-        return charStream;
+        // return charStream;
     }
 
     public static boolean isBinaryOperator(String token) {
@@ -165,6 +219,9 @@ public abstract class AbstractFileStackFrame implements IFileStackFrame {
         if (token.isBlank()) {
             return false;
         }
+        if (token.equalsIgnoreCase("defined")) { // the keyword defined is not an identifier!
+            return false;
+        }
         if (!isLetterPattern.matcher(token).matches()) {
             return false;
         }
@@ -179,7 +236,6 @@ public abstract class AbstractFileStackFrame implements IFileStackFrame {
         }
 
         return true;
-
     }
 
 

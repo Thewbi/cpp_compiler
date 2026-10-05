@@ -1,9 +1,11 @@
 package preprocessor;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.Map;
 
 import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.Token;
 import org.apache.commons.lang3.math.NumberUtils;
 
@@ -115,7 +117,10 @@ public class SimpleFileStackFrame extends AbstractFileStackFrame {
     @Override
     public void start() throws IOException {
 
-        CharStream charStream = includeToCharStream();
+        // load the file which is procesed by this file stack frame.
+        // The flag useIncludePathResolution determines the way the file is loaded.
+        Path filepath = includeToCharStream(filename);
+        CharStream charStream = CharStreams.fromFileName(filepath.toString());
         lexer = new PreprocessorLexer2(charStream);
 
         TreeNode rootNode = new TreeNode();
@@ -156,6 +161,11 @@ public class SimpleFileStackFrame extends AbstractFileStackFrame {
             // add a newline
             if (token.getType() == PreprocessorLexer2.Newline) {
                 outputStringBuilder.append("\n");
+            }
+
+            // DEBUG
+            if (text.matches("defined")) {
+                System.out.println("defined");
             }
 
             TreeNode node = new TreeNode();
@@ -248,11 +258,17 @@ public class SimpleFileStackFrame extends AbstractFileStackFrame {
 
                 node = new TreeNode();
                 node.value = "#endif";
+
+                // connect parent and child
                 currentNode.children.add(node);
                 node.parent = currentNode;
 
                 // descend
                 currentNode = node;
+
+                definedSymbolStruct = new DefinedSymbolStruct();
+                definedSymbolStruct.symbolName = text;
+                definedSymbolStruct.treeNode = rootNode;
 
             } else if (text.equalsIgnoreCase("#ifdef")) {
 
@@ -333,16 +349,22 @@ public class SimpleFileStackFrame extends AbstractFileStackFrame {
 
                 // DEBUG
                 System.out.println("Processing include file: \"" + includeFile + "\"");
+                System.out.println("Processing include file. Current file: \"" + filepath + "\"");
 
                 ((DefaultFileStackFrameCallback) callback).stringBuilder = outputStringBuilder;
 
                 // descend into the included header file by createing a new file stackframe
                 // for the file stack denoting the header file to includ
                 SimpleFileStackFrame fileStackFrame = new SimpleFileStackFrame();
+
                 fileStackFrame.filename = includeFile;
                 fileStackFrame.useIncludePathResolution = useIncludePathResolution;
-                fileStackFrame.includePath.add(basePath.getParent()); // fake dummy include path using the basepath
+                // fake dummy include path using the basepath
+                fileStackFrame.includePath.add(basePath.getParent());
+                fileStackFrame.includePath.add(Path.of("C:/Program Files (x86)/Windows Kits/10/Include/10.0.26100.0/ucrt"));
+                fileStackFrame.includePath.add(Path.of("C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/VC/Tools/MSVC/14.44.35207/include"));
                 fileStackFrame.basePath = basePath;
+
                 fileStackFrame.outputStringBuilder = outputStringBuilder;
                 fileStackFrame.callback = callback;
                 fileStackFrame.fileStack = fileStack;

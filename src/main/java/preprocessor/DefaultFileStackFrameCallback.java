@@ -24,7 +24,7 @@ public class DefaultFileStackFrameCallback implements FileStackFrameCallback {
     @Override
     public void executePragma(String pragma_instruction) {
         // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'executePragma'");
+        //throw new UnsupportedOperationException("Unimplemented method 'executePragma'");
     }
 
     @Override
@@ -33,10 +33,12 @@ public class DefaultFileStackFrameCallback implements FileStackFrameCallback {
         TreeNode astNode = definedSymbolStruct.treeNode;
 
         // DEBUG
-        StringBuilder stringBuilder = new StringBuilder();
-        int indent = 0;
-        astNode.printRecursive(stringBuilder, indent);
-        System.out.println(stringBuilder.toString());
+        if (astNode != null) {
+            StringBuilder stringBuilder = new StringBuilder();
+            int indent = 0;
+            astNode.printRecursive(stringBuilder, indent);
+            System.out.println(stringBuilder.toString());
+        }
 
         ASTNode node = null;
         if ((node = isDefine(astNode)) != null) {
@@ -277,6 +279,10 @@ public class DefaultFileStackFrameCallback implements FileStackFrameCallback {
     }
 
     private void processEndif(ASTNode astNode) {
+        if (ifStack.isEmpty()) {
+            throw new RuntimeException("If stack is empty during execution of #endif!");
+        }
+
         ifStack.pop();
     }
 
@@ -400,6 +406,10 @@ public class DefaultFileStackFrameCallback implements FileStackFrameCallback {
 
     private boolean evaluate(ASTNode astNode) {
 
+        if (astNode == null) {
+            System.out.println("");
+        }
+
         if ("!".equalsIgnoreCase(astNode.value)) {
 
             boolean lhsValue = false;
@@ -506,6 +516,44 @@ public class DefaultFileStackFrameCallback implements FileStackFrameCallback {
 
                 return lhsDouble >= rhsDouble;
 
+            }
+
+        } else {
+
+            String symbol = astNode.value;
+
+            System.out.println("Evaluate: " + symbol);
+
+            //
+            // Example: #if <symbol>
+            //
+            // Check if the symbol is defined and if so, what value
+            // it was defined to have.
+            //
+            // Undefined symbols used in #if are replaced by 0.
+            //
+            // Symbols defined without explicit value are called empty macros
+            // empty macros used in #if are replaced by 0.
+            //
+            // Symbols defined with non-zero values evaluate to true if used
+            // within #if statements
+            //
+            // 0 evaluates to false in #if statements.
+            //
+
+            if (defineKeyMap.containsKey(symbol)) {
+
+                TreeNode keyTreeNode = (TreeNode) defineKeyMap.get(symbol);
+                System.out.println("keyTreeNode: " + keyTreeNode);
+
+                DefinedSymbolStruct value = defineValueMap.get(symbol);
+                System.out.println("valueTreeNode: " + value.symbolName);
+
+                int valueAsInt = Integer.parseInt(value.symbolName);
+
+                return valueAsInt != 0;
+            } else {
+                return false;
             }
 
         }
